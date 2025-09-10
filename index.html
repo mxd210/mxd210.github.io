@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MXD – Dụng cụ thi công & Vật tư tin dùng</title>
+  <meta name="description" content="MXD – Trung tâm tiếp thị liên kết ngành xây dựng: máy móc, vật tư, keo, thiết bị an toàn. Tuyển chọn từ Shopee, Tiki, Lazada.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+
+  <!-- CSS Tùy chỉnh -->
+  <style>
+    :root {
+      --bg: #0b1220;
+      --text: #e5e7eb;
+      --border: #1f2a44;
+      --brand: #22d3ee;
+      --brand2: #60a5fa;
+      --muted: #94a3b8;
+      --chip: #0b213a;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+    }
+
+    .container { padding-top: 1rem; padding-bottom: 2rem; }
+
+    header {
+      background-color: rgba(11, 18, 32, 0.9);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+    }
+
+    .logo {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      padding: 0.5rem 0.7rem;
+      border-radius: 8px;
+      color: #000;
+      font-weight: 900;
+    }
+
+    .menu a {
+      color: var(--muted);
+      margin-right: 1rem;
+    }
+
+    .menu a:hover {
+      color: var(--text);
+    }
+
+    .cta .btn {
+      margin-left: 0.5rem;
+    }
+
+    .hero {
+      padding: 3rem 0;
+    }
+
+    .hero .wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero .wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .chip {
+      background: var(--chip);
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .card {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1rem;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    /* Floating contact buttons */
+    .contact-fab a {
+      display: grid;
+      place-items: center;
+      width: 50px;
+      height: 50px;
+      border-radius: 999px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <a href="/" class="logo">
+        <span class="logo-badge">MXD</span> MXD – Dụng cụ thi công
+      </a>
+      <nav class="menu">
+        <a href="/">Trang chủ</a>
+        <a href="/store.html">Danh mục sản phẩm</a>
+        <a href="/tu-van.html">Gợi ý & Tư vấn</a>
+        <a href="/blog.html">Chia sẻ kinh nghiệm</a>
+        <a href="/lien-he.html">Liên hệ</a>
+      </nav>
+      <div class="cta">
+        <button class="btn" id="btnCart">Giỏ hàng (0)</button>
+        <a class="btn btn-primary" href="/store.html">Mua ngay</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container wrap">
+      <div>
+        <h1>MXD – Chọn lọc sản phẩm xây dựng đáng tin cậy</h1>
+        <p>Tất cả đã được tuyển chọn từ Shopee, Tiki, Lazada… bởi người thật việc thật – bạn chỉ cần bấm mua.</p>
+        <div class="chips">
+          <span class="chip">Máy móc</span>
+          <span class="chip">Thiết bị đo</span>
+          <span class="chip">Keo ốp lát</span>
+          <span class="chip">Gạch / đá</span>
+          <span class="chip">An toàn lao động</span>
+        </div>
+      </div>
+      <div class="card">
+        <strong>Cam kết chọn lọc:</strong>
+        <p class="muted">Ưu tiên sản phẩm có đánh giá thật, nhà bán uy tín, dẫn link an toàn, không can thiệp giá.</p>
+        <div class="chips">
+          <span class="chip">Đánh giá tốt</span>
+          <span class="chip">Giá niêm yết</span>
+          <span class="chip">Chính hãng</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nút liên hệ nổi -->
+  <div class="contact-fab" aria-label="Liên hệ nhanh" style="position: fixed; right: 16px; bottom: 16px; display: grid; gap: 10px; z-index: 999;">
+    <a class="btn btn-primary" href="tel:0338328898" title="Gọi ngay">📞</a>
+    <a class="btn btn-primary" href="https://www.facebook.com/mxd6686" target="_blank" rel="noopener" title="Facebook Messenger">💬</a>
+  </div>
+
+</body>
+</html>
