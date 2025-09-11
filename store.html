@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SRMVN734D'); // thay bằng Measurement ID vừa tạo
+</script>
+
+  <head>
   <style>
   @media (min-width: 768px) {
     .grid {
@@ -35,6 +43,18 @@
 </style>
 
 </head>
+<script>
+document.addEventListener('click', function(e){
+  const a = e.target.closest('a.btn-buy');
+  if (!a) return;
+  gtag('event', 'click_buy', {
+    link_url: a.href,
+    item_id: a.dataset.sku || '',
+    merchant: a.dataset.merchant || ''
+  });
+});
+</script>
+
 <body>
   <nav class="container-fluid">
     <ul>
