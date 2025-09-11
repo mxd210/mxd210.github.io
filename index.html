@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SRMVN734D"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SRMVN734D'); // thay bằng Measurement ID vừa tạo
+</script>
+
+  <head>
   <link rel="icon" type="image/png" href="favicon-mxd.png" />
 
 
@@ -33,6 +42,17 @@
 </style>
 
 </head>
+<script>
+document.addEventListener('click', function(e){
+  const a = e.target.closest('a.btn-buy');
+  if (!a) return;
+  gtag('event', 'click_buy', {
+    link_url: a.href,
+    item_id: a.dataset.sku || '',
+    merchant: a.dataset.merchant || ''
+  });
+});
+</script>
 
 <body>
 
