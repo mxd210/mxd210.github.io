@@ -12,40 +12,26 @@
 
   <!-- CSS Tùy chỉnh -->
   <style>
-    .cta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-  flex-wrap: wrap; /* Cho responsive tốt hơn */
-}
-
-.cta button,
-.cta a {
-  white-space: nowrap;
-}
-
-    <style>
-  header {
-    padding: 16px 0;
-    background-color: #0f172a;
-  }
-
-  .cta {
+  .menu {
     display: flex;
-    gap: 10px;
-    margin-top: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0;
+    list-style: none;
   }
 
-  .btn {
-    padding: 6px 12px;
+  .menu a {
+    white-space: nowrap;
     font-size: 0.9rem;
+    color: var(--text);
   }
 
-  nav ul li a {
-    font-size: 0.9rem;
+  .menu li {
+    list-style: none;
   }
-  </style>
+</style>
+
 </head>
 
 <body>
@@ -66,8 +52,9 @@
   <a href="lien-he.html">Liên hệ</a>
   <a href="#cart" role="button">🛒 Giỏ hàng</a>
 </nav>
-    
-      <div class="cta">
+
+
+        <div class="cta">
         <button class="btn" id="btnCart">Giỏ hàng (0)</button>
         <a class="btn btn-primary" href="/store.html">Mua ngay</a>
       </div>
