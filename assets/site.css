@@ -1,0 +1,80 @@
+/* ========== MXD BASE ========== */
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:400 16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#111;background:#fff}
+a{color:#111;text-decoration:none}a:hover{text-decoration:underline}img{max-width:100%;display:block;height:auto}
+
+/* Wrap & sections */
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+.mxd-section{padding:40px 0}.mxd-section.alt{background:#fafafa}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:20px}
+.section-head h2{margin:0;font-size:28px}
+.section-head .link{font-weight:600}
+
+/* Header */
+.mxd-header{position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #eee;z-index:999;transition:transform .25s}
+.mxd-header.hide{transform:translateY(-100%)}.mxd-header .wrap{display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:800;font-size:22px;letter-spacing:.5px}
+.nav-toggle{display:none;padding:8px 10px;border:1px solid #ddd;background:#fff;border-radius:8px}
+.nav-list{display:flex;gap:16px;list-style:none;margin:0;padding:0}
+.nav-list a{display:block;padding:10px 0}
+
+/* Hero */
+.mxd-hero{padding:32px 0;background:linear-gradient(180deg,#f8f8f8,#fff)}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}
+.hero-copy h1{margin:0 0 8px 0;font-size:36px}
+.hero-copy .highlight{background:#111;color:#fff;padding:0 8px;border-radius:8px}
+.hero-cta{display:flex;gap:12px;margin-top:12px}
+.btn{display:inline-block;padding:10px 14px;border:1px solid #111;border-radius:10px;background:#fff}
+.btn.btn-primary{background:#111;color:#fff}
+.btn.btn-small{padding:8px 12px}
+
+/* Categories */
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.cat{border:1px solid #eee;border-radius:14px;background:#fff;overflow:hidden;transition:transform .15s, box-shadow .15s}
+.cat:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.cat-link{display:block;padding-bottom:8px}
+.cat h3{margin:10px 12px 4px 12px}
+.cat p{margin:0 12px 12px 12px;color:#444}
+
+/* Products */
+.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.prod{border:1px solid #eee;border-radius:14px;background:#fff;overflow:hidden;transition:transform .15s, box-shadow .15s}
+.prod:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.prod-link{display:block;padding-bottom:6px}
+.prod h3{margin:10px 12px 4px 12px;font-size:16px}
+.prod .desc{margin:0 12px 8px 12px;color:#444}
+.prod .meta{display:flex;justify-content:space-between;align-items:center;padding:0 12px 10px 12px;color:#222}
+.price{font-weight:700}
+
+/* Checklist */
+.checklist{border:1px solid #eee;border-radius:14px;background:#fff}
+.checklist .checklist-list{margin:0 0 14px 20px;padding:0}
+.checklist .checklist-list li{margin:8px 0}
+
+/* Blog */
+.post-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.post{border:1px solid #eee;border-radius:14px;background:#fff;overflow:hidden;transition:transform .15s, box-shadow .15s}
+.post:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.post h3{margin:10px 12px 6px 12px;font-size:18px}
+.post p{margin:0 12px 12px 12px;color:#444}
+
+/* Lead box */
+.lead-box{border:1px solid #eee;border-radius:14px;background:#fafafa;text-align:center}
+.lead-form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.lead-form input{padding:10px;border:1px solid #ddd;border-radius:8px;min-width:240px}
+
+/* Footer */
+.mxd-footer{background:#111;color:#eee;padding:28px 0;margin-top:20px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:20px}
+.mxd-footer a{color:#eee}
+.mxd-footer h4{margin:0 0 8px 0;color:#fff}
+.mxd-footer ul{margin:0;padding-left:18px}
+.copyright{text-align:center;color:#bbb;padding-top:12px;border-top:1px solid #222;margin-top:18px}
+
+/* FAB */
+.mxd-fab{position:fixed;right:16px;bottom:16px;display:flex;gap:8px;z-index:9999}
+.mxd-fab .fab{padding:10px 12px;border-radius:999px;background:#111;color:#fff;font:600 14px/1.1 system-ui;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.mxd-fab .fb{background:#1877f2}.mxd-fab .zl{background:#008fe5}.mxd-fab .call{background:#16a34a}
+
+/* Responsive */
+@media (max-width:1024px){.hero-grid{grid-template-columns:1fr}.cat-grid{grid-template-columns:repeat(2,1fr)}.prod-grid{grid-template-columns:repeat(2,1fr)}.post-grid{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.post-grid{grid-template-columns:1fr}.cat-grid{grid-template-columns:1fr}.prod-grid{grid-template-columns:1fr}}
