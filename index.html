@@ -1,350 +1,171 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <!-- MXD210 index.html v4.0 | Full with SEO + JSON-LD + 7 Products -->
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>MXD – Dụng cụ thi công & Vật tư tin dùng</title>
-  <meta name="description" content="Chọn lọc sản phẩm xây dựng đáng tin cậy. Tư vấn bộ vật tư & thi công tối ưu. Cửa hàng MXD – bán qua liên kết, khuyến nghị có trách nhiệm." />
+  <title>MXD – Dụng cụ thi công & vật tư tin dùng</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="description" content="Cửa hàng MXD – chọn lọc dụng cụ xây dựng bền bỉ. Tư vấn theo nhu cầu thực tế. Liên kết đáng tin cậy." />
   <link rel="canonical" href="https://mxd210.github.io/" />
-  
-  <!-- FAVICON & THEME -->
-  <link rel="icon" href="/assets/img/brand/logo-mxd.webp" sizes="48x48" />
-  <link rel="apple-touch-icon" href="/assets/img/brand/logo-mxd.webp" />
-  <meta name="theme-color" content="#111111" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="/assets/img/favicon.png" />
+  <link rel="apple-touch-icon" href="/assets/img/favicon.png" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <style>
+    #contact-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.contact-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-size: 26px;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+.contact-btn.zalo {
+  background-color: #0068ff;
+  background-image: url('https://img.icons8.com/ios-filled/50/ffffff/zalo.png');
+}
+.contact-btn.messenger {
+  background-color: #0084ff;
+  background-image: url('https://img.icons8.com/ios-filled/50/ffffff/facebook-messenger.png');
+}
+.contact-btn.call {
+  background-color: #22c55e;
+  background-image: url('https://img.icons8.com/ios-filled/50/ffffff/phone.png');
+}
 
-  <!-- OG / TWITTER CARD -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="MXD – Dụng cụ thi công & Vật tư tin dùng" />
-  <meta property="og:description" content="Chọn lọc sản phẩm xây dựng đáng tin cậy. Tư vấn bộ vật tư & thi công tối ưu." />
-  <meta property="og:url" content="https://mxd210.github.io/" />
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/brand/hero-mxd.webp" />
-  <meta name="twitter:card" content="summary_large_image" />
-
-  <!-- CSS -->
-  <link rel="preload" href="/assets/site.css" as="style" />
-  <link rel="stylesheet" href="/assets/site.css" />
-
-  <!-- JSON-LD Organization -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"Organization",
-    "name":"MXD",
-    "url":"https://mxd210.github.io/",
-    "logo":"https://mxd210.github.io/assets/img/brand/logo-mxd.webp",
-    "sameAs":["https://www.facebook.com/mxd6686"],
-    "contactPoint":[{"@type":"ContactPoint","telephone":"+84338328898","contactType":"customer service","areaServed":"VN"}]
-  }
-  </script>
-
-  <!-- JSON-LD Website -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"WebSite",
-    "url":"https://mxd210.github.io/",
-    "potentialAction":{"@type":"SearchAction","target":"https://mxd210.github.io/?q={search_term}","query-input":"required name=search_term"}
-  }
-  </script>
-
-  <!-- JSON-LD Breadcrumbs -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Trang chủ", "item": "https://mxd210.github.io/" },
-      { "@type": "ListItem", "position": 2, "name": "Cửa hàng", "item": "https://mxd210.github.io/store.html" }
-    ]
-  }
-  </script>
-
-  <!-- JSON-LD cho 7 sản phẩm affiliate -->
-  <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org/",
-      "@type": "Product",
-      "name": "Máy cắt chuột",
-      "image": "https://mxd210.github.io/assets/img/products/may-cat-chuot.webp",
-      "description": "Cắt gạch, đá – ổn định, nhỏ gọn, dễ sử dụng.",
-      "brand": { "@type": "Brand", "name": "MXD" },
-      "sku": "MXD-001",
-      "offers": {
-        "@type": "Offer",
-        "url": "https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-m%C3%A1y-th%E1%BB%A7y-b%C3%ACnh-12-tia-3-m%C3%A0u-m%E1%BA%ABu-m%E1%BB%9Bi-si%C3%AAu-n%C3%A9t-b%E1%BB%99-d%E1%BB%A5ng-c%E1%BB%A5-cao-c%E1%BA%A5p-i.106694827.27310073879?sp_atk=b32e98a5-6cb8-4209-9fbe-d22ae53bd1ca&xptdk=b32e98a5-6cb8-4209-9fbe-d22ae53bd1ca",
-        "priceCurrency": "VND",
-        "price": "2390000",
-        "availability": "https://schema.org/InStock"
-      },
-      "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "120" }
-    },
-    {
-      "@context": "https://schema.org/",
-      "@type": "Product",
-      "name": "Máy laze 12 tia 3 màu",
-      "image": "https://mxd210.github.io/assets/img/products/may-laze-12tia.webp",
-      "description": "Thiết kế gọn, đa chức năng, tia rõ nét.",
-      "brand": { "@type": "Brand", "name": "MXD" },
-      "sku": "MXD-002",
-      "offers": {
-        "@type": "Offer",
-        "url": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser...",
-        "priceCurrency": "VND",
-        "price": "2490000",
-        "availability": "https://schema.org/InStock"
-      },
-      "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.7", "reviewCount": "98" }
+    body { font-family: system-ui, sans-serif; margin: 0; background: #f8fafc; color: #0b1220; }
+    .container { max-width: 1100px; margin: auto; padding: 0 16px; }
+    header, footer { background: #fff; border-bottom: 1px solid #e5e7eb; }
+    nav.menu { display: flex; flex-wrap: wrap; gap: 14px; }
+    .hero, .categories, .featured-products, .blog-preview, .cta-help { padding: 32px 0; }
+    .grid { display: grid; gap: 16px; }
+    .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 900px) {
+      .grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid.cols-3 { grid-template-columns: 1fr; }
     }
-    // sản phẩm 3–7 tiếp tục ở JSON-LD, phần sau
-  ]
-  </script>
+    #contact-float {
+      position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 12px;
+    }
+    .contact-btn {
+      width: 48px; height: 48px; border-radius: 50%; background-size: 26px; background-repeat: no-repeat;
+      background-position: center; box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    }
+    .contact-btn.zalo { background-color: #0068ff; background-image: url('https://img.icons8.com/ios-filled/50/ffffff/zalo.png'); }
+    .contact-btn.messenger { background-color: #0084ff; background-image: url('https://img.icons8.com/ios-filled/50/ffffff/facebook-messenger.png'); }
+    .contact-btn.call { background-color: #22c55e; background-image: url('https://img.icons8.com/ios-filled/50/ffffff/phone.png'); }
+  </style>
 </head>
 <body>
-  <!-- ========================= HEADER ========================= -->
-  <header class="mxd-header" role="banner">
-    <div class="wrap">
-      <a class="brand" href="/" aria-label="Trang chủ MXD">
-        <img src="/assets/img/brand/logo-mxd.webp" alt="MXD logo" width="48" height="48">
-      </a>
-      <nav class="nav" aria-label="Điều hướng chính">
-        <button class="nav-toggle" aria-expanded="false" aria-controls="mxd-nav-list">☰</button>
-        <ul id="mxd-nav-list" class="nav-list">
-          <li><a href="/store.html">Cửa hàng</a></li>
-          <li><a href="/blog.html">Tin tức</a></li>
-          <li><a href="/tu-van.html">Tư vấn</a></li>
-          <li><a href="/lien-he.html">Liên hệ</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
 
-  <!-- ========================= HERO ========================= -->
-  <section class="mxd-hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <h1>Dụng cụ thi công & vật tư <span class="highlight">tin dùng</span></h1>
-        <p>Chúng tôi bán qua liên kết (affiliate) dựa trên trải nghiệm thực tế thi công. 
-        Ưu tiên sản phẩm bền, chuẩn, dễ mua – tư vấn bộ vật tư theo checklist công việc.</p>
-        <div class="hero-cta">
-          <a class="btn btn-primary" href="/store.html">🛒 Vào Cửa hàng MXD</a>
-          <a class="btn" href="/tu-van.html">📋 Nhận tư vấn bộ vật tư</a>
-        </div>
-      </div>
-      <div class="hero-art">
-        <img src="/assets/img/brand/hero-mxd.webp" alt="MXD Hero Banner" width="640" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
-  <!-- ========================= FEATURED PRODUCTS ========================= -->
-  <section class="mxd-section alt">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Sản phẩm nổi bật</h2>
-        <div class="section-actions">
-          <a class="btn btn-small" href="/store.html">Tới cửa hàng</a>
-        </div>
-      </div>
+<header>
+  <div class="container nav">
+    <a href="/" class="brand"><img src="/assets/img/logo.png" alt="MXD logo" width="36" height="36" /><strong>MXD</strong></a>
+    <nav class="menu">
+      <a href="/store.html">Cửa hàng</a>
+      <a href="/tu-van.html">Tư vấn</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/lien-he.html">Liên hệ</a>
+    </nav>
+  </div>
+</header>
 
-      <div class="prod-grid">
-
-        <!-- Product 1 -->
-        <article class="prod" data-shop="shopee" itemscope itemtype="https://schema.org/Product">
-          <a class="prod-link" href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-m%C3%A1y-th%E1%BB%A7y-b%C3%ACnh-12-tia-3-m%C3%A0u-m%E1%BA%ABu-m%E1%BB%9Bi-si%C3%AAu-n%C3%A9t-b%E1%BB%99-d%E1%BB%A5ng-c%E1%BB%A5-cao-c%E1%BA%A5p-i.106694827.27310073879?sp_atk=b32e98a5-6cb8-4209-9fbe-d22ae53bd1ca&xptdk=b32e98a5-6cb8-4209-9fbe-d22ae53bd1ca" target="_blank" rel="nofollow sponsored noreferrer">
-            <img itemprop="image" src="/assets/img/products/may-cat-chuot.webp" alt="Máy cắt chuột" width="320" height="220" loading="lazy" />
-            <h3 itemprop="name">Máy cắt chuột</h3>
-            <p class="desc" itemprop="description">Thiết kế nhỏ gọn, cắt chính xác, tiện lợi cho thợ thi công.</p>
-            <div class="meta">
-              <span class="price">₫1.200.000</span>
-              <span class="shop">Shopee</span>
-            </div>
-          </a>
-        </article>
-
-        <!-- Product 2 -->
-        <article class="prod" data-shop="shopee" itemscope itemtype="https://schema.org/Product">
-          <a class="prod-link" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laser..." target="_blank" rel="nofollow sponsored noreferrer">
-            <img itemprop="image" src="/assets/img/products/may-laze-12tia.webp" alt="Máy laze 12 tia 3 màu" width="320" height="220" loading="lazy" />
-            <h3 itemprop="name">Máy laze 12 tia 3 màu</h3>
-            <p class="desc" itemprop="description">Độ chính xác cao, tia sáng rõ ràng, thích hợp cho công trình lớn.</p>
-            <div class="meta">
-              <span class="price">₫2.490.000</span>
-              <span class="shop">Shopee</span>
-            </div>
-          </a>
-        </article>
-
-        <!-- Product 3 -->
-        <article class="prod" data-shop="shopee" itemscope itemtype="https://schema.org/Product">
-          <a class="prod-link" href="https://go.isclix.com/deep_link/6803097511817356947/?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-m%25C3%25A0i-pin..." target="_blank" rel="nofollow sponsored noreferrer">
-            <img itemprop="image" src="/assets/img/products/may-mai-pin.webp" alt="Máy mài pin Dekton M21 AG100 Plus" width="320" height="220" loading="lazy" />
-            <h3 itemprop="name">Máy mài pin Dekton M21 AG100 Plus</h3>
-            <p class="desc" itemprop="description">Tốc độ cao, động cơ mạnh, pin bền lâu, thích hợp cho thi công di động.</p>
-            <div class="meta">
-              <span class="price">₫1.690.000</span>
-              <span class="shop">Shopee</span>
-            </div>
-          </a>
-        </article>
-
-        <!-- Product 4 -->
-        <article class="prod" data-shop="shopee" itemscope itemtype="https://schema.org/Product">
-          <a class="prod-link" href="https://go.isclix.com/deep_link/6803097511817356947/?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-C%25C3%25A2n-B%25E1%25BA%25B1ng-Laser-12-Tia..." target="_blank" rel="nofollow sponsored noreferrer">
-            <img itemprop="image" src="/assets/img/products/may-laze-ranger.webp" alt="Máy cân bằng laser Ranger RG-126" width="320" height="220" loading="lazy" />
-            <h3 itemprop="name">Máy cân bằng laser Ranger RG-126</h3>
-            <p class="desc" itemprop="description">Máy cân bằng tia xanh, đo nhanh, chính xác và bền bỉ.</p>
-            <div class="meta">
-              <span class="price">₫2.590.000</span>
-              <span class="shop">Shopee</span>
-            </div>
-          </a>
-        </article>
-
-        <!-- Product 5 -->
-        <article class="prod" data-shop="shopee" itemscope itemtype="https://schema.org/Product">
-          <a class="prod-link" href="https://go.isclix.com/deep_link/6803097511817356947/?url=https%3A%2F%2Fshopee.vn%2FWADFOW-B%25C3%25A0n-c%25E1%25BA%25AFt-g%25E1%25BA%25A1ch..." target="_blank" rel="nofollow sponsored noreferrer">
-            <img itemprop="image" src="/assets/img/products/ban-cat-gach.webp" alt="Bàn cắt gạch WADFOW 600mm" width="320" height="220" loading="lazy" />
-            <h3 itemprop="name">Bàn cắt gạch WADFOW 600mm</h3>
-            <p class="desc" itemprop="description">Bàn cắt gạch đẩy tay chắc chắn, đường cắt thẳng, thao tác nhẹ nhàng.</p>
-            <div class="meta">
-              <span class="price">₫1.290.000</span>
-              <span class="shop">Shopee</span>
-            </div>
-          </a>
-        </article>
-
-        <!-- Product 6 -->
-        <article class="prod" data-shop="shopee" itemscope itemtype="https://schema.org/Product">
-          <a class="prod-link" href="https://go.isclix.com/deep_link/6803097511817356947/?url=https%3A%2F%2Fshopee.vn%2Fproduct%2F64833883%2F23762003297..." target="_blank" rel="nofollow sponsored noreferrer">
-            <img itemprop="image" src="/assets/img/products/may-mai-khuon.webp" alt="Máy mài khuôn mini WADFOW" width="320" height="220" loading="lazy" />
-            <h3 itemprop="name">Máy mài khuôn mini WADFOW</h3>
-            <p class="desc" itemprop="description">Công suất ổn định, nhỏ gọn, thích hợp mài chi tiết nhỏ.</p>
-            <div class="meta">
-              <span class="price">₫890.000</span>
-              <span class="shop">Shopee</span>
-            </div>
-          </a>
-        </article>
-
-        <!-- Product 7 -->
-        <article class="prod" data-shop="shopee" itemscope itemtype="https://schema.org/Product">
-          <a class="prod-link" href="https://go.isclix.com/deep_link/6803097511817356947/?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-C%25E1%25BA%25AFt-C%25E1%25BA%25A7m-Tay-Dekton..." target="_blank" rel="nofollow sponsored noreferrer">
-            <img itemprop="image" src="/assets/img/products/may-cat-dekton.webp" alt="Máy cắt Dekton DK-AG950S 950W" width="320" height="220" loading="lazy" />
-            <h3 itemprop="name">Máy cắt Dekton DK-AG950S 950W</h3>
-            <p class="desc" itemprop="description">Máy cắt cầm tay 950W, bền bỉ, giá hợp lý cho thợ xây.</p>
-            <div class="meta">
-              <span class="price">₫950.000</span>
-              <span class="shop">Shopee</span>
-            </div>
-          </a>
-        </article>
-
-      </div>
-    </div>
-  </section>
-  <!-- ========================= BLOG SECTION ========================= -->
-  <section class="mxd-section">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Tin tức & Bài viết</h2>
-        <div class="section-actions">
-          <a class="btn btn-small" href="/blog.html">Xem tất cả</a>
-        </div>
-      </div>
-
-      <div class="blog-grid">
-        <article class="blog-post">
-          <a href="/blog/cach-chon-may-cat.html">
-            <img src="/assets/img/blog/may-cat.webp" alt="Cách chọn máy cắt" width="320" height="200" loading="lazy" />
-            <h3>Cách chọn máy cắt phù hợp cho công trình</h3>
-          </a>
-        </article>
-        <article class="blog-post">
-          <a href="/blog/so-sanh-laser.html">
-            <img src="/assets/img/blog/may-laser.webp" alt="So sánh máy laser" width="320" height="200" loading="lazy" />
-            <h3>So sánh máy cân bằng laser phổ biến</h3>
-          </a>
-        </article>
-        <article class="blog-post">
-          <a href="/blog/tips-an-toan.html">
-            <img src="/assets/img/blog/an-toan.webp" alt="Tips an toàn thi công" width="320" height="200" loading="lazy" />
-            <h3>5 mẹo an toàn khi dùng máy mài</h3>
-          </a>
-        </article>
-      </div>
+<main>
+  <section class="hero container">
+    <h1>Dụng cụ thi công đã được chọn lọc</h1>
+    <p>Không đại trà. MXD chỉ chọn món đáng tiền, đúng nhu cầu. Có hướng dẫn theo ngân sách.</p>
+    <div class="cta">
+      <a href="/store.html" class="btn primary">Xem sản phẩm</a>
+      <a href="/tu-van.html" class="btn">Xin tư vấn</a>
     </div>
   </section>
 
-  <!-- ========================= NEWSLETTER ========================= -->
-  <section class="mxd-section alt newsletter">
-    <div class="wrap">
-      <h2>Đăng ký nhận tin</h2>
-      <p>Nhận ngay danh sách vật tư tối ưu cho từng hạng mục thi công.</p>
-      <form class="newsletter-form" action="https://formspree.io/f/mnqekjzb" method="POST">
-        <input type="email" name="email" placeholder="Nhập email của bạn" required />
-        <button type="submit" class="btn btn-primary">Đăng ký</button>
-      </form>
+  <section class="categories container">
+    <h2>Danh mục nổi bật</h2>
+    <div class="grid cols-4">
+      <!-- placeholder: sẽ load từ JSON -->
     </div>
   </section>
-  <!-- ========================= FOOTER ========================= -->
-  <footer class="mxd-footer">
-    <div class="wrap">
-      <p>© <span id="y"></span> MXD210 – Dụng cụ thi công & vật tư tin dùng</p>
+
+  <section class="featured-products container">
+    <h2>Gợi ý nổi bật</h2>
+    <div class="grid cols-4">
+      <!-- placeholder: sẽ load từ JSON -->
     </div>
-  </footer>
+  </section>
 
-  <!-- ========================= SCRIPTS ========================= -->
-  <script>
-    // Header toggle + year
-    (function(){
-      const header = document.querySelector('.mxd-header');
-      const btn = document.querySelector('.nav-toggle');
-      const list = document.getElementById('mxd-nav-list');
-      let lastY = window.scrollY;
-      window.addEventListener('scroll', () => {
-        const y = window.scrollY;
-        if (y > 24 && y > lastY) header.classList.add('hide'); else header.classList.remove('hide');
-        lastY = y;
-      });
-      btn.addEventListener('click', () => {
-        const exp = btn.getAttribute('aria-expanded') === 'true';
-        btn.setAttribute('aria-expanded', String(!exp));
-        list.classList.toggle('open');
-      });
-      const y = document.getElementById('y'); if (y) y.textContent = new Date().getFullYear();
-    })();
+  <section class="blog-preview container">
+    <h2>Góc chia sẻ</h2>
+    <div class="grid cols-3">
+      <!-- placeholder: 3 bài blog -->
+    </div>
+  </section>
 
-    // Filter sản phẩm theo sàn
-    document.querySelectorAll('.filters button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const filter = btn.dataset.filter;
-        document.querySelectorAll('.prod').forEach(prod => {
-          prod.style.display = (filter === 'all' || prod.dataset.shop === filter) ? 'block' : 'none';
-        });
-      });
-    });
+  <section class="cta-help container">
+    <div class="card">
+      <h2>Không biết bắt đầu từ đâu?</h2>
+      <p>Gửi nhu cầu – mình gợi ý bộ đồ nghề theo ngân sách của bạn.</p>
+      <a href="/tu-van.html" class="btn primary">Xin tư vấn ngay</a>
+    </div>
+  </section>
+</main>
 
-    // Affiliate tracking auto-append UTM
-    document.querySelectorAll('a.prod-link').forEach(a => {
-      if (a.href.includes('shopee') || a.href.includes('lazada') || a.href.includes('tiki')) {
-        if (!a.href.includes('utm_source')) {
-          const joiner = a.href.includes('?') ? '&' : '?';
-          a.href += joiner + 'utm_source=mxd210&utm_medium=affiliate&utm_campaign=product';
-        }
-      }
-    });
-  </script>
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <strong>MXD</strong>
+      <p class="muted">Cửa hàng chọn lọc dụng cụ thi công. Bán qua liên kết – chỉ khuyến nghị món đáng tiền.</p>
+      <p><a href="https://facebook.com/mxd6686" target="_blank">Facebook</a></p>
+    </div>
+    <div>
+      <strong>Liên kết nhanh</strong>
+      <ul>
+        <li><a href="/store.html">Cửa hàng</a></li>
+        <li><a href="/blog.html">Blog</a></li>
+        <li><a href="/tu-van.html">Tư vấn</a></li>
+      </ul>
+    </div>
+    <div>
+      <strong>Chính sách</strong>
+      <ul>
+        <li><a href="/chinh-sach/bao-mat.html">Bảo mật</a></li>
+        <li><a href="/chinh-sach/doi-tra.html">Đổi trả</a></li>
+        <li><a href="/chinh-sach/van-chuyen.html">Vận chuyển</a></li>
+      </ul>
+    </div>
+  </div>
+  <p class="container muted">© <span id="year"></span> MXD. Hotline: <a href="tel:+84338328898">0338 328 898</a></p>
+</footer>
+
+<!-- Nút nổi liên hệ -->
+<div id="contact-float">
+  <a href="https://zalo.me/84338328898" target="_blank" class="contact-btn zalo" aria-label="Zalo"></a>
+  <a href="https://m.me/mxd6686" target="_blank" class="contact-btn messenger" aria-label="Messenger"></a>
+  <a href="tel:+84338328898" class="contact-btn call" aria-label="Gọi ngay"></a>
+</div>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+<!-- Liên hệ nổi -->
+<div id="contact-float">
+  <a href="https://zalo.me/84338328898" target="_blank" class="contact-btn zalo" aria-label="Zalo"></a>
+  <a href="https://m.me/mxd6686" target="_blank" class="contact-btn messenger" aria-label="Messenger"></a>
+  <a href="tel:+84338328898" class="contact-btn call" aria-label="Gọi ngay"></a>
+<a class="btn" href="tel:+84338328898">Gọi MXD</a>
+
+</div>
+
 </body>
 </html>
-
-<!-- Padding để đủ 1200 dòng -->
-<!-- LP-001 -->
-<!-- LP-002 -->
-<!-- LP-003 -->
-<!-- ... -->
-<!-- LP-1199 -->
-<!-- LP-1200 -->
