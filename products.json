@@ -1,0 +1,21 @@
+[
+  {
+    "id": "MXD-SHOPEE-001",
+    "name": "Máy cân bằng laser 12 tia",
+    "image": "/assets/img/products/laser-12.webp",
+    "description": "Máy cân bằng laser 12 tia xanh, độ chính xác cao.",
+    "price": 2390000,
+    "rating": 4.7,
+    "affiliate_url": "https://shopee.vn/..."
+  },
+  {
+    "id": "MXD-SHOPEE-002",
+    "name": "Máy mài pin Dekton M21 AG100 Plus",
+    "image": "/assets/img/products/may-mai.webp",
+    "description": "Máy mài tốc độ cao, pin khỏe, nhỏ gọn.",
+    "price": 1690000,
+    "rating": 4.8,
+    "affiliate_url": "https://go.isclix.com/..."
+  }
+  // thêm các sản phẩm khác...
+]
