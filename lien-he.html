@@ -41,6 +41,16 @@
     <small>&copy; 2025 MXD – Tiết kiệm thời gian, tối ưu chi phí.</small>
   </footer>
 <script src="/assets/js/floating-contact.js" defer></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!window.__swRld) { window.__swRld = true; location.reload(); }
+  });
+  navigator.serviceWorker.ready.then(reg => {
+    if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+  });
+}
+</script>
 
 </body>
 </html>
