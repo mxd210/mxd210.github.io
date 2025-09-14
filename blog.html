@@ -1,120 +1,150 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Chia sẻ kinh nghiệm – MXD</title>
-  <!-- Pico (nhẹ, tiện cho blog) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"/>
-  <!-- CSS chung của site (nếu có) -->
-  <link rel="stylesheet" href="/assets/site.css?v=1"/>
-  <script src="/assets/analytics.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="format-detection" content="telephone=no" />
 
+  <title>Chia sẻ kinh nghiệm thi công & chọn sản phẩm | MXD</title>
+  <meta name="description" content="Kinh nghiệm thực chiến: chống thấm, ốp lát, chọn thiết bị, tối ưu chi phí. Bài viết ngắn, dễ hiểu dành cho thợ xây dựng, kỹ sư & người làm nhà.">
+  <meta name="robots" content="index, follow">
+
+  <!-- Canonical & PWA -->
+  <link rel="canonical" href="https://mxd210.github.io/blog.html" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#111111" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Chia sẻ kinh nghiệm thi công & chọn sản phẩm | MXD">
+  <meta property="og:description" content="Chống thấm, ốp lát, dụng cụ, keo dán gạch… tổng hợp thực chiến.">
+  <meta property="og:url" content="https://mxd210.github.io/blog.html">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/site.css" />
 </head>
 <body>
-  <nav class="container-fluid" aria-label="Điều hướng chính">
-    <ul>
-      <li><strong><a href="/" aria-label="Trang chủ MXD">MXD</a></strong></li>
-    </ul>
-    <ul>
-      <li><a href="/">🏠 Trang chủ</a></li>
-      <li><a href="/store.html">Cửa hàng</a></li>
-      <li><a href="/tu-van.html">Tư vấn</a></li>
-      <li><a href="/blog.html" aria-current="page">Blog</a></li>
-    </ul>
-  </nav>
-
-  <main class="container">
-    <h2>🧱 Chia sẻ kinh nghiệm thi công & chọn sản phẩm</h2>
-    <p>Các bài viết hữu ích dành cho thợ xây dựng, kỹ sư & người làm nhà.</p>
-
-    <article>
-      <h3>🔧 Cách chọn máy cắt gạch phù hợp</h3>
-      <p>Nên chọn máy bàn đẩy hay cầm tay? Lưỡi cắt, công suất bao nhiêu là đủ?</p>
-      <a class="btn" href="/blog/may-cat-gach.html">Xem bài viết</a>
-    </article>
-
-    <article>
-      <h3>🚿 Kỹ thuật chống thấm sàn vệ sinh</h3>
-      <p>Giới thiệu các loại keo chống thấm, lưu ý xử lý chân tường, mạch ngừng.</p>
-      <a class="btn" href="/blog/chong-tham-wc.html">Xem bài viết</a>
-    </article>
-
-    <article>
-      <h3>🧪 Nên dùng loại keo dán gạch nào?</h3>
-      <p>Phân biệt mác C1, C2, C2TE. Gợi ý sản phẩm tốt cho từng loại gạch.</p>
-      <a class="btn" href="/blog/keo-dan-gach.html">Xem bài viết</a>
-    </article>
-  </main>
-
-  <footer class="container">
-    <small>
-      © <span id="y">2025</span> MXD •
-      <a href="/">Trang chủ</a> •
-      <a href="https://facebook.com/mxd6686" target="_blank" rel="noopener">Facebook</a>
-    </small>
-  </footer>
-
-  <!-- Nút nổi liên hệ -->
-  <style>
-    .float-box{
-      position:fixed; right:16px; bottom:16px;
-      display:flex; flex-direction:column; gap:10px;
-      z-index:9999;
-    }
-    .float-btn{
-      display:flex; align-items:center; gap:8px;
-      background:#fff; color:#111; text-decoration:none;
-      border:1px solid #111; border-radius:999px;
-      padding:10px 14px;
-      box-shadow:0 8px 24px rgba(0,0,0,.12);
-      font:600 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-      transition:transform .15s ease;
-    }
-    .float-btn:hover{ transform:translateY(-1px); }
-    .float-btn .icon{ font-size:18px; line-height:1; }
-    @media (max-width:480px){ .float-btn .label{ display:none; } }
-  </style>
-
-  <div class="float-box" aria-label="Liên hệ nhanh MXD">
-    <a class="float-btn" href="tel:+84338328898" aria-label="Gọi điện cho MXD">
-      <span class="icon">📞</span><span class="label">Gọi MXD</span>
-    </a>
-    <a class="float-btn" href="https://zalo.me/0338328898" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho MXD">
-      <span class="icon">💬</span><span class="label">Zalo</span>
-    </a>
-    <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD">
-      <span class="icon">📨</span><span class="label">Messenger</span>
-    </a>
+<header class="mxd-header">
+  <div class="wrap">
+    <a class="brand" href="/">MXD</a>
+    <nav class="menu">
+      <a href="/">Trang chủ</a>
+      <a href="/store.html">Cửa hàng</a>
+      <a href="/tu-van.html">Tư vấn</a>
+      <a href="/blog.html" aria-current="page">Blog</a>
+    </nav>
   </div>
+</header>
 
-  <!-- Scripts -->
-  <script>
-    // Cập nhật năm bản quyền nếu có phần tử #y
-    const y = document.getElementById('y');
-    if (y) y.textContent = new Date().getFullYear();
+<main class="mxd-section">
+  <div class="wrap">
+    <!-- Hero -->
+    <section class="hero" style="margin-bottom:16px">
+      <h1 style="display:flex;gap:10px;align-items:center">
+        <span style="font-size:1.6rem">🧱</span>
+        <span>Chia sẻ kinh nghiệm thi công & chọn sản phẩm</span>
+      </h1>
+      <p class="lead">Các bài viết hữu ích dành cho thợ xây dựng, kỹ sư & người làm nhà.</p>
+    </section>
 
-    // Đăng ký Service Worker (nếu site có /sw.js)
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => {});
-      });
-    }
-  </script>
-  <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!window.__swRld) { window.__swRld = true; location.reload(); }
-  });
-  navigator.serviceWorker.ready.then(reg => {
-    if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-  });
+    <!-- Blog cards: 5 bài -->
+    <section aria-label="Bài viết mới">
+      <ul class="cards">
+        <li>
+          <a class="card" href="/blog/may-cat-gach.html">
+            <img src="/assets/img/tin-tuc/may-cat-gach.jpg" alt="Cách chọn máy cắt gạch phù hợp" loading="lazy">
+            <div class="card-body">
+              <h3>🔧 Cách chọn máy cắt gạch phù hợp</h3>
+              <p>Nên chọn máy bàn đẩy hay cầm tay? Lưỡi cắt, công suất bao nhiêu là đủ?</p>
+              <div class="meta"><span>5 phút đọc</span> <span class="chip">Dụng cụ</span></div>
+            </div>
+          </a>
+        </li>
+
+        <li>
+          <a class="card" href="/blog/chong-tham-wc.html">
+            <img src="/assets/img/tin-tuc/chong-tham-nha-ve-sinh.jpg" alt="Kỹ thuật chống thấm sàn vệ sinh" loading="lazy">
+            <div class="card-body">
+              <h3>🚿 Kỹ thuật chống thấm sàn vệ sinh</h3>
+              <p>Các loại vật liệu, xử lý cổ ống, chân tường, mạch ngừng để không thấm ngược.</p>
+              <div class="meta"><span>4 phút đọc</span> <span class="chip">Chống thấm</span></div>
+            </div>
+          </a>
+        </li>
+
+        <li>
+          <a class="card" href="/blog/keo-dan-gach.html">
+            <img src="/assets/img/tin-tuc/keo-dan-gach.jpg" alt="Nên dùng loại keo dán gạch nào" loading="lazy">
+            <div class="card-body">
+              <h3>🧪 Nên dùng loại keo dán gạch nào?</h3>
+              <p>Phân biệt C1, C2, C2TE; gợi ý theo kích thước & bề mặt gạch.</p>
+              <div class="meta"><span>6 phút đọc</span> <span class="chip">Vật tư</span></div>
+            </div>
+          </a>
+        </li>
+
+        <li>
+          <a class="card" href="/blog/thi-cong-nha-ve-sinh-500tr.html">
+            <img src="/assets/img/tin-tuc/ve-sinh-500tr.jpg" alt="Thi công nhà vệ sinh 500 triệu – checklist & vật tư cốt lõi" loading="lazy">
+            <div class="card-body">
+              <h3>💰 Thi công nhà vệ sinh 500&nbsp;triệu</h3>
+              <p>Phân bổ ngân sách, vật tư cốt lõi, timeline 7–12 ngày, checklist nghiệm thu.</p>
+              <div class="meta"><span>7 phút đọc</span> <span class="chip">Thi công</span></div>
+            </div>
+          </a>
+        </li>
+
+        <li>
+          <a class="card" href="/blog/chon-gach-op-lat-nha-ve-sinh-dep-ben.html">
+            <img src="/assets/img/tin-tuc/gach-op-lat-nvs.jpg" alt="Chọn gạch ốp lát nhà vệ sinh: đẹp & bền" loading="lazy">
+            <div class="card-body">
+              <h3>🧱 Chọn gạch ốp lát NVS: đẹp & bền</h3>
+              <p>Kích thước, chống trượt, phối màu, ron; mẹo thi công bền lâu.</p>
+              <div class="meta"><span>5 phút đọc</span> <span class="chip">Ốp lát</span></div>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+</main>
+
+<footer class="mxd-footer"><div class="wrap">© MXD</div></footer>
+
+<!-- Scripts -->
+<script src="/mxd-affiliate.js"></script>
+<script src="/js/floating-contact.js" defer></script>
+
+<!-- JSON-LD: CollectionPage -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Chia sẻ kinh nghiệm thi công & chọn sản phẩm | MXD",
+  "url": "https://mxd210.github.io/blog.html"
 }
 </script>
 
-  <!-- Affiliate auto-rewrite (nếu đang dùng) -->
-  <script src="/assets/mxd-affiliate.js" defer></script>
-  <script src="/assets/js/floating-contact.js" defer></script>
-
+<!-- CSS tăng cường cho thẻ blog (nhẹ, gắn ngay tại trang nếu chưa muốn sửa site.css) -->
+<style>
+  .cards{
+    list-style:none;margin:0;padding:0;display:grid;gap:20px;
+    grid-template-columns:repeat(3,minmax(0,1fr))
+  }
+  @media (max-width:960px){.cards{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:640px){.cards{grid-template-columns:1fr}}
+  .card{
+    display:block;background:#fff;color:inherit;text-decoration:none;overflow:hidden;
+    border:1px solid #e9e9e9;border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.04);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease
+  }
+  .card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.08);border-color:#ddd}
+  .card>img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;display:block}
+  .card-body{padding:14px 16px 16px}
+  .card-body h3{margin:4px 0 8px;font-size:1.05rem;line-height:1.35}
+  .card-body p{margin:0 0 10px;color:#444}
+  .meta{display:flex;gap:8px;align-items:center;font-size:.9rem;color:#666}
+  .meta .chip{border:1px solid #e3e3e3;border-radius:999px;padding:2px 10px;font-size:.8rem;background:#fafafa}
+</style>
 </body>
 </html>
