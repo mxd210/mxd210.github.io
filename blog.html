@@ -101,6 +101,17 @@
       });
     }
   </script>
+  <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!window.__swRld) { window.__swRld = true; location.reload(); }
+  });
+  navigator.serviceWorker.ready.then(reg => {
+    if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+  });
+}
+</script>
+
   <!-- Affiliate auto-rewrite (nếu đang dùng) -->
   <script src="/assets/mxd-affiliate.js" defer></script>
   <script src="/assets/js/floating-contact.js" defer></script>
