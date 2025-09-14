@@ -363,13 +363,15 @@
     // Năm hiện tại
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Đăng ký Service Worker nếu có sw.js
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => {});
-      });
-    }
-  </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .catch(err => console.warn('SW register failed:', err));
+    });
+  }
+</script>
+
 
   <!-- Quan trọng: script rewrite link affiliate. Tạo file /mxd-affiliate.js theo chuẩn đã thống nhất -->
   <script src="/mxd-affiliate.js"></script>
