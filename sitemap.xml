@@ -17,30 +17,38 @@
   </url>
 
   <!-- Danh mục -->
-  <url>
-    <loc>https://mxd210.github.io/store/may-cat-mai.html</loc>
-    <lastmod>2025-09-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/keo-op-lat.html</loc>
-    <lastmod>2025-09-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/bay-rang-cua.html</loc>
-    <lastmod>2025-09-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/chong-tham.html</loc>
-    <lastmod>2025-09-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  <!-- Blog posts -->
+<url>
+  <loc>https://mxd210.github.io/blog/may-cat-gach.html</loc>
+  <changefreq>weekly</changefreq>
+  <priority>0.60</priority>
+  <lastmod>2025-09-14</lastmod>
+</url>
+<url>
+  <loc>https://mxd210.github.io/blog/chong-tham-wc.html</loc>
+  <changefreq>weekly</changefreq>
+  <priority>0.60</priority>
+  <lastmod>2025-09-14</lastmod>
+</url>
+<url>
+  <loc>https://mxd210.github.io/blog/keo-dan-gach.html</loc>
+  <changefreq>weekly</changefreq>
+  <priority>0.60</priority>
+  <lastmod>2025-09-14</lastmod>
+</url>
+<url>
+  <loc>https://mxd210.github.io/blog/thi-cong-nha-ve-sinh-500tr.html</loc>
+  <changefreq>weekly</changefreq>
+  <priority>0.60</priority>
+  <lastmod>2025-09-14</lastmod>
+</url>
+<url>
+  <loc>https://mxd210.github.io/blog/gach-op-lat-wc.html</loc>
+  <changefreq>weekly</changefreq>
+  <priority>0.60</priority>
+  <lastmod>2025-09-14</lastmod>
+</url>
+
 
   <!-- Chính sách -->
   <url>
