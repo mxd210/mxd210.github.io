@@ -7,42 +7,51 @@
   <meta name="description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
   <link rel="stylesheet" href="/assets/css/styles.css">
   <style>
+    /* Layout cửa hàng */
     body { font-family: system-ui, sans-serif; margin: 0; background: #f8fafc; color: #0b1220; }
     .container { max-width: 1100px; margin: auto; padding: 20px; }
     h1 { font-size: 28px; margin-bottom: 16px; }
     .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
     .card {
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      overflow: hidden;
-      background: white;
-      display: flex;
-      flex-direction: column;
+      border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;
+      background: #fff; display: flex; flex-direction: column;
     }
     .card img { width: 100%; height: 180px; object-fit: cover; }
     .card .info { padding: 14px; flex: 1; display: flex; flex-direction: column; }
     .card h2 { font-size: 18px; margin: 0 0 8px; }
     .card p { font-size: 14px; color: #64748b; margin-bottom: 12px; flex: 1; }
-    .price { font-weight: bold; margin-bottom: 8px; color: #0f172a; }
+    .price { font-weight: 700; margin-bottom: 8px; color: #0f172a; }
     .rating { font-size: 14px; color: #f59e0b; margin-bottom: 12px; }
     .btn {
-      background: #1d4ed8;
-      color: white;
-      text-align: center;
-      padding: 10px 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
+      background: #1d4ed8; color: #fff; text-align: center;
+      padding: 10px 12px; border-radius: 8px; text-decoration: none; font-weight: 600;
     }
     .btn:hover { background: #2563eb; }
     header, footer { padding: 16px; background: #fff; text-align: center; border-bottom: 1px solid #e5e7eb; }
     footer { border-top: 1px solid #e5e7eb; font-size: 14px; color: #64748b; }
+
+    /* Nút nổi liên hệ – tạm để inline, lát tách ra /assets/js/floating-contact.js */
+    .float-box{
+      position:fixed; right:16px; bottom:16px;
+      display:flex; flex-direction:column; gap:10px; z-index:9999;
+    }
+    .float-btn{
+      display:flex; align-items:center; gap:8px;
+      background:#fff; color:#111; text-decoration:none;
+      border:1px solid #111; border-radius:999px;
+      padding:10px 14px; box-shadow:0 8px 24px rgba(0,0,0,.12);
+      font:600 14px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      transition:transform .15s ease;
+    }
+    .float-btn:hover{ transform:translateY(-1px); }
+    .float-btn .icon{ font-size:18px; line-height:1; }
+    @media (max-width:480px){ .float-btn .label{ display:none; } }
   </style>
 </head>
 <body>
 
   <header>
-    <a href="/" style="text-decoration:none; font-weight: bold; font-size: 20px;">← Về trang chủ</a>
+    <a href="/" style="text-decoration:none; font-weight: 700; font-size: 20px;">← Về trang chủ</a>
     <h1>Danh sách sản phẩm</h1>
   </header>
 
@@ -56,12 +65,30 @@
     © <span id="year"></span> MXD – Liên hệ: <a href="tel:+84338328898">0338 328 898</a>
   </footer>
 
-  <!-- Script: Load sản phẩm từ products.json -->
+  <!-- Nút nổi liên hệ -->
+  <div class="float-box" aria-label="Liên hệ nhanh MXD">
+    <a class="float-btn" href="tel:+84338328898" aria-label="Gọi điện cho MXD">
+      <span class="icon">📞</span><span class="label">Gọi MXD</span>
+    </a>
+    <a class="float-btn" href="https://zalo.me/0338328898" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho MXD">
+      <span class="icon">💬</span><span class="label">Zalo</span>
+    </a>
+    <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD">
+      <span class="icon">📨</span><span class="label">Messenger</span>
+    </a>
+  </div>
+
+  <!-- Script: affiliate (đặt trước khi đóng body ở mọi trang bán) -->
+  <script src="/mxd-affiliate.js"></script>
+
+  <!-- Script: năm hiện tại + load products + SW register (không lồng script) -->
   <script>
+    // Năm hiện tại
     document.getElementById("year").textContent = new Date().getFullYear();
 
+    // Load sản phẩm
     fetch('/products.json')
-      .then(response => response.json())
+      .then(r => r.json())
       .then(products => {
         const container = document.getElementById('product-list');
         products.forEach(p => {
@@ -74,17 +101,30 @@
               <p>${p.description}</p>
               <div class="price">${p.price} đ</div>
               <div class="rating">⭐ ${p.rating}</div>
-              <a class="btn" href="${p.link}" target="_blank" rel="noopener sponsored">Xem giá</a>
+              <a class="btn" href="${p.link}" target="_blank" rel="noopener noreferrer sponsored">Xem giá</a>
             </div>
           `;
           container.appendChild(card);
         });
+
+        // Nếu script affiliate có hàm scan, gọi lại sau khi append sản phẩm
+        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
+          window.mxdAffiliate.scan();
+        }
       })
       .catch(error => {
         console.error("Không thể tải sản phẩm:", error);
-        document.getElementById('product-list').innerHTML = "<p>Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.</p>";
+        document.getElementById('product-list').innerHTML =
+          "<p>Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.</p>";
       });
-  </script>
 
+    // Đăng ký Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .catch(err => console.warn('SW register failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>
