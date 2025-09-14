@@ -1,4 +1,4 @@
-const CACHE = "mxd-v2";
+const CACHE = "mxd-v3";
 
 // Tự tính base path cho GitHub Pages (vd: "" hoặc "/ten-repo")
 const BASE = new URL(self.registration.scope).pathname.replace(/\/$/, "");
