@@ -78,3 +78,5 @@ a{color:#111;text-decoration:none}a:hover{text-decoration:underline}img{max-widt
 /* Responsive */
 @media (max-width:1024px){.hero-grid{grid-template-columns:1fr}.cat-grid{grid-template-columns:repeat(2,1fr)}.prod-grid{grid-template-columns:repeat(2,1fr)}.post-grid{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr 1fr}}
 @media (max-width:640px){.post-grid{grid-template-columns:1fr}.cat-grid{grid-template-columns:1fr}.prod-grid{grid-template-columns:1fr}}
+/* Intro under hero title */
+.intro { max-width: 640px; line-height: 1.6; opacity: .9; }
