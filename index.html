@@ -23,20 +23,33 @@
   <!-- Upload ảnh 1200×630 vào /assets/og-home.jpg -->
   <meta property="og:image" content="/assets/og-home.jpg" />
 
-  <!-- Structured data: Organization -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "MXD",
-    "url": "https://mxd210.github.io/",
-    "logo": "/logo.png",
-    "sameAs": [
-      "https://facebook.com/", 
-      "https://zalo.me/"
-    ]
-  }
-  </script>
+  <!-- Structured data: Organization (SEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "MXD",
+  "url": "https://mxd210.github.io/",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://mxd210.github.io/assets/img/logo.png",
+    "width": 512,
+    "height": 512
+  },
+  "sameAs": [
+    "https://www.facebook.com/mxd6686",
+    "https://m.me/mxd6686",
+    "https://zalo.me/0338328898"
+  ],
+  "contactPoint": [{
+    "@type": "ContactPoint",
+    "telephone": "+84-338-328-898",
+    "contactType": "customer service",
+    "areaServed": "VN",
+    "availableLanguage": ["vi", "en"]
+  }]
+}
+</script>
 
   <style>
     :root {
@@ -306,12 +319,45 @@
     </div>
   </footer>
 
-  <!-- Floating contact buttons (đặt số thật của bạn vào liên kết) -->
-  <div class="float-box" aria-label="Liên hệ nhanh">
-    <a href="tel:+84900000000" aria-label="Gọi điện"><span>📞</span> <span>Gọi MXD</span></a>
-    <a href="https://zalo.me/0900000000" target="_blank" rel="noopener" aria-label="Zalo"><span>💬</span> <span>Zalo</span></a>
-    <a href="https://m.me/your.page" target="_blank" rel="noopener" aria-label="Messenger"><span>📨</span> <span>Messenger</span></a>
-  </div>
+  <!-- Floating contact buttons -->
+<style>
+  .float-box{
+    position:fixed; right:16px; bottom:16px;
+    display:flex; flex-direction:column; gap:10px;
+    z-index:9999;
+  }
+  .float-btn{
+    display:flex; align-items:center; gap:8px;
+    background:#fff; color:#111; text-decoration:none;
+    border:1px solid #111; border-radius:999px;
+    padding:10px 14px;
+    box-shadow:0 8px 24px rgba(0,0,0,.12);
+    font:600 14px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    transition:transform .15s ease;
+  }
+  .float-btn:hover{ transform:translateY(-1px); }
+  .float-btn .icon{ font-size:18px; line-height:1; }
+  /* Ẩn chữ trên màn hình nhỏ, chỉ giữ icon để gọn */
+  @media (max-width:480px){ .float-btn .label{ display:none; } }
+</style>
+
+<div class="float-box" aria-label="Liên hệ nhanh MXD">
+  <a class="float-btn" href="tel:+84338328898" aria-label="Gọi điện cho MXD">
+    <span class="icon">📞</span><span class="label">Gọi MXD</span>
+  </a>
+
+  <!-- Zalo: đổi 0338328898 thành số Zalo của bạn.
+       Có thể dùng dạng 0338328898 hoặc 84338328898 tùy tài khoản. -->
+  <a class="float-btn" href="https://zalo.me/0338328898" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho MXD">
+    <span class="icon">💬</span><span class="label">Zalo</span>
+  </a>
+
+  <!-- Messenger: dùng m.me để mở chat trực tiếp -->
+  <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD">
+    <span class="icon">📨</span><span class="label">Messenger</span>
+  </a>
+</div>
+
 
   <script>
     // Năm hiện tại
