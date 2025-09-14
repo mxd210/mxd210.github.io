@@ -1,21 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Chia sẻ kinh nghiệm – MXD</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+  <!-- Pico (nhẹ, tiện cho blog) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"/>
+  <!-- CSS chung của site (nếu có) -->
+  <link rel="stylesheet" href="/assets/site.css?v=1"/>
 </head>
 <body>
-  <nav class="container-fluid">
+  <nav class="container-fluid" aria-label="Điều hướng chính">
     <ul>
-      <li><strong>MXD</strong></li>
+      <li><strong><a href="/" aria-label="Trang chủ MXD">MXD</a></strong></li>
     </ul>
     <ul>
-      <li><a href="index.html">🏠 Trang chủ</a></li>
-      <li><a href="store.html">Cửa hàng</a></li>
-      <li><a href="tu-van.html">Tư vấn</a></li>
-      <li><a href="blog.html">Blog</a></li>
+      <li><a href="/">🏠 Trang chủ</a></li>
+      <li><a href="/store.html">Cửa hàng</a></li>
+      <li><a href="/tu-van.html">Tư vấn</a></li>
+      <li><a href="/blog.html" aria-current="page">Blog</a></li>
     </ul>
   </nav>
 
@@ -26,27 +29,77 @@
     <article>
       <h3>🔧 Cách chọn máy cắt gạch phù hợp</h3>
       <p>Nên chọn máy bàn đẩy hay cầm tay? Lưỡi cắt, công suất bao nhiêu là đủ?</p>
-      <a class="btn" href="blog/may-cat-gach.html">Xem bài viết</a>
+      <a class="btn" href="/blog/may-cat-gach.html">Xem bài viết</a>
     </article>
 
     <article>
       <h3>🚿 Kỹ thuật chống thấm sàn vệ sinh</h3>
       <p>Giới thiệu các loại keo chống thấm, lưu ý xử lý chân tường, mạch ngừng.</p>
-      <a class="btn" href="blog/chong-tham-wc.html">Xem bài viết</a>
+      <a class="btn" href="/blog/chong-tham-wc.html">Xem bài viết</a>
     </article>
 
     <article>
       <h3>🧪 Nên dùng loại keo dán gạch nào?</h3>
       <p>Phân biệt mác C1, C2, C2TE. Gợi ý sản phẩm tốt cho từng loại gạch.</p>
-      <a class="btn" href="blog/keo-dan-gach.html">Xem bài viết</a>
+      <a class="btn" href="/blog/keo-dan-gach.html">Xem bài viết</a>
     </article>
   </main>
 
   <footer class="container">
     <small>
-      <a href="index.html">← Quay về trang chủ</a> •
-      <a href="https://facebook.com/mxd6686" target="_blank">Facebook</a>
+      © <span id="y">2025</span> MXD •
+      <a href="/">Trang chủ</a> •
+      <a href="https://facebook.com/mxd6686" target="_blank" rel="noopener">Facebook</a>
     </small>
   </footer>
+
+  <!-- Nút nổi liên hệ -->
+  <style>
+    .float-box{
+      position:fixed; right:16px; bottom:16px;
+      display:flex; flex-direction:column; gap:10px;
+      z-index:9999;
+    }
+    .float-btn{
+      display:flex; align-items:center; gap:8px;
+      background:#fff; color:#111; text-decoration:none;
+      border:1px solid #111; border-radius:999px;
+      padding:10px 14px;
+      box-shadow:0 8px 24px rgba(0,0,0,.12);
+      font:600 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      transition:transform .15s ease;
+    }
+    .float-btn:hover{ transform:translateY(-1px); }
+    .float-btn .icon{ font-size:18px; line-height:1; }
+    @media (max-width:480px){ .float-btn .label{ display:none; } }
+  </style>
+
+  <div class="float-box" aria-label="Liên hệ nhanh MXD">
+    <a class="float-btn" href="tel:+84338328898" aria-label="Gọi điện cho MXD">
+      <span class="icon">📞</span><span class="label">Gọi MXD</span>
+    </a>
+    <a class="float-btn" href="https://zalo.me/0338328898" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho MXD">
+      <span class="icon">💬</span><span class="label">Zalo</span>
+    </a>
+    <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD">
+      <span class="icon">📨</span><span class="label">Messenger</span>
+    </a>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Cập nhật năm bản quyền nếu có phần tử #y
+    const y = document.getElementById('y');
+    if (y) y.textContent = new Date().getFullYear();
+
+    // Đăng ký Service Worker (nếu site có /sw.js)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
+  <!-- Affiliate auto-rewrite (nếu đang dùng) -->
+  <script src="/assets/mxd-affiliate.js" defer></script>
 </body>
 </html>
