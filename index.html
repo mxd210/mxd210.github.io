@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="vi">
-  <head>
+<head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="format-detection" content="telephone=no" />
   <title>MXD – Cửa hàng & Dịch vụ thi công uy tín</title>
-<meta name="description" content="MXD: thi công & mua sắm dụng cụ xây dựng. Chọn một lần – yên tâm nhiều năm: keo ốp lát, chống thấm, máy cắt, bay răng cưa… nội dung thực chiến, uy tín chất lượng.">
+  <meta name="description" content="MXD: thi công & mua sắm dụng cụ xây dựng. Chọn một lần – yên tâm nhiều năm: keo ốp lát, chống thấm, máy cắt, bay răng cưa… nội dung thực chiến, uy tín chất lượng.">
 
   <!-- Canonical & PWA -->
   <link rel="canonical" href="https://mxd210.github.io/" />
@@ -20,38 +20,39 @@
   <meta property="og:url" content="https://mxd210.github.io/" />
   <meta property="og:title" content="MXD – Cửa hàng & Dịch vụ thi công uy tín" />
   <meta property="og:description" content="Cửa hàng MXD, tổng hợp dụng cụ & vật tư thi công. Có tư vấn, kinh nghiệm thực tế, và ưu đãi cho khách hàng thân thiết." />
-  <!-- Upload ảnh 1200×630 vào /assets/og-home.jpg -->
   <meta property="og:image" content="/assets/og-home.jpg" />
 
-  <!-- Structured data: Organization (SEO) -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "MXD",
-  "url": "https://mxd210.github.io/",
-  "logo": {
-    "@type": "ImageObject",
-    "url": "https://mxd210.github.io/assets/img/logo.png",
-    "width": 512,
-    "height": 512
-  },
-  "sameAs": [
-    "https://www.facebook.com/mxd6686",
-    "https://m.me/mxd6686",
-    "https://zalo.me/0338328898"
-  "slogan": "Chọn một lần – yên tâm nhiều năm."
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "MXD",
+    "url": "https://mxd210.github.io/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://mxd210.github.io/assets/img/logo.png",
+      "width": 512,
+      "height": 512
+    },
+    "sameAs": [
+      "https://www.facebook.com/mxd6686",
+      "https://m.me/mxd6686",
+      "https://zalo.me/0338328898"
+    ],
+    "slogan": "Chọn một lần – yên tâm nhiều năm.",
+    "contactPoint": [{
+      "@type": "ContactPoint",
+      "telephone": "+84-338-328-898",
+      "contactType": "customer service",
+      "areaServed": "VN",
+      "availableLanguage": ["vi", "en"]
+    }]
+  }
+  </script>
 
-  ],
-  "contactPoint": [{
-    "@type": "ContactPoint",
-    "telephone": "+84-338-328-898",
-    "contactType": "customer service",
-    "areaServed": "VN",
-    "availableLanguage": ["vi", "en"]
-  }]
-}
-</script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -59,12 +60,16 @@
       --card: #ffffff;
       --ink: #111111;
       --muted: #6b7280;
-      --brand: #0ea5e9; /* xanh dịu */
-      --accent: #111111; /* đen nhấn */
+      --brand: #0ea5e9;
+      --accent: #111111;
       --radius: 14px;
       --shadow: 0 8px 24px rgba(0,0,0,0.08);
     }
-    html, body { margin:0; padding:0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; color: var(--ink); background: var(--bg); }
+    html, body {
+      margin:0; padding:0;
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink); background: var(--bg);
+    }
     a { color: inherit; text-decoration: none; }
     img { max-width: 100%; display: block; border-radius: 12px; }
 
@@ -81,10 +86,14 @@
     nav.menu a { padding: 8px 10px; border-radius: 10px; }
     nav.menu a.active, nav.menu a:hover { background: #111; color:#fff; }
 
-    .hero { display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items:center; background: linear-gradient(180deg, #fff, #f8fafc); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+    .hero {
+      display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items:center;
+      background: linear-gradient(135deg, #0d47a1, #1976d2);
+      border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); color: #fff;
+    }
     .hero h1 { font-size: clamp(24px, 3.2vw, 40px); line-height: 1.15; margin: 0 0 10px; }
-    .hero p { color: var(--muted); margin: 0 0 18px; }
-    .hero .cta { display:flex; gap: 12px; flex-wrap: wrap; }
+    .hero p { margin: 0 0 18px; color:#e2e8f0; }
+    .hero img { border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
 
     .btn { display:inline-block; padding: 12px 16px; border-radius: 12px; border:1px solid #111; background:#fff; color:#111; font-weight:600; }
     .btn.primary { background:#111; color:#fff; }
@@ -98,7 +107,8 @@
     .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
     .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
 
-    .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display:flex; flex-direction:column; }
+    .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display:flex; flex-direction:column; transition: all .2s ease; }
+    .card:hover { transform: scale(1.02); box-shadow: 0 8px 24px rgba(0,0,0,.12); }
     .card .body { padding: 14px; display:flex; flex-direction:column; gap: 8px; }
     .card h3 { margin: 0; font-size: 16px; }
     .muted { color: var(--muted); font-size: 13px; }
@@ -114,7 +124,9 @@
 
     /* Floating contact buttons */
     .float-box { position: fixed; right: 14px; bottom: 14px; display: grid; gap: 10px; z-index: 80; }
-    .float-box a { display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #111; padding:10px 12px; border-radius: 999px; box-shadow: var(--shadow); font-weight: 600; }
+    .float-btn { display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #111; padding:12px 16px; border-radius: 999px; box-shadow: var(--shadow); font-weight: 600; font-size:14px; }
+    .float-btn .icon { font-size:20px; }
+    .float-btn:hover { transform: translateY(-1px); }
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -122,21 +134,22 @@
       .grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
       .grid.cols-3 { grid-template-columns: 1fr; }
       nav.menu { flex-direction: column; gap: 8px; align-items: flex-start; }
-      .float-box a span { display:none; }
+      .float-btn .label { display:none; }
     }
   </style>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SRMVN734D"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){ dataLayer.push(arguments); }
-  gtag('js', new Date());
-  gtag('config', 'G-SRMVN734D', { send_page_view: true });
-</script>
-<script src="/assets/analytics.js" defer></script>
 
+  <!-- GA -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SRMVN734D"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-SRMVN734D', { send_page_view: true });
+  </script>
+  <script src="/assets/analytics.js" defer></script>
 </head>
 <body>
+  <!-- Header -->
   <header class="topbar">
     <div class="container row">
       <a class="brand" href="/" aria-label="Trang chủ MXD">
@@ -158,19 +171,17 @@
       <div>
         <h1>Trung tâm mua sắm affiliate ngành xây dựng · Thi công thực chiến</h1>
         <p class="intro">Nội dung thực chiến + lựa chọn đúng ngay từ đầu để dùng bền và tiết kiệm.</p>
-
         <div class="cta">
           <a class="btn primary" href="/store.html">🛒 Vào Cửa hàng MXD</a>
           <a class="btn" href="/tu-van.html">📅 Đặt lịch tư vấn</a>
         </div>
       </div>
       <div>
-        <!-- Ảnh hero đề xuất: /assets/img/hero.webp -->
         <img src="/assets/img/hero.webp" alt="Dụng cụ & vật tư MXD" loading="lazy" />
       </div>
     </section>
 
-    <!-- CATEGORIES -->
+    <!-- Danh mục nổi bật -->
     <div class="section-title">
       <h2>Danh mục nổi bật</h2>
       <a href="/store.html">Xem tất cả →</a>
@@ -206,7 +217,7 @@
       </a>
     </section>
 
-    <!-- FEATURED PRODUCTS (mẫu) -->
+    <!-- Sản phẩm nổi bật -->
     <div class="section-title">
       <h2>Sản phẩm nổi bật</h2>
       <a href="/store.html">Xem thêm →</a>
@@ -218,7 +229,6 @@
           <h3>Máy cắt đa năng</h3>
           <div class="muted">Động cơ bền, lưỡi cắt đi kèm</div>
           <div class="price">1.590.000đ</div>
-          <!-- Đặt link gốc của shop vào href; để data-merchant nhận diện. mxd-affiliate.js sẽ rewrite tự động. -->
           <a class="btn" href="#" data-merchant="shopee">Mua ngay</a>
         </div>
       </article>
@@ -251,7 +261,7 @@
       </article>
     </section>
 
-    <!-- BLOG / NEWS -->
+    <!-- Tin tức -->
     <div class="section-title">
       <h2>Tin tức & Kinh nghiệm</h2>
       <a href="/blog.html">Xem tất cả →</a>
@@ -295,6 +305,7 @@
     </section>
   </main>
 
+  <!-- Footer -->
   <footer class="site">
     <div class="container stack">
       <div class="cols">
@@ -304,7 +315,6 @@
             <strong>MXD</strong>
           </div>
           <small>Chọn một lần – yên tâm nhiều năm.</small>
-
         </div>
         <div>
           <strong>Thông tin</strong>
@@ -334,73 +344,43 @@
   </footer>
 
   <!-- Floating contact buttons -->
-<style>
-  .float-box{
-    position:fixed; right:16px; bottom:16px;
-    display:flex; flex-direction:column; gap:10px;
-    z-index:9999;
-  }
-  .float-btn{
-    display:flex; align-items:center; gap:8px;
-    background:#fff; color:#111; text-decoration:none;
-    border:1px solid #111; border-radius:999px;
-    padding:10px 14px;
-    box-shadow:0 8px 24px rgba(0,0,0,.12);
-    font:600 14px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-    transition:transform .15s ease;
-  }
-  .float-btn:hover{ transform:translateY(-1px); }
-  .float-btn .icon{ font-size:18px; line-height:1; }
-  /* Ẩn chữ trên màn hình nhỏ, chỉ giữ icon để gọn */
-  @media (max-width:480px){ .float-btn .label{ display:none; } }
-</style>
-
-<div class="float-box" aria-label="Liên hệ nhanh MXD">
-  <a class="float-btn" href="tel:+84338328898" aria-label="Gọi điện cho MXD">
-    <span class="icon">📞</span><span class="label">Gọi MXD</span>
-  </a>
-
-  <!-- Zalo: đổi 0338328898 thành số Zalo của bạn.
-       Có thể dùng dạng 0338328898 hoặc 84338328898 tùy tài khoản. -->
-  <a class="float-btn" href="https://zalo.me/0338328898" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho MXD">
-    <span class="icon">💬</span><span class="label">Zalo</span>
-  </a>
-
-  <!-- Messenger: dùng m.me để mở chat trực tiếp -->
-  <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD">
-    <span class="icon">📨</span><span class="label">Messenger</span>
-  </a>
-</div>
-
+  <div class="float-box" aria-label="Liên hệ nhanh MXD">
+    <a class="float-btn" href="tel:+84338328898" aria-label="Gọi điện cho MXD">
+      <span class="icon">📞</span><span class="label">Gọi MXD</span>
+    </a>
+    <a class="float-btn" href="https://zalo.me/0338328898" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho MXD">
+      <span class="icon">💬</span><span class="label">Zalo</span>
+    </a>
+    <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD">
+      <span class="icon">📨</span><span class="label">Messenger</span>
+    </a>
+  </div>
 
   <script>
-    // Năm hiện tại
     document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
 
-    <script>
+  <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js', { scope: '/' })
         .catch(err => console.warn('SW register failed:', err));
     });
   }
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!window.__swRld) { window.__swRld = true; location.reload(); }
-  });
-  navigator.serviceWorker.ready.then(reg => {
-    if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-  });
-}
-</script>
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!window.__swRld) { window.__swRld = true; location.reload(); }
+    });
+    navigator.serviceWorker.ready.then(reg => {
+      if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+    });
+  }
+  </script>
 
-
-  <!-- Quan trọng: script rewrite link affiliate. Tạo file /mxd-affiliate.js theo chuẩn đã thống nhất -->
   <script src="/mxd-affiliate.js"></script>
-<script src="/assets/js/floating-contact.js" defer></script>
-<script src="/assets/analytics.js"></script>
-
+  <script src="/assets/js/floating-contact.js" defer></script>
+  <script src="/assets/analytics.js"></script>
 </body>
 </html>
