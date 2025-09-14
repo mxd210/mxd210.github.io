@@ -1,81 +1,108 @@
-// sw.js
-const CACHE = "mxd-v4"; // bump version để re-cache
+// sw.js — MXD PWA v5
+const VERSION = 'v5';
+const CACHE_PREFIX = 'mxd';
+const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
-// Tự tính base path cho GitHub Pages (vd: "" hoặc "/ten-repo")
-const BASE = new URL(self.registration.scope).pathname.replace(/\/$/, "");
-const A = p => `${BASE}${p}`;
-
-// Precache các tài nguyên quan trọng
+// Liệt kê file tĩnh cốt lõi. DÙNG ĐƯỜNG DẪN KHÔNG query.
+// (Fetcher sẽ tự chuẩn hóa để khớp cả khi HTML dùng ?v=1)
 const ASSETS = [
-  A("/"),
-  A("/index.html"),
-  A("/store.html"),
-  A("/blog.html"),
-  A("/tu-van.html"),
-  A("/lien-he.html"),
-  A("/offline.html"),
-
-  // Data & static
-  A("/products.json"),
-  A("/assets/css/styles.css"),        // ✅ đúng đường dẫn CSS
-  A("/assets/js/floating-contact.js"),
-  A("/mxd-affiliate.js"),             // ✅ đúng vị trí file affiliate (gốc site)
-  A("/logo.png")                      // nếu có
+  '/',                   // shell trang chủ
+  '/offline.html',       // trang offline riêng (nhớ tạo file)
+  '/assets/site.css',
+  '/assets/mxd-affiliate.js',
+  '/assets/analytics.js'
 ];
 
-self.addEventListener("install", e => {
+// Chuẩn hoá URL: bỏ query cho tài nguyên same-origin để tránh lệch key
+const normalize = (input) => {
+  const u = typeof input === 'string' ? new URL(input, location.origin) : new URL(input.url);
+  return u.origin === location.origin ? u.pathname : u.href;
+};
+
+self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE)
-      .then(c => c.addAll(ASSETS))
-      .then(() => self.skipWaiting())
+      .then((c) => c.addAll(ASSETS))
+      .then(() => self.skipWaiting()) // kích hoạt SW mới ngay
   );
 });
 
-self.addEventListener("activate", e => {
+self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((k) => k.startsWith(CACHE_PREFIX) && k !== CACHE)
+          .map((k) => caches.delete(k))
+      )
     ).then(() => self.clients.claim())
   );
 });
 
-// Chiến lược:
-// - Điều hướng (HTML): network-first → nếu lỗi → thử cache trang cũ → offline.html
-// - Static (CSS/JS/IMG/JSON): cache-first + ghi đệm động
-self.addEventListener("fetch", e => {
+// Cho phép client gửi message để skipWaiting thủ công (tuỳ chọn)
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
+});
+
+self.addEventListener('fetch', (e) => {
   const req = e.request;
 
-  // Bỏ qua non-GET cho an toàn
-  if (req.method !== "GET") return;
+  // Endpoint debug nhanh: /sw-version trả về version
+  if (new URL(req.url).pathname === '/sw-version') {
+    e.respondWith(new Response(VERSION, { headers: {'content-type': 'text/plain'} }));
+    return;
+  }
 
-  // 1) Điều hướng (HTML)
-  if (req.mode === "navigate") {
+  // Chỉ xử lý GET
+  if (req.method !== 'GET') return;
+
+  // Điều hướng trang: network-first, rớt mạng → offline.html
+  if (req.mode === 'navigate') {
     e.respondWith(
-      fetch(req).then(resp => {
-        // Lưu đệm bản copy để lần sau offline còn xem lại
-        const copy = resp.clone();
-        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
-        return resp;
-      }).catch(async () => {
-        // Thử trang đã cache trước khi rơi về offline.html
-        const cached = await caches.match(req);
-        return cached || caches.match(A("/offline.html"));
+      fetch(req)
+        .then((res) => {
+          // lưu shell '/' để có khung khi offline
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put('/', copy));
+          return res;
+        })
+        .catch(() => caches.match('/offline.html'))
+    );
+    return;
+  }
+
+  const url = new URL(req.url);
+
+  // Tài nguyên cùng origin: stale-while-revalidate + normalize key
+  if (url.origin === location.origin) {
+    e.respondWith(
+      caches.match(req).then((cached) => {
+        // thử thêm khóa đã chuẩn hoá (bỏ query)
+        const tryNormalized = cached ? Promise.resolve(cached) : caches.match(normalize(req));
+
+        return tryNormalized.then((hit) => {
+          const fetchPromise = fetch(req)
+            .then((res) => {
+              const cpy = res.clone();
+              caches.open(CACHE).then((c) => {
+                c.put(req, cpy);
+                // Lưu thêm bản normalized nếu khác key
+                const normKey = normalize(req);
+                if (normKey !== req.url) c.put(normKey, res.clone());
+              });
+              return res;
+            })
+            .catch(() => null);
+
+          return hit || fetchPromise || caches.match('/offline.html');
+        });
       })
     );
     return;
   }
 
-  // 2) Tài nguyên tĩnh: cache-first + ghi đệm động
+  // Ngoài domain: network-first, rớt → trả cache (nếu có)
   e.respondWith(
-    caches.match(req).then(hit => {
-      if (hit) return hit;
-      return fetch(req).then(resp => {
-        const copy = resp.clone();
-        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
-        return resp;
-      }).catch(() => {
-        // Tùy chọn: có thể trả về gì đó nếu cần (vd: ảnh placeholder)
-      });
-    })
+    fetch(req).catch(() => caches.match(req))
   );
 });
