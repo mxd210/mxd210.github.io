@@ -2,193 +2,330 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
-  <title>MXD – Dụng cụ thi công & vật tư tin dùng</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="format-detection" content="telephone=no" />
-  <meta name="description" content="Cửa hàng MXD – chọn lọc dụng cụ xây dựng bền bỉ. Tư vấn theo nhu cầu thực tế. Liên kết đáng tin cậy." />
-  <link rel="canonical" href="https://mxd210.github.io/" />
-  <meta name="theme-color" content="#0f172a" />
-  <link rel="icon" href="/assets/img/favicon.png" />
-  <link rel="apple-touch-icon" href="/assets/img/favicon.png" />
-  <link rel="stylesheet" href="/assets/css/styles.css" />
-  <style>
-    #contact-float {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.contact-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-size: 26px;
-  background-repeat: no-repeat;
-  background-position: center;
-  box-shadow: 0 0 8px rgba(0,0,0,0.2);
-}
-.contact-btn.zalo {
-  background-color: #0068ff;
-  background-image: url('https://img.icons8.com/ios-filled/50/ffffff/zalo.png');
-}
-.contact-btn.messenger {
-  background-color: #0084ff;
-  background-image: url('https://img.icons8.com/ios-filled/50/ffffff/facebook-messenger.png');
-}
-.contact-btn.call {
-  background-color: #22c55e;
-  background-image: url('https://img.icons8.com/ios-filled/50/ffffff/phone.png');
-}
+  <title>MXD – Cửa hàng & Dịch vụ thi công uy tín</title>
+  <meta name="description" content="MXD: Trung tâm mua sắm affiliate ngành xây dựng + dịch vụ thi công thực chiến. Cửa hàng, tư vấn, tin tức, kinh nghiệm – tất cả trong một." />
 
-    body { font-family: system-ui, sans-serif; margin: 0; background: #f8fafc; color: #0b1220; }
-    .container { max-width: 1100px; margin: auto; padding: 0 16px; }
-    header, footer { background: #fff; border-bottom: 1px solid #e5e7eb; }
-    nav.menu { display: flex; flex-wrap: wrap; gap: 14px; }
-    .hero, .categories, .featured-products, .blog-preview, .cta-help { padding: 32px 0; }
-    .grid { display: grid; gap: 16px; }
+  <!-- Canonical & PWA -->
+  <link rel="canonical" href="https://mxd210.github.io/" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#111111" />
+
+  <!-- Favicon / Logo -->
+  <link rel="icon" href="/favicon-mxd.png" />
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mxd210.github.io/" />
+  <meta property="og:title" content="MXD – Cửa hàng & Dịch vụ thi công uy tín" />
+  <meta property="og:description" content="Cửa hàng MXD, tổng hợp dụng cụ & vật tư thi công. Có tư vấn, kinh nghiệm thực tế, và ưu đãi cho khách hàng thân thiết." />
+  <!-- Upload ảnh 1200×630 vào /assets/og-home.jpg -->
+  <meta property="og:image" content="/assets/og-home.jpg" />
+
+  <!-- Structured data: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "MXD",
+    "url": "https://mxd210.github.io/",
+    "logo": "/logo.png",
+    "sameAs": [
+      "https://facebook.com/", 
+      "https://zalo.me/"
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #f6f7f8;
+      --card: #ffffff;
+      --ink: #111111;
+      --muted: #6b7280;
+      --brand: #0ea5e9; /* xanh dịu */
+      --accent: #111111; /* đen nhấn */
+      --radius: 14px;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    html, body { margin:0; padding:0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; color: var(--ink); background: var(--bg); }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; border-radius: 12px; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    .stack { display: grid; gap: 16px; }
+
+    header.topbar { background: var(--card); position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow); }
+    header .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .brand { display:flex; align-items:center; gap:10px; }
+    .brand img { width: 36px; height: 36px; }
+    .brand strong { letter-spacing: 0.5px; }
+
+    nav.menu { display:flex; align-items:center; gap: 16px; flex-wrap: wrap; }
+    nav.menu a { padding: 8px 10px; border-radius: 10px; }
+    nav.menu a.active, nav.menu a:hover { background: #111; color:#fff; }
+
+    .hero { display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items:center; background: linear-gradient(180deg, #fff, #f8fafc); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+    .hero h1 { font-size: clamp(24px, 3.2vw, 40px); line-height: 1.15; margin: 0 0 10px; }
+    .hero p { color: var(--muted); margin: 0 0 18px; }
+    .hero .cta { display:flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn { display:inline-block; padding: 12px 16px; border-radius: 12px; border:1px solid #111; background:#fff; color:#111; font-weight:600; }
+    .btn.primary { background:#111; color:#fff; }
+
+    .section-title { display:flex; align-items:baseline; justify-content:space-between; gap: 12px; margin: 24px 0 8px; }
+    .section-title h2 { margin:0; font-size: clamp(18px, 2.8vw, 28px); }
+    .section-title a { color: var(--muted); }
+
+    .grid { display:grid; gap: 16px; }
     .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
     .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-    @media (max-width: 900px) {
+    .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+    .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display:flex; flex-direction:column; }
+    .card .body { padding: 14px; display:flex; flex-direction:column; gap: 8px; }
+    .card h3 { margin: 0; font-size: 16px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .price { font-weight:700; }
+    .badge { display:inline-block; padding:4px 8px; border:1px solid #111; border-radius:999px; font-size:12px; }
+
+    .cta-block { background:#111; color:#fff; border-radius: var(--radius); padding: 24px; display:grid; gap: 12px; box-shadow: var(--shadow); }
+
+    footer.site { margin-top: 32px; background:#0f172a; color:#cbd5e1; }
+    footer .cols { display:grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 16px; }
+    footer a { color:#e2e8f0; }
+    footer small { color:#94a3b8; }
+
+    /* Floating contact buttons */
+    .float-box { position: fixed; right: 14px; bottom: 14px; display: grid; gap: 10px; z-index: 80; }
+    .float-box a { display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #111; padding:10px 12px; border-radius: 999px; box-shadow: var(--shadow); font-weight: 600; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; text-align: center; }
       .grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
       .grid.cols-3 { grid-template-columns: 1fr; }
+      nav.menu { flex-direction: column; gap: 8px; align-items: flex-start; }
+      .float-box a span { display:none; }
     }
-    #contact-float {
-      position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 12px;
-    }
-    .contact-btn {
-      width: 48px; height: 48px; border-radius: 50%; background-size: 26px; background-repeat: no-repeat;
-      background-position: center; box-shadow: 0 0 8px rgba(0,0,0,0.2);
-    }
-    .contact-btn.zalo { background-color: #0068ff; background-image: url('https://img.icons8.com/ios-filled/50/ffffff/zalo.png'); }
-    .contact-btn.messenger { background-color: #0084ff; background-image: url('https://img.icons8.com/ios-filled/50/ffffff/facebook-messenger.png'); }
-    .contact-btn.call { background-color: #22c55e; background-image: url('https://img.icons8.com/ios-filled/50/ffffff/phone.png'); }
   </style>
 </head>
 <body>
+  <header class="topbar">
+    <div class="container row">
+      <a class="brand" href="/" aria-label="Trang chủ MXD">
+        <img src="/logo.png" alt="Logo MXD" />
+        <strong>MXD</strong>
+      </a>
+      <nav class="menu" aria-label="Điều hướng chính">
+        <a href="/store.html">Cửa hàng</a>
+        <a href="/blog.html">Tin tức</a>
+        <a href="/tu-van.html">Tư vấn</a>
+        <a href="/lien-he.html">Liên hệ</a>
+      </nav>
+    </div>
+  </header>
 
-<header>
-  <div class="container nav">
-    <a href="/" class="brand"><img src="/assets/img/logo.png" alt="MXD logo" width="36" height="36" /><strong>MXD</strong></a>
-    <nav class="menu">
-     <a href="/" class="brand">
-  <img src="/assets/img/logo.png" width="36" alt="MXD logo" />
-  <strong>MXD</strong>
-</a>
-<div style="margin-left:auto; font-size:14px;">
-  
-</div>
+  <main class="container stack">
+    <!-- HERO -->
+    <section class="hero" aria-label="Giới thiệu MXD">
+      <div>
+        <h1>Trung tâm mua sắm affiliate ngành xây dựng · Thi công thực chiến</h1>
+        <p>Chúng tôi bán hàng và trực tiếp thi công, nên sản phẩm là hàng tin dùng thực tế. Khách hàng thân thuộc MXD sẽ nhận ưu đãi đặc biệt.</p>
+        <div class="cta">
+          <a class="btn primary" href="/store.html">🛒 Vào Cửa hàng MXD</a>
+          <a class="btn" href="/tu-van.html">📅 Đặt lịch tư vấn</a>
+        </div>
+      </div>
+      <div>
+        <!-- Ảnh hero đề xuất: /assets/img/hero.webp -->
+        <img src="/assets/img/hero.webp" alt="Dụng cụ & vật tư MXD" loading="lazy" />
+      </div>
+    </section>
 
-      <a href="/store.html">Cửa hàng</a>
-      <a href="/tu-van.html">Tư vấn</a>
-      <a href="/blog.html">Blog</a>
-      <a href="/lien-he.html">Liên hệ</a>
-    </nav>
-  </div>
-</header>
+    <!-- CATEGORIES -->
+    <div class="section-title">
+      <h2>Danh mục nổi bật</h2>
+      <a href="/store.html">Xem tất cả →</a>
+    </div>
+    <section class="grid cols-4" aria-label="Danh mục sản phẩm">
+      <a class="card" href="/store/may-cat-mai.html">
+        <img src="/assets/img/categories/may-cat-mai.webp" alt="Máy cắt, máy mài" />
+        <div class="body">
+          <h3>Máy cắt · Máy mài</h3>
+          <span class="muted">Thiết bị cầm tay đa năng</span>
+        </div>
+      </a>
+      <a class="card" href="/store/keo-op-lat.html">
+        <img src="/assets/img/categories/keo-op-lat.webp" alt="Keo ốp lát" />
+        <div class="body">
+          <h3>Keo ốp lát</h3>
+          <span class="muted">Chuẩn bền · chống thấm</span>
+        </div>
+      </a>
+      <a class="card" href="/store/bay-rang-cua.html">
+        <img src="/assets/img/categories/bay-rang-cua.webp" alt="Bay răng cưa" />
+        <div class="body">
+          <h3>Bay răng cưa</h3>
+          <span class="muted">Chuẩn kích thước thi công</span>
+        </div>
+      </a>
+      <a class="card" href="/store/chong-tham.html">
+        <img src="/assets/img/categories/chong-tham.webp" alt="Chống thấm" />
+        <div class="body">
+          <h3>Chống thấm</h3>
+          <span class="muted">Vật tư nền móng & WC</span>
+        </div>
+      </a>
+    </section>
 
-<main>
-  <section class="hero container">
-  <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
-    <img src="/assets/img/hero.webp" alt="Dụng cụ MXD" width="480" style="border-radius:12px" />
-    <div>
-      <h1>Dụng cụ thi công đã được chọn lọc</h1>
-      <p>Không đại trà. MXD chỉ chọn món đáng tiền, đúng nhu cầu. Có hướng dẫn theo ngân sách.</p>
-      <div class="cta">
-        <a href="/store.html" class="btn primary">Xem sản phẩm</a>
-        <a href="/tu-van.html" class="btn">Xin tư vấn</a>
+    <!-- FEATURED PRODUCTS (mẫu) -->
+    <div class="section-title">
+      <h2>Sản phẩm nổi bật</h2>
+      <a href="/store.html">Xem thêm →</a>
+    </div>
+    <section class="grid cols-4" aria-label="Sản phẩm">
+      <article class="card">
+        <img src="/assets/img/products/may-cat-1.webp" alt="Máy cắt đa năng" />
+        <div class="body">
+          <h3>Máy cắt đa năng</h3>
+          <div class="muted">Động cơ bền, lưỡi cắt đi kèm</div>
+          <div class="price">1.590.000đ</div>
+          <!-- Đặt link gốc của shop vào href; để data-merchant nhận diện. mxd-affiliate.js sẽ rewrite tự động. -->
+          <a class="btn" href="#" data-merchant="shopee">Mua ngay</a>
+        </div>
+      </article>
+      <article class="card">
+        <img src="/assets/img/products/keo-op-1.webp" alt="Keo ốp lát cao cấp" />
+        <div class="body">
+          <h3>Keo ốp lát S1</h3>
+          <div class="muted">Độ bám dính cao, chống võng</div>
+          <div class="price">259.000đ</div>
+          <a class="btn" href="#" data-merchant="tiki">Mua ngay</a>
+        </div>
+      </article>
+      <article class="card">
+        <img src="/assets/img/products/bay-60.webp" alt="Bay răng cưa 60cm" />
+        <div class="body">
+          <h3>Bay răng cưa 60cm</h3>
+          <div class="muted">Chuẩn 6×6 – tay cầm êm</div>
+          <div class="price">169.000đ</div>
+          <a class="btn" href="#" data-merchant="lazada">Mua ngay</a>
+        </div>
+      </article>
+      <article class="card">
+        <img src="/assets/img/products/sika-1.webp" alt="Sika chống thấm" />
+        <div class="body">
+          <h3>Sika chống thấm</h3>
+          <div class="muted">Phòng tắm, ban công, mái</div>
+          <div class="price">389.000đ</div>
+          <a class="btn" href="#" data-merchant="shopee">Mua ngay</a>
+        </div>
+      </article>
+    </section>
+
+    <!-- BLOG / NEWS -->
+    <div class="section-title">
+      <h2>Tin tức & Kinh nghiệm</h2>
+      <a href="/blog.html">Xem tất cả →</a>
+    </div>
+    <section class="grid cols-3" aria-label="Bài viết">
+      <a class="card" href="/blog.html#thi-cong-nha-ve-sinh-500tr">
+        <img src="/assets/img/tin-tuc/ve-sinh-500tr.jpg" alt="Thi công nhà vệ sinh 500 triệu" />
+        <div class="body">
+          <h3>Thi công nhà vệ sinh 500 triệu</h3>
+          <span class="muted">Checklist & vật tư cốt lõi</span>
+        </div>
+      </a>
+      <a class="card" href="/blog.html#keo-op-lat-chuan">
+        <img src="/assets/img/tin-tuc/keo-op-lat.jpg" alt="Keo ốp lát chuẩn" />
+        <div class="body">
+          <h3>Keo ốp lát: chọn loại nào?</h3>
+          <span class="muted">Kinh nghiệm thi công thực tế</span>
+        </div>
+      </a>
+      <a class="card" href="/blog.html#bay-rang-cua">
+        <img src="/assets/img/tin-tuc/bay-rang-cua.jpg" alt="Bay răng cưa" />
+        <div class="body">
+          <h3>Bay răng cưa: kích cỡ & răng</h3>
+          <span class="muted">Chọn đúng giúp mặt lát chuẩn</span>
+        </div>
+      </a>
+    </section>
+
+    <!-- CTA block -->
+    <section class="cta-block" aria-label="Kêu gọi hành động">
+      <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
+        <div>
+          <strong style="font-size:18px">Cần tư vấn nhanh?</strong>
+          <div class="muted">Đặt lịch khảo sát miễn phí tại công trình của bạn.</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a class="btn" href="/tu-van.html">📅 Đặt hẹn khảo sát</a>
+          <a class="btn" href="/lien-he.html">✉️ Liên hệ MXD</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div class="container stack">
+      <div class="cols">
+        <div>
+          <div class="brand" style="margin-bottom:8px">
+            <img src="/logo.png" alt="MXD" width="36" height="36" />
+            <strong>MXD</strong>
+          </div>
+          <small>"Tối ưu & bền vững – không chỉ kiếm hoa hồng một lần, mà xây chuỗi nội dung, funnel, remarketing để giữ chân khách."</small>
+        </div>
+        <div>
+          <strong>Thông tin</strong>
+          <div class="stack" style="margin-top:8px">
+            <a href="/store.html">Cửa hàng</a>
+            <a href="/blog.html">Tin tức & Kinh nghiệm</a>
+            <a href="/tu-van.html">Tư vấn</a>
+            <a href="/lien-he.html">Liên hệ</a>
+          </div>
+        </div>
+        <div>
+          <strong>Chính sách</strong>
+          <div class="stack" style="margin-top:8px">
+            <a href="/chinh-sach/doi-tra.html">Đổi trả</a>
+            <a href="/chinh-sach/giao-hang.html">Giao hàng</a>
+            <a href="/chinh-sach/bao-hanh.html">Bảo hành</a>
+            <a href="/chinh-sach/bao-mat.html">Bảo mật</a>
+            <a href="/chinh-sach/dieu-khoan.html">Điều khoản sử dụng</a>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; border-top:1px solid #1f2937; padding:12px 0;">
+        <small>© <span id="y"></span> MXD. All rights reserved.</small>
+        <small><a href="/sitemap.xml">Sitemap</a> · <a href="/robots.txt">Robots</a></small>
       </div>
     </div>
+  </footer>
+
+  <!-- Floating contact buttons (đặt số thật của bạn vào liên kết) -->
+  <div class="float-box" aria-label="Liên hệ nhanh">
+    <a href="tel:+84900000000" aria-label="Gọi điện"><span>📞</span> <span>Gọi MXD</span></a>
+    <a href="https://zalo.me/0900000000" target="_blank" rel="noopener" aria-label="Zalo"><span>💬</span> <span>Zalo</span></a>
+    <a href="https://m.me/your.page" target="_blank" rel="noopener" aria-label="Messenger"><span>📨</span> <span>Messenger</span></a>
   </div>
-</section>
 
+  <script>
+    // Năm hiện tại
+    document.getElementById('y').textContent = new Date().getFullYear();
 
-  <section class="container">
-  <div class="grid cols-3">
-    <div>
-      <strong>✅ Chọn lọc thực tế</strong>
-      <p class="muted">Sản phẩm đã được thử nghiệm qua công trình thật, không quảng cáo rỗng.</p>
-    </div>
-    <div>
-      <strong>🎯 Gợi ý theo nhu cầu</strong>
-      <p class="muted">Bạn không cần rành kỹ thuật – MXD tư vấn phù hợp ngân sách.</p>
-    </div>
-    <div>
-      <strong>📦 Mua hàng liên kết</strong>
-      <p class="muted">Không ép giá – bạn tự mua từ Shopee/Lazada với giá chuẩn.</p>
-    </div>
-  </div>
-</section>
+    // Đăng ký Service Worker nếu có sw.js
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
 
-
-  <section class="featured-products container">
-    <h2>Gợi ý nổi bật</h2>
-    <div class="grid cols-4">
-      <!-- placeholder: sẽ load từ JSON -->
-    </div>
-  </section>
-
-  <section class="container">
-  <div class="card">
-    <blockquote>
-      "Nhờ MXD tư vấn, tôi mua đúng 3 món cần thiết cho công trình nhỏ – tiết kiệm cả triệu bạc."  
-      <footer class="muted">– Anh Huy (Kỹ sư dân dụng)</footer>
-    </blockquote>
-  </div>
-</section>
-
-
-  <section class="cta-help container">
-    <div class="card">
-      <h2>Không biết bắt đầu từ đâu?</h2>
-      <p>Gửi nhu cầu – mình gợi ý bộ đồ nghề theo ngân sách của bạn.</p>
-      <a href="/tu-van.html" class="btn primary">Xin tư vấn ngay</a>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div class="container footer-grid">
-    <div>
-      <strong>MXD</strong>
-      <p class="muted">Cửa hàng chọn lọc dụng cụ thi công. Bán qua liên kết – chỉ khuyến nghị món đáng tiền.</p>
-      <p><a href="https://facebook.com/mxd6686" target="_blank">Facebook</a></p>
-    </div>
-    <div>
-      <strong>Liên kết nhanh</strong>
-      <ul>
-        <li><a href="/store.html">Cửa hàng</a></li>
-        <li><a href="/blog.html">Blog</a></li>
-        <li><a href="/tu-van.html">Tư vấn</a></li>
-      </ul>
-    </div>
-    <div>
-      <strong>Chính sách</strong>
-      <ul>
-        <li><a href="/chinh-sach/bao-mat.html">Bảo mật</a></li>
-        <li><a href="/chinh-sach/doi-tra.html">Đổi trả</a></li>
-        <li><a href="/chinh-sach/van-chuyen.html">Vận chuyển</a></li>
-      </ul>
-    </div>
-  </div>
-  <p class="container muted">© <span id="year"></span> MXD. Hotline: <a href="tel:+84338328898">0338 328 898</a></p>
-</footer>
-
-
-
-<script>
-  document.getElementById('year').textContent = new Date().getFullYear();
-</script>
-<!-- Liên hệ nổi -->
-<div id="contact-float">
-  <a href="https://zalo.me/84338328898" target="_blank" class="contact-btn zalo" aria-label="Zalo"></a>
-  <a href="https://m.me/mxd6686" target="_blank" class="contact-btn messenger" aria-label="Messenger"></a>
-  <a href="tel:+84338328898" class="contact-btn call" aria-label="Gọi ngay"></a>
-<a class="btn" href="tel:+84338328898">Gọi MXD</a>
-📞 <a href="tel:+84338328898">0338 328 898</a>
-</div>
-
+  <!-- Quan trọng: script rewrite link affiliate. Tạo file /mxd-affiliate.js theo chuẩn đã thống nhất -->
+  <script src="/mxd-affiliate.js"></script>
 </body>
 </html>
