@@ -385,6 +385,16 @@
     });
   }
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!window.__swRld) { window.__swRld = true; location.reload(); }
+  });
+  navigator.serviceWorker.ready.then(reg => {
+    if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+  });
+}
+</script>
 
 
   <!-- Quan trọng: script rewrite link affiliate. Tạo file /mxd-affiliate.js theo chuẩn đã thống nhất -->
