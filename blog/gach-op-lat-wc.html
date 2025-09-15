@@ -5,257 +5,213 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="format-detection" content="telephone=no" />
 
-  <title>Gạch ốp lát WC: chọn kích thước, chống trơn & ron đẹp | MXD</title>
-  <meta name="description" content="Cách chọn gạch ốp lát cho nhà vệ sinh: chống trơn (R10–R12), kích thước 30×60–60×120, chọn keo & ron phù hợp, độ dốc 1–2% về phễu, bố cục lát đẹp và checklist nghiệm thu." />
-  <meta name="robots" content="index, follow" />
+  <title>Gạch ốp lát WC: Cách chọn, chống trơn & thi công sạch sẽ | MXD</title>
+  <meta name="description" content="Hướng dẫn chọn gạch ốp lát cho WC: kích thước, chống trơn R10–R12, phối màu, keo ốp lát, độ dốc sàn, ron epoxy. Checklist vật tư & lỗi thường gặp." />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Canonical & PWA -->
   <link rel="canonical" href="https://mxd210.github.io/blog/gach-op-lat-wc.html" />
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="MXD" />
-  <meta property="og:title" content="Gạch ốp lát WC: chọn kích thước, chống trơn & ron đẹp" />
-  <meta property="og:description" content="Chọn gạch đúng chỗ, đúng thông số trượt R, keo & ron chuẩn; bố trí lát đẹp và kiểm soát chất lượng theo checklist." />
-  <meta property="og:url" content="https://mxd210.github.io/blog/gach-op-lat-wc.html" />
-  <meta property="og:image" content="/assets/img/tin-tuc/gach-op-lat-wc.jpg" />
-  <meta property="og:image:alt" content="Gạch ốp lát nhà vệ sinh" />
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Gạch ốp lát WC: chọn kích thước, chống trơn & ron đẹp" />
-  <meta name="twitter:description" content="Chọn gạch đúng chỗ, đúng thông số trượt R, keo & ron chuẩn; bố trí lát đẹp và kiểm soát chất lượng theo checklist." />
-  <meta name="twitter:image" content="/assets/img/tin-tuc/gach-op-lat-wc.jpg" />
-
-  <!-- PWA & Favicon -->
-  <link rel="icon" href="/logo.png" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#111111" />
 
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Gạch ốp lát WC: Cách chọn, chống trơn & thi công sạch sẽ" />
+  <meta property="og:description" content="Chọn gạch đúng loại, chống trơn an toàn, thi công sạch sẽ: keo ốp lát, độ dốc, ron epoxy, checklist vật tư & lỗi thường gặp." />
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/tin-tuc/keo-op-lat.jpg" />
+  <meta property="og:url" content="https://mxd210.github.io/blog/gach-op-lat-wc.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Favicon / Logo -->
+  <link rel="icon" href="/assets/favicon.ico" />
+
+  <!-- Styles: dùng CSS chung + vài dòng tinh chỉnh cho bài viết -->
   <link rel="stylesheet" href="/assets/site.css" />
   <style>
-    :root{--mx:1100px}
-    .wrap{max-width:var(--mx);margin:auto;padding:16px}
-    .hero{display:grid;gap:20px;align-items:center;grid-template-columns:1.1fr 1fr;padding:24px 0}
-    .hero h1{font-size:clamp(28px,4vw,40px);line-height:1.15;margin:0}
-    .muted{color:#666}
-    .badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid #111;border-radius:999px;font-size:13px}
-    .btn{display:inline-block;padding:10px 14px;border:1px solid #111;border-radius:10px;text-decoration:none;color:#111;background:#fff}
-    .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-    .card{border:1px solid #e5e5e5;border-radius:14px;background:#fff;overflow:hidden}
-    .card .body{padding:14px}
-    .grid{display:grid;gap:16px}
-    .cols-2{grid-template-columns:1fr 1fr}
-    .cols-3{grid-template-columns:repeat(3,1fr)}
-    .cols-4{grid-template-columns:repeat(4,1fr)}
-    .headline{font-size:22px;margin:0 0 12px}
-    .section{padding:28px 0}
-    .table{width:100%;border-collapse:collapse}
-    .table th,.table td{padding:10px;border-bottom:1px solid #eee;text-align:left}
-    .note{background:#f9f9f9;border:1px dashed #ccc;border-radius:10px;padding:12px}
-    @media (max-width:900px){.hero{grid-template-columns:1fr}.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
-
-    header.nav{position:sticky;top:0;background:#fff;border-bottom:1px solid #eee;z-index:5}
-    header.nav .row{display:flex;align-items:center;justify-content:space-between}
-    header.nav a{color:#111;text-decoration:none}
+    :root { --c-text:#111; --c-muted:#666; --c-border:#eaeaea; --c-bg:#fff; }
+    body{color:var(--c-text); background:var(--c-bg); font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+    .container{max-width:980px;margin:0 auto;padding:24px 16px;}
+    header.site{border-bottom:1px solid var(--c-border); padding:12px 16px;}
+    header.site nav{display:flex;gap:16px;align-items:center;}
+    header.site a{color:inherit;text-decoration:none}
+    header.site .brand{font-weight:700}
+    .hero{margin:16px 0 24px}
+    .hero img{width:100%;height:auto;border-radius:12px;display:block}
+    article.post h1{font-size:28px;line-height:1.25;margin:8px 0 12px}
+    article.post .meta{color:var(--c-muted);font-size:14px;margin-bottom:8px}
+    article.post .intro{font-size:18px;color:#222;margin-bottom:12px}
+    article.post h2{margin-top:28px;font-size:22px}
+    article.post h3{margin-top:18px;font-size:18px}
+    article.post p{line-height:1.7;margin:10px 0}
+    article.post ul{padding-left:18px}
+    article.post li{margin:6px 0}
+    figure{margin:18px 0}
+    figure img{width:100%;height:auto;border-radius:10px}
+    figure figcaption{color:var(--c-muted);font-size:13px;margin-top:6px}
+    .note{background:#fafafa;border:1px solid var(--c-border);border-left:4px solid #111;padding:12px;border-radius:8px}
+    .grid{display:grid;gap:12px}
+    .grid.cols-2{grid-template-columns:repeat(2,1fr)}
+    @media (max-width:768px){.grid.cols-2{grid-template-columns:1fr}}
+    .related{border-top:1px solid var(--c-border);margin-top:28px;padding-top:16px}
+    .related a{display:inline-block;margin-right:10px}
+    footer.site{border-top:1px solid var(--c-border);padding:20px 16px;margin-top:28px;color:var(--c-muted);font-size:14px}
   </style>
-</head>
-<body>
-  <!-- Header -->
-  <header class="nav">
-    <div class="wrap row">
-      <a href="/" aria-label="Trang chủ MXD" style="display:flex;gap:8px;align-items:center">
-        <img src="/logo.png" alt="Logo MXD" width="28" height="28" loading="lazy" />
-        <strong>MXD</strong>
-      </a>
-      <nav class="menu" aria-label="Menu chính" style="display:flex;gap:12px">
-        <a href="/store.html">Cửa hàng</a>
-        <a href="/blog/">Blog</a>
-        <a href="#lien-he" class="btn">Tư vấn chọn gạch</a>
-      </nav>
-    </div>
-  </header>
 
-  <main>
-    <nav class="wrap" aria-label="Breadcrumb" style="font-size:14px;margin-top:8px">
-      <a href="/">Trang chủ</a> › <a href="/blog/">Blog</a> › Gạch ốp lát WC
-    </nav>
-
-    <!-- HERO -->
-    <section class="wrap hero" aria-label="Gạch ốp lát nhà vệ sinh">
-      <div>
-        <span class="badge">🧱 Vật liệu & thi công</span>
-        <h1>Gạch ốp lát WC: chọn kích thước, chống trơn & <mark>ron đẹp</mark></h1>
-        <p class="muted">Đúng loại gạch cho đúng vị trí; chống trơn tay nắm chắc (R10–R12), độ dốc chuẩn 1–2% về phễu; keo & ron hợp lý để bề mặt vừa đẹp vừa bền.</p>
-        <div class="cta">
-          <a class="btn" href="#chon-gach">Chọn gạch theo vị trí</a>
-          <a class="btn" href="#layout">Kích thước & layout</a>
-          <a class="btn" href="#keo-ron">Keo & ron</a>
-        </div>
-      </div>
-      <div>
-        <figure class="hero">
-  <img src="/assets/img/tin-tuc/gach-op-lat-wc.webp"
-       alt="Gạch ốp lát nhà vệ sinh: kích thước, bề mặt & phối màu"
-       width="1280" height="720" loading="eager" decoding="async">
-</figure>
-
-      </div>
-    </section>
-
-    <!-- LIÊN KẾT BÀI LIÊN QUAN -->
-    <section class="wrap section" aria-label="Bài liên quan">
-      <div class="card"><div class="body">
-        <p>Bài này nằm trong chuỗi thi công WC cùng MXD: 
-          <a href="/blog/thi-cong-nha-ve-sinh-500tr.html">Thi công WC 500 triệu</a> · 
-          <a href="/blog/chong-tham-wc.html">Chống thấm WC</a> · 
-          <a href="/blog/keo-dan-gach.html">Keo dán gạch</a> · 
-          <a href="/blog/may-cat-gach.html">Máy cắt gạch</a> · 
-          <strong>Gạch ốp lát WC</strong>
-        </p>
-      </div></div>
-    </section>
-
-    <!-- CHỌN GẠCH THEO VỊ TRÍ -->
-    <section id="chon-gach" class="wrap section" aria-label="Chọn gạch theo vị trí">
-      <h2 class="headline">Chọn gạch đúng chỗ, đúng thông số</h2>
-      <div class="card"><div class="body">
-        <table class="table">
-          <thead><tr><th>Vị trí</th><th>Loại gạch</th><th>Chống trơn (R)</th><th>Hấp thụ nước</th><th>Độ dày</th><th>Kích thước gợi ý</th></tr></thead>
-          <tbody>
-            <tr><td>Sàn WC</td><td>Porcelain (granite nhân tạo)</td><td>R10–R12 (bề mặt mờ/nhám)</td><td>≤ 0,5%</td><td>8–10mm</td><td>30×30, 30×60, 60×60</td></tr>
-            <tr><td>Vùng ướt (tắm, quanh phễu)</td><td>Porcelain/anti-slip</td><td>R11–R12</td><td>≤ 0,5%</td><td>8–10mm</td><td>30×30, mosaic 5×5–10×10</td></tr>
-            <tr><td>Tường ướt</td><td>Ceramic/porcelain bề mặt mờ</td><td>R9–R10 (không trơn tay)</td><td>≤ 10% (ceramic) / ≤0,5% (porcelain)</td><td>7–9mm</td><td>30×60, 30×90, 60×120</td></tr>
-            <tr><td>Tường khô</td><td>Ceramic/porcelain</td><td>R9</td><td>—</td><td>7–9mm</td><td>30×60, 30×90</td></tr>
-          </tbody>
-        </table>
-        <p class="muted" style="margin-top:8px">Thông số R (Resistencia/Slip rating) mang tính tham khảo theo tiêu chuẩn hãng. Luôn xem TDS của từng dòng gạch trước khi quyết định.</p>
-      </div></div>
-    </section>
-
-    <!-- KÍCH THƯỚC & LAYOUT -->
-    <section id="layout" class="wrap section" aria-label="Kích thước & layout">
-      <h2 class="headline">Kích thước & bố cục lát (layout)</h2>
-      <div class="grid cols-3">
-        <article class="card"><div class="body"><strong>30×60 / 60×60</strong><p class="muted">Dễ cân phòng nhỏ; cắt gọn quanh phễu & hố ga. Với 60×60 nên dùng keo C2TE và bộ cân bằng (leveling).</p></div></article>
-        <article class="card"><div class="body"><strong>60×120</strong><p class="muted">Ít mạch, sang – nhưng cần bề mặt phẳng, 2 thợ thi công và keo C2TE S1 + back-buttering.</p></div></article>
-        <article class="card"><div class="body"><strong>Mosaic 5–10cm</strong><p class="muted">Tuyệt cho vùng dốc mạnh quanh phễu; tạo đường chảy đẹp, chống trơn tốt.</p></div></article>
-      </div>
-      <div class="card" style="margin-top:12px"><div class="body">
-        <table class="table">
-          <thead><tr><th>Kiểu lát</th><th>Mô tả</th><th>Tỉ lệ hao hụt gợi ý</th></tr></thead>
-          <tbody>
-            <tr><td>Thẳng hàng</td><td>Song song cạnh tường</td><td>~5%</td></tr>
-            <tr><td>So le 1/2 (brick)</td><td>Giảm thấy mạch, hợp 30×60</td><td>~7–10%</td></tr>
-            <tr><td>Chéo 45°</td><td>Hợp phòng vuông, che lệch tường</td><td>~10–12%</td></tr>
-            <tr><td>Xương cá (herringbone)</td><td>Tạo điểm nhấn, cần thợ cứng</td><td>~10–15%</td></tr>
-          </tbody>
-        </table>
-        <p class="muted" style="margin-top:8px">Hao hụt còn phụ thuộc mặt bằng, kích thước gạch và tay nghề thợ.</p>
-      </div></div>
-    </section>
-
-    <!-- KEO & RON -->
-    <section id="keo-ron" class="wrap section" aria-label="Keo dán & ron">
-      <h2 class="headline">Keo dán & ron: bền chắc từ bên dưới</h2>
-      <div class="grid cols-2">
-        <article class="card"><div class="body"><strong>Keo dán</strong><p class="muted">Sàn WC & gạch lớn: ưu tiên C2TE (độ bám cao, chống trượt) – nếu 60×120 nên dùng loại có độ dẻo S1 và <em>back-buttering</em> mặt sau gạch. Căn răng bay: 6–8mm cho 30×60, 10–12mm cho 60×60 trở lên.</p><p class="muted">Tham khảo thêm bài <a href="/blog/keo-dan-gach.html">Keo dán gạch</a>.</p></div></article>
-        <article class="card"><div class="body"><strong>Ron (chít mạch)</strong><p class="muted">Rectified (cạnh cắt): 2–3mm; non-rectified: 3–5mm. Khu vực ướt ưu tiên ron polymer cải tiến/kháng ố; có thể chọn epoxy cho chống bẩn cao (khó thi công hơn).</p></div></article>
-      </div>
-      <p class="wrap note" style="margin-top:14px">Độ phủ keo tối thiểu ~80–90% cho tường; ~90–100% cho sàn ướt. Dùng nêm/cân bằng để hạn chế bậc gạch (lippage).</p>
-    </section>
-
-    <!-- 6 LƯU Ý THI CÔNG -->
-    <section class="wrap section" aria-label="Lưu ý thi công">
-      <h2 class="headline">6 lưu ý thi công giúp bề mặt đẹp & bền</h2>
-      <div class="grid cols-3">
-        <article class="card"><div class="body"><strong>Độ dốc 1–2%</strong><p class="muted">Dốc đều về phễu/hố ga; ưu tiên mosaic quanh phễu để chỉnh dốc mịn.</p></div></article>
-        <article class="card"><div class="body"><strong>Phẳng nền trước khi lát</strong><p class="muted">Sai số phẳng làm hở keo. Bả phẳng/siết phẳng trước với vữa sửa nền.</p></div></article>
-        <article class="card"><div class="body"><strong>Back-buttering</strong><p class="muted">Bắt buộc với gạch lớn/ít hút nước; tăng diện tích bám dính.</p></div></article>
-        <article class="card"><div class="body"><strong>Joint giãn nở</strong><p class="muted">Để khe chu vi 3–5mm (silicon/PU) tại chân tường, ngưỡng cửa.</p></div></article>
-        <article class="card"><div class="body"><strong>Cắt & bo cạnh sạch</strong><p class="muted">Cắt gạch bằng lưỡi đúng vật liệu; mài vát mép để mạch gọn.</p></div></article>
-        <article class="card"><div class="body"><strong>Lau keo đúng lúc</strong><p class="muted">Lau keo tràn trước khi đóng rắn; chít mạch sau khi keo đủ cứng theo TDS.</p></div></article>
-      </div>
-    </section>
-
-    <!-- CHECKLIST NGHIỆM THU -->
-    <section class="wrap section" aria-label="Checklist nghiệm thu">
-      <h2 class="headline">Checklist nghiệm thu nhanh</h2>
-      <div class="grid cols-3">
-        <article class="card"><div class="body"><strong>Hướng dốc đúng</strong><p class="muted">Nước rút nhanh, không đọng vũng quanh phễu/điểm thấp.</p></div></article>
-        <article class="card"><div class="body"><strong>Bề mặt phẳng & đều mạch</strong><p class="muted">Không bậc gạch; mạch thẳng, đồng đều; khe chu vi có chất đàn hồi.</p></div></article>
-        <article class="card"><div class="body"><strong>Không bộp rỗng</strong><p class="muted">Gõ nghe chắc; điểm rỗng phải xử lý lại.</p></div></article>
-        <article class="card"><div class="body"><strong>Ron sạch</strong><p class="muted">Không lem; bề mặt sạch keo; bo silicon các góc 90°.</p></div></article>
-        <article class="card"><div class="body"><strong>Ảnh biên bản</strong><p class="muted">Chụp lại layout, độ dốc, tình trạng sau 24–48h sử dụng.</p></div></article>
-        <article class="card"><div class="body"><strong>TDS tuân thủ</strong><p class="muted">Thi công theo hướng dẫn hãng keo/ron/gạch.</p></div></article>
-      </div>
-    </section>
-
-    <!-- LỖI THƯỜNG GẶP -->
-    <section class="wrap section" aria-label="Lỗi thường gặp">
-      <h2 class="headline">Lỗi thường gặp & cách khắc phục</h2>
-      <div class="grid cols-2">
-        <article class="card"><div class="body"><strong>Lát từ cửa vào</strong><p class="muted">Dễ “tịt” đường thoát. Nên xuất phát từ phễu – canh cắt đẹp ở chân tường/cửa.</p></div></article>
-        <article class="card"><div class="body"><strong>Bỏ khe chu vi</strong><p class="muted">Nở nhiệt làm đội nền/mẻ gạch. Luôn để khe đàn hồi quanh chu vi.</p></div></article>
-        <article class="card"><div class="body"><strong>Ron quá nhỏ</strong><p class="muted">Dễ nứt/bẩn. Giữ 2–3mm với gạch cạnh cắt, 3–5mm với cạnh bo.</p></div></article>
-        <article class="card"><div class="body"><strong>Dùng keo không đúng</strong><p class="muted">Gạch lớn mà dùng C1 sẽ trượt/lệch. Ưu tiên C2TE/S1 cho khổ lớn.</p></div></article>
-      </div>
-    </section>
-
-    <!-- CTA LIÊN HỆ & CỬA HÀNG -->
-    <section id="lien-he" class="wrap section" aria-label="Liên hệ tư vấn">
-      <h2 class="headline">Cần tư vấn chọn gạch & layout? Liên hệ MXD</h2>
-      <div class="card"><div class="body">
-        <form action="https://formspree.io/f/your_form_id" method="POST">
-          <div class="grid cols-3">
-            <label class="card" style="border:none"><div class="body" style="padding:0"><span>Họ tên</span><input required name="name" type="text" placeholder="Nguyễn Văn A" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px"/></div></label>
-            <label class="card" style="border:none"><div class="body" style="padding:0"><span>Số điện thoại</span><input required name="phone" type="tel" placeholder="09xx xxx xxx" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px"/></div></label>
-            <label class="card" style="border:none"><div class="body" style="padding:0"><span>Địa điểm</span><input name="location" type="text" placeholder="Quận/Huyện, Tỉnh/TP" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px"/></div></label>
-          </div>
-          <label class="card" style="border:none;margin-top:10px"><div class="body" style="padding:0"><span>Ghi chú</span><textarea name="message" rows="4" placeholder="Phong cách, kích thước gạch dự định, thời gian thi công..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px"></textarea></div></label>
-          <div class="cta" style="margin-top:12px">
-            <button class="btn" type="submit">Gửi yêu cầu</button>
-            <a class="btn" href="/store.html">Mua gạch & phụ kiện</a>
-            <a class="btn" href="tel:+84338328898">Gọi MXD: 0338 328 898</a>
-          </div>
-        </form>
-      </div></div>
-      <p class="muted" style="margin-top:8px">* Thay <code>your_form_id</code> bằng Formspree ID thật.</p>
-    </section>
-  </main>
-
-  <footer class="wrap" style="border-top:1px solid #eee;padding:20px 16px">
-    <small class="muted">© <span id="y"></span> MXD – Thi công & mua sắm dụng cụ xây dựng. “Tối ưu & bền vững – không chỉ kiếm hoa hồng một lần, mà xây chuỗi nội dung để giữ chân khách.”</small>
-    <nav style="margin-top:8px;display:flex;gap:12px;flex-wrap:wrap">
-      <a href="/" class="muted">Trang chủ</a>
-      <a href="/store.html" class="muted">Cửa hàng</a>
-      <a href="/blog/thi-cong-nha-ve-sinh-500tr.html" class="muted">Bài liên quan</a>
-    </nav>
-  </footer>
-
-  <!-- Schema.org: BlogPosting -->
+  <!-- Structured data: Article -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "Gạch ốp lát WC: chọn kích thước, chống trơn & ron đẹp",
-    "image": ["https://mxd210.github.io/assets/img/tin-tuc/gach-op-lat-wc.jpg"],
+    "@type": "Article",
+    "headline": "Gạch ốp lát WC: Cách chọn, chống trơn & thi công sạch sẽ",
+    "description": "Hướng dẫn chọn gạch ốp lát cho WC: kích thước, chống trơn R10–R12, phối màu, keo ốp lát, độ dốc sàn, ron epoxy.",
+    "image": ["https://mxd210.github.io/assets/img/tin-tuc/keo-op-lat.jpg"],
+    "author": {"@type": "Organization", "name": "MXD"},
+    "publisher": {"@type": "Organization", "name": "MXD", "logo": {"@type": "ImageObject", "url": "https://mxd210.github.io/logo.png"}},
     "datePublished": "2025-09-15",
     "dateModified": "2025-09-15",
-    "author": {"@type":"Organization","name":"MXD"},
-    "publisher": {"@type":"Organization","name":"MXD","logo":{"@type":"ImageObject","url":"https://mxd210.github.io/logo.png"}},
-    "url": "https://mxd210.github.io/blog/gach-op-lat-wc.html",
-    "description": "Chọn gạch đúng chỗ, đúng thông số trượt R, keo & ron chuẩn; bố trí lát đẹp và kiểm soát chất lượng theo checklist."
+    "mainEntityOfPage": {"@type": "WebPage", "@id": "https://mxd210.github.io/blog/gach-op-lat-wc.html"}
   }
   </script>
+</head>
+<body>
+  <header class="site" role="banner">
+    <nav aria-label="Điều hướng">
+      <a class="brand" href="/">MXD</a>
+      <a href="/store.html">Cửa hàng</a>
+      <a href="/blog.html" aria-current="page">Blog</a>
+      <a href="/lien-he.html">Liên hệ</a>
+    </nav>
+  </header>
 
-  <!-- Analytics + SW -->
-  <script src="/assets/analytics.js" defer></script>
+  <main class="container" role="main">
+    <article class="post" itemscope itemtype="https://schema.org/Article">
+      <header>
+        <p class="meta"><time datetime="2025-09-15">15/09/2025</time> • 8–10 phút đọc</p>
+        <h1 itemprop="headline">Gạch ốp lát WC: cách chọn kích thước, chống trơn & thi công sạch sẽ</h1>
+        <p class="intro">Nhà vệ sinh nhỏ nhưng “khó”. Chọn sai gạch là trơn trượt, ố bẩn, xuống màu nhanh. Bài này tóm toàn bộ kinh nghiệm thực chiến: từ chọn gạch, keo ốp lát, tạo dốc, đến chà ron epoxy cho sạch – bền – đẹp.</p>
+      </header>
+
+      <section class="hero" aria-label="Ảnh minh họa">
+        <img src="/assets/img/tin-tuc/keo-op-lat.jpg" alt="Thi công keo ốp lát gạch WC, bề mặt phẳng sạch" width="1280" height="720" loading="lazy" decoding="async">
+      </section>
+
+      <section id="chon-gach">
+        <h2>1) Chọn gạch đúng: vật liệu, bề mặt & kích thước</h2>
+        <h3>Vật liệu: Ceramic vs Porcelain</h3>
+        <ul>
+          <li><strong>Ceramic</strong>: nhẹ, giá tốt; hút nước cao hơn – phù hợp ốp tường.</li>
+          <li><strong>Porcelain</strong>: đặc, ít hút nước, bền bề mặt – hợp lát sàn WC.</li>
+        </ul>
+        <h3>Chống trơn: đọc chỉ số R</h3>
+        <p>Ưu tiên bề mặt mờ, <strong>R10–R12</strong>. Tránh bóng kính ở sàn vì dễ trượt, đặc biệt khi ướt xà phòng.</p>
+        <h3>Kích thước</h3>
+        <ul>
+          <li><strong>Sàn</strong>: 300×300 / 300×600 dễ tạo dốc; phòng lớn có thể 600×600 kèm rãnh dẫn.</li>
+          <li><strong>Tường</strong>: 300×600 dễ ốp thẳng hàng, gọn ron; cao tới trần để chống ẩm.</li>
+        </ul>
+        <figure>
+          <img src="/assets/img/tin-tuc/keo-dan-gach.webp" alt="So sánh gạch 30x60 và 60x60 cho khu vệ sinh" width="1280" height="720" loading="lazy" decoding="async">
+          <figcaption>Chọn khổ phù hợp giúp thi công nhanh, ron thẳng – đẹp.</figcaption>
+        </figure>
+      </section>
+
+      <section id="chuan-bi-ben-mat">
+        <h2>2) Chuẩn bị bề mặt & chống thấm trước khi lát</h2>
+        <ul>
+          <li>Vệ sinh, bả phẳng, <strong>tạo nhám nhẹ</strong> nơi cần bám dính tốt.</li>
+          <li><strong>Chống thấm</strong> đủ lớp (tối thiểu 2 lớp vuông góc nhau), <em>up</em> lên chân tường ≥ 200&nbsp;mm.</li>
+          <li>Test ngâm 24 giờ trước khi lát – nếu thấm, sửa ngay, đừng “cầu may”.</li>
+        </ul>
+        <p class="note">Kinh nghiệm: quét hồ dầu xi+latex lên nền hút nước mạnh trước khi trét keo để chống “cháy keo”.</p>
+      </section>
+
+      <section id="keo-op-lat">
+        <h2>3) Keo ốp lát & kỹ thuật trải keo</h2>
+        <ul>
+          <li>Chọn keo <strong>C1/C2</strong> tùy nền và kích thước gạch; gạch lớn → cần <strong>độ dẻo & bám dính cao</strong>.</li>
+          <li>Dùng <strong>bay răng cưa</strong> cỡ răng phù hợp (≈ 6–10&nbsp;mm tùy gạch).</li>
+          <li>Trải 2 chiều (nền & lưng gạch) với gạch lớn hoặc nền không phẳng để tránh rỗng.</li>
+          <li>Giữ <strong>khoảng hở ron</strong> tối thiểu 2–3&nbsp;mm; dùng <em>ke chữ thập</em> canh ron.</li>
+        </ul>
+        <div class="grid cols-2">
+          <figure>
+            <img src="/assets/img/products/bay-60.webp" alt="Bay răng cưa 60 cm răng 8 mm dùng trải keo" width="640" height="360" loading="lazy" decoding="async">
+            <figcaption>Bay răng cưa 60&nbsp;cm – răng 8&nbsp;mm.</figcaption>
+          </figure>
+          <figure>
+            <img src="/assets/img/products/may-cat-1.webp" alt="Máy cắt gạch cầm tay cắt gạch 60x60" width="640" height="360" loading="lazy" decoding="async">
+            <figcaption>Máy cắt gạch – cắt chỉnh gờ, khe thoát nước.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="do-doc">
+        <h2>4) Độ dốc sàn & thoát nước êm</h2>
+        <ul>
+          <li>Độ dốc khuyến nghị: <strong>1.0–1.5%</strong> hướng về phễu thu. Phòng nhỏ: tạo “máng” 2 hướng để nước không đọng.</li>
+          <li>Chỉnh gờ cửa, cao độ sàn WC <em>thấp hơn</em> sàn ngoài 10–20&nbsp;mm hoặc dùng gờ chống tràn.</li>
+          <li>Bo chân tường bằng gạch cắt 45° hoặc nẹp để dễ vệ sinh.</li>
+        </ul>
+      </section>
+
+      <section id="ron-epoxy">
+        <h2>5) Chà ron epoxy: sạch, kháng ố vàng</h2>
+        <p>Ron <strong>epoxy</strong> kháng ố, ít thấm bẩn, rất hợp WC; thi công chậm khô hơn xi măng nên có thời gian chỉnh sửa. Màu ron nên tiệp màu gạch hoặc xám nhạt cho “sạch mắt”.</p>
+      </section>
+
+      <section id="checklist">
+        <h2>6) Checklist vật tư nhanh</h2>
+        <ul>
+          <li>Gạch sàn R10–R12; gạch tường 30×60.</li>
+          <li>Keo ốp lát phù hợp nền/gạch (C1/C2); phụ gia latex nếu cần.</li>
+          <li>Bay răng cưa (6–10&nbsp;mm), nêm chữ thập, búa cao su.</li>
+          <li>Ron epoxy + dụng cụ chà ron, miếng mút lau.</li>
+          <li>Phễu thu chống mùi, nẹp góc, nẹp cửa, silicon kháng mốc.</li>
+        </ul>
+      </section>
+
+      <section id="loi-thuong-gap">
+        <h2>7) Lỗi thường gặp & cách xử lý</h2>
+        <ul>
+          <li><strong>Phồng rộp, kêu bộp:</strong> trải keo mỏng, rỗng – khắc phục bằng trải kép, dùng răng cưa lớn hơn.</li>
+          <li><strong>Đọng nước:</strong> độ dốc chưa đủ – chỉnh lại cao độ, cắt rãnh dẫn về phễu.</li>
+          <li><strong>Ron ố vàng:</strong> đổi ron epoxy, tăng thông gió; lau vệ sinh theo tuần.</li>
+        </ul>
+      </section>
+
+      <section class="note" aria-label="Gợi ý mua nhanh">
+        <p><strong>Mua nhanh:</strong> <a href="/store/keo-op-lat.html">Keo ốp lát</a> • <a href="/store/bay-rang-cua.html">Bay răng cưa</a> • <a href="/store/may-cat-mai.html">Máy cắt gạch</a> • <a href="/store/chong-tham.html">Chống thấm</a></p>
+      </section>
+
+      <section class="related" aria-label="Bài liên quan">
+        <h3>Đọc tiếp</h3>
+        <a href="/blog/chong-tham-wc.html">Chống thấm WC: quy trình 3 lớp</a>
+        <a href="/blog/may-cat-gach.html">Máy cắt gạch: chọn & dùng đúng cách</a>
+        <a href="/blog/bay-rang-cua.html">Bay răng cưa: chọn răng & cán</a>
+      </section>
+    </article>
+  </main>
+
+  <footer class="site" role="contentinfo">
+    <div class="container">
+      <p>© <span id="y"></span> MXD – Thi công & mua sắm dụng cụ xây dựng. "Lựa chọn của bạn – hạnh phúc của tôi."</p>
+      <p><a href="/chinh-sach.html">Chính sách</a> • <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
+  </footer>
+
   <script>
+    // Năm hiện tại
     document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Đăng ký Service Worker (an toàn khi vào trang lẻ)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(()=>{});
+        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(()=>{});
       });
     }
   </script>
+  <!-- Thứ tự script: analytics trước, affiliate sau (để có gtag nếu cần tracking click) -->
+  <script src="/assets/analytics.js" defer></script>
+  <script src="/assets/mxd-affiliate.js" defer></script>
 </body>
 </html>
