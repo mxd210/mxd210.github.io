@@ -21,7 +21,22 @@
 
   <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/assets/site.css"/>
-  <style>.container{max-width:980px;margin:0 auto;padding:24px 16px}.hero img{width:100%;border-radius:12px;display:block}</style>
+  <style>
+    .container{max-width:980px;margin:0 auto;padding:24px 16px}
+    .hero img{width:100%;border-radius:12px;display:block}
+    .note{background:#fafafa;border:1px solid #eee;border-left:4px solid #111;padding:12px;border-radius:8px}
+    .related{border-top:1px solid #eee;margin-top:28px;padding-top:16px}
+    .grid.products{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media (max-width:900px){.grid.products{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.grid.products{grid-template-columns:1fr}}
+    .product-card{border:1px solid #e9e9e9;border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+    .product-card img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+    .product-card .body{padding:10px 12px}
+    .product-card h3{margin:0 0 6px;font-size:1rem;line-height:1.35}
+    .product-card p{margin:0;color:#444}
+    .product-card .price{margin-top:6px;font-weight:600}
+    .product-card a.stretched{display:block;text-decoration:none;color:inherit}
+  </style>
 
   <script type="application/ld+json">
   {
@@ -45,7 +60,7 @@
 
 <main class="container">
   <article>
-    <p class="meta"><time datetime="2025-09-15">15/09/2025</time> • 6 phút đọc</p>
+    <p class="meta"><time datetime="2025-09-15">15/09/2025</time> • 6–8 phút đọc</p>
     <h1>Máy cắt gạch: chọn máy & mẹo sử dụng hiệu quả</h1>
     <section class="hero">
       <img src="/assets/img/tin-tuc/may-cat-gach.webp" alt="Máy cắt gạch: chọn máy & mẹo sử dụng" width="1280" height="720" loading="lazy" decoding="async">
@@ -54,7 +69,7 @@
     <h2>Chọn máy</h2>
     <ul>
       <li><strong>Bàn đẩy</strong>: cắt thẳng gạch men/porcelain, ít bụi.</li>
-      <li><strong>Cầm tay</strong>: linh hoạt cắt rãnh, lỗ; cần lưỡi phù hợp.</li>
+      <li><strong>Cầm tay</strong>: linh hoạt cắt rãnh, cắt lỗ; cần lưỡi phù hợp.</li>
       <li><strong>Máy ướt</strong>: cắt đẹp gạch dày/đá, giảm bụi & sứt mẻ.</li>
     </ul>
 
@@ -66,6 +81,45 @@
       <li>Đeo kính/khẩu trang; cố định phôi; cắt thử trước khi vào đường chính.</li>
       <li>Kẻ rãnh mồi, áp lực đều tay, không bẻ gạch khi chưa đủ rãnh.</li>
     </ul>
+
+    <!-- 🔽 Block 3 link affiliate: dùng link gốc + data-merchant để script tự xử lý -->
+    <section id="goi-y-may" aria-label="Một số máy đáng tham khảo" data-list="products" data-list-name="Máy cắt gợi ý">
+      <h2>Gợi ý nhanh: 3 mẫu máy “đủ xài – bền tay”</h2>
+      <div class="grid products">
+        <!-- Item 1: Lazada -->
+        <article class="product-card" itemscope itemtype="https://schema.org/Product">
+          <a class="stretched" href="https://www.lazada.vn/products/may-cat-gach-ban-60cm" data-merchant="lazada.vn" itemprop="url">
+            <img src="/assets/img/products/may-cat-1.webp" alt="Máy cắt gạch bàn 60&nbsp;cm" width="640" height="360" loading="lazy" decoding="async" itemprop="image">
+            <div class="body">
+              <h3 itemprop="name">Máy cắt gạch bàn 60&nbsp;cm (thanh trượt)</h3>
+              <p class="price"><span itemprop="offers" itemscope itemtype="https://schema.org/Offer"><span itemprop="priceCurrency" content="VND"></span><span itemprop="price">1.590.000</span>₫</span></p>
+            </div>
+          </a>
+        </article>
+
+        <!-- Item 2: Shopee -->
+        <article class="product-card" itemscope itemtype="https://schema.org/Product">
+          <a class="stretched" href="https://shopee.vn/may-cat-gach-cam-tay-125mm" data-merchant="shopee.vn" itemprop="url">
+            <img src="/assets/img/products/may-cat-1.webp" alt="Máy cắt gạch cầm tay 125&nbsp;mm" width="640" height="360" loading="lazy" decoding="async" itemprop="image">
+            <div class="body">
+              <h3 itemprop="name">Máy cắt gạch cầm tay 125&nbsp;mm (1.200W)</h3>
+              <p class="price"><span itemprop="offers" itemscope itemtype="https://schema.org/Offer"><span itemprop="priceCurrency" content="VND"></span><span itemprop="price">899.000</span>₫</span></p>
+            </div>
+          </a>
+        </article>
+
+        <!-- Item 3: Tiki -->
+        <article class="product-card" itemscope itemtype="https://schema.org/Product">
+          <a class="stretched" href="https://tiki.vn/may-cat-uot-ban-nuoc-800w" data-merchant="tiki.vn" itemprop="url">
+            <img src="/assets/img/products/may-cat-1.webp" alt="Máy cắt ướt bàn nước 800W" width="640" height="360" loading="lazy" decoding="async" itemprop="image">
+            <div class="body">
+              <h3 itemprop="name">Máy cắt ướt (bàn nước) 800W</h3>
+              <p class="price"><span itemprop="offers" itemscope itemtype="https://schema.org/Offer"><span itemprop="priceCurrency" content="VND"></span><span itemprop="price">2.190.000</span>₫</span></p>
+            </div>
+          </a>
+        </article>
+      </div>
+    </section>
 
     <section class="note"><strong>Mua nhanh:</strong> <a href="/store/may-cat-mai.html">Máy cắt</a> • <a href="/store/keo-op-lat.html">Keo ốp lát</a> • <a href="/store/bay-rang-cua.html">Bay răng cưa</a></section>
 
