@@ -1,65 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Cửa hàng MXD – Sản phẩm chọn lọc</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
-  <link rel="stylesheet" href="/assets/css/styles.css">
-  <style>
-    /* Layout cửa hàng */
-    body { font-family: system-ui, sans-serif; margin: 0; background: #f8fafc; color: #0b1220; }
-    .container { max-width: 1100px; margin: auto; padding: 20px; }
-    h1 { font-size: 28px; margin-bottom: 16px; }
-    .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
-    .card {
-      border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;
-      background: #fff; display: flex; flex-direction: column;
-    }
-    .card img { width: 100%; height: 180px; object-fit: cover; }
-    .card .info { padding: 14px; flex: 1; display: flex; flex-direction: column; }
-    .card h2 { font-size: 18px; margin: 0 0 8px; }
-    .card p { font-size: 14px; color: #64748b; margin-bottom: 12px; flex: 1; }
-    .price { font-weight: 700; margin-bottom: 8px; color: #0f172a; }
-    .rating { font-size: 14px; color: #f59e0b; margin-bottom: 12px; }
-    .btn {
-      background: #1d4ed8; color: #fff; text-align: center;
-      padding: 10px 12px; border-radius: 8px; text-decoration: none; font-weight: 600;
-    }
-    .btn:hover { background: #2563eb; }
-    header, footer { padding: 16px; background: #fff; text-align: center; border-bottom: 1px solid #e5e7eb; }
-    footer { border-top: 1px solid #e5e7eb; font-size: 14px; color: #64748b; }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    /* Nút nổi liên hệ – tạm để inline, lát tách ra /assets/js/floating-contact.js */
-    .float-box{
-      position:fixed; right:16px; bottom:16px;
-      display:flex; flex-direction:column; gap:10px; z-index:9999;
-    }
-    .float-btn{
-      display:flex; align-items:center; gap:8px;
-      background:#fff; color:#111; text-decoration:none;
-      border:1px solid #111; border-radius:999px;
-      padding:10px 14px; box-shadow:0 8px 24px rgba(0,0,0,.12);
-      font:600 14px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      transition:transform .15s ease;
-    }
-    .float-btn:hover{ transform:translateY(-1px); }
-    .float-btn .icon{ font-size:18px; line-height:1; }
-    @media (max-width:480px){ .float-btn .label{ display:none; } }
+  <title>Cửa hàng MXD – Sản phẩm chọn lọc</title>
+  <meta name="description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
+  <link rel="canonical" href="https://mxd210.github.io/store.html">
+  <meta name="robots" content="index,follow">
+
+  <!-- OG / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Cửa hàng MXD – Sản phẩm chọn lọc">
+  <meta property="og:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
+  <meta property="og:url" content="https://mxd210.github.io/store.html">
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/products/bay-rang-cua-banner.webp">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cửa hàng MXD – Sản phẩm chọn lọc">
+  <meta name="twitter:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
+  <meta name="twitter:image" content="https://mxd210.github.io/assets/img/products/bay-rang-cua-banner.webp">
+
+  <link rel="icon" href="/logo.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#111111">
+
+  <!-- CSS chính của site -->
+  <link rel="stylesheet" href="/assets/site.css">
+
+  <!-- Style riêng cho store -->
+  <style>
+    body{font-family:system-ui,sans-serif;margin:0;background:#f8fafc;color:#0b1220}
+    header,footer{padding:16px;background:#fff;border-bottom:1px solid #e5e7eb;text-align:center}
+    footer{border-top:1px solid #e5e7eb;border-bottom:none;font-size:14px;color:#64748b}
+    .container{max-width:1100px;margin:auto;padding:20px}
+    h1{font-size:28px;margin:0 0 16px}
+    .grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+    .card{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+    .card img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+    .card .info{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1}
+    .card h2{font-size:18px;margin:0}
+    .card p{font-size:14px;color:#64748b;margin:0 0 4px;flex:1}
+    .price{font-weight:700;color:#0f172a}
+    .rating{font-size:14px;color:#f59e0b}
+    .btn{background:#1d4ed8;color:#fff;text-align:center;padding:10px 12px;border-radius:8px;text-decoration:none;font-weight:600}
+    .btn:hover{background:#2563eb}
+
+    /* Nút nổi liên hệ */
+    .float-box{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:9999}
+    .float-btn{display:flex;align-items:center;gap:8px;background:#fff;color:#111;text-decoration:none;border:1px solid #111;border-radius:999px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,.12);font:600 14px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;transition:transform .15s ease}
+    .float-btn:hover{transform:translateY(-1px)}
+    .float-btn .icon{font-size:18px;line-height:1}
+    @media (max-width:480px){.float-btn .label{display:none}}
   </style>
-  <script src="/assets/analytics.js"></script>
+
+  <script src="/assets/analytics.js" defer></script>
 </head>
 <body>
 
   <header>
-    <a href="/" style="text-decoration:none; font-weight: 700; font-size: 20px;">← Về trang chủ</a>
+    <a href="/" style="text-decoration:none;font-weight:700;font-size:20px">← Về trang chủ</a>
     <h1>Danh sách sản phẩm</h1>
   </header>
 
   <main class="container">
-    <div id="product-list" class="grid">
-      <!-- Sản phẩm sẽ được load tự động tại đây -->
-    </div>
+    <div id="product-list" class="grid"><!-- Sản phẩm sẽ được render ở đây --></div>
   </main>
 
   <footer>
@@ -68,78 +73,76 @@
 
   <!-- Nút nổi liên hệ -->
   <div class="float-box" aria-label="Liên hệ nhanh MXD">
-    <a class="float-btn" href="tel:+84338328898" aria-label="Gọi điện cho MXD">
-      <span class="icon">📞</span><span class="label">Gọi MXD</span>
-    </a>
-    <a class="float-btn" href="https://zalo.me/0338328898" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho MXD">
-      <span class="icon">💬</span><span class="label">Zalo</span>
-    </a>
-    <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD">
-      <span class="icon">📨</span><span class="label">Messenger</span>
-    </a>
+    <a class="float-btn" href="tel:+84338328898" aria-label="Gọi điện cho MXD"><span class="icon">📞</span><span class="label">Gọi MXD</span></a>
+    <a class="float-btn" href="https://zalo.me/0338328898" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho MXD"><span class="icon">💬</span><span class="label">Zalo</span></a>
+    <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD"><span class="icon">📨</span><span class="label">Messenger</span></a>
   </div>
 
-  <!-- Script: affiliate (đặt trước khi đóng body ở mọi trang bán) -->
-  <script src="/mxd-affiliate.js"></script>
+  <!-- Affiliate (một lần, defer) -->
+  <script src="/mxd-affiliate.js" defer></script>
 
-  <!-- Script: năm hiện tại + load products + SW register (không lồng script) -->
+  <!-- JS: năm hiện tại + load products + JSON-LD + Service Worker -->
   <script>
     // Năm hiện tại
-    document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Load sản phẩm
+    // Render danh sách sản phẩm
     fetch('/products.json')
       .then(r => r.json())
       .then(products => {
         const container = document.getElementById('product-list');
+        container.innerHTML = '';
         products.forEach(p => {
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <img src="${p.image}" alt="${p.name}" loading="lazy">
+            <img src="${p.image}" alt="${p.name}" loading="lazy" decoding="async">
             <div class="info">
               <h2>${p.name}</h2>
-              <p>${p.description}</p>
-              <div class="price">${p.price} đ</div>
-              <div class="rating">⭐ ${p.rating}</div>
-              <a class="btn" href="${p.link}" target="_blank" rel="noopener noreferrer sponsored">Xem giá</a>
+              <p>${p.description || ''}</p>
+              <div class="price">${p.price || ''}</div>
+              <div class="rating">${p.rating ? '⭐ ' + p.rating : ''}</div>
+              <a class="btn" href="${p.link}" target="_blank" rel="nofollow sponsored noopener noreferrer">Xem giá</a>
             </div>
           `;
           container.appendChild(card);
         });
 
-        // Nếu script affiliate có hàm scan, gọi lại sau khi append sản phẩm
+        // Gọi lại affiliate scanner nếu có
         if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
           window.mxdAffiliate.scan();
         }
+
+        // JSON-LD ItemList cho SEO
+        const ld = {
+          "@context":"https://schema.org","@type":"ItemList",
+          "itemListElement": products.map((p,i)=>({
+            "@type":"ListItem","position":i+1,"name":p.name,"url":p.link
+          }))
+        };
+        const s = document.createElement('script');
+        s.type = 'application/ld+json';
+        s.textContent = JSON.stringify(ld);
+        document.head.appendChild(s);
       })
-      .catch(error => {
-        console.error("Không thể tải sản phẩm:", error);
+      .catch(err => {
+        console.error('Không thể tải sản phẩm:', err);
         document.getElementById('product-list').innerHTML =
-          "<p>Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.</p>";
+          '<p>Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.</p>';
       });
 
-    // Đăng ký Service Worker
+    // Service Worker: đăng ký + auto reload khi có bản mới
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js', { scope: '/' })
-          .catch(err => console.warn('SW register failed:', err));
+      navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(()=>{});
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!window.__swRld) { window.__swRld = true; location.reload(); }
+      });
+      navigator.serviceWorker.ready.then(reg => {
+        if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
       });
     }
   </script>
-  <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!window.__swRld) { window.__swRld = true; location.reload(); }
-  });
-  navigator.serviceWorker.ready.then(reg => {
-    if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-  });
-}
-</script>
 
-  <script src="/mxd-affiliate.js"></script>
-<script src="/assets/js/floating-contact.js" defer></script>
-
+  <script src="/assets/js/floating-contact.js" defer></script>
 </body>
 </html>
