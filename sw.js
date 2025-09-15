@@ -1,24 +1,21 @@
-+ // sw.js — MXD PWA v11
-+ const VERSION = '';
+// sw.js — MXD PWA v12 (final)
+const VERSION = 'v12';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
-// File tĩnh cốt lõi (KHÔNG query). Có thể thêm/bớt tuỳ thực tế.
+// File tĩnh cốt lõi (KHÔNG query)
 const ASSETS = [
-  '/',                   // shell trang chủ
+  '/',                   // shell trang chủ (nếu dùng SPA)
   '/offline.html',       // trang offline riêng
   '/assets/site.css',
   '/assets/mxd-affiliate.js',
   '/assets/analytics.js',
-  // Tuỳ chọn: precache ảnh "above-the-fold" (chỉ bật nếu file đã tồn tại)
+  // Có thể thêm ảnh "above-the-fold" nếu đã tồn tại
   // '/assets/img/hero.webp',
   // '/assets/og-home.jpg',
 ];
 
-// Domain Analytics: bỏ qua để không chặn GA/gtag
-const GA_HOSTS = ['www.google-analytics.com','www.googletagmanager.com'];
-
-// Chuẩn hoá URL: bỏ query cho same-origin để tránh lệch key cache
+// Chuẩn hoá URL same-origin (bỏ query) để ổn định key cache
 const normalize = (input) => {
   const u = typeof input === 'string'
     ? new URL(input, location.origin)
@@ -39,8 +36,9 @@ self.addEventListener('activate', (e) => {
     // Xoá cache cũ
     const keys = await caches.keys();
     await Promise.all(
-      keys.filter((k) => k.startsWith(CACHE_PREFIX) && k !== CACHE)
-          .map((k) => caches.delete(k))
+      keys
+        .filter((k) => k.startsWith(CACHE_PREFIX) && k !== CACHE)
+        .map((k) => caches.delete(k))
     );
     // Bật navigation preload (tăng tốc lần tải đầu)
     if (self.registration.navigationPreload) {
@@ -50,7 +48,7 @@ self.addEventListener('activate', (e) => {
   })());
 });
 
-// Cho phép client gửi message để skipWaiting thủ công
+// Cho phép client "bật" SW mới ngay
 self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
@@ -59,7 +57,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   const url = new URL(req.url);
 
-  // Endpoint debug nhanh: /sw-version → trả version
+  // Endpoint debug nhanh: /sw-version → trả version hiện tại
   if (url.pathname === '/sw-version') {
     e.respondWith(new Response(VERSION, { headers: {'content-type':'text/plain'} }));
     return;
@@ -68,44 +66,51 @@ self.addEventListener('fetch', (e) => {
   // Chỉ xử lý GET
   if (req.method !== 'GET') return;
 
-  // Không can thiệp GA/gtag để Analytics hoạt động chuẩn
-  if (GA_HOSTS.includes(url.hostname)) return;
+  // Không can thiệp Analytics (mọi biến thể host)
+  const u = req.url;
+  if (u.includes('googletagmanager.com') || u.includes('google-analytics.com')) return;
 
-  // 1) Điều hướng HTML → network-first + preload; rớt mạng → shell hoặc offline
-  if (req.mode === 'navigate') {
+  // Xác định request HTML điều hướng
+  const isHTMLNav =
+    req.mode === 'navigate' ||
+    (req.headers.get('accept') || '').includes('text/html');
+
+  // 1) HTML navigate → network-first (+ navigation preload); rớt mạng → cache theo trang, rồi '/', rồi offline.html
+  if (isHTMLNav) {
     e.respondWith((async () => {
       try {
-        // dùng navigation preload nếu sẵn
         const preload = await e.preloadResponse;
         if (preload) {
-          caches.open(CACHE).then((c) => c.put('/', preload.clone()));
+          const key = normalize(req);
+          caches.open(CACHE).then(c => c.put(key, preload.clone()));
           return preload;
         }
         const res = await fetch(req);
-        caches.open(CACHE).then((c) => c.put('/', res.clone()));
+        const key = normalize(req);
+        caches.open(CACHE).then(c => c.put(key, res.clone()));
         return res;
       } catch {
-        return (await caches.match('/')) || (await caches.match('/offline.html'));
+        return (await caches.match(normalize(req)))
+            || (await caches.match('/'))
+            || (await caches.match('/offline.html'));
       }
     })());
     return;
   }
 
   // 2) Same-origin static → stale-while-revalidate + normalize key
-  const isStatic = (
-    url.origin === location.origin &&
-    (
+  const isStatic =
+    url.origin === location.origin && (
       url.pathname.startsWith('/assets/') ||
-      url.pathname.endsWith('.css') ||
-      url.pathname.endsWith('.js')  ||
-      url.pathname.endsWith('.webp')||
-      url.pathname.endsWith('.png') ||
-      url.pathname.endsWith('.jpg') ||
-      url.pathname.endsWith('.jpeg')||
-      url.pathname.endsWith('.svg') ||
+      url.pathname.endsWith('.css')   ||
+      url.pathname.endsWith('.js')    ||
+      url.pathname.endsWith('.webp')  ||
+      url.pathname.endsWith('.png')   ||
+      url.pathname.endsWith('.jpg')   ||
+      url.pathname.endsWith('.jpeg')  ||
+      url.pathname.endsWith('.svg')   ||
       url.pathname.endsWith('.woff2')
-    )
-  );
+    );
 
   if (isStatic) {
     e.respondWith(
@@ -113,9 +118,9 @@ self.addEventListener('fetch', (e) => {
         const tryNormalized = cached ? Promise.resolve(cached) : caches.match(normalize(req));
         return tryNormalized.then((hit) => {
           const fetching = fetch(req).then((res) => {
-            const cpy = res.clone();
+            const clone1 = res.clone();
             caches.open(CACHE).then((c) => {
-              c.put(req, cpy);
+              c.put(req, clone1);
               const normKey = normalize(req);
               if (normKey !== req.url) c.put(normKey, res.clone());
             });
@@ -129,7 +134,5 @@ self.addEventListener('fetch', (e) => {
   }
 
   // 3) Khác origin → network-first; rớt mạng → dùng cache nếu có
-  e.respondWith(
-    fetch(req).catch(() => caches.match(req))
-  );
+  e.respondWith(fetch(req).catch(() => caches.match(req)));
 });
