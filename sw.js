@@ -1,10 +1,10 @@
-// sw.js — MXD PWA v13
-const VERSION = 'v13';
+// sw.js — MXD PWA v14
+const VERSION = 'v14';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
 const ASSETS = [
-  '/',                   // shell trang chủ (nếu dùng SPA)
+  '/',                   // shell trang chủ
   '/offline.html',       // trang offline riêng
   '/assets/site.css',
   '/assets/mxd-affiliate.js',
@@ -36,6 +36,7 @@ self.addEventListener('activate', (e) => {
       keys.filter((k) => k.startsWith(CACHE_PREFIX) && k !== CACHE)
           .map((k) => caches.delete(k))
     );
+    // Bật Navigation Preload (tăng tốc lần đầu)
     if (self.registration.navigationPreload) {
       try { await self.registration.navigationPreload.enable(); } catch {}
     }
@@ -49,6 +50,8 @@ self.addEventListener('message', (event) => {
 
 self.addEventListener('fetch', (e) => {
   const req = e.request;
+  if (req.method !== 'GET') return;
+
   const url = new URL(req.url);
 
   // Endpoint debug: /sw-version → trả version
@@ -57,12 +60,16 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Chỉ xử lý GET
-  if (req.method !== 'GET') return;
-
-  // Không can thiệp Analytics (mọi biến thể host)
-  const u = req.url;
-  if (u.includes('googletagmanager.com') || u.includes('google-analytics.com')) return;
+  // Không can thiệp các request Analytics
+  const GA_HOSTS = new Set([
+    'www.googletagmanager.com',
+    'googletagmanager.com',
+    'www.google-analytics.com',
+    'google-analytics.com',
+    'analytics.google.com',
+    'g.doubleclick.net'
+  ]);
+  if (GA_HOSTS.has(url.hostname)) return;
 
   // Điều hướng HTML?
   const isHTMLNav = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
