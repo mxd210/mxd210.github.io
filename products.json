@@ -1,21 +1,48 @@
 [
   {
-    "id": "MXD-SHOPEE-001",
-    "name": "Máy cân bằng laser 12 tia",
-    "image": "/assets/img/products/laser-12.webp",
-    "description": "Máy cân bằng laser 12 tia xanh, độ chính xác cao.",
-    "price": 2390000,
-    "rating": 4.7,
-    "affiliate_url": "https://shopee.vn/..."
+    "sku": "bay-60",
+    "name": "Bay răng cưa 60 cm (6–12 mm)",
+    "description": "Bay răng cưa cán nhựa; răng 6/8/10/12 mm – hợp khổ gạch 60×60.",
+    "image": "/assets/img/products/bay-60.webp",
+    "price": "",
+    "rating": "4.8/5",
+    "link": "/store/bay-rang-cua.html#bay-60"
   },
   {
-    "id": "MXD-SHOPEE-002",
-    "name": "Máy mài pin Dekton M21 AG100 Plus",
-    "image": "/assets/img/products/may-mai.webp",
-    "description": "Máy mài tốc độ cao, pin khỏe, nhỏ gọn.",
-    "price": 1690000,
-    "rating": 4.8,
-    "affiliate_url": "https://go.isclix.com/..."
+    "sku": "bay-80",
+    "name": "Bay răng cưa 80 cm (6–12 mm)",
+    "description": "Hợp khổ gạch lớn (60×120). Cán dài, đầm tay, dễ kiểm soát lớp keo.",
+    "image": "/assets/img/products/bay-80.webp",
+    "price": "",
+    "rating": "4.7/5",
+    "link": "/store/bay-rang-cua.html#bay-80"
+  },
+
+  {
+    "sku": "may-cat-cam-tay-800-1200w",
+    "name": "Máy cắt gạch cầm tay 800–1200W",
+    "description": "Nhỏ gọn, linh hoạt cho sửa chữa dân dụng; lưu ý chọn lưỡi đúng loại gạch.",
+    "image": "/assets/img/tin-tuc/may-cat-gach.webp",
+    "price": "",
+    "rating": "",
+    "link": "https://go.isclix.com/deep_link/6803097511817356947/5785137271776984286?url=https%3A%2F%2Fshopee.vn%2Fproduct%2F718585685%2F26903964352&sub1=may-cat-gach&sub2=list_1&sub3=shopee&sub4=oneatweb&utm_source=mxd-blog&utm_medium=content&utm_campaign=may-cat-gach_20250914&utm_content=list_1_shopee"
+  },
+  {
+    "sku": "may-ban-day-chinh-xac",
+    "name": "Máy cắt gạch bàn đẩy (độ chính xác cao)",
+    "description": "Đường cắt thẳng, ít bụi; phù hợp ốp lát chuẩn xác cho diện tích lớn.",
+    "image": "/assets/img/tin-tuc/may-cat-gach.webp",
+    "price": "",
+    "rating": "",
+    "link": "https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=https%3A%2F%2Fwww.lazada.vn%2Fproducts%2Fmay-cat-duc-may-cua-dien-da-cam-thach-xe-ranh-kim-loai-gach-men-xach-tay-da-chuc-nang-cong-suat-lon-cho-tho-moc-gia-dung-i2524273711-s12373057165.html&sub1=may-cat-gach&sub2=list_2&sub3=lazada&sub4=oneatweb&utm_source=mxd-blog&utm_medium=content&utm_campaign=may-cat-gach&utm_content=list_2_lazada"
+  },
+  {
+    "sku": "may-cat-uot",
+    "name": "Máy cắt gạch ướt – đường cắt mịn",
+    "description": "Có nước làm mát lưỡi, giảm nứt vỡ cạnh; hợp gạch dày/đá.",
+    "image": "/assets/img/tin-tuc/may-cat-gach.webp",
+    "price": "",
+    "rating": "",
+    "link": "https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=https%3A%2F%2Fwww.lazada.vn%2Fproducts%2Fpdp-i2623637396-s12799182249.html&sub1=may-cat-gach&sub2=list_3&sub3=lazada&sub4=oneatweb&utm_source=mxd-blog&utm_medium=content&utm_campaign=may-cat-gach_20250914&utm_content=list_3_lazada"
   }
-  // thêm các sản phẩm khác...
 ]
