@@ -1,79 +1,106 @@
-// /assets/mxd-affiliate.js
+/* mxd-affiliate.js – Chuẩn hoá nút Mua ngay (MXD)
+   - Rewrites: link gốc → deep link AccessTrade
+   - Adds: target, rel, và GA4 click event
+   - Chỉ động vào <a.buy data-merchant ...>
+*/
 (() => {
-  // Domain affiliate cần track
-  const MERCHANTS = {
-    "shopee.vn": true,
-    "lazada.vn": true,
-    "s.lazada.vn": true,
-    "tiki.vn": true,
-    "go.isclix.com": true // Accesstrade deep link
+  // ---- Config: AccessTrade (điền đúng mã của bạn) --------------------------
+  const PUB_ID = '6803097511817356947'; // Publisher ID
+  const CAMPAIGN = {
+    'shopee.vn': '5785137271776984286',
+    'lazada.vn': '5127144557053758578',
+    'tiki.vn':   'REPLACE_TIKI_CAMPAIGN_ID' // TODO: điền mã Tiki nếu dùng
   };
 
-  const REQUIRED_REL = "nofollow sponsored noreferrer noopener";
-  const gtagSafe = window.gtag || function(){ (window.dataLayer = window.dataLayer || []).push(arguments); };
-  const isMod = (e) => e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
+  // ---- Helpers --------------------------------------------------------------
+  const cleanHost = (h) => h.replace(/^www\./, '');
+  const isAlreadyAff = (url) =>
+    /go\.isclix\.com\/deep_link/i.test(url);
 
-  function decorateAnchor(a) {
-    try {
-      const u = new URL(a.href);
-      const host = u.hostname.replace(/^www\./, "");
-      if (!MERCHANTS[host]) return;
+  const pageSlug = (() => {
+    const f = location.pathname.split('/').pop() || '';
+    return (f.replace(/\.html$/,'') || 'home').toLowerCase();
+  })();
 
-      // Bổ sung rel/target an toàn
-      const rel = new Set((a.getAttribute("rel") || "").split(/\s+/).filter(Boolean));
-      REQUIRED_REL.split(" ").forEach(t => rel.add(t));
-      a.setAttribute("rel", Array.from(rel).join(" "));
-      if (!a.getAttribute("target")) a.setAttribute("target", "_blank");
+  const buildUTM = (a) => {
+    const sub1 = a.dataset.sub1 || pageSlug;
+    return `utm_source=mxd-blog&utm_medium=content&utm_campaign=${encodeURIComponent(sub1)}`;
+  };
 
-      if (a.dataset.affBound) return;
-      a.addEventListener("click", (e) => {
-        const href = a.href;
+  const buildAccessTradeLink = (a) => {
+    const href = a.getAttribute('href');
+    if (!href) return null;
+    let u;
+    try { u = new URL(href, location.origin); } catch { return null; }
 
-        // Nếu mở cùng tab & không dùng phím bổ trợ → giữ điều hướng 1 nhịp để gửi event
-        const sameTab = (a.target === "_self" || !a.target) && !isMod(e);
-        if (sameTab) {
-          e.preventDefault();
-          let done = false;
-          const go = () => { if (!done) { done = true; location.href = href; } };
-          const t = setTimeout(go, 700);
+    const host = cleanHost(u.hostname);
+    const camp = CAMPAIGN[host];
+    if (!camp) return null;
 
-          gtagSafe("event", "affiliate_click", {
-            merchant: host,
-            link_url: href,
-            page_location: location.href,
-            page_title: document.title,
-            event_label: host,
-            debug_mode: true,
-            event_callback: () => { clearTimeout(t); go(); }
-          });
-        } else {
-          // Mở tab mới hoặc dùng phím bổ trợ → chỉ bắn event
-          gtagSafe("event", "affiliate_click", {
-            merchant: host,
-            link_url: href,
-            page_location: location.href,
-            page_title: document.title,
-            event_label: host,
-            debug_mode: true
+    const deep = encodeURIComponent(u.toString());
+    const qs = new URLSearchParams();
+
+    // sub1..sub4 từ data-*
+    ['sub1','sub2','sub3','sub4'].forEach(k => {
+      if (a.dataset[k]) qs.set(k, a.dataset[k]);
+    });
+
+    // Thêm UTM
+    const utm = buildUTM(a).split('&');
+    utm.forEach(kv => {
+      const [k,v] = kv.split('=');
+      if (k && v) qs.set(k, v);
+    });
+
+    return `https://go.isclix.com/deep_link/${PUB_ID}/${camp}?url=${deep}` +
+           (qs.toString() ? `&${qs.toString()}` : '');
+  };
+
+  // ---- Rewrite tất cả nút .buy ---------------------------------------------
+  const buttons = document.querySelectorAll('a.buy[data-merchant]');
+  buttons.forEach(a => {
+    const rawHref = a.getAttribute('href');
+
+    // Cảnh báo nếu còn để "#"/rỗng → phải điền link gốc trước
+    if (!rawHref || rawHref === '#') {
+      console.warn('[MXD] Nút "Mua ngay" thiếu link gốc:', a);
+      a.target = '_blank';
+      a.rel = 'nofollow sponsored noreferrer';
+      return;
+    }
+
+    // Nếu đã là link AccessTrade → chỉ bổ sung thuộc tính an toàn
+    if (isAlreadyAff(a.href)) {
+      a.target = '_blank';
+      a.rel = 'nofollow sponsored noreferrer';
+    } else {
+      const aff = buildAccessTradeLink(a);
+      if (aff) a.href = aff;
+      a.target = '_blank';
+      a.rel = 'nofollow sponsored noreferrer';
+    }
+
+    // GA4 click event (analytics.js phải load trước)
+    a.addEventListener('click', () => {
+      try {
+        if (window.gtag) {
+          const merch = a.dataset.merchant || 'unknown';
+          window.gtag('event', 'affiliate_click', {
+            event_category: 'affiliate',
+            event_label: merch,
+            value: 1
           });
         }
-      }, { capture: true, passive: false });
+      } catch {}
+    }, { capture: true });
+  });
 
-      a.dataset.affBound = "1";
-    } catch (_) { /* ignore bad URL */ }
+  // ---- Audit nhanh: log các nút còn sai ------------------------------------
+  const bad = [...document.querySelectorAll('a.buy')]
+    .filter(a => a.getAttribute('href') === '#' || !a.getAttribute('href'));
+  if (bad.length) {
+    console.group('[MXD] Nút "Mua ngay" vẫn để href="#" hoặc rỗng');
+    bad.forEach(a => console.log(a));
+    console.groupEnd();
   }
-
-  // Quét ban đầu
-  document.querySelectorAll('a[href^="http"]').forEach(decorateAnchor);
-
-  // Tự bind cho link thêm động (SPA, lazyload…)
-  new MutationObserver(muts => {
-    for (const m of muts) {
-      for (const n of m.addedNodes) {
-        if (n.nodeType !== 1) continue;
-        if (n.matches && n.matches('a[href^="http"]')) decorateAnchor(n);
-        if (n.querySelectorAll) n.querySelectorAll('a[href^="http"]').forEach(decorateAnchor);
-      }
-    }
-  }).observe(document.documentElement, { childList: true, subtree: true });
 })();
