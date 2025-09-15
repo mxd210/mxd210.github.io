@@ -1,5 +1,5 @@
-+ // sw.js — MXD PWA v10
-+ const VERSION = 'v10';
++ // sw.js — MXD PWA v11
++ const VERSION = '';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
