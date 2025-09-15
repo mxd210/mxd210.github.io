@@ -1,8 +1,39 @@
-<!doctype html><meta charset="utf-8"><title>Trang không tồn tại</title>
-<meta http-equiv="refresh" content="3; url=/">
-<link rel="stylesheet" href="/assets/site.css">
-<main class="mxd-section"><div class="wrap">
-  <h1>404 – Không tìm thấy trang</h1>
-  <p>Tự động trở về trang chủ sau 3 giây…</p>
-  <p><a class="btn" href="/">Về trang chủ ngay</a></p>
-</div></main>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>404 – Trang không tồn tại | MXD</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/site.css">
+  <!-- GA4 -->
+  <script src="/assets/analytics.js" defer></script>
+</head>
+<body>
+  <main class="mxd-section"><div class="wrap">
+    <h1>404 – Không tìm thấy trang</h1>
+    <p>Đường dẫn <code id="p"></code> không tồn tại. Tự động trở về trang chủ sau 3 giây…</p>
+    <p>
+      <a class="btn" href="/">Về trang chủ ngay</a>
+      <a class="btn" href="/store.html">Vào cửa hàng</a>
+    </p>
+  </div></main>
+
+  <script>
+    // Hiển thị đường dẫn
+    document.getElementById('p').textContent = location.pathname;
+
+    // Bắn sự kiện GA để theo dõi link hỏng
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.gtag) {
+        gtag('event', 'page_404', {
+          page_path: location.pathname,
+          referrer: document.referrer || '(direct)'
+        });
+      }
+      // Chờ 3s rồi về trang chủ (để GA kịp gửi event)
+      setTimeout(() => location.replace('/'), 3000);
+    });
+  </script>
+</body>
+</html>
