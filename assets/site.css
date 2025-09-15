@@ -18,6 +18,34 @@ a{color:#111;text-decoration:none}a:hover{text-decoration:underline}img{max-widt
 .nav-list a{display:block;padding:10px 0}
 
 /* Hero */
+/* Hero (figure cover dùng chung blog + store) */
+.hero { margin: 8px 0 20px; }
+.hero img{
+  display:block;
+  width:100%;
+  height:auto;           /* giữ đúng tỉ lệ ảnh */
+  border-radius:12px;
+}
+
+/* Banner ngang (1600x500) – crop ổn trên màn lớn */
+@media (min-width: 640px){
+  .hero img[width="1600"][height="500"]{
+    aspect-ratio: 16 / 5;
+    object-fit: cover;   /* luôn fill khung, không méo */
+  }
+}
+
+/* Ảnh trong các card (blog/store) */
+.cards img,
+.prod-card img{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio: 16 / 9;  /* thumbnail 16:9 */
+  object-fit: cover;
+  border-radius:12px;
+}
+
 .mxd-hero{padding:32px 0;background:linear-gradient(180deg,#f8f8f8,#fff)}
 .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}
 .hero-copy h1{margin:0 0 8px 0;font-size:36px}
