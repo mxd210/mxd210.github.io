@@ -1,16 +1,16 @@
-// sw.js — MXD PWA v14
-const VERSION = 'v14';
+// sw.js — MXD PWA v15
+const VERSION = 'v15';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
 const ASSETS = [
   '/',                   // shell trang chủ
+  '/store.html',         // ✅ precache trang store
   '/offline.html',       // trang offline riêng
   '/assets/site.css',
   '/assets/mxd-affiliate.js',
   '/assets/analytics.js',
-  // '/assets/img/hero.webp',
-  // '/assets/og-home.jpg',
+  // Có thể thêm hero/og sau này nếu muốn precache ảnh lớn
 ];
 
 // Chuẩn hoá URL same-origin (bỏ query) để ổn định key cache
@@ -60,21 +60,18 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Không can thiệp các request Analytics
+  // Không can thiệp Analytics
   const GA_HOSTS = new Set([
-    'www.googletagmanager.com',
-    'googletagmanager.com',
-    'www.google-analytics.com',
-    'google-analytics.com',
-    'analytics.google.com',
-    'g.doubleclick.net'
+    'www.googletagmanager.com','googletagmanager.com',
+    'www.google-analytics.com','google-analytics.com',
+    'analytics.google.com','g.doubleclick.net'
   ]);
   if (GA_HOSTS.has(url.hostname)) return;
 
   // Điều hướng HTML?
   const isHTMLNav = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
 
-  // 1) HTML navigate → network-first (+ navigation preload); rớt mạng → cache theo trang, rồi '/', rồi offline.html
+  // 1) HTML navigate → network-first (+ preload); rớt mạng → cache theo trang, rồi '/', rồi offline.html
   if (isHTMLNav) {
     e.respondWith((async () => {
       try {
