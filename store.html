@@ -202,30 +202,25 @@
 
   <!-- JS: năm hiện tại + load products + JSON-LD + Service Worker -->
   <script>
-    // Năm hiện tại
-    document.getElementById('year').textContent = new Date().getFullYear();
+  // Năm hiện tại
+  document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Render danh sách sản phẩm
-    fetch('/products.json')
-      .then(r => r.json())
-      .then(products => {
-        const container = document.getElementById('product-list');
-        container.innerHTML = '';
-        products.forEach(p => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src="${p.image}" alt="${p.name}" loading="lazy" decoding="async">
-            <div class="info">
-              <h2>${p.name}</h2>
-              <p>${p.description || ''}</p>
-              <div class="price">${p.price || ''}</div>
-              <div class="rating">${p.rating ? '⭐ ' + p.rating : ''}</div>
-              <a class="btn" href="${p.link}" target="_blank" rel="nofollow sponsored noopener noreferrer">Xem giá</a>
-            </div>
-          `;
-          container.appendChild(card);
-        });
+  // Quét lại affiliate sau khi DOM sẵn sàng (nếu script hỗ trợ)
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
+      window.mxdAffiliate.scan();
+    }
+  });
+
+  // Service Worker: đăng ký + auto reload khi có bản mới
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(()=>{});
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!window.__swRld) { window.__swRld = true; location.reload(); }
+    });
+  }
+</script>
+
 
         // Gọi lại affiliate scanner nếu có
         if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
