@@ -1,16 +1,14 @@
-// sw.js — MXD PWA v15
-const VERSION = 'v15';
+// sw.js — MXD PWA v16 (no external offline.html needed)
+const VERSION = 'v16';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
 const ASSETS = [
-  '/',                   // shell trang chủ
-  '/store.html',         // ✅ precache trang store
-  '/offline.html',       // trang offline riêng
+  '/',                  // shell trang chủ
+  '/store.html',        // precache trang store
   '/assets/site.css',
   '/assets/mxd-affiliate.js',
   '/assets/analytics.js',
-  // Có thể thêm hero/og sau này nếu muốn precache ảnh lớn
 ];
 
 // Chuẩn hoá URL same-origin (bỏ query) để ổn định key cache
@@ -20,6 +18,18 @@ const normalize = (input) => {
     : new URL(input.url);
   return u.origin === location.origin ? u.pathname : u.href;
 };
+
+// Trang offline nội tuyến (không cần file offline.html)
+const offlinePage = () => new Response(
+  `<!doctype html><meta charset="utf-8">
+   <title>MXD – Offline</title>
+   <main style="max-width:640px;margin:20vh auto;font:16px/1.6 system-ui;text-align:center">
+     <h1>Không có mạng</h1>
+     <p>Vui lòng kết nối Internet để tiếp tục.</p>
+     <p><a href="/" rel="nofollow">Về trang chủ</a> · <a href="/store.html">Vào cửa hàng</a></p>
+   </main>`,
+  { headers: {'content-type':'text/html; charset=utf-8'} }
+);
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -33,10 +43,10 @@ self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(
-      keys.filter((k) => k.startsWith(CACHE_PREFIX) && k !== CACHE)
-          .map((k) => caches.delete(k))
+      keys.filter(k => k.startsWith(CACHE_PREFIX) && k !== CACHE)
+          .map(k => caches.delete(k))
     );
-    // Bật Navigation Preload (tăng tốc lần đầu)
+    // Navigation Preload
     if (self.registration.navigationPreload) {
       try { await self.registration.navigationPreload.enable(); } catch {}
     }
@@ -54,7 +64,7 @@ self.addEventListener('fetch', (e) => {
 
   const url = new URL(req.url);
 
-  // Endpoint debug: /sw-version → trả version
+  // /sw-version → xem phiên bản
   if (url.pathname === '/sw-version') {
     e.respondWith(new Response(VERSION, { headers: {'content-type':'text/plain'} }));
     return;
@@ -71,7 +81,7 @@ self.addEventListener('fetch', (e) => {
   // Điều hướng HTML?
   const isHTMLNav = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
 
-  // 1) HTML navigate → network-first (+ preload); rớt mạng → cache theo trang, rồi '/', rồi offline.html
+  // 1) HTML → network-first (+ preload); lỗi mạng → cache theo trang, rồi '/', cuối cùng trả offlinePage()
   if (isHTMLNav) {
     e.respondWith((async () => {
       try {
@@ -92,13 +102,13 @@ self.addEventListener('fetch', (e) => {
       } catch {
         return (await caches.match(normalize(req)))
             || (await caches.match('/'))
-            || (await caches.match('/offline.html'));
+            || offlinePage();
       }
     })());
     return;
   }
 
-  // 2) Same-origin static → stale-while-revalidate + normalize key
+  // 2) Static same-origin → stale-while-revalidate (+ normalize key)
   const isStatic =
     url.origin === location.origin && (
       url.pathname.startsWith('/assets/') ||
@@ -128,13 +138,13 @@ self.addEventListener('fetch', (e) => {
             }
             return res;
           }).catch(() => null);
-          return hit || fetching || caches.match('/offline.html');
+          return hit || fetching || null;
         });
       })
     );
     return;
   }
 
-  // 3) Khác origin → network-first; rớt mạng → cache nếu có
+  // 3) Khác origin → network-first; rớt mạng → cache (nếu có)
   e.respondWith(fetch(req).catch(() => caches.match(req)));
 });
