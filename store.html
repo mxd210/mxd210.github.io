@@ -200,16 +200,31 @@
     <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD"><span class="icon">📨</span><span class="label">Messenger</span></a>
   </div>
 
-  <!-- JS: năm hiện tại + load products + JSON-LD + Service Worker -->
-  <script>
-  // Năm hiện tại
-  document.getElementById('year').textContent = new Date().getFullYear();
+<script>
+  // Năm ở footer
+  const yr = document.getElementById('year');
+  if (yr) yr.textContent = new Date().getFullYear();
 
-  // Quét lại affiliate sau khi DOM sẵn sàng (nếu script hỗ trợ)
+  // Sau khi DOM sẵn sàng: quét affiliate + gắn JSON-LD từ thẻ hiện có
   document.addEventListener('DOMContentLoaded', () => {
+    // 1) Quét affiliate (nếu script hỗ trợ)
     if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
       window.mxdAffiliate.scan();
     }
+
+    // 2) JSON-LD ItemList cho SEO (lấy từ danh sách đã render)
+    try {
+      const items = [...document.querySelectorAll('#may-cat-list .product')].map((card, i) => {
+        const name = card.querySelector('.title')?.textContent?.trim() || 'Sản phẩm';
+        const url  = card.querySelector('.buy')?.href || location.href;
+        return {"@type":"ListItem","position":i+1,"name":name,"url":url};
+      });
+      const ld = {"@context":"https://schema.org","@type":"ItemList","itemListElement":items};
+      const s = document.createElement('script');
+      s.type = 'application/ld+json';
+      s.textContent = JSON.stringify(ld);
+      document.head.appendChild(s);
+    } catch {}
   });
 
   // Service Worker: đăng ký + auto reload khi có bản mới
@@ -218,43 +233,12 @@
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (!window.__swRld) { window.__swRld = true; location.reload(); }
     });
+    navigator.serviceWorker.ready.then(reg => {
+      if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+    });
   }
 </script>
 
-
-        // Gọi lại affiliate scanner nếu có
-        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
-          window.mxdAffiliate.scan();
-        }
-
-        // JSON-LD ItemList cho SEO
-        const ld = {
-          "@context":"https://schema.org","@type":"ItemList",
-          "itemListElement": products.map((p,i)=>({
-            "@type":"ListItem","position":i+1,"name":p.name,"url":p.link
-          }))
-        };
-        const s = document.createElement('script');
-        s.type = 'application/ld+json';
-        s.textContent = JSON.stringify(ld);
-        document.head.appendChild(s);
-      })
-      .catch(err => {
-        console.error('Không thể tải sản phẩm:', err);
-        document.getElementById('product-list').innerHTML =
-          '<p>Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.</p>';
-      });
-
-    // Service Worker: đăng ký + auto reload khi có bản mới
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(()=>{});
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!window.__swRld) { window.__swRld = true; location.reload(); }
-      });
-      navigator.serviceWorker.ready.then(reg => {
-        if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-      });
-    }
   </script>
 <script src="/assets/analytics.js" defer></script>
 <script src="/assets/mxd-affiliate.js" defer></script>
