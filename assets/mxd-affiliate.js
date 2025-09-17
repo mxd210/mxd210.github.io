@@ -1,131 +1,229 @@
-/* mxd-affiliate.js – Chuẩn hoá nút Mua ngay (MXD)
-   - Rewrites: link gốc → deep link AccessTrade
-   - Adds: target, rel, và GA4 click event
-   - Chỉ động vào <a.buy data-merchant ...>
-*/
-(() => {
-  // ---- Config: AccessTrade (điền đúng mã của bạn) --------------------------
-  const PUB_ID = '6803097511817356947'; // Publisher ID
-  const CAMPAIGN = {
-    'shopee.vn': '5785137271776984286',
-    'lazada.vn': '5127144557053758578',
-    'tiki.vn':   'REPLACE_TIKI_CAMPAIGN_ID' // TODO: điền mã Tiki nếu dùng
-  };
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  // ---- Helpers --------------------------------------------------------------
-  const cleanHost = (h) => h.replace(/^www\./, '');
-  const isAlreadyAff = (url) =>
-    /go\.isclix\.com\/deep_link/i.test(url);
+  <title>Cửa hàng MXD – Sản phẩm chọn lọc</title>
+  <meta name="description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
+  <link rel="canonical" href="https://mxd210.github.io/store.html">
+  <meta name="robots" content="index,follow">
 
-  const pageSlug = (() => {
-    const f = location.pathname.split('/').pop() || '';
-    return (f.replace(/\.html$/,'') || 'home').toLowerCase();
-  })();
+  <!-- OG / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Cửa hàng MXD – Sản phẩm chọn lọc">
+  <meta property="og:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
+  <!-- TODO: upload ảnh hero mới theo chuẩn /assets/img/products/store-hero.webp -->
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/products/store-hero.webp">
+  <meta property="og:url" content="https://mxd210.github.io/store.html">
 
-  const buildUTM = (a) => {
-    const sub1 = a.dataset.sub1 || pageSlug;
-    return `utm_source=mxd-blog&utm_medium=content&utm_campaign=${encodeURIComponent(sub1)}`;
-  };
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cửa hàng MXD – Sản phẩm chọn lọc">
+  <meta name="twitter:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
+  <meta name="twitter:image" content="https://mxd210.github.io/assets/img/products/store-hero.webp">
 
-  const buildAccessTradeLink = (a) => {
-    const href = a.getAttribute('href');
-    if (!href) return null;
-    let u;
-    try { u = new URL(href, location.origin); } catch { return null; }
+  <link rel="icon" href="/logo.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#111111">
 
-    const host = cleanHost(u.hostname);
-    const camp = CAMPAIGN[host];
-    if (!camp) return null;
+  <!-- CSS chính -->
+  <link rel="stylesheet" href="/assets/site.css">
 
-    const deep = encodeURIComponent(u.toString());
-    const qs = new URLSearchParams();
+  <!-- Style tối thiểu cho grid -->
+  <style>
+    :root{color-scheme:light dark}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#f8fafc;color:#0b1220}
+    header,footer{padding:16px;background:#fff;border-bottom:1px solid #e5e7eb;text-align:center}
+    footer{border-top:1px solid #e5e7eb;border-bottom:none;font-size:14px;color:#64748b}
+    .container{max-width:1100px;margin:auto;padding:20px}
+    h1{font-size:28px;margin:0 0 16px}
+    h2{font-size:20px;margin:16px 0 12px}
 
-    // sub1..sub4 từ data-*
-    ['sub1','sub2','sub3','sub4'].forEach(k => {
-      if (a.dataset[k]) qs.set(k, a.dataset[k]);
-    });
+    .grid{display:grid;gap:20px}
+    #product-list{grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); list-style:none; padding:0; margin:0}
+    .product{border:1px solid #e5e7eb;border-radius:12px;padding:12px;background:#fff;display:flex;flex-direction:column}
+    .product .thumb img{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:8px;display:block}
+    .product h3{font-size:16px;margin:10px 0 6px}
+    .product .price{font-weight:700;color:#0f172a;margin:6px 0 10px}
+    .product .btn.buy{display:inline-block;padding:10px 12px;border:1px solid #111;border-radius:10px;text-decoration:none;font-weight:600;color:#111}
+    .product .btn.buy:hover{background:#111;color:#fff}
 
-    // Thêm UTM
-    const utm = buildUTM(a).split('&');
-    utm.forEach(kv => {
-      const [k,v] = kv.split('=');
-      if (k && v) qs.set(k, v);
-    });
+    /* Vùng dán dữ liệu (ẩn) – KHÔNG bọc grid thực trong class này */
+    .auto-products{display:none}
 
-    return `https://go.isclix.com/deep_link/${PUB_ID}/${camp}?url=${deep}` +
-           (qs.toString() ? `&${qs.toString()}` : '');
-  };
+    /* Nút nổi liên hệ */
+    .float-box{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:9999}
+    .float-btn{display:flex;align-items:center;gap:8px;background:#fff;color:#111;text-decoration:none;border:1px solid #111;border-radius:999px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,.12);font:600 14px/1 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;transition:transform .15s ease}
+    .float-btn:hover{transform:translateY(-1px)}
+    .float-btn .icon{font-size:18px;line-height:1}
+    @media (max-width:480px){.float-btn .label{display:none}}
+  </style>
+</head>
+<body>
 
-  // ---- Rewrite tất cả nút .buy ---------------------------------------------
-  const buttons = document.querySelectorAll('a.buy[data-merchant]');
-  buttons.forEach(a => {
-    const rawHref = a.getAttribute('href');
+  <header>
+    <a href="/" style="text-decoration:none;font-weight:700;font-size:20px">← Về trang chủ</a>
+    <h1>Cửa hàng MXD</h1>
+  </header>
 
-    // Cảnh báo nếu còn để "#"/rỗng → phải điền link gốc trước
-    if (!rawHref || rawHref === '#') {
-      console.warn('[MXD] Nút "Mua ngay" thiếu link gốc:', a);
-      a.target = '_blank';
-      a.rel = 'nofollow sponsored noreferrer';
-      return;
-    }
+  <main class="container">
+    <section aria-label="Danh sách sản phẩm">
+      <h2>Sản phẩm chọn lọc</h2>
+      <p>Chuẩn MXD: mỗi sản phẩm có <code>a.product-meta</code> (bắt buộc) + 1..n <code>a.buy</code> phía sau. Ảnh tại <code>/assets/img/products/&lt;slug&gt;.webp</code>.</p>
 
-    // Nếu đã là link AccessTrade → chỉ bổ sung thuộc tính an toàn
-    if (isAlreadyAff(a.href)) {
-      a.target = '_blank';
-      a.rel = 'nofollow sponsored noreferrer';
-    } else {
-      const aff = buildAccessTradeLink(a);
-      if (aff) a.href = aff;
-      a.target = '_blank';
-      a.rel = 'nofollow sponsored noreferrer';
-    }
+      <!-- Điểm đổ -->
+      <ul id="product-list" class="grid" aria-live="polite"></ul>
 
-    // GA4 click event (analytics.js phải load trước)
-    a.addEventListener('click', () => {
-      try {
-        if (window.gtag) {
-          const merch = a.dataset.merchant || 'unknown';
-          window.gtag('event', 'affiliate_click', {
-            event_category: 'affiliate',
-            event_label: merch,
-            value: 1
+      <!-- VÙNG DÁN LINK (ẩn) – Chỉ giữ 1 sản phẩm mẫu đúng chuẩn -->
+      <div class="auto-products" id="paste-links-here">
+        <!-- Sản phẩm #1 (mẫu) -->
+        <a class="product-meta"
+           href="https://shopee.vn/M%C3%A1y-C%E1%BA%AFt-C%E1%BA%A7m-Tay-Dekton-DK-AG950S-950W-%F0%9D%97%96%F0%9D%97%A1%F0%9D%97%A2%F0%9D%97%97%F0%9D%97%A4-%F0%9D%97%9F%F0%9D%97%A2%F0%9D%97%98-%F0%9D%97%83%F0%9D%97%A1%F0%9D%97%AE-i.300702715.5984515446"
+           data-merchant="shopee"
+           data-sku="may-cat-cam-tay-dekton-dk-ag950s"
+           data-img="/assets/img/products/may-cat-cam-tay-dekton-dk-ag950s.webp"
+           data-price="822000">Máy Cắt Cầm Tay Dekton DK-AG950S 950W</a>
+        <a class="buy" href="https://shopee.vn/product/300702715/5984515446" data-merchant="shopee" data-sub1="store" data-sub2="list_1">Mua ngay</a>
+
+        <!-- Thêm sản phẩm mới: copy block trên, đổi name + data-sku + data-img + href -->
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © <span id="year"></span> MXD – Liên hệ: <a href="tel:+84338328898">0338 328 898</a>
+  </footer>
+
+  <!-- Nút nổi liên hệ -->
+  <div class="float-box" aria-label="Liên hệ nhanh MXD">
+    <a class="float-btn" href="tel:+84338328898" aria-label="Gọi điện cho MXD"><span class="icon">📞</span><span class="label">Gọi MXD</span></a>
+    <a class="float-btn" href="https://zalo.me/0338328898" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho MXD"><span class="icon">💬</span><span class="label">Zalo</span></a>
+    <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD"><span class="icon">📨</span><span class="label">Messenger</span></a>
+  </div>
+
+  <!-- Footer year -->
+  <script>
+    (function(){ const yr=document.getElementById('year'); if(yr) yr.textContent=new Date().getFullYear(); })();
+  </script>
+
+  <!-- Render list sản phẩm (theo CHUẨN MXD) -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const src = document.querySelector('#paste-links-here');
+    const out = document.querySelector('#product-list');
+    if (!src || !out) return;
+
+    const PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="16" fill="#64748b">Đang cập nhật ảnh</text></svg>'
+    );
+
+    const normSku = s => (s||'').toLowerCase().trim()
+      .replace(/đ|ð/g,'d')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+
+    const metas = Array.from(src.querySelectorAll('a.product-meta'));
+    out.innerHTML = '';
+
+    metas.forEach(metaA => {
+      const name = (metaA.textContent || 'Sản phẩm').trim();
+      const href = metaA.getAttribute('href') || '#';
+      const merchant = (metaA.dataset.merchant || '').toLowerCase();
+      const priceNum = metaA.dataset.price ? parseInt(metaA.dataset.price,10) : null;
+
+      const sku = metaA.dataset.sku ? metaA.dataset.sku : normSku(name);
+      const img = metaA.dataset.img || `/assets/img/products/${sku}.webp`;
+
+      // gom các buy ngay sau meta cho đến khi gặp meta tiếp theo
+      const buys = [];
+      let n = metaA.nextElementSibling;
+      while (n && !(n.matches && n.matches('a.product-meta'))) {
+        if (n.matches && n.matches('a.buy')) {
+          buys.push({
+            href: n.getAttribute('href') || '#',
+            merchant: (n.dataset.merchant || '').toLowerCase(),
+            sub1: n.dataset.sub1 || '', sub2: n.dataset.sub2 || '',
+            sub3: n.dataset.sub3 || '', sub4: n.dataset.sub4 || ''
           });
         }
-      } catch {}
-    }, { capture: true });
+        n = n.nextElementSibling;
+      }
+
+      const primaryBuy = (buys[0]?.href) || href;
+      const primaryMerchant = (buys[0]?.merchant) || merchant;
+
+      let priceText = 'Cập nhật giá';
+      if (Number.isInteger(priceNum)) priceText = priceNum.toLocaleString('vi-VN');
+
+      const li = document.createElement('li');
+      li.className = 'product';
+      li.setAttribute('itemscope','');
+      li.setAttribute('itemtype','https://schema.org/Product');
+      li.innerHTML = `
+        <a class="thumb" href="${primaryBuy}" target="_blank" rel="nofollow sponsored noopener"
+           data-merchant="${primaryMerchant}" data-sku="${sku}">
+          <img src="${img}" alt="${name}" width="400" height="400" loading="lazy" decoding="async"
+               onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+        </a>
+        <h3 itemprop="name">${name}</h3>
+        <p class="price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+          <meta itemprop="priceCurrency" content="VND">
+          <span class="price-text" ${Number.isInteger(priceNum) ? 'itemprop="price" content="'+priceNum+'"' : ''}>${priceText}</span>
+        </p>
+        <a class="btn buy" href="${primaryBuy}" target="_blank" rel="nofollow sponsored noopener"
+           data-merchant="${primaryMerchant}" data-sku="${sku}" data-source="store" data-campaign="store_20250917">Mua ngay</a>
+      `;
+
+      if (buys.length > 1) {
+        const more = document.createElement('div');
+        more.style.marginTop = '8px';
+        more.innerHTML = buys.slice(1).map(b =>
+          `<a class="btn buy" style="margin-right:8px" href="${b.href}" target="_blank" rel="nofollow sponsored noopener"
+              data-merchant="${b.merchant}" data-sku="${sku}" data-source="store" data-campaign="store_20250917">Nguồn khác</a>`
+        ).join('');
+        li.appendChild(more);
+      }
+
+      out.appendChild(li);
+    });
   });
+  </script>
 
-  // ---- Audit nhanh: log các nút còn sai ------------------------------------
-  const bad = [...document.querySelectorAll('a.buy')]
-    .filter(a => a.getAttribute('href') === '#' || !a.getAttribute('href'));
-  if (bad.length) {
-    console.group('[MXD] Nút "Mua ngay" vẫn để href="#" hoặc rỗng');
-    bad.forEach(a => console.log(a));
-    console.groupEnd();
+  <!-- JSON-LD ItemList -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = [...document.querySelectorAll('#product-list .product')];
+    if (!cards.length) return;
+    const items = cards.map((card, i) => {
+      const name = card.querySelector('h3')?.textContent?.trim() || 'Sản phẩm';
+      const url  = card.querySelector('.buy')?.href || location.href;
+      return {"@type":"ListItem","position":i+1,"name":name,"url":url};
+    });
+    const ld = {"@context":"https://schema.org","@type":"ItemList","itemListElement":items};
+    const s = document.createElement('script');
+    s.type = 'application/ld+json';
+    s.textContent = JSON.stringify(ld);
+    document.head.appendChild(s);
+  });
+  </script>
+
+  <!-- Service Worker -->
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(()=>{});
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!window.__swRld) { window.__swRld = true; location.reload(); }
+    });
+    navigator.serviceWorker.ready.then(reg => {
+      if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+    });
   }
-})();
-// MXD Link Upgrader: dùng affiliates.json để thay /g.html?sku=... bằng deeplink trực tiếp
-(() => {
-  const UPGRADE = async () => {
-    try {
-      const res = await fetch('/assets/data/affiliates.json', { cache: 'no-cache' });
-      const map = await res.json();
+  </script>
 
-      document.querySelectorAll('a.buy, a.product-meta, a.go').forEach(a => {
-        const sku = (a.dataset.sku || '').trim().toLowerCase();
-        if (!sku || !map[sku] || !map[sku].deeplink) return;
-        a.href = map[sku].deeplink;
-        a.setAttribute('rel', 'nofollow sponsored noopener');
-        a.dataset.merchant = a.dataset.merchant || (map[sku].merchant || '');
-      });
-    } catch (e) {
-      console.warn('MXD Link Upgrader: cannot load affiliates.json', e);
-    }
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', UPGRADE);
-  } else {
-    UPGRADE();
-  }
-})();
+  <!-- GA4 trước, Affiliate sau (chuẩn MXD) -->
+  <script src="/assets/analytics.js" defer></script>
+  <script src="/assets/mxd-affiliate.js" defer></script>
+  <!-- JS khác -->
+  <script src="/assets/js/floating-contact.js" defer></script>
+</body>
+</html>
