@@ -1,7 +1,12 @@
-// sw.js — MXD PWA v17 (offline inline, safe install, bypass affiliate hosts)
-const VERSION = 'v17';
+// sw.js — MXD PWA v18
+const VERSION = 'v18';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
+self.addEventListener('activate', (e)=>e.waitUntil(
+  caches.keys().then(keys=>Promise.all(keys
+    .filter(k=>!k.endsWith(VERSION))
+    .map(k=>caches.delete(k))))
+));
 
 // ---- Precache ----
 const ASSETS = [
