@@ -144,55 +144,88 @@
   </div>
 
   <!-- JS nội tuyến -->
+<script src="/assets/products.js" defer></script>
   <script>
   // Năm ở footer
   const yr = document.getElementById('year');
   if (yr) yr.textContent = new Date().getFullYear();
 
-  // Render list sản phẩm từ vùng dán link
-  (function () {
-    const src = document.querySelector('#paste-links-here');
-    const out = document.querySelector('#may-cat-list');
-    if (!src || !out) return;
+ <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const src = document.querySelector('#paste-links-here');
+  const out = document.querySelector('#may-cat-list');
+  if (!src || !out) return;
 
-    const links = Array.from(src.querySelectorAll('a'));
-    out.innerHTML = '';
+  const links = Array.from(src.querySelectorAll('a'));
+  out.innerHTML = '';
 
-    const normSku = s => (s||'').toLowerCase().trim()
-      .replace(/đ|ð/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-      .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  const PLACEHOLDER_DATAURL = 'data:image/svg+xml;utf8,' +
+    encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="16" fill="#64748b">Đang cập nhật ảnh</text></svg>');
 
-    links.forEach(a => {
-      const name = a.textContent.trim() || 'Sản phẩm';
-      const href = a.getAttribute('href') || '#';
-      const merchant = (a.dataset.merchant || '').toLowerCase();
-      const sku = a.dataset.sku || normSku(name).slice(0,64);
-      const img = a.dataset.img || '/assets/img/products/placeholder.webp';
-      const price = a.dataset.price ? Number(a.dataset.price) : null;
-      const priceText = price ? price.toLocaleString('vi-VN') : 'Cập nhật giá';
+  const normSku = s => (s||'').toLowerCase().trim()
+    .replace(/đ|ð/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 
-      const li = document.createElement('li');
-      li.className = 'product';
-      li.setAttribute('itemscope','');
-      li.setAttribute('itemtype','https://schema.org/Product');
-      li.innerHTML = `
-        <a class="thumb" href="${href}" target="_blank" rel="nofollow sponsored noopener"
-           data-merchant="${merchant}" data-sku="${sku}">
-          <img src="${img}" alt="${name}" width="400" height="400" loading="lazy" decoding="async">
-        </a>
-        <h3 itemprop="name">${name}</h3>
-        <p class="price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-          <meta itemprop="priceCurrency" content="VND">
-          <span class="price-text" ${price ? 'itemprop="price" content="'+price+'"' : ''}>${priceText}</span>
-        </p>
-        <a class="btn buy" href="${href}" target="_blank" rel="nofollow sponsored noopener"
-           data-merchant="${merchant}" data-sku="${sku}" data-source="store" data-campaign="may-cat_20250916">
-           Mua ngay
-        </a>`;
-      out.appendChild(li);
-    });
-  })();
+  function parseShopee(u){
+    try{
+      const m = u.match(/\/product\/(\d+)\/(\d+)/);
+      return m ? {shop:m[1], item:m[2]} : null;
+    }catch{return null;}
+  }
 
+  links.forEach(a => {
+    const nameRaw = a.textContent.trim();
+    const href = a.getAttribute('href') || '#';
+    const merchant = (a.dataset.merchant || '').toLowerCase();
+
+    const sh  = parseShopee(href);
+    const id  = sh ? `${sh.shop}-${sh.item}` : (a.dataset.sku || normSku(nameRaw)).slice(0,64);
+    const meta = (window.MXD_PRODUCTS || {})[id] || {};
+
+    // Tên hiển thị: ưu tiên trong products.js
+    const name = meta.title || (nameRaw && !/^mua ngay$/i.test(nameRaw) ? nameRaw : 'Sản phẩm');
+
+    // Giá: 1 số (price) hoặc khoảng (min–max). SEO: nhét priceNum vào itemprop="price"
+    let priceNum = null, priceText = 'Cập nhật giá';
+    if (Number.isInteger(meta.price)) {
+      priceNum  = meta.price;
+      priceText = meta.price.toLocaleString('vi-VN');
+    } else if (Number.isInteger(meta.min) && Number.isInteger(meta.max)) {
+      priceNum  = meta.min;
+      priceText = `${meta.min.toLocaleString('vi-VN')} - ${meta.max.toLocaleString('vi-VN')}`;
+    }
+
+    // Ảnh: theo quy ước shopee-<shop>-<item>.webp; fallback placeholder
+    const sku = a.dataset.sku || (sh ? id : normSku(name)).slice(0,64);
+    const img = a.dataset.img || (sh
+      ? `/assets/img/products/shopee-${sh.shop}-${sh.item}.webp`
+      : `/assets/img/products/${sku}.webp`);
+
+    const li = document.createElement('li');
+    li.className = 'product';
+    li.setAttribute('itemscope','');
+    li.setAttribute('itemtype','https://schema.org/Product');
+    li.innerHTML = `
+      <a class="thumb" href="${href}" target="_blank" rel="nofollow sponsored noopener"
+         data-merchant="${merchant}" data-sku="${sku}">
+        <img src="${img}" alt="${name}" width="400" height="400" loading="lazy" decoding="async"
+             onerror="this.onerror=null;this.src='${PLACEHOLDER_DATAURL}'">
+      </a>
+      <h3 itemprop="name">${name}</h3>
+      <p class="price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+        <meta itemprop="priceCurrency" content="VND">
+        <span class="price-text" ${priceNum ? 'itemprop="price" content="'+priceNum+'"' : ''}>${priceText}</span>
+      </p>
+      <a class="btn buy" href="${href}" target="_blank" rel="nofollow sponsored noopener"
+         data-merchant="${merchant}" data-sku="${sku}" data-source="store" data-campaign="may-cat_20250916">
+         Mua ngay
+      </a>`;
+    out.appendChild(li);
+  });
+});
+</script>
+  
+<script>
   // JSON-LD ItemList cho SEO (đọc từ danh sách đã render)
   (function () {
     try {
@@ -227,6 +260,9 @@
   <script src="/assets/mxd-affiliate.js" defer></script>
 
   <!-- (Tùy chọn) JS khác -->
+  
+  
   <script src="/assets/js/floating-contact.js" defer></script>
+
 </body>
 </html>
