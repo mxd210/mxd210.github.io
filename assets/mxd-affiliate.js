@@ -104,3 +104,28 @@
     console.groupEnd();
   }
 })();
+// MXD Link Upgrader: dùng affiliates.json để thay /g.html?sku=... bằng deeplink trực tiếp
+(() => {
+  const UPGRADE = async () => {
+    try {
+      const res = await fetch('/assets/data/affiliates.json', { cache: 'no-cache' });
+      const map = await res.json();
+
+      document.querySelectorAll('a.buy, a.product-meta, a.go').forEach(a => {
+        const sku = (a.dataset.sku || '').trim().toLowerCase();
+        if (!sku || !map[sku] || !map[sku].deeplink) return;
+        a.href = map[sku].deeplink;
+        a.setAttribute('rel', 'nofollow sponsored noopener');
+        a.dataset.merchant = a.dataset.merchant || (map[sku].merchant || '');
+      });
+    } catch (e) {
+      console.warn('MXD Link Upgrader: cannot load affiliates.json', e);
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', UPGRADE);
+  } else {
+    UPGRADE();
+  }
+})();
