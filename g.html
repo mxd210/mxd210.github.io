@@ -100,6 +100,14 @@
       document.getElementById('og-desc').setAttribute('content', desc);
       document.getElementById('og-image').setAttribute('content', img);
     }
+const buySection = document.getElementById('buy-section');
+if (p.link || (p.links && p.links.length)) {
+  const href = p.link || (p.links[0] && p.links[0].href) || '#';
+  const merchant = p.merchant || (p.links[0] && p.links[0].merchant) || '';
+  buySection.innerHTML = `<a class="buy" href="${href}" data-merchant="${merchant}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>`;
+} else {
+  buySection.innerHTML = '<p class="muted">Chưa có link mua</p>';
+}
 
     function renderNotFound(){
       document.getElementById('robots').setAttribute('content','noindex,nofollow');
@@ -118,6 +126,7 @@
         // 1) Tải dữ liệu với fallback
         let res = await fetch('/assets/data/affiliates.json', {cache:'no-store'});
         if (!res.ok) res = await fetch('/products.json', {cache:'no-store'});
+<div id="buy-section"></div>
 
         const raw = await res.text();
         let list;
