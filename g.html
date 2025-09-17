@@ -115,31 +115,40 @@
       if(!skuParam){ renderNotFound(); return; }
 
       try{
-        const res = await fetch('/assets/data/affiliates.json', {cache:'no-store'});
-        const list = await res.json();
+        // 1) Tải dữ liệu với fallback
+        let res = await fetch('/assets/data/affiliates.json', {cache:'no-store'});
+        if (!res.ok) res = await fetch('/products.json', {cache:'no-store'});
 
-        // Tìm theo SKU: chấp nhận sku | p_sku | id (case-insensitive)
-        const p = list.find(x => {
-          const keys = [x.sku, x.p_sku, x.id].map(norm);
-          return keys.includes(norm(skuParam));
-        });
+        const raw = await res.text();
+        let list;
+        try { list = JSON.parse(raw); }
+        catch(e){ console.error('JSON parse error', e); list = []; }
 
+        // 2) Chuẩn hoá về mảng
+        if (!Array.isArray(list)) {
+          if (list && typeof list === 'object') {
+            list = Array.isArray(list.items) ? list.items : Object.values(list);
+          } else {
+            list = [];
+          }
+        }
+
+        // 3) Tìm theo SKU: chấp nhận sku | p_sku | id (case-insensitive)
+        const p = list.find(x => [x.sku, x.p_sku, x.id].map(norm).includes(norm(skuParam)));
         if(!p){ renderNotFound(); return; }
 
-        // Lấy SKU thực, chuẩn hoá giá & link
+        // 4) Lấy SKU thực, chuẩn hoá giá & link & ảnh
         const skuReal = p.sku || p.p_sku || p.id;
-        const priceNum = typeof p.price === 'number'
-          ? p.price
-          : Number(String(p.price||'').replace(/[^\d]/g,'')); // "690.000 đ" -> 690000
+        const priceNum = typeof p.price === 'number' ? p.price : Number(String(p.price||'').replace(/[^\d]/g,''));
         const link = p.link || p.url || (Array.isArray(p.links) ? p.links[0] : '');
         const image = p.image || `/assets/img/products/${skuReal}.webp`;
         const priceText = priceNum ? new Intl.NumberFormat('vi-VN').format(priceNum) + ' đ' : 'Liên hệ';
 
-        // Meta/OG + Product JSON-LD
+        // 5) Meta/OG + Product JSON-LD
         setMeta(p.name, `Sản phẩm ${p.name} – giá tham khảo ${priceText}.`, `https://mxd210.github.io${image}`);
         injectProductLD({ name:p.name, sku:skuReal, price:priceNum, image:`https://mxd210.github.io${image}`, link:link });
 
-        // Nút mua (1 hoặc nhiều)
+        // 6) Buy box (1 hoặc nhiều nơi bán)
         let buyBox = '';
         if (Array.isArray(p.links) && p.links.length){
           buyBox = p.links.map((u,i)=>{
@@ -153,7 +162,7 @@
           buyBox = `<span class="muted">Chưa có link mua</span>`;
         }
 
-        // Render
+        // 7) Render
         document.getElementById('app').innerHTML = `
           <article class="card">
             <div>
@@ -169,7 +178,7 @@
           </article>
         `;
 
-        // Kích hoạt affiliate scanner nếu có
+        // 8) Kích hoạt affiliate scanner nếu có
         if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
           window.mxdAffiliate.scan();
         }
