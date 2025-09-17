@@ -145,12 +145,17 @@
 
   <!-- JS nội tuyến -->
 <script src="/assets/products.js" defer></script>
-  <script>
-  // Năm ở footer
-  const yr = document.getElementById('year');
-  if (yr) yr.textContent = new Date().getFullYear();
 
- <script>
+<!-- Footer year -->
+<script>
+  (function(){
+    const yr = document.getElementById('year');
+    if (yr) yr.textContent = new Date().getFullYear();
+  })();
+</script>
+
+<!-- Render list sản phẩm từ vùng dán link -->
+<script>
 document.addEventListener('DOMContentLoaded', () => {
   const src = document.querySelector('#paste-links-here');
   const out = document.querySelector('#may-cat-list');
@@ -163,18 +168,17 @@ document.addEventListener('DOMContentLoaded', () => {
     encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="16" fill="#64748b">Đang cập nhật ảnh</text></svg>');
 
   const normSku = s => (s||'').toLowerCase().trim()
-    .replace(/đ|ð/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/đ|ð/g,'d')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 
   function parseShopee(u){
-    try{
-      const m = u.match(/\/product\/(\d+)\/(\d+)/);
-      return m ? {shop:m[1], item:m[2]} : null;
-    }catch{return null;}
+    const m = u && u.match(/\/product\/(\d+)\/(\d+)/);
+    return m ? {shop:m[1], item:m[2]} : null;
   }
 
   links.forEach(a => {
-    const nameRaw = a.textContent.trim();
+    const nameRaw = (a.textContent || '').trim();
     const href = a.getAttribute('href') || '#';
     const merchant = (a.dataset.merchant || '').toLowerCase();
 
@@ -182,10 +186,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const id  = sh ? `${sh.shop}-${sh.item}` : (a.dataset.sku || normSku(nameRaw)).slice(0,64);
     const meta = (window.MXD_PRODUCTS || {})[id] || {};
 
-    // Tên hiển thị: ưu tiên trong products.js
+    // Tên
     const name = meta.title || (nameRaw && !/^mua ngay$/i.test(nameRaw) ? nameRaw : 'Sản phẩm');
 
-    // Giá: 1 số (price) hoặc khoảng (min–max). SEO: nhét priceNum vào itemprop="price"
+    // Giá
     let priceNum = null, priceText = 'Cập nhật giá';
     if (Number.isInteger(meta.price)) {
       priceNum  = meta.price;
@@ -195,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
       priceText = `${meta.min.toLocaleString('vi-VN')} - ${meta.max.toLocaleString('vi-VN')}`;
     }
 
-    // Ảnh: theo quy ước shopee-<shop>-<item>.webp; fallback placeholder
+    // Ảnh
     const sku = a.dataset.sku || (sh ? id : normSku(name)).slice(0,64);
     const img = a.dataset.img || (sh
       ? `/assets/img/products/shopee-${sh.shop}-${sh.item}.webp`
@@ -217,52 +221,49 @@ document.addEventListener('DOMContentLoaded', () => {
         <span class="price-text" ${priceNum ? 'itemprop="price" content="'+priceNum+'"' : ''}>${priceText}</span>
       </p>
       <a class="btn buy" href="${href}" target="_blank" rel="nofollow sponsored noopener"
-         data-merchant="${merchant}" data-sku="${sku}" data-source="store" data-campaign="may-cat_20250916">
-         Mua ngay
-      </a>`;
+         data-merchant="${merchant}" data-sku="${sku}" data-source="store" data-campaign="may-cat_20250916">Mua ngay</a>`;
     out.appendChild(li);
   });
 });
 </script>
-  
+
+<!-- JSON-LD ItemList -->
 <script>
-  // JSON-LD ItemList cho SEO (đọc từ danh sách đã render)
-  (function () {
-    try {
-      const cards = [...document.querySelectorAll('#may-cat-list .product')];
-      const items = cards.map((card, i) => {
-        const name = card.querySelector('h3')?.textContent?.trim() || 'Sản phẩm';
-        const url  = card.querySelector('.buy')?.href || location.href;
-        return {"@type":"ListItem","position":i+1,"name":name,"url":url};
-      });
-      const ld = {"@context":"https://schema.org","@type":"ItemList","itemListElement":items};
-      const s = document.createElement('script');
-      s.type = 'application/ld+json';
-      s.textContent = JSON.stringify(ld);
-      document.head.appendChild(s);
-    } catch {}
-  })();
-
-  // Service Worker: đăng ký + auto reload khi có bản mới
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(()=>{});
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!window.__swRld) { window.__swRld = true; location.reload(); }
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const cards = [...document.querySelectorAll('#may-cat-list .product')];
+    if (!cards.length) return;
+    const items = cards.map((card, i) => {
+      const name = card.querySelector('h3')?.textContent?.trim() || 'Sản phẩm';
+      const url  = card.querySelector('.buy')?.href || location.href;
+      return {"@type":"ListItem","position":i+1,"name":name,"url":url};
     });
-    navigator.serviceWorker.ready.then(reg => {
-      if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-    });
-  }
-  </script>
+    const ld = {"@context":"https://schema.org","@type":"ItemList","itemListElement":items};
+    const s = document.createElement('script');
+    s.type = 'application/ld+json';
+    s.textContent = JSON.stringify(ld);
+    document.head.appendChild(s);
+  } catch {}
+});
+</script>
 
-  <!-- GA4 trước, Affiliate sau (tránh trùng lặp; bỏ bản GA ở <head>) -->
-  <script src="/assets/analytics.js" defer></script>
-  <script src="/assets/mxd-affiliate.js" defer></script>
+<!-- Service Worker -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(()=>{});
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!window.__swRld) { window.__swRld = true; location.reload(); }
+  });
+  navigator.serviceWorker.ready.then(reg => {
+    if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+  });
+}
+</script>
 
-  <!-- (Tùy chọn) JS khác -->
-  
-  
-  <script src="/assets/js/floating-contact.js" defer></script>
-
+<!-- GA4 trước, Affiliate sau -->
+<script src="/assets/analytics.js" defer></script>
+<script src="/assets/mxd-affiliate.js" defer></script>
+<!-- JS khác -->
+<script src="/assets/js/floating-contact.js" defer></script>
 </body>
 </html>
