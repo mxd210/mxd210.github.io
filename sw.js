@@ -1,5 +1,5 @@
-// sw.js — MXD PWA v21
-const VERSION = 'v21';
+// sw.js — MXD PWA v22
+const VERSION = 'v22';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
