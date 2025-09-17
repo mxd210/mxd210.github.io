@@ -1,11 +1,13 @@
-// sw.js — MXD PWA v16 (no external offline.html needed)
-const VERSION = 'v16';
+// sw.js — MXD PWA v17 (offline inline, safe install, bypass affiliate hosts)
+const VERSION = 'v17';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
+// ---- Precache ----
 const ASSETS = [
   '/',                  // shell trang chủ
   '/store.html',        // precache trang store
+  '/blog.html',         // precache blog index (nếu có)
   '/assets/site.css',
   '/assets/mxd-affiliate.js',
   '/assets/analytics.js',
@@ -31,12 +33,14 @@ const offlinePage = () => new Response(
   { headers: {'content-type':'text/html; charset=utf-8'} }
 );
 
+// ---- Install / Activate ----
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE)
-      .then((c) => c.addAll(ASSETS))
-      .then(() => self.skipWaiting())
-  );
+  e.waitUntil((async () => {
+    const c = await caches.open(CACHE);
+    // Thêm từng file (nếu 1 file lỗi sẽ không phá hỏng cả install)
+    await Promise.all(ASSETS.map(u => c.add(u).catch(() => {})));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', (e) => {
@@ -46,18 +50,19 @@ self.addEventListener('activate', (e) => {
       keys.filter(k => k.startsWith(CACHE_PREFIX) && k !== CACHE)
           .map(k => caches.delete(k))
     );
-    // Navigation Preload
-    if (self.registration.navigationPreload) {
+    if ('navigationPreload' in self.registration) {
       try { await self.registration.navigationPreload.enable(); } catch {}
     }
     await self.clients.claim();
   })());
 });
 
+// Cho phép SKIP_WAITING thủ công
 self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
+// ---- Fetch ----
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
@@ -70,18 +75,26 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Không can thiệp Analytics
-  const GA_HOSTS = new Set([
+  // Không can thiệp Analytics + Affiliate + MXH (tránh ảnh hưởng redirect/conversion)
+  const BYPASS_HOSTS = new Set([
+    // Analytics
     'www.googletagmanager.com','googletagmanager.com',
     'www.google-analytics.com','google-analytics.com',
-    'analytics.google.com','g.doubleclick.net'
+    'analytics.google.com','g.doubleclick.net',
+    // Affiliate / TMĐT
+    'go.isclix.com',
+    'shopee.vn','cf.shopee.vn','s.shopee.vn',
+    'lazada.vn','s.lazada.vn','pages.lazada.vn',
+    'tiki.vn','api.tiki.vn',
+    // MXH
+    'facebook.com','www.facebook.com','zalo.me'
   ]);
-  if (GA_HOSTS.has(url.hostname)) return;
+  if (BYPASS_HOSTS.has(url.hostname)) return;
 
   // Điều hướng HTML?
   const isHTMLNav = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
 
-  // 1) HTML → network-first (+ preload); lỗi mạng → cache theo trang, rồi '/', cuối cùng trả offlinePage()
+  // 1) HTML → network-first (+ preload); lỗi mạng → cache theo trang, rồi '/', cuối cùng offlinePage()
   if (isHTMLNav) {
     e.respondWith((async () => {
       try {
@@ -93,58 +106,55 @@ self.addEventListener('fetch', (e) => {
           }
           return preload;
         }
-        const res = await fetch(req);
+        const res = await fetch(req, { cache: 'no-store' });
         if (res && res.ok) {
           const key = normalize(req);
           caches.open(CACHE).then(c => c.put(key, res.clone()));
         }
         return res;
       } catch {
-        return (await caches.match(normalize(req)))
-            || (await caches.match('/'))
+        return (await caches.match(normalize(req), { ignoreSearch: true }))
+            || (await caches.match('/', { ignoreSearch: true }))
             || offlinePage();
       }
     })());
     return;
   }
 
-  // 2) Static same-origin → stale-while-revalidate (+ normalize key)
+  // 2) Static same-origin → stale-while-revalidate (+ normalize key, ignoreSearch)
   const isStatic =
     url.origin === location.origin && (
       url.pathname.startsWith('/assets/') ||
-      url.pathname.endsWith('.css')   ||
-      url.pathname.endsWith('.js')    ||
-      url.pathname.endsWith('.webp')  ||
-      url.pathname.endsWith('.png')   ||
-      url.pathname.endsWith('.jpg')   ||
-      url.pathname.endsWith('.jpeg')  ||
-      url.pathname.endsWith('.svg')   ||
-      url.pathname.endsWith('.woff2')
+      /\.(css|js|webp|png|jpg|jpeg|svg|woff2)$/.test(url.pathname)
     );
 
   if (isStatic) {
-    e.respondWith(
-      caches.match(req).then((cached) => {
-        const tryNormalized = cached ? Promise.resolve(cached) : caches.match(normalize(req));
-        return tryNormalized.then((hit) => {
-          const fetching = fetch(req).then((res) => {
-            if (res && res.ok) {
-              const clone1 = res.clone();
-              caches.open(CACHE).then((c) => {
-                c.put(req, clone1);
-                const normKey = normalize(req);
-                if (normKey !== req.url) c.put(normKey, res.clone());
-              });
-            }
-            return res;
-          }).catch(() => null);
-          return hit || fetching || null;
-        });
-      })
-    );
+    e.respondWith((async () => {
+      const cached = await caches.match(req, { ignoreSearch: true });
+
+      // Revalidate (không chặn trả về)
+      const revalidate = fetch(req).then(async (res) => {
+        if (res && res.ok) {
+          const c = await caches.open(CACHE);
+          await c.put(req, res.clone());
+          const normKey = normalize(req);
+          if (normKey !== req.url) await c.put(normKey, res.clone());
+        }
+        return res;
+      }).catch(() => null);
+
+      return cached || (await revalidate) || new Response('', { status: 504 });
+    })());
     return;
   }
 
-  // 3) Khác origin → network-first; rớt mạng → cache (nếu có)
-  e.respondWith(fetch(req).catch(() => caches.match(req)));
+  // 3) Khác origin → network-first; rớt mạng → cache (nếu có), đảm bảo luôn trả Response
+  e.respondWith((async () => {
+    try {
+      return await fetch(req);
+    } catch {
+      const hit = await caches.match(req, { ignoreSearch: true });
+      return hit || new Response('', { status: 504 });
+    }
+  })());
 });
