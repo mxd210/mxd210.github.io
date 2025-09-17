@@ -4,28 +4,36 @@
     "name": "Máy cắt cầm tay Dekton DK-AG950S",
     "price": 690000,
     "origin": "https://shopee.vn/product/279547485/5274192859",
-    "merchant": "shopee"
+    "merchant": "shopee",
+     "featured": true,
+  "featured_order": 1
   },
   {
     "sku": "kynko-j1c-kd28-26",
     "name": "Máy khoan bê tông Kynko J1C-KD28-26",
     "price": 1833000,
     "origin": "https://shopee.vn/product/772892494/21507014059",
-    "merchant": "shopee"
+    "merchant": "shopee",
+    "featured": true,
+  "featured_order": 2
   },
   {
     "sku": "may-mai-pin-bosch-388vf",
     "name": "Máy Mài Pin BOSCH 388VF không chổi than",
     "price": 763240,
     "origin": "https://shopee.vn/product/1061097771/22861822077",
-    "merchant": "shopee"
+    "merchant": "shopee",
+    "featured": true,
+  "featured_order": 3
   },
   {
     "sku": "may-mai-pin-hukan-g1-ag6000j",
     "name": "Máy Mài Pin HUKAN G1-AG6000J",
     "price": 424000,
     "origin": "https://shopee.vn/product/654430280/22380739205",
-    "merchant": "shopee"
+    "merchant": "shopee",
+    "featured": true,
+  "featured_order": 4
   },
   {
     "sku": "may-khoan-duc-be-tong-pin-boshun-bs-r2803h",
@@ -39,7 +47,9 @@
     "name": "Máy Mài Cầm Tay HUKAN HK-AG5030RP",
     "price": 554000,
     "origin": "https://shopee.vn/product/654430280/22255243106",
-    "merchant": "shopee"
+    "merchant": "shopee",
+    "featured": true,
+  "featured_order": 5
   },
   {
     "sku": "may-mai-pin-hukan-hk-ag7900bl",
