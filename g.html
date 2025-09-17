@@ -55,9 +55,11 @@
   <script>
     // --- helpers ---
     const params = new URL(location.href).searchParams;
-    const sku = (params.get('sku') || '').trim();
-    document.getElementById('can').href = `https://mxd210.github.io/g.html?sku=${encodeURIComponent(sku)}`;
-    document.getElementById('og-url').setAttribute('content', `https://mxd210.github.io/g.html?sku=${encodeURIComponent(sku)}`);
+    const skuParam = (params.get('sku') || '').trim();
+    document.getElementById('can').href = `https://mxd210.github.io/g.html?sku=${encodeURIComponent(skuParam)}`;
+    document.getElementById('og-url').setAttribute('content', `https://mxd210.github.io/g.html?sku=${encodeURIComponent(skuParam)}`);
+
+    const norm = s => (s||'').toString().trim().toLowerCase();
 
     function getMerchant(u){
       try{
@@ -103,42 +105,55 @@
       document.getElementById('robots').setAttribute('content','noindex,nofollow');
       document.getElementById('app').innerHTML = `
         <h1>Không tìm thấy sản phẩm</h1>
-        <p class="muted">SKU: <code>${sku || '(trống)'}</code> không khớp dữ liệu.</p>
+        <p class="muted">SKU: <code>${skuParam || '(trống)'}</code> không khớp dữ liệu.</p>
         <p><a href="/store.html">← Về Cửa hàng</a></p>
       `;
     }
 
     // --- main ---
     (async () => {
-      if(!sku){ renderNotFound(); return; }
+      if(!skuParam){ renderNotFound(); return; }
 
       try{
-        // Dữ liệu nguồn: affiliates.json (định dạng: [{sku, name, price, link, image?}, ...])
         const res = await fetch('/assets/data/affiliates.json', {cache:'no-store'});
         const list = await res.json();
 
-        // Tìm theo SKU
-        const p = list.find(x => (x.sku||'').trim() === sku);
+        // Tìm theo SKU: chấp nhận sku | p_sku | id (case-insensitive)
+        const p = list.find(x => {
+          const keys = [x.sku, x.p_sku, x.id].map(norm);
+          return keys.includes(norm(skuParam));
+        });
 
-        if(!p){
-          renderNotFound();
-          return;
+        if(!p){ renderNotFound(); return; }
+
+        // Lấy SKU thực, chuẩn hoá giá & link
+        const skuReal = p.sku || p.p_sku || p.id;
+        const priceNum = typeof p.price === 'number'
+          ? p.price
+          : Number(String(p.price||'').replace(/[^\d]/g,'')); // "690.000 đ" -> 690000
+        const link = p.link || p.url || (Array.isArray(p.links) ? p.links[0] : '');
+        const image = p.image || `/assets/img/products/${skuReal}.webp`;
+        const priceText = priceNum ? new Intl.NumberFormat('vi-VN').format(priceNum) + ' đ' : 'Liên hệ';
+
+        // Meta/OG + Product JSON-LD
+        setMeta(p.name, `Sản phẩm ${p.name} – giá tham khảo ${priceText}.`, `https://mxd210.github.io${image}`);
+        injectProductLD({ name:p.name, sku:skuReal, price:priceNum, image:`https://mxd210.github.io${image}`, link:link });
+
+        // Nút mua (1 hoặc nhiều)
+        let buyBox = '';
+        if (Array.isArray(p.links) && p.links.length){
+          buyBox = p.links.map((u,i)=>{
+            const m = getMerchant(u);
+            return `<a class="buy" href="${u}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ${i+1} (${m})</a>`;
+          }).join('');
+        } else if (link){
+          const m = getMerchant(link);
+          buyBox = `<a class="buy" href="${link}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ngay</a>`;
+        } else {
+          buyBox = `<span class="muted">Chưa có link mua</span>`;
         }
 
-        // Ảnh: ưu tiên p.image; nếu thiếu, dùng quy ước MXD
-        const image = p.image || `/assets/img/products/${p.sku}.webp`;
-        const priceText = p.price ? new Intl.NumberFormat('vi-VN').format(p.price) + ' đ' : 'Liên hệ';
-
-        // Cập nhật meta/OG + canonical + Product JSON-LD
-        setMeta(p.name, `Sản phẩm ${p.name} – giá tham khảo ${priceText}.`, `https://mxd210.github.io${image}`);
-        injectProductLD({ name:p.name, sku:p.sku, price:p.price, image:`https://mxd210.github.io${image}`, link:p.link });
-
-        // Render giao diện + buy links (có thể mở rộng nhiều nơi bán nếu JSON có p.links[])
-        const merchant = getMerchant(p.link || '');
-        const buyBtn = p.link
-          ? `<a class="buy" href="${p.link}" data-merchant="${merchant}" data-sub1="g_sku" data-sub2="${p.sku}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ngay</a>`
-          : `<span class="muted">Chưa có link mua</span>`;
-
+        // Render
         document.getElementById('app').innerHTML = `
           <article class="card">
             <div>
@@ -147,14 +162,14 @@
             <div>
               <h1>${p.name}</h1>
               <div class="price">${priceText}</div>
-              <div class="buybox">${buyBtn}</div>
-              <p class="muted">SKU: <code>${p.sku}</code></p>
+              <div class="buybox">${buyBox}</div>
+              <p class="muted">SKU: <code>${skuReal}</code></p>
               <p><a href="/store.html">← Về Cửa hàng</a></p>
             </div>
           </article>
         `;
 
-        // Gọi lại affiliate scanner nếu có
+        // Kích hoạt affiliate scanner nếu có
         if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
           window.mxdAffiliate.scan();
         }
