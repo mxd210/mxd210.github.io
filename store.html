@@ -13,22 +13,23 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Cửa hàng MXD – Sản phẩm chọn lọc">
   <meta property="og:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
+  <!-- TODO: upload ảnh hero mới theo chuẩn /assets/img/products/store-hero.webp -->
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/products/store-hero.webp">
   <meta property="og:url" content="https://mxd210.github.io/store.html">
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/products/bay-rang-cua-banner.webp">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Cửa hàng MXD – Sản phẩm chọn lọc">
   <meta name="twitter:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
-  <meta name="twitter:image" content="https://mxd210.github.io/assets/img/products/bay-rang-cua-banner.webp">
+  <meta name="twitter:image" content="https://mxd210.github.io/assets/img/products/store-hero.webp">
 
   <link rel="icon" href="/logo.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#111111">
 
-  <!-- CSS chính của site -->
+  <!-- CSS chính -->
   <link rel="stylesheet" href="/assets/site.css">
 
-  <!-- Style riêng cho store -->
+  <!-- Style tối thiểu cho grid -->
   <style>
     :root{color-scheme:light dark}
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#f8fafc;color:#0b1220}
@@ -36,10 +37,10 @@
     footer{border-top:1px solid #e5e7eb;border-bottom:none;font-size:14px;color:#64748b}
     .container{max-width:1100px;margin:auto;padding:20px}
     h1{font-size:28px;margin:0 0 16px}
+    h2{font-size:20px;margin:16px 0 12px}
 
-    /* Cards */
     .grid{display:grid;gap:20px}
-    #may-cat-list{grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); list-style:none; padding:0; margin:0}
+    #product-list{grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); list-style:none; padding:0; margin:0}
     .product{border:1px solid #e5e7eb;border-radius:12px;padding:12px;background:#fff;display:flex;flex-direction:column}
     .product .thumb img{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:8px;display:block}
     .product h3{font-size:16px;margin:10px 0 6px}
@@ -47,7 +48,7 @@
     .product .btn.buy{display:inline-block;padding:10px 12px;border:1px solid #111;border-radius:10px;text-decoration:none;font-weight:600;color:#111}
     .product .btn.buy:hover{background:#111;color:#fff}
 
-    /* Vùng dán link (ẩn) */
+    /* Vùng dán dữ liệu (ẩn) – KHÔNG bọc grid thực trong class này */
     .auto-products{display:none}
 
     /* Nút nổi liên hệ */
@@ -62,74 +63,35 @@
 
   <header>
     <a href="/" style="text-decoration:none;font-weight:700;font-size:20px">← Về trang chủ</a>
-    <h1>Danh sách sản phẩm</h1>
+    <h1>Cửa hàng MXD</h1>
   </header>
 
   <main class="container">
-    <!-- ====================== MÁY CẮT – TỔNG HỢP ====================== -->
-    <section id="may-cat" aria-label="Máy cắt – Tổng hợp">
-      <h2>Máy cắt – Tổng hợp</h2>
-      <p><code>data-price</code> (giá số), <code>data-img</code> (đường dẫn ảnh), <code>data-sku</code> (mã tuỳ chọn).</p>
+    <section aria-label="Danh sách sản phẩm">
+      <h2>Sản phẩm chọn lọc</h2>
+      <p>Chuẩn MXD: mỗi sản phẩm có <code>a.product-meta</code> (bắt buộc) + 1..n <code>a.buy</code> phía sau. Ảnh tại <code>/assets/img/products/&lt;slug&gt;.webp</code>.</p>
 
-      <!-- ĐIỂM ĐỔ (bắt buộc phải có) -->
-      <ul id="may-cat-list" class="grid" aria-live="polite"></ul>
+      <!-- Điểm đổ -->
+      <ul id="product-list" class="grid" aria-live="polite"></ul>
 
-      <!-- Vùng dán link (ẩn) -->
+      <!-- VÙNG DÁN LINK (ẩn) – Chỉ giữ 1 sản phẩm mẫu đúng chuẩn -->
       <div class="auto-products" id="paste-links-here">
-        <a href="https://shopee.vn/Máy-Cắt-Cầm-Tay-Dekton-DK-AG950S-950W-𝗖𝗵𝗶̉𝗻𝗵-𝗧𝗼̂́𝗰-Đ𝗼̣̂-i.300702715.5984515446" data-merchant="shopee" data-price="822000" data-sku="may-cat-cam-tay-dekton-dk-ag950s" data-img="/assets/img/products/may-cat-cam-tay-dekton-dk-ag950s.webp">Máy Cắt Cầm Tay Dekton DK AG950S 950W 𝗖𝗵𝗶̉𝗻𝗵 𝗧𝗼̂́𝗰 Đ𝗼̣̂</a>
-        <a class="buy" href="https://shopee.vn/product/300702715/5984515446" data-merchant="shopee" data-sub1="store" data-sub2="list_2">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/654430280/22380739205" data-merchant="shopee" data-sub1="store" data-sub2="list_3">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/654430280/23055248675" data-merchant="shopee" data-sub1="store" data-sub2="list_4">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/654430280/22255243106" data-merchant="shopee" data-sub1="store" data-sub2="list_5">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/166287331/24663400599" data-merchant="shopee" data-sub1="store" data-sub2="list_6">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/166287331/20882235158" data-merchant="shopee" data-sub1="store" data-sub2="list_7">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/1308044692/27757745334" data-merchant="shopee" data-sub1="store" data-sub2="list_8">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/319001815/18982725145" data-merchant="shopee" data-sub1="store" data-sub2="list_9">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/319001815/23476218146" data-merchant="shopee" data-sub1="store" data-sub2="list_10">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/91610174/17496283862" data-merchant="shopee" data-sub1="store" data-sub2="list_11">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/718585685/40657720438" data-merchant="shopee" data-sub1="store" data-sub2="list_12">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/561921607/23854348138" data-merchant="shopee" data-sub1="store" data-sub2="list_13">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/718585685/26903964352" data-merchant="shopee" data-sub1="store" data-sub2="list_14">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/718585685/43811112520" data-merchant="shopee" data-sub1="store" data-sub2="list_15">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/239636778/5965143102" data-merchant="shopee" data-sub1="store" data-sub2="list_16">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/561921607/23754348735" data-merchant="shopee" data-sub1="store" data-sub2="list_17">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/1307736249/26755400099" data-merchant="shopee" data-sub1="store" data-sub2="list_18">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/1308044692/27655407437" data-merchant="shopee" data-sub1="store" data-sub2="list_19">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/166287331/28552862620" data-merchant="shopee" data-sub1="store" data-sub2="list_20">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/225431323/28409900154" data-merchant="shopee" data-sub1="store" data-sub2="list_21">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/225431323/42155531660" data-merchant="shopee" data-sub1="store" data-sub2="list_22">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/225431323/27084905616" data-merchant="shopee" data-sub1="store" data-sub2="list_23">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/300702715/2924599192" data-merchant="shopee" data-sub1="store" data-sub2="list_24">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/329099148/22371315416" data-merchant="shopee" data-sub1="store" data-sub2="list_25">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/69531031/1579917792" data-merchant="shopee" data-sub1="store" data-sub2="list_26">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/1242691774/29165865471" data-merchant="shopee" data-sub1="store" data-sub2="list_27">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/217851417/16738318098" data-merchant="shopee" data-sub1="store" data-sub2="list_28">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/300702715/21226248062" data-merchant="shopee" data-sub1="store" data-sub2="list_29">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/69531031/17781224066" data-merchant="shopee" data-sub1="store" data-sub2="list_30">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/1146804112/24706546657" data-merchant="shopee" data-sub1="store" data-sub2="list_31">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/410556208/24223786596" data-merchant="shopee" data-sub1="store" data-sub2="list_32">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/75810249/14700002665" data-merchant="shopee" data-sub1="store" data-sub2="list_33">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/109816675/11061626170" data-merchant="shopee" data-sub1="store" data-sub2="list_34">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/109816675/40357939565" data-merchant="shopee" data-sub1="store" data-sub2="list_35">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/1022471396/22079403365" data-merchant="shopee" data-sub1="store" data-sub2="list_36">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/750843606/25883750845" data-merchant="shopee" data-sub1="store" data-sub2="list_37">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/750843606/18432109478" data-merchant="shopee" data-sub1="store" data-sub2="list_38">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/772892494/43960877125" data-merchant="shopee" data-sub1="store" data-sub2="list_39">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/772892494/20507810746" data-merchant="shopee" data-sub1="store" data-sub2="list_40">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/772892494/21507014059" data-merchant="shopee" data-sub1="store" data-sub2="list_41">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/772892494/21507006756" data-merchant="shopee" data-sub1="store" data-sub2="list_42">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/477191566/23116652705" data-merchant="shopee" data-sub1="store" data-sub2="list_43">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/1175273312/29976738485" data-merchant="shopee" data-sub1="store" data-sub2="list_44">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/189865177/19430598393" data-merchant="shopee" data-sub1="store" data-sub2="list_45">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/1349676167/42807970281" data-merchant="shopee" data-sub1="store" data-sub2="list_46">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/1349676167/41554042244" data-merchant="shopee" data-sub1="store" data-sub2="list_47">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/7239997/25784321039" data-merchant="shopee" data-sub1="store" data-sub2="list_48">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/68653843/8580641349" data-merchant="shopee" data-sub1="store" data-sub2="list_49">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/68653843/13507058015" data-merchant="shopee" data-sub1="store" data-sub2="list_50">Mua ngay</a>
-        <a class="buy" href="https://shopee.vn/product/1061097771/22861822077" data-merchant="shopee" data-sub1="store" data-sub2="list_51">Mua ngay</a>
+  <a class="product-meta"
+     href="/g.html?sku=may-cat-cam-tay-dekton-dk-ag950s"
+     data-origin="https://shopee.vn/product/300702715/5984515446"
+     data-merchant="shopee"
+     data-sku="may-cat-cam-tay-dekton-dk-ag950s"
+     data-img="/assets/img/products/may-cat-cam-tay-dekton-dk-ag950s.webp"
+     data-price="822000">Máy Cắt Cầm Tay Dekton DK-AG950S 950W</a>
+
+  <a class="buy"
+     href="/g.html?sku=may-cat-cam-tay-dekton-dk-ag950s"
+     data-merchant="shopee" data-sku="may-cat-cam-tay-dekton-dk-ag950s"
+     data-sub1="store" data-sub2="list_1">Mua ngay</a>
+</div>
+        <!-- Thêm sản phẩm mới: copy block trên, đổi name + data-sku + data-img + href -->
       </div>
     </section>
-    <!-- ==================== /MÁY CẮT – TỔNG HỢP ==================== -->
   </main>
 
   <footer>
@@ -143,95 +105,98 @@
     <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD"><span class="icon">📨</span><span class="label">Messenger</span></a>
   </div>
 
-  <!-- JS nội tuyến -->
-<script src="/assets/products.js" defer></script>
+  <!-- Footer year -->
+  <script>
+    (function(){ const yr=document.getElementById('year'); if(yr) yr.textContent=new Date().getFullYear(); })();
+  </script>
 
-<!-- Footer year -->
-<script>
-  (function(){
-    const yr = document.getElementById('year');
-    if (yr) yr.textContent = new Date().getFullYear();
-  })();
-</script>
+  <!-- Render list sản phẩm (theo CHUẨN MXD) -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const src = document.querySelector('#paste-links-here');
+    const out = document.querySelector('#product-list');
+    if (!src || !out) return;
 
-<!-- Render list sản phẩm từ vùng dán link -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const src = document.querySelector('#paste-links-here');
-  const out = document.querySelector('#may-cat-list');
-  if (!src || !out) return;
+    const PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="16" fill="#64748b">Đang cập nhật ảnh</text></svg>'
+    );
 
-  const links = Array.from(src.querySelectorAll('a'));
-  out.innerHTML = '';
+    const normSku = s => (s||'').toLowerCase().trim()
+      .replace(/đ|ð/g,'d')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 
-  const PLACEHOLDER_DATAURL = 'data:image/svg+xml;utf8,' +
-    encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#f1f5f9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui" font-size="16" fill="#64748b">Đang cập nhật ảnh</text></svg>');
+    const metas = Array.from(src.querySelectorAll('a.product-meta'));
+    out.innerHTML = '';
 
-  const normSku = s => (s||'').toLowerCase().trim()
-    .replace(/đ|ð/g,'d')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    metas.forEach(metaA => {
+      const name = (metaA.textContent || 'Sản phẩm').trim();
+      const href = metaA.getAttribute('href') || '#';
+      const merchant = (metaA.dataset.merchant || '').toLowerCase();
+      const priceNum = metaA.dataset.price ? parseInt(metaA.dataset.price,10) : null;
 
-  function parseShopee(u){
-    const m = u && u.match(/\/product\/(\d+)\/(\d+)/);
-    return m ? {shop:m[1], item:m[2]} : null;
-  }
+      const sku = metaA.dataset.sku ? metaA.dataset.sku : normSku(name);
+      const img = metaA.dataset.img || `/assets/img/products/${sku}.webp`;
 
-  links.forEach(a => {
-    const nameRaw = (a.textContent || '').trim();
-    const href = a.getAttribute('href') || '#';
-    const merchant = (a.dataset.merchant || '').toLowerCase();
+      // gom các buy ngay sau meta cho đến khi gặp meta tiếp theo
+      const buys = [];
+      let n = metaA.nextElementSibling;
+      while (n && !(n.matches && n.matches('a.product-meta'))) {
+        if (n.matches && n.matches('a.buy')) {
+          buys.push({
+            href: n.getAttribute('href') || '#',
+            merchant: (n.dataset.merchant || '').toLowerCase(),
+            sub1: n.dataset.sub1 || '', sub2: n.dataset.sub2 || '',
+            sub3: n.dataset.sub3 || '', sub4: n.dataset.sub4 || ''
+          });
+        }
+        n = n.nextElementSibling;
+      }
 
-    const sh  = parseShopee(href);
-    const id  = sh ? `${sh.shop}-${sh.item}` : (a.dataset.sku || normSku(nameRaw)).slice(0,64);
-    const meta = (window.MXD_PRODUCTS || {})[id] || {};
+      const primaryBuy = (buys[0]?.href) || href;
+      const primaryMerchant = (buys[0]?.merchant) || merchant;
 
-    // Tên
-    const name = meta.title || (nameRaw && !/^mua ngay$/i.test(nameRaw) ? nameRaw : 'Sản phẩm');
+      let priceText = 'Cập nhật giá';
+      if (Number.isInteger(priceNum)) priceText = priceNum.toLocaleString('vi-VN');
 
-    // Giá
-    let priceNum = null, priceText = 'Cập nhật giá';
-    if (Number.isInteger(meta.price)) {
-      priceNum  = meta.price;
-      priceText = meta.price.toLocaleString('vi-VN');
-    } else if (Number.isInteger(meta.min) && Number.isInteger(meta.max)) {
-      priceNum  = meta.min;
-      priceText = `${meta.min.toLocaleString('vi-VN')} - ${meta.max.toLocaleString('vi-VN')}`;
-    }
+      const li = document.createElement('li');
+      li.className = 'product';
+      li.setAttribute('itemscope','');
+      li.setAttribute('itemtype','https://schema.org/Product');
+      li.innerHTML = `
+        <a class="thumb" href="${primaryBuy}" target="_blank" rel="nofollow sponsored noopener"
+           data-merchant="${primaryMerchant}" data-sku="${sku}">
+          <img src="${img}" alt="${name}" width="400" height="400" loading="lazy" decoding="async"
+               onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+        </a>
+        <h3 itemprop="name">${name}</h3>
+        <p class="price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+          <meta itemprop="priceCurrency" content="VND">
+          <span class="price-text" ${Number.isInteger(priceNum) ? 'itemprop="price" content="'+priceNum+'"' : ''}>${priceText}</span>
+        </p>
+        <a class="btn buy" href="${primaryBuy}" target="_blank" rel="nofollow sponsored noopener"
+           data-merchant="${primaryMerchant}" data-sku="${sku}" data-source="store" data-campaign="store_20250917">Mua ngay</a>
+      `;
 
-    // Ảnh
-    const sku = a.dataset.sku || (sh ? id : normSku(name)).slice(0,64);
-    const img = a.dataset.img || (sh
-      ? `/assets/img/products/shopee-${sh.shop}-${sh.item}.webp`
-      : `/assets/img/products/${sku}.webp`);
+      if (buys.length > 1) {
+        const more = document.createElement('div');
+        more.style.marginTop = '8px';
+        more.innerHTML = buys.slice(1).map(b =>
+          `<a class="btn buy" style="margin-right:8px" href="${b.href}" target="_blank" rel="nofollow sponsored noopener"
+              data-merchant="${b.merchant}" data-sku="${sku}" data-source="store" data-campaign="store_20250917">Nguồn khác</a>`
+        ).join('');
+        li.appendChild(more);
+      }
 
-    const li = document.createElement('li');
-    li.className = 'product';
-    li.setAttribute('itemscope','');
-    li.setAttribute('itemtype','https://schema.org/Product');
-    li.innerHTML = `
-      <a class="thumb" href="${href}" target="_blank" rel="nofollow sponsored noopener"
-         data-merchant="${merchant}" data-sku="${sku}">
-        <img src="${img}" alt="${name}" width="400" height="400" loading="lazy" decoding="async"
-             onerror="this.onerror=null;this.src='${PLACEHOLDER_DATAURL}'">
-      </a>
-      <h3 itemprop="name">${name}</h3>
-      <p class="price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-        <meta itemprop="priceCurrency" content="VND">
-        <span class="price-text" ${priceNum ? 'itemprop="price" content="'+priceNum+'"' : ''}>${priceText}</span>
-      </p>
-      <a class="btn buy" href="${href}" target="_blank" rel="nofollow sponsored noopener"
-         data-merchant="${merchant}" data-sku="${sku}" data-source="store" data-campaign="may-cat_20250916">Mua ngay</a>`;
-    out.appendChild(li);
+      out.appendChild(li);
+    });
   });
-});
-</script>
+  </script>
 
-<!-- JSON-LD ItemList -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    const cards = [...document.querySelectorAll('#may-cat-list .product')];
+  <!-- JSON-LD ItemList -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = [...document.querySelectorAll('#product-list .product')];
     if (!cards.length) return;
     const items = cards.map((card, i) => {
       const name = card.querySelector('h3')?.textContent?.trim() || 'Sản phẩm';
@@ -243,27 +208,26 @@ document.addEventListener('DOMContentLoaded', () => {
     s.type = 'application/ld+json';
     s.textContent = JSON.stringify(ld);
     document.head.appendChild(s);
-  } catch {}
-});
-</script>
-
-<!-- Service Worker -->
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(()=>{});
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!window.__swRld) { window.__swRld = true; location.reload(); }
   });
-  navigator.serviceWorker.ready.then(reg => {
-    if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-  });
-}
-</script>
+  </script>
 
-<!-- GA4 trước, Affiliate sau -->
-<script src="/assets/analytics.js" defer></script>
-<script src="/assets/mxd-affiliate.js" defer></script>
-<!-- JS khác -->
-<script src="/assets/js/floating-contact.js" defer></script>
+  <!-- Service Worker -->
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(()=>{});
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!window.__swRld) { window.__swRld = true; location.reload(); }
+    });
+    navigator.serviceWorker.ready.then(reg => {
+      if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+    });
+  }
+  </script>
+
+  <!-- GA4 trước, Affiliate sau (chuẩn MXD) -->
+  <script src="/assets/analytics.js" defer></script>
+  <script src="/assets/mxd-affiliate.js" defer></script>
+  <!-- JS khác -->
+  <script src="/assets/js/floating-contact.js" defer></script>
 </body>
 </html>
