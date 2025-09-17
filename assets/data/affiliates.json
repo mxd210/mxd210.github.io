@@ -1,17 +1,16 @@
 [
   {
-    {
-  "sku": "may-cat-cam-tay-dekton-dk-ag950s",
-  "name": "Máy cắt cầm tay Dekton DK-AG950S",
-  "price": 690000,
-  "link": "https://shopee.vn/product/69531031/1579917792"
-}
+    "sku": "may-cat-cam-tay-dekton-dk-ag950s",
+    "name": "Máy cắt cầm tay Dekton DK-AG950S",
+    "price": 690000,
+    "origin": "https://shopee.vn/product/69531031/1579917792",
+    "merchant": "shopee"
   },
   {
-    "sku": "may-khoan-be-tong-kynko-j1c-kd28-26",
+    "sku": "kynko-j1c-kd28-26",
     "name": "Máy khoan bê tông Kynko J1C-KD28-26",
     "price": 1833000,
-    "merchant": "shopee",
-    "origin": "https://shopee.vn/Máy-khoan-bê-tông-cầm-tay-3-chức-năng-chính-hãng-Kynko-J1C-KD28-26-siêu-bền-mạnh-mẽ-i.772892494.21507014059"
+    "origin": "https://shopee.vn/product/772892494/21507014059",
+    "merchant": "shopee"
   }
 ]
