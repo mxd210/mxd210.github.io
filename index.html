@@ -388,6 +388,31 @@
   </script>
 
   <script src="/assets/js/floating-contact.js" defer></script>
-  
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+        // ép trình duyệt check update
+        reg.update();
+        // Nếu có SW mới chờ, cho nó skipWaiting ngay
+        if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+        // Khi SW có trạng thái new -> installed -> waiting
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          nw?.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              // reload nhẹ để nhận SW mới (tuỳ chọn)
+              // location.reload();
+            }
+          });
+        });
+      } catch(e) {
+        console.warn('SW register failed:', e);
+      }
+    });
+  }
+</script>
+
 </body>
 </html>
