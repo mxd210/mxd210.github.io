@@ -200,3 +200,8 @@ a{color:#111;text-decoration:none}a:hover{text-decoration:underline}img{max-widt
 }
 .featured.ultra .title { -webkit-line-clamp: 1; min-height: 1.4em; }
 .featured.ultra a.buy  { padding: 0.45rem; }
+.blog-list{padding:1rem 0}
+.post-list{list-style:none;margin:0;padding:0}
+.post-list li{padding:.75rem 0;border-bottom:1px solid #eee}
+.post-list a{font-weight:600}
+.post-list time{display:block;font-size:.85rem;color:#666;margin-top:.25rem}
