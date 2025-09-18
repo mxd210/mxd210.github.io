@@ -1,5 +1,5 @@
 ﻿// sw.js â€” MXD PWA v28
-const VERSION = 'v29';
+const VERSION = 'v30';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
@@ -162,4 +162,5 @@ self.addEventListener('fetch', (e) => {
     }
   })());
 });
+
 
