@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>MXD – Shopee Importer (auto-price)</title>
+  <style>
+    :root { --bg:#0b0b0b; --fg:#eee; --muted:#888; --card:#141414; --ok:#1b5e20; --warn:#704700; --bad:#7f1d1d; }
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:1080px;margin:24px auto;padding:0 12px;line-height:1.5;color:#111}
+    h1{margin:0 0 8px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    textarea, input[type="url"], input[type="text"]{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px}
+    textarea{min-height:220px}
+    .out{white-space:pre; background:var(--bg); color:var(--fg); padding:12px;border-radius:10px;overflow:auto;min-height:220px}
+    .muted{color:#666}
+    .tips{background:#fff7e6;border:1px solid #ffe0a3;padding:10px;border-radius:10px}
+    button{padding:10px 14px;border-radius:10px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
+    button.primary{background:#111;color:#fff}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #ddd;background:#fafafa}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .ok{color:#0a7c2f}.warn{color:#a66b00}.bad{color:#b91c1c}
+    .copy{float:right;margin-left:8px}
+    code,kbd{background:#f4f4f4;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <h1>MXD – Shopee → affiliates.json <span class="badge">Auto Price</span></h1>
+  <p class="muted">Dán danh sách vào ô dưới. Hỗ trợ 2 định dạng dòng:</p>
+  <ul>
+    <li><b>Mode A:</b> <code>https://shopee.vn/product/&lt;shopId&gt;/&lt;itemId&gt;</code></li>
+    <li><b>Mode B:</b> <code>Tên sản phẩm | giá (số) | link Shopee</code></li>
+  </ul>
+
+  <div class="grid">
+    <section>
+      <h3>1) Dữ liệu đầu vào</h3>
+      <textarea id="input" placeholder="Ví dụ:
+Máy cắt cầm tay Dekton DK-AG950S | 690000 | https://shopee.vn/product/279547485/5274192859
+https://shopee.vn/product/772892494/21507014059"></textarea>
+      <div class="tips">
+        <b>Quy ước MXD:</b>
+        <ul>
+          <li><b>sku</b> = slug tên SP → khớp tên ảnh <code>/assets/img/products/&lt;sku&gt;.webp</code></li>
+          <li><b>merchant</b> = <code>shopee</code>, <b>origin</b> = link Shopee gốc</li>
+          <li>Nếu <code>name</code> trống, tool sẽ lấy tiêu đề từ Worker.</li>
+        </ul>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <label class="row"><input type="checkbox" id="autolowerprice" checked> Giảm nhẹ giá hiển thị 3% (hút click)</label>
+        <label class="row"><input type="checkbox" id="forceMin" checked> Dùng <code>priceMin</code> (nếu có <code>priceMax</code>)</label>
+      </div>
+      <div style="margin-top:10px">
+        <label>Proxy Worker URL:
+          <input id="proxy" type="url" placeholder="https://mxd-price-worker.<subdomain>.workers.dev/">
+        </label>
+        <div class="row" style="margin-top:8px">
+          <button id="autoprice">Lấy giá tự động</button>
+          <button id="gen" class="primary">Generate JSON &amp; Meta</button>
+          <button id="dedup">Khử trùng link</button>
+          <button id="clear">Xoá</button>
+        </div>
+      </div>
+      <p id="status" class="muted"></p>
+    </section>
+
+    <section>
+      <h3>2) Kết quả – dán vào <code>assets/data/affiliates.json</code>
+        <button class="copy" data-copy="json">Copy JSON</button>
+      </h3>
+      <div id="json" class="out">{ }</div>
+
+      <h3 style="margin-top:16px">3) HTML meta (dán vào trang danh mục)
+        <button class="copy" data-copy="meta">Copy Meta</button>
+      </h3>
+      <div id="meta" class="out">&lt;!-- meta links --&gt;</div>
+    </section>
+  </div>
+
+  <script>
+  // ===== Helpers =====
+  function slugify(s){
+    return (s||'').toString()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // bỏ dấu
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,'-')
+      .replace(/^-+|-+$/g,'')
+      .replace(/--+/g,'-');
+  }
+  function parseShopeeId(url){
+    try{
+      const u=new URL(url.trim());
+      const m=u.pathname.match(/\/product\/(\d+)\/(\d+)/);
+      return m?{shopId:m[1],itemId:m[2]}:null;
+    }catch(e){return null;}
+  }
+  function canonShopee(url){
+    const ids=parseShopeeId(url);
+    return ids?`https://shopee.vn/product/${ids.shopId}/${ids.itemId}`:url.trim();
+  }
+  const fmtPrice = n => Math.max(0, Math.round(n||0));
+
+  // ===== UI wiring =====
+  const el = id => document.getElementById(id);
+  const setStatus = (msg, cls='')=>{
+    const s=el('status'); s.textContent=msg; s.className='muted '+cls;
+  };
+
+  // Copy buttons
+  document.querySelectorAll('button.copy').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const target = btn.dataset.copy;
+      const text = el(target).textContent;
+      navigator.clipboard.writeText(text).then(()=>{
+        btn.textContent='Copied!';
+        setTimeout(()=>btn.textContent='Copy '+(target==='json'?'JSON':'Meta'),900);
+      });
+    });
+  });
+
+  // Khử trùng link
+  el('dedup').addEventListener('click', ()=>{
+    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
+    const seen = new Set();
+    const out = [];
+    for (let line of lines){
+      const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
+      const ids = parseShopeeId(link);
+      const key = ids ? `${ids.shopId}_${ids.itemId}` : line.trim();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(line);
+    }
+    el('input').value = out.join('\n');
+    setStatus(`Đã khử trùng: còn ${out.length} dòng.`, 'ok');
+  });
+
+  // Xoá input
+  el('clear').addEventListener('click', ()=>{
+    el('input').value='';
+    setStatus('Đã xoá input.');
+  });
+
+  // Auto-price (gọi Worker)
+  async function fetchDetail(proxy, link){
+    try{
+      const u = new URL(proxy);
+      u.searchParams.set('url', canonShopee(link));
+      const r = await fetch(u.toString());
+      if(!r.ok) throw new Error('fetch fail');
+      return await r.json(); // { title, priceMin, priceMax, price, images[] }
+    }catch(e){ return null; }
+  }
+
+  el('autoprice').addEventListener('click', async ()=>{
+    const proxy = el('proxy').value.trim();
+    if (!proxy){ setStatus('Nhập Proxy Worker URL trước đã.', 'bad'); return; }
+
+    const lines = el('input').value.trim().split(/\r?\n/);
+    const out = [];
+    const useMin = el('forceMin').checked;
+    let ok=0, miss=0;
+
+    for (let i=0;i<lines.length;i++){
+      let line = lines[i].trim();
+      if (!line) continue;
+
+      let name='', price=0, link='';
+      if (line.includes('|')){
+        const [n, p, l] = line.split('|').map(s=>s.trim());
+        name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||'';
+      } else {
+        link=line;
+      }
+
+      if (/shopee\.vn\/product\//.test(link)){
+        const detail = await fetchDetail(proxy, link);
+        if (detail){
+          // giá
+          let auto = useMin ? (detail.priceMin||detail.price||0) : (detail.price||detail.priceMin||0);
+          if (!price) price = auto;
+          // tên
+          if (!name || /^need_name/i.test(name)){
+            name = detail.title || name || '';
+          }
+          ok++;
+        } else {
+          miss++;
+        }
+      }
+      out.push(`${name||'NEED_NAME'} | ${price||0} | ${link}`);
+    }
+
+    el('input').value = out.join('\n');
+    setStatus(`Auto-price xong. Thành công ${ok}, lỗi ${miss}.`, miss? 'warn':'ok');
+  });
+
+  // Generate JSON + Meta
+  el('gen').addEventListener('click', ()=>{
+    const wantLower = el('autolowerprice').checked;
+    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
+
+    const seen=new Set();
+    const items=[];
+    const metas=[];
+
+    for (const line of lines){
+      let name='', price=0, link='';
+      if (line.includes('|')){
+        const [n, p, l] = line.split('|').map(s=>s.trim());
+        name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||'';
+      } else {
+        link=line.trim();
+      }
+      const ids = parseShopeeId(link);
+      if (!ids) continue;
+      const key = `${ids.shopId}_${ids.itemId}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      const origin = canonShopee(link);
+      let sku = name ? slugify(name) : `p-${ids.itemId}`;
+      if (wantLower && price>0) price=Math.round(price*0.97);
+
+      const rec = {
+        sku,
+        name: name || `NEED_NAME_${ids.itemId}`,
+        price: fmtPrice(price),
+        origin,
+        merchant: "shopee"
+      };
+      items.push(rec);
+
+      metas.push(
+        `<a class="product-meta" href="${rec.origin}" data-merchant="shopee" data-sku="${rec.sku}" data-img="/assets/img/products/${rec.sku}.webp" data-price="${rec.price}">${rec.name}</a>\n<a class="buy" href="${rec.origin}" data-merchant="shopee">Mua ngay</a>`
+      );
+    }
+
+    el('json').textContent = JSON.stringify(items, null, 2);
+    el('meta').textContent = metas.join('\n\n') || '<!-- no items parsed -->';
+    setStatus(`Generate xong: ${items.length} sản phẩm.`, 'ok');
+  });
+  </script>
+</body>
+</html>
