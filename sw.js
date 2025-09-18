@@ -1,5 +1,5 @@
 ﻿// sw.js â€” MXD PWA v28
-const VERSION = 'v30';
+const VERSION = 'v31';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
@@ -163,4 +163,26 @@ self.addEventListener('fetch', (e) => {
   })());
 });
 
+
+\n/* === MXD_SAFE_FETCH: clone() before caching to avoid 'body used' === */
+self.addEventListener('fetch', event => {
+  try {
+    const req = event.request;
+    if (req.method !== 'GET') return;
+    const url = new URL(req.url);
+    // chỉ xử lý same-origin để không đụng tài nguyên ngoài
+    if (url.origin !== self.location.origin) return;
+
+    event.respondWith((async () => {
+      const cache = await caches.open(typeof CACHE !== 'undefined' ? CACHE : (typeof CACHE_NAME !== 'undefined' ? CACHE_NAME : 'mxd-cache'));
+      const cached = await cache.match(req);
+      if (cached) return cached;
+
+      const net = await fetch(req);
+      // clone trước khi ghi vào cache để không tiêu thụ body
+      try { await cache.put(req, net.clone()); } catch(e) { /* ignore quota */ }
+      return net;
+    })());
+  } catch(e) { /* noop */ }
+});
 
