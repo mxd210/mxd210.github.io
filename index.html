@@ -1,145 +1,71 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <meta name="format-detection" content="telephone=no" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 
-  <title>MXD – Cửa hàng & Dịch vụ thi công uy tín</title>
-  <meta name="description" content="MXD: thi công & mua sắm dụng cụ xây dựng. Chọn một lần – yên tâm nhiều năm: keo ốp lát, chống thấm, máy cắt, bay răng cưa… nội dung thực chiến, uy tín chất lượng.">
+  <title>Cửa hàng MXD – Sản phẩm chọn lọc</title>
+  <meta name="description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền."/>
+  <link rel="canonical" href="https://mxd210.github.io/store.html"/>
+  <meta name="robots" content="index,follow"/>
 
-  <!-- Canonical & PWA -->
-  <link rel="canonical" href="https://mxd210.github.io/" />
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#111111" />
+  <!-- OG -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Cửa hàng MXD – Sản phẩm chọn lọc"/>
+  <meta property="og:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền."/>
+  <meta property="og:url" content="https://mxd210.github.io/store.html"/>
+  <meta property="og:image" content="/assets/img/products/placeholder.webp"/>
 
-  <!-- Favicon / Logo -->
-  <link rel="icon" href="/favicon-mxd.png" />
-
-  <!-- Open Graph / Social -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://mxd210.github.io/" />
-  <meta property="og:title" content="MXD – Cửa hàng & Dịch vụ thi công uy tín" />
-  <meta property="og:description" content="Cửa hàng MXD, tổng hợp dụng cụ & vật tư thi công. Có tư vấn, kinh nghiệm thực tế, và ưu đãi cho khách hàng thân thiết." />
-  <meta property="og:image" content="/assets/og-home.jpg" />
-
-  <!-- Structured data (fixed type attribute) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "MXD",
-    "url": "https://mxd210.github.io/",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://mxd210.github.io/assets/img/logo.png",
-      "width": 512,
-      "height": 512
-    },
-    "sameAs": [
-      "https://www.facebook.com/mxd6686",
-      "https://m.me/mxd6686",
-      "https://zalo.me/0338328898"
-    ],
-    "slogan": "Chọn một lần – yên tâm nhiều năm.",
-    "contactPoint": [{
-      "@type": "ContactPoint",
-      "telephone": "+84-338-328-898",
-      "contactType": "customer service",
-      "areaServed": "VN",
-      "availableLanguage": ["vi", "en"]
-    }]
-  }
-  </script>
-
-  <!-- VERIFY + ROBOTS -->
+  <!-- VERIFY (điền mã thật khi có) -->
   <meta name="google-site-verification" content="PASTE_GOOGLE_CODE">
   <meta name="msvalidate.01" content="PASTE_BING_CODE">
-  <meta name="robots" content="index,follow">
 
-  <!-- Fonts (giữ nguyên) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css"/>
 
   <style>
-    :root {
-      --bg: #f6f7f8;
-      --card: #ffffff;
-      --ink: #111111;
-      --muted: #6b7280;
-      --brand: #0ea5e9;
-      --accent: #111111;
-      --radius: 14px;
-      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+    /* ================== THEME CHUẨN MXD (có dark mode) ================== */
+    :root{
+      --bg:#ffffff; --text:#111111; --muted:#666666; --border:#eaeaea;
+      --card:#ffffff; --brand:#0a84ff; --brand-contrast:#ffffff;
+      --hover:#111111; --radius:16px; --gap:16px; --shadow:0 6px 20px rgba(0,0,0,.06);
     }
-    html, body {
-      margin:0; padding:0;
-      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: var(--ink); background: var(--bg);
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0f1215; --text:#e8e8e8; --muted:#a2a2a2; --border:#262b31;
+        --card:#14181d; --hover:#e8e8e8; --shadow:0 10px 28px rgba(0,0,0,.35);
+      }
     }
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; border-radius: 12px; }
 
-    .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
-    .stack { display: grid; gap: 16px; }
-
-    header.topbar { background: var(--card); position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow); }
-    header .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .brand { display:flex; align-items:center; gap:10px; }
-    .brand img { width: 36px; height: 36px; }
-    .brand strong { letter-spacing: 0.5px; }
-
-    nav.menu { display:flex; align-items:center; gap: 12px; flex-wrap: wrap; }
-    nav.menu a { padding: 8px 10px; border-radius: 10px; }
-    nav.menu a.active, nav.menu a:hover { background: #111; color:#fff; }
-
-    /* Quick nav dưới hero */
-    .quick-nav { display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 0; }
-    .quick-nav a { padding:8px 10px; border:1px solid #111; border-radius:10px; background:#fff; }
-    .quick-nav a:hover { background:#111; color:#fff; }
-
-    .hero {
-      display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items:center;
-      background: linear-gradient(135deg, #0d47a1, #1976d2);
-      border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); color: #fff;
+    /* ================== BASE ================== */
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:'Inter', system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","DejaVu Sans",sans-serif;
+      text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased;
     }
-    .hero h1 { font-size: clamp(24px, 3.2vw, 40px); line-height: 1.15; margin: 0 0 10px; }
-    .hero p { margin: 0 0 18px; color:#e2e8f0; }
-    .hero img { border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+    a{color:var(--brand); text-decoration:none}
+    a:hover{opacity:.9}
+    header,footer{padding:12px 16px; border-bottom:1px solid var(--border)}
+    footer{border-bottom:none;border-top:1px solid var(--border); margin-top:24px}
+    .container{max-width:1100px;margin:0 auto;padding:0 16px}
+    .muted{color:var(--muted)}
+    .sr-only{position:absolute;left:-9999px}
 
-    .btn { display:inline-block; padding: 12px 16px; border-radius: 12px; border:1px solid #111; background:#fff; color:#111; font-weight:600; }
-    .btn.primary { background:#111; color:#fff; }
+    /* ================== GRID / CARD (tối ưu mobile) ================== */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--gap);margin:16px 0}
+    .card{
+      border:1px solid var(--border); border-radius:var(--radius);
+      background:var(--card); overflow:hidden; display:flex; flex-direction:column;
+      box-shadow:var(--shadow); transition:transform .15s ease;
+    }
+    .card:hover{transform:translateY(-2px)}
+    .card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#f7f7f7;height:auto}
+    .card .body{padding:12px}
+    .name{font-size:16px;line-height:1.35;margin:0 0 6px}
+    .price{font-weight:800;margin:4px 0 10px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
 
-    .section-title { display:flex; align-items:baseline; justify-content:space-between; gap: 12px; margin: 24px 0 8px; }
-    .section-title h2 { margin:0; font-size: clamp(18px, 2.8vw, 28px); }
-    .section-title a { color: var(--muted); }
-
-    .grid { display:grid; gap: 16px; }
-    .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
-    .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-    .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-
-    .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display:flex; flex-direction:column; transition: all .2s ease; }
-    .card:hover { transform: scale(1.02); box-shadow: 0 8px 24px rgba(0,0,0,.12); }
-    .card .body { padding: 14px; display:flex; flex-direction:column; gap: 8px; }
-    .card h3 { margin: 0; font-size: 16px; }
-    .muted { color: var(--muted); font-size: 13px; }
-    .price { font-weight:700; }
-    .badge { display:inline-block; padding:4px 8px; border:1px solid #111; border-radius:999px; font-size:12px; }
-
-    .cta-block { background:#111; color:#fff; border-radius: var(--radius); padding: 24px; display:grid; gap: 12px; box-shadow: var(--shadow); }
-
-    footer.site { margin-top: 32px; background:#0f172a; color:#cbd5e1; }
-    footer .cols { display:grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 16px; }
-    footer a { color:#e2e8f0; }
-    footer small { color:#94a3b8; }
-
-    /* Floating contact buttons */
-    .float-box { position: fixed; right: 14px; bottom: 14px; display: grid; gap: 10px; z-index: 80; }
-    .float-btn { display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #111; padding:12px 16px; border-radius: 999px; box-shadow: var(--shadow); font-weight: 600; font-size:14px; }
-    .float-btn .icon { font-size:20px; }
-    .float-btn:hover { transform: translateY(-1px); }
-
-    /* ===== Nút Mua ngay (theo merchant) cho phần Featured ===== */
+    /* Nút mua – tô màu theo merchant */
     .buy{
       display:inline-block; width:100%; text-align:center;
       padding:10px 12px; border-radius:12px; font-weight:800;
@@ -152,322 +78,255 @@
     .buy[data-merchant="tiktok"] { background:#000;    border-color:#000; }
     .buy:hover{ filter:brightness(1.05) }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero { grid-template-columns: 1fr; text-align: center; }
-      .grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
-      .grid.cols-3 { grid-template-columns: 1fr; }
-      nav.menu { flex-direction: column; gap: 8px; align-items: flex-start; }
-      .float-btn .label { display:none; }
+    .badge{
+      display:inline-block; background:var(--brand); color:var(--brand-contrast);
+      padding:4px 8px; font-size:12px; border-radius:999px; margin:8px 8px 0;
+      align-self:flex-start;
+    }
+
+    /* ================== SKELETON ================== */
+    .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%)}
+    .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
+    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+    /* ================== NAV + FLOATING CONTACTS ================== */
+    .nav-link{
+      padding:8px 10px; border-radius:10px; color:var(--text); text-decoration:none;
+    }
+    .nav-link:hover{ background:rgba(23,70,255,.08) }
+    .nav-link[aria-current="page"]{ background:#eef4ff; color:#1746ff }
+
+    .fc{position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:1000}
+    .fab{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer}
+    .fab svg{width:22px;height:22px}
+    .fab-brand{background:var(--brand); border-color:var(--brand); color:var(--brand-contrast)}
+    .fab:hover{filter:brightness(1.02)}
+    .fab-top{display:none}
+
+    @media (max-width:480px){
+      .name{font-size:15px}
     }
   </style>
 
-  <!-- GA4 trước – Affiliate sau (duy nhất 1 lần) -->
+  <!-- GA4 trước, Affiliate sau -->
   <script src="/assets/analytics.js" defer></script>
   <script src="/assets/mxd-affiliate.js" defer></script>
 </head>
 <body>
-  <!-- Header -->
-  <header class="topbar">
-    <div class="container row">
-      <a class="brand" href="/" aria-label="Trang chủ MXD">
-        <img src="/logo.png" alt="Logo MXD" />
-        <strong>MXD</strong>
-      </a>
-      <nav class="menu" aria-label="Điều hướng chính">
-        <a href="/store.html">Cửa hàng</a>
-        <a href="/blog.html">Tin tức</a>
-        <a href="/tu-van.html">Tư vấn</a>
-        <a href="/lien-he.html">Liên hệ</a>
+  <!-- Header có điều hướng -->
+  <header style="position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(6px)">
+    <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)">
+      <a href="/" class="brand" style="font-weight:900;font-size:18px;color:var(--text);text-decoration:none">MXD</a>
+      <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
+        <a href="/"                  class="nav-link">Trang chủ</a>
+        <a href="/store.html"        class="nav-link" aria-current="page">Cửa hàng</a>
+        <a href="/blog/"             class="nav-link">Tin tức</a>
+        <a href="/tu-van.html"       class="nav-link">Tư vấn</a>
+        <a href="/lien-he.html"      class="nav-link">Liên hệ</a>
       </nav>
     </div>
   </header>
 
-  <main class="container stack">
-    <!-- HERO -->
-    <section class="hero" aria-label="Giới thiệu MXD">
-      <div>
-        <h1>Trung tâm mua sắm affiliate ngành xây dựng · Thi công thực chiến</h1>
-        <p class="intro">Nội dung thực chiến + lựa chọn đúng ngay từ đầu để dùng bền và tiết kiệm.</p>
-        <div class="cta">
-          <a class="btn primary" href="/store.html">🛒 Vào Cửa hàng MXD</a>
-          <a class="btn" href="/tu-van.html">📅 Đặt lịch tư vấn</a>
-        </div>
-        <nav aria-label="Điểm đến quan trọng" class="quick-nav">
-          <a href="/store.html">Cửa hàng</a>
-          <a href="/store/bay-rang-cua.html">Bay răng cưa</a>
-          <a href="/blog/may-cat-gach.html">Máy cắt gạch</a>
-          <a href="/blog/chong-tham-wc.html">Chống thấm WC</a>
-        </nav>
-      </div>
-      <div>
-        <img src="/assets/img/hero.webp" alt="Dụng cụ & vật tư MXD" loading="lazy" />
-      </div>
-    </section>
-
-    <!-- Danh mục nổi bật -->
-    <div class="section-title">
-      <h2>Danh mục nổi bật</h2>
-      <a href="/store.html">Xem tất cả →</a>
-    </div>
-    <section class="grid cols-4" aria-label="Danh mục sản phẩm">
-      <a class="card" href="/store/may-cat-mai.html">
-        <img src="/assets/img/categories/may-cat-mai.webp" alt="Máy cắt, máy mài" />
-        <div class="body">
-          <h3>Máy cắt · Máy mài</h3>
-          <span class="muted">Thiết bị cầm tay đa năng</span>
-        </div>
-      </a>
-      <a class="card" href="/store/keo-op-lat.html">
-        <img src="/assets/img/categories/keo-op-lat.webp" alt="Keo ốp lát" />
-        <div class="body">
-          <h3>Keo ốp lát</h3>
-          <span class="muted">Chuẩn bền · chống thấm</span>
-        </div>
-      </a>
-      <a class="card" href="/store/bay-rang-cua.html">
-        <img src="/assets/img/categories/bay-rang-cua.webp" alt="Bay răng cưa" />
-        <div class="body">
-          <h3>Bay răng cưa</h3>
-          <span class="muted">Chuẩn kích thước thi công</span>
-        </div>
-      </a>
-      <a class="card" href="/store/chong-tham.html">
-        <img src="/assets/img/categories/chong-tham.webp" alt="Chống thấm" />
-        <div class="body">
-          <h3>Chống thấm</h3>
-          <span class="muted">Vật tư nền móng & WC</span>
-        </div>
-      </a>
-    </section>
-
-    <!-- Sản phẩm nổi bật (render tĩnh mẫu + grid động ở dưới) -->
-    <div class="section-title">
-      <h2>Sản phẩm nổi bật</h2>
-      <a href="/store.html">Xem thêm →</a>
-    </div>
-    <section class="grid cols-4" aria-label="Sản phẩm">
-      <article class="card">
-        <img src="/assets/img/products/may-cat-1.webp" alt="Máy cắt đa năng" />
-        <div class="body">
-          <h3>Máy cắt đa năng</h3>
-          <div class="muted">Động cơ bền, lưỡi cắt đi kèm</div>
-          <div class="price">1.590.000đ</div>
-          <a class="btn" href="#" data-merchant="shopee">Mua ngay</a>
-        </div>
-      </article>
-      <article class="card">
-        <img src="/assets/img/products/keo-op-1.webp" alt="Keo ốp lát cao cấp" />
-        <div class="body">
-          <h3>Keo ốp lát S1</h3>
-          <div class="muted">Độ bám dính cao, chống võng</div>
-          <div class="price">259.000đ</div>
-          <a class="btn" href="#" data-merchant="tiki">Mua ngay</a>
-        </div>
-      </article>
-      <article class="card">
-        <img src="/assets/img/products/bay-60.webp" alt="Bay răng cưa 60cm" />
-        <div class="body">
-          <h3>Bay răng cưa 60cm</h3>
-          <div class="muted">Chuẩn 6×6 – tay cầm êm</div>
-          <div class="price">169.000đ</div>
-          <a class="btn" href="#" data-merchant="lazada">Mua ngay</a>
-        </div>
-      </article>
-      <article class="card">
-        <img src="/assets/img/products/sika-1.webp" alt="Sika chống thấm" />
-        <div class="body">
-          <h3>Sika chống thấm</h3>
-          <div class="muted">Phòng tắm, ban công, mái</div>
-          <div class="price">389.000đ</div>
-          <a class="btn" href="#" data-merchant="shopee">Mua ngay</a>
-        </div>
-      </article>
-    </section>
-
-    <!-- Featured (động từ affiliates.json) -->
-    <section id="featured" class="container mx-auto px-4 py-8" style="padding-left:0;padding-right:0">
-      <h2 class="text-2xl font-bold mb-4">Sản phẩm nổi bật</h2>
-      <div id="featured-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px"></div>
-    </section>
-
-    <!-- Tin tức -->
-    <div class="section-title">
-      <h2>Tin tức & Kinh nghiệm</h2>
-      <a href="/blog.html">Xem tất cả →</a>
-    </div>
-    <section class="grid cols-3" aria-label="Bài viết">
-      <a class="card" href="/blog.html#thi-cong-nha-ve-sinh-500tr">
-        <img src="/assets/img/tin-tuc/ve-sinh-500tr.jpg" alt="Thi công nhà vệ sinh 500 triệu" />
-        <div class="body">
-          <h3>Thi công nhà vệ sinh 500 triệu</h3>
-          <span class="muted">Checklist & vật tư cốt lõi</span>
-        </div>
-      </a>
-      <a class="card" href="/blog.html#keo-op-lat-chuan">
-        <img src="/assets/img/tin-tuc/keo-op-lat.jpg" alt="Keo ốp lát chuẩn" />
-        <div class="body">
-          <h3>Keo ốp lát: chọn loại nào?</h3>
-          <span class="muted">Kinh nghiệm thi công thực tế</span>
-        </div>
-      </a>
-      <a class="card" href="/blog.html#bay-rang-cua">
-        <img src="/assets/img/tin-tuc/bay-rang-cua.jpg" alt="Bay răng cưa" />
-        <div class="body">
-          <h3>Bay răng cưa: kích cỡ & răng</h3>
-          <span class="muted">Chọn đúng giúp mặt lát chuẩn</span>
-        </div>
-      </a>
-    </section>
-
-    <!-- CTA block -->
-    <section class="cta-block" aria-label="Kêu gọi hành động">
-      <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
-        <div>
-          <strong style="font-size:18px">Cần tư vấn nhanh?</strong>
-          <div class="muted">Đặt lịch khảo sát miễn phí tại công trình của bạn.</div>
-        </div>
-        <div style="display:flex; gap:10px;">
-          <a class="btn" href="/tu-van.html">📅 Đặt hẹn khảo sát</a>
-          <a class="btn" href="/lien-he.html">✉️ Liên hệ MXD</a>
-        </div>
-      </div>
-    </section>
+  <main class="container">
+    <div id="product-list" class="grid" aria-live="polite"></div>
+    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/assets/data/affiliates.json</code> hoặc <code>/products.json</code>.</p>
+    <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
   </main>
 
-  <!-- Footer -->
-  <footer class="site">
-    <div class="container stack">
-      <div class="cols">
-        <div>
-          <div class="brand" style="margin-bottom:8px">
-            <img src="/logo.png" alt="MXD" width="36" height="36" />
-            <strong>MXD</strong>
-          </div>
-          <small>Chọn một lần – yên tâm nhiều năm.</small>
-        </div>
-        <div>
-          <strong>Thông tin</strong>
-          <div class="stack" style="margin-top:8px">
-            <a href="/store.html">Cửa hàng</a>
-            <a href="/blog.html">Tin tức & Kinh nghiệm</a>
-            <a href="/tu-van.html">Tư vấn</a>
-            <a href="/lien-he.html">Liên hệ</a>
-          </div>
-        </div>
-        <div>
-          <strong>Chính sách</strong>
-          <div class="stack" style="margin-top:8px">
-            <a href="/chinh-sach/doi-tra.html">Đổi trả</a>
-            <a href="/chinh-sach/giao-hang.html">Giao hàng</a>
-            <a href="/chinh-sach/bao-hanh.html">Bảo hành</a>
-            <a href="/chinh-sach/bao-mat.html">Bảo mật</a>
-            <a href="/chinh-sach/dieu-khoan.html">Điều khoản sử dụng</a>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; border-top:1px solid #1f2937; padding:12px 0;">
-        <small>© <span id="y"></span> MXD. All rights reserved.</small>
-        <small><a href="/sitemap.xml">Sitemap</a> · <a href="/robots.txt">Robots</a></small>
-      </div>
+  <footer>
+    <div class="container">
+      © MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a>
     </div>
   </footer>
 
-  <!-- Floating contact buttons -->
-  <div class="float-box" aria-label="Liên hệ nhanh MXD">
-    <a class="float-btn" href="tel:+84338328898" aria-label="Gọi điện cho MXD">
-      <span class="icon">📞</span><span class="label">Gọi MXD</span>
+  <!-- FLOATING CONTACTS — MXD -->
+  <div class="fc" id="floating-contacts" aria-label="Liên hệ nhanh">
+    <a class="fab fab-brand" href="https://zalo.me/0338328898" target="_blank" rel="noopener nofollow"
+       data-channel="zalo" aria-label="Chat Zalo 0338328898">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12.5a1.5 1.5 0 0 1-2.45 1.15l-2.77-2.31H5a2 2 0 0 1-2-2V5z"/></svg>
     </a>
-    <a class="float-btn" href="https://zalo.me/0338328898" target="_blank" rel="noopener" aria-label="Nhắn Zalo cho MXD">
-      <span class="icon">💬</span><span class="label">Zalo</span>
+    <a class="fab fab-brand" href="https://www.facebook.com/mxd6686" target="_blank" rel="noopener nofollow"
+       data-channel="facebook" aria-label="Facebook MXD6686">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 3h4a1 1 0 0 1 1 1v3h-3a2 2 0 0 0-2 2v3h5l-1 4h-4v7h-4v-7H7v-4h2V9a5 5 0 0 1 5-5z"/></svg>
     </a>
-    <a class="float-btn" href="https://m.me/mxd6686" target="_blank" rel="noopener" aria-label="Nhắn Messenger cho MXD">
-      <span class="icon">📨</span><span class="label">Messenger</span>
+    <a class="fab" href="tel:0338328898" data-channel="phone" aria-label="Gọi 0338328898">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1.1-.2c1.2.5 2.6.8 4 .8a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C12.3 21 3 11.7 3 1a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1c0 1.4.3 2.8.8 4a1 1 0 0 1-.2 1.1L6.6 10.8z"/></svg>
     </a>
+    <button class="fab fab-top" id="toTop" aria-label="Lên đầu trang">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 14l5-5 5 5H7z"/></svg>
+    </button>
   </div>
 
-  <!-- Năm footer -->
-  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
-
-  <!-- Service Worker (giữ logic cũ, gộp gọn – không đổi hành vi) -->
   <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', async () => {
-      try {
-        const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-        reg.update();
-        if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (!window.__swRld) { window.__swRld = true; location.reload(); }
-        });
-        reg.addEventListener('updatefound', () => {
-          const nw = reg.installing;
-          nw?.addEventListener('statechange', () => {
-            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              /* tuỳ chọn: location.reload(); */
-            }
-          });
-        });
-      } catch(e) {
-        console.warn('SW register failed:', e);
-      }
-    });
-  }
+    // Hiện nút "Lên đầu trang" + GA4 event
+    (function(){
+      const root = document.getElementById('floating-contacts');
+      const toTop = document.getElementById('toTop');
+      function toggleTop(){ if (!toTop) return; toTop.style.display = window.scrollY > 320 ? 'flex' : 'none'; }
+      window.addEventListener('scroll', toggleTop, {passive:true});
+      document.addEventListener('DOMContentLoaded', toggleTop);
+      function track(channel){ if (window.gtag) gtag('event','contact_click',{channel,page:location.pathname}); }
+      root?.querySelectorAll('[data-channel]').forEach(el=> el.addEventListener('click', ()=>track(el.dataset.channel), {passive:true}));
+      toTop?.addEventListener('click', (e)=>{ e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); track('to_top'); });
+    })();
   </script>
 
-  <!-- Featured Products render -->
-  <script>
+ <script>
+  // ===== Store Loader (robust) + FIX lỗi font tiếng Việt =====
   (async () => {
-    try {
-      const res = await fetch('/assets/data/affiliates.json', { cache: 'no-store' });
-      const all = await res.json();
+    const app  = document.getElementById('product-list');
+    const empty = document.getElementById('empty');
+    const PLACEHOLDER = '/assets/img/products/placeholder.webp';
 
-      let featured = all
-        .filter(p => p.featured === true)
-        .sort((a,b) => (a.featured_order ?? 999) - (b.featured_order ?? 999))
-        .slice(0,5);
+    const fmtVND = n => {
+      const x = Number(n);
+      if (!isFinite(x)) return '';
+      try { return new Intl.NumberFormat('vi-VN').format(x) + '₫'; }
+      catch { return (x+'').replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '₫'; }
+    };
+    const guessMerchant = (u) => {
+      try {
+        const host = new URL(u, location.origin).hostname;
+        if (host.includes('shopee')) return 'shopee';
+        if (host.includes('lazada')) return 'lazada';
+        if (host.includes('tiki')) return 'tiki';
+        if (host.includes('tik') && host.includes('tok')) return 'tiktok';
+      } catch {}
+      return '';
+    };
 
-      const fmt = n => Number(n||0).toLocaleString('vi-VN') + '₫';
-      const $grid = document.getElementById('featured-grid');
-
-      $grid.innerHTML = featured.map(p => `
-        <article style="border:1px solid #eee;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px">
-          <a href="/g.html?sku=${p.sku}" style="text-decoration:none;color:inherit">
-            <img src="/assets/img/products/${p.sku}.webp"
-                 alt="${p.name}" width="480" height="480"
-                 loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-            <h3 style="font-size:16px;margin:8px 0 4px">${p.name}</h3>
-            <p style="margin:0 0 8px;font-weight:600">${fmt(p.price)}</p>
-          </a>
-          <a class="buy"
-             href="${p.origin}"
-             data-merchant="${p.merchant||'shopee'}"
-             data-sub1="home" data-sub2="featured">
-            Mua ngay
-          </a>
+    function renderSkeleton() {
+      app.innerHTML = Array.from({length:8}).map(()=>`
+        <article class="card">
+          <div class="skeleton" style="aspect-ratio:4/3"></div>
+          <div class="body">
+            <div class="skeleton" style="height:18px;width:70%"></div>
+            <div class="skeleton" style="height:16px;width:40%;margin-top:8px"></div>
+            <div class="skeleton" style="height:34px;width:120px;margin-top:12px;border-radius:10px"></div>
+          </div>
         </article>
       `).join('');
+    }
 
-      // SEO JSON-LD cho danh sách featured
+    /* ===== Vá mojibake: phát hiện & sửa UTF-8 bị đọc như 1252/1258 ===== */
+    function looksBroken(str){ return /Ã|Â|áº|á»|Æ|â|�/.test(str); }
+    function fixLatin1Utf8(str){ try { return decodeURIComponent(escape(str)); } catch { return str; } }
+    function fixText(str){ return (typeof str==='string' && looksBroken(str)) ? fixLatin1Utf8(str) : str; }
+
+    function normalizeList(data){
+      // chấp nhận: [] | {items:[]} | object-map | {affiliates:[]} | {products:[]}
+      const arr = Array.isArray(data) ? data :
+                  (data && typeof data === 'object') ?
+                    (Array.isArray(data.items) ? data.items
+                    : Array.isArray(data.affiliates) ? data.affiliates
+                    : Array.isArray(data.products) ? data.products
+                    : Object.values(data))
+                  : [];
+      return arr.map(x => {
+        const sku   = x.sku || x.p_sku || x.id || '';
+        const name  = fixText(x.name || x.title || sku);
+        const price = (typeof x.price === 'number') ? x.price : Number(String(x.price||'').replace(/[^\d]/g,''));
+        const image = x.image || x.img || `/assets/img/products/${sku}.webp`;
+        let link = x.link || x.url || x.origin || (Array.isArray(x.links) ? (typeof x.links[0]==='string' ? x.links[0] : (x.links[0]?.href || '')) : '');
+        let links = [];
+        if (Array.isArray(x.links)) {
+          links = x.links.map(l => {
+            if (typeof l === 'string') return {href:l, merchant:guessMerchant(l)};
+            return {href:(l.href||''), merchant:(l.merchant || guessMerchant(l.href||''))};
+          }).filter(l => l.href);
+        }
+        if (!links.length && link) links = [{href:link, merchant:guessMerchant(link)}];
+        const merchant = x.merchant || (links[0]?.merchant || guessMerchant(link));
+        return { sku, name, price, image, link, links, merchant };
+      });
+    }
+
+    function renderCard(p){
+      const first = (p.links && p.links[0]) ? p.links[0] : (p.link ? {href:p.link, merchant:p.merchant||guessMerchant(p.link)} : null);
+      const imgSrc = p.image || `/assets/img/products/${p.sku}.webp`;
+      return `
+        <article class="card">
+          <span class="badge">MXD chọn</span>
+
+          <!-- meta link CHUẨN để affiliate.js scan -->
+          <a class="product-meta sr-only"
+             href="${first ? first.href : '#'}"
+             data-merchant="${first ? (first.merchant||'') : ''}"
+             data-sku="${p.sku}"
+             data-img="${imgSrc}"
+             data-price="${p.price||''}">${fixText(p.name)}</a>
+
+          <img loading="lazy" decoding="async" width="640" height="480"
+               src="${imgSrc}" alt="${fixText(p.name)}"
+               onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+
+          <div class="body">
+            <h3 class="name">${fixText(p.name)}</h3>
+            ${p.price ? `<div class="price" data-price="${p.price}">${fmtVND(p.price)}</div>` : ''}
+            <div class="actions">
+              ${first ? `<a class="buy" href="${first.href}" data-merchant="${first.merchant||''}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>` : ''}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    async function loadJSON(src){
+      try {
+        const res = await fetch(src, {cache:'no-store'});
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          return { ok: res.ok, status: res.status, src, list: normalizeList(data) };
+        } catch {
+          return { ok: false, status: res.status, src, list: [] };
+        }
+      } catch {
+        return { ok: false, status: 0, src, list: [] };
+      }
+    }
+
+    renderSkeleton();
+
+    // 1) ưu tiên affiliates.json  → nếu rỗng/parse-fail → 2) thử products.json
+    const primary  = await loadJSON('/assets/data/affiliates.json');
+    const fallback = (!primary.list.length) ? await loadJSON('/products.json') : null;
+    const srcUsed  = (primary.list.length ? primary : fallback);
+
+    if (!srcUsed || !srcUsed.list.length){
+      empty.style.display = 'block';
+      app.innerHTML = '';
+    } else {
+      empty.style.display = 'none';
+      app.innerHTML = srcUsed.list.map(renderCard).join('');
+
+      // JSON-LD ItemList
       const ld = {
         "@context":"https://schema.org","@type":"ItemList",
-        "itemListElement": featured.map((p,i)=>({
-          "@type":"ListItem","position":i+1,"name":p.name,"url":`https://mxd210.github.io/g.html?sku=${p.sku}`
-        }))
+        "itemListElement": srcUsed.list.map((p,i)=>({"@type":"ListItem","position":i+1,"name":fixText(p.name),"url": `/g.html?sku=${p.sku}`}))
       };
-      const s = document.createElement('script');
-      s.type = 'application/ld+json';
-      s.textContent = JSON.stringify(ld);
-      document.head.appendChild(s);
+      const s = document.createElement('script'); s.type='application/ld+json'; s.textContent = JSON.stringify(ld); document.head.appendChild(s);
 
+      // Cho affiliate script xử lý rewrite + GA
       if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
-    } catch (e) {
-      console.error('Featured load fail:', e);
-      document.getElementById('featured-grid').innerHTML =
-        '<p>Không thể tải Sản phẩm nổi bật.</p>';
+    }
+
+    // Debug nhẹ trên store: thêm #debug để thấy nguồn + count
+    if (location.hash === '#debug') {
+      const box = document.createElement('pre');
+      box.style = 'white-space:pre-wrap;padding:12px;border:1px dashed #ccc;background:#f9f9f9;margin:16px';
+      box.textContent = [
+        'STORE DEBUG',
+        `primary: ${primary.src} (status ${primary.status}) count=${primary.list.length}`,
+        `fallback: ${fallback ? fallback.src : '(skipped)'}${fallback ? ' (status '+fallback.status+') count='+fallback.list.length : ''}`,
+        `used   : ${srcUsed ? srcUsed.src : '(none)'}`
+      ].join('\n');
+      document.body.prepend(box);
     }
   })();
-  </script>
+</script>
+
+  <!-- JS khác (nếu tách riêng) -->
+  <script src="/assets/js/floating-contact.js" defer></script>
 </body>
 </html>
