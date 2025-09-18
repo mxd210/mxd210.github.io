@@ -205,3 +205,68 @@ a{color:#111;text-decoration:none}a:hover{text-decoration:underline}img{max-widt
 .post-list li{padding:.75rem 0;border-bottom:1px solid #eee}
 .post-list a{font-weight:600}
 .post-list time{display:block;font-size:.85rem;color:#666;margin-top:.25rem}
+/* === Blog Index (MXD) === */
+.container{max-width:1100px;margin:0 auto;padding:0 16px}
+
+.blog-hero{
+  margin: 10px 0 14px;
+  padding: 18px 16px;
+  background: linear-gradient(180deg,#f7fafc, #f1f5f9);
+  border: 1px solid #e6eaf0; border-radius: 14px;
+}
+.blog-hero h1{margin:0 0 6px; font-size: clamp(20px, 4vw, 28px);}
+.blog-hero p{margin:0; color:#5b6777}
+
+.blog-quicknav{
+  display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 6px;
+}
+.blog-quicknav a{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 10px; border-radius:999px; background:#fff;
+  border:1px solid #e6eaf0; text-decoration:none;
+  font-size:13px;
+}
+.blog-quicknav a:hover{background:#f6f9ff}
+
+.post-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin: 10px 0 28px;
+}
+.post-card{
+  display:flex; flex-direction:column; background:#fff; border-radius:14px;
+  border:1px solid #e6eaf0; overflow:hidden; text-decoration:none;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.post-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.06)}
+.post-thumb{
+  width:100%; aspect-ratio:16/9; object-fit:cover; background:#eef2f6;
+}
+.post-body{padding:12px}
+.post-meta{
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px;
+  font-size:12px; color:#617081;
+}
+.post-meta .pill{
+  padding:2px 8px; border-radius:999px; background:#f1f5f9; border:1px solid #e6eaf0;
+  font-weight:600; color:#445264
+}
+.post-title{
+  font-size: clamp(14px, 3.2vw, 18px);
+  line-height:1.35; margin:2px 0 6px; color:#111827;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  min-height: 2.7em;
+}
+.post-excerpt{
+  color:#4b5563; font-size:14px; line-height:1.45; margin:0 0 10px;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+  min-height: 3.9em;
+}
+.post-actions{margin-top:auto; display:flex; justify-content:space-between; align-items:center}
+a.readmore{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:8px 10px; border-radius:10px; background:#f6f9ff; text-decoration:none;
+  border:1px solid #dde6f5; font-weight:600;
+}
+a.readmore:hover{background:#eaf2ff}
