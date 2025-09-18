@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>MXD – Shopee → affiliates.json</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:980px;margin:24px auto;padding:0 12px;line-height:1.5}
+    textarea{width:100%;min-height:200px}
+    code,kbd{background:#f4f4f4;padding:2px 6px;border-radius:6px}
+    .out{white-space:pre; background:#0b0b0b;color:#eee;padding:12px;border-radius:10px;overflow:auto}
+    .row{display:flex;gap:16px;flex-wrap:wrap}
+    .row > div{flex:1 1 420px}
+    .muted{color:#666}
+    button{padding:10px 14px;border-radius:10px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
+    .tips{background:#fff7e6;border:1px solid #ffe0a3;padding:10px;border-radius:10px}
+  </style>
+</head>
+<body>
+  <h1>MXD – Shopee → affiliates.json</h1>
+  <p class="muted">Dán danh sách vào ô dưới. Hỗ trợ 2 định dạng dòng:</p>
+  <ul>
+    <li><b>Mode A:</b> <code>https://shopee.vn/product/&lt;shopId&gt;/&lt;itemId&gt;</code></li>
+    <li><b>Mode B:</b> <code>Tên sản phẩm | giá (số) | link Shopee</code></li>
+  </ul>
+
+  <div class="row">
+    <div>
+      <h3>1) Dữ liệu đầu vào</h3>
+      <textarea id="input" placeholder="Ví dụ:
+Máy cắt cầm tay Dekton DK-AG950S | 690000 | https://shopee.vn/product/279547485/5274192859
+https://shopee.vn/product/772892494/21507014059"></textarea>
+      <p class="muted">Giá để dạng số nguyên (VND), không có dấu chấm/phẩy. Có thể bỏ trống (0) – sẽ chỉnh sau.</p>
+      <div class="tips">
+        Quy ước MXD:
+        <ul>
+          <li><b>sku</b> = slug tên SP (chữ thường-kebab) → phải khớp tên ảnh <code>/assets/img/products/&lt;sku&gt;.webp</code></li>
+          <li><b>merchant</b> = <code>shopee</code>, <b>origin</b> = link Shopee gốc (không cần deep link)</li>
+        </ul>
+      </div>
+      <p>
+        <label><input type="checkbox" id="autolowerprice" checked> Giảm nhẹ giá hiển thị 3% (hút click, có thể bỏ chọn)</label>
+      </p>
+      <button id="gen">Generate</button>
+    </div>
+
+    <div>
+      <h3>2) Kết quả – dán vào <code>assets/data/affiliates.json</code></h3>
+      <div id="json" class="out">{ }</div>
+      <h3>3) HTML meta (tuỳ chọn – dán vào trang danh mục)</h3>
+      <div id="meta" class="out">&lt;!-- meta links --&gt;</div>
+    </div>
+  </div>
+
+  <script>
+  function slugify(s){
+    return (s||'').toString()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // bỏ dấu
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,'-')
+      .replace(/^-+|-+$/g,'')
+      .replace(/--+/g,'-');
+  }
+  function parseShopeeId(url){
+    try{
+      const u=new URL(url.trim());
+      const m=u.pathname.match(/\/product\/(\d+)\/(\d+)/);
+      return m?{shopId:m[1],itemId:m[2]}:null;
+    }catch(e){return null;}
+  }
+  function canonShopee(url){
+    const ids=parseShopeeId(url);
+    return ids?`https://shopee.vn/product/${ids.shopId}/${ids.itemId}`:url.trim();
+  }
+  function fmtPrice(n){return Math.max(0, Math.round(n||0));}
+
+  document.getElementById('gen').addEventListener('click', ()=>{
+    const raw=document.getElementById('input').value.trim().split(/\r?\n/).filter(Boolean);
+    const wantLower=document.getElementById('autolowerprice').checked;
+
+    const seen=new Set();
+    const out=[];
+    const metas=[];
+
+    for(const line of raw){
+      let name='', price=0, link='';
+      if(line.includes('|')){
+        const parts=line.split('|').map(s=>s.trim());
+        name = parts[0]||'';
+        price = fmtPrice(parseInt((parts[1]||'0').replace(/[^\d]/g,''),10));
+        link = parts[2]||'';
+      }else{
+        link = line.trim();
+      }
+
+      const ids=parseShopeeId(link);
+      if(!ids){ continue; }
+      const key = `${ids.shopId}_${ids.itemId}`;
+      if(seen.has(key)) continue;
+      seen.add(key);
+
+      // sku
+      let sku = name ? slugify(name) : `p-${ids.itemId}`;
+      // price tweak (optional)
+      if(wantLower && price>0){ price = Math.round(price*0.97); }
+
+      const rec={
+        sku,
+        name: name || `NEED_NAME_${ids.itemId}`,
+        price,
+        origin: canonShopee(link),
+        merchant: "shopee"
+      };
+      out.push(rec);
+
+      metas.push(
+        `<a class="product-meta" href="${rec.origin}" data-merchant="shopee" data-sku="${rec.sku}" data-img="/assets/img/products/${rec.sku}.webp" data-price="${rec.price}">${rec.name}</a>\n<a class="buy" href="${rec.origin}" data-merchant="shopee">Mua ngay</a>`
+      );
+    }
+
+    document.getElementById('json').textContent = JSON.stringify(out, null, 2);
+    document.getElementById('meta').textContent = metas.join('\n\n') || '<!-- no items parsed -->';
+  });
+  </script>
+</body>
+</html>
