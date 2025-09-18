@@ -36,20 +36,32 @@
       }
     }
 
-    /* ================== BASE ================== */
-    html,body{height:100%}
-    body{
-      margin:0; background:var(--bg); color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased;
-    }
-    a{color:var(--brand); text-decoration:none}
-    a:hover{opacity:.9}
-    header,footer{padding:12px 16px; border-bottom:1px solid var(--border)}
-    footer{border-bottom:none;border-top:1px solid var(--border); margin-top:24px}
-    .container{max-width:1100px;margin:0 auto;padding:0 16px}
-    .muted{color:var(--muted)}
-    .sr-only{position:absolute;left:-9999px}
+    /* Nút mua – base */
+.buy{
+  display:inline-block; width:100%; text-align:center;
+  padding:10px 12px; border-radius:12px; font-weight:800;
+  text-decoration:none; color:#fff; border:1px solid transparent;
+}
+.buy:focus-visible{outline:2px solid #0000ff55; outline-offset:2px}
+.buy:active{transform:translateY(1px)}
+
+/* Mặc định (neu chưa nhận diện merchant) */
+.buy{ background:#1746ff; border-color:#1746ff }
+
+/* Theo merchant */
+.buy[data-merchant="shopee"]  { background:#ee4d2d; border-color:#ee4d2d }  /* cam Shopee */
+.buy[data-merchant="lazada"]  { background:#0f146d; border-color:#0f146d }  /* xanh đậm Lazada */
+.buy[data-merchant="tiki"]    { background:#1a94ff; border-color:#1a94ff }  /* xanh Tiki */
+.buy[data-merchant="tiktok"]  { background:#111;    border-color:#111 }     /* đen TikTok */
+
+/* Hover nhẹ (giữ tương phản) */
+.buy:hover{ filter:brightness(1.05) }
+
+/* Dark mode chỉnh nhẹ contrast */
+@media (prefers-color-scheme: dark){
+  .buy{ filter:brightness(1.08) }
+}
+
 
     /* ================== GRID / CARD (tối ưu mobile) ================== */
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--gap);margin:16px 0}
@@ -91,6 +103,15 @@
     @media (max-width:480px){
       .name{font-size:15px}
     }
+    .nav-link{
+  padding:8px 10px; border-radius:10px; color:var(--text); text-decoration:none;
+}
+.nav-link:hover{ background:rgba(23,70,255,.08) }
+.nav-link[aria-current="page"]{ background:#eef4ff; color:#1746ff }
+@media (max-width:480px){
+  .nav-link{ padding:8px }
+}
+
   </style>
 
   <!-- Chuẩn MXD: GA4 trước, Affiliate sau (mỗi trang chỉ 1 lần) -->
@@ -98,15 +119,19 @@
   <script src="/assets/mxd-affiliate.js" defer></script>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <h1 style="margin:0">Cửa hàng MXD</h1>
-      <nav class="muted" style="margin-top:6px">
-        <a href="/store/may-cat.html">Máy cắt</a>
-      </nav>
-      <!-- ĐÃ XÓA đoạn p hướng dẫn nội bộ để tránh rối người dùng -->
-    </div>
-  </header>
+ <header style="position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(6px)">
+  <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)">
+    <a href="/" class="brand" style="font-weight:900;font-size:18px;color:var(--text);text-decoration:none">MXD</a>
+    <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
+      <a href="/"                  class="nav-link">Trang chủ</a>
+      <a href="/store.html"        class="nav-link" aria-current="page">Cửa hàng</a>
+      <a href="/blog/"             class="nav-link">Tin tức</a>
+      <a href="/tu-van.html"       class="nav-link">Tư vấn</a>
+      <a href="/lien-he.html"      class="nav-link">Liên hệ</a>
+    </nav>
+  </div>
+</header>
+
 
   <main class="container">
     <div id="product-list" class="grid" aria-live="polite"></div>
