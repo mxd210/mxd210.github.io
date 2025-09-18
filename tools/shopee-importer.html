@@ -188,14 +188,40 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
       .toLowerCase().replace(/[^a-z0-9]+/g,'-')
       .replace(/^-+|-+$/g,'').replace(/--+/g,'-');
+ function parseShopeeId(url){
+  try{
+    const u = new URL(url.trim());
+    const p = u.pathname;
+
+    // 1) /product/<shopId>/<itemId>
+    let m = p.match(/\/product\/(\d+)\/(\d+)/);
+    if (m) return { shopId: m[1], itemId: m[2] };
+
+    // 2) /shop/<shopId>/item/<itemId>
+    m = p.match(/\/shop\/(\d+)\/item\/(\d+)/);
+    if (m) return { shopId: m[1], itemId: m[2] };
+
+    // 3) ... i.<shopId>.<itemId> ... (thường có trong link chia sẻ)
+    m = url.match(/i\.(\d+)\.(\d+)/);
+    if (m) return { shopId: m[1], itemId: m[2] };
+
+    // 4) ?shopid=...&itemid=... (hoặc viết hoa)
+    const sh = u.searchParams.get('shopid') || u.searchParams.get('shopId');
+    const it = u.searchParams.get('itemid') || u.searchParams.get('itemId');
+    if (sh && it) return { shopId: sh, itemId: it };
+
+    return null;
+  }catch(e){
+    return null;
   }
-  function parseShopeeId(url){
-    try{ const u=new URL(url.trim()); const m=u.pathname.match(/\/product\/(\d+)\/(\d+)/); return m?{shopId:m[1],itemId:m[2]}:null; }
-    catch(e){return null;}
+}
+
   }
-  function canonShopee(url){
-    const ids=parseShopeeId(url); return ids?`https://shopee.vn/product/${ids.shopId}/${ids.itemId}`:url.trim();
-  }
+ function canonShopee(url){
+  const ids = parseShopeeId(url);
+  return ids ? `https://shopee.vn/product/${ids.shopId}/${ids.itemId}` : (url||'').trim();
+}
+
   const fmtPrice = n => Math.max(0, Math.round(n||0));
 
   // Copy buttons
