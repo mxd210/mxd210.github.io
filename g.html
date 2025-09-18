@@ -156,6 +156,16 @@ if (p.link || (p.links && p.links.length)) {
         // 5) Meta/OG + Product JSON-LD
         setMeta(p.name, `Sản phẩm ${p.name} – giá tham khảo ${priceText}.`, `https://mxd210.github.io${image}`);
         injectProductLD({ name:p.name, sku:skuReal, price:priceNum, image:`https://mxd210.github.io${image}`, link:link });
+${(()=>{
+  const metaHref = p.origin || (Array.isArray(p.links)&&p.links.length ? p.links[0] : '#');
+  const m = p.merchant || (metaHref ? getMerchant(metaHref) : '');
+  return `<a class="product-meta"
+             href="${metaHref}"
+             data-merchant="${m}"
+             data-sku="${skuReal}"
+             data-img="/assets/img/products/${skuReal}.webp"
+             data-price="${(priceText||'').replace(/[^0-9]/g,'')}">${p.name}</a>`;
+})()}
 
         // 6) Buy box (1 hoặc nhiều nơi bán)
         let buyBox = '';
