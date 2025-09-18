@@ -3,29 +3,36 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MXD – Shopee Importer (Auto-Price + JSON & Meta)</title>
+  <title>MXD – Shopee Importer (Auto-Price + Image WebP/ZIP)</title>
   <style>
-    :root { --bg:#0b0b0b; --fg:#eee; }
+    :root { --bg:#0b0b0b; --fg:#eee; --card:#141414; --muted:#666; --brand:#111; }
     *{box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:1080px;margin:24px auto;padding:0 12px;line-height:1.5}
-    h1{margin:0 0 8px}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:1100px;margin:24px auto;padding:0 12px;line-height:1.55;color:#111}
+    h1{margin:0 0 6px}
+    h2,h3{margin:18px 0 8px}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    @media (max-width:900px){.grid{grid-template-columns:1fr}}
-    textarea, input[type="url"], input[type="text"]{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+    textarea, input[type="url"], input[type="text"], input[type="number"]{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px}
     textarea{min-height:220px}
     .out{white-space:pre; background:var(--bg); color:var(--fg); padding:12px;border-radius:10px;overflow:auto;min-height:220px}
-    .muted{color:#666}
+    .muted{color:var(--muted)}
     .tips{background:#fff7e6;border:1px solid #ffe0a3;padding:10px;border-radius:10px}
-    button{padding:10px 14px;border-radius:10px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
-    button.primary{background:#111;color:#fff}
-    .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #ddd;background:#fafafa}
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    button{padding:10px 14px;border-radius:10px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
+    button.primary{background:var(--brand);color:#fff}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #ddd;background:#fafafa}
     .copy{float:right;margin-left:8px}
+    .ok{color:#0a7c2f}.warn{color:#a66b00}.bad{color:#b91c1c}
+    .progress{height:8px;background:#eee;border-radius:999px;overflow:hidden}
+    .bar{height:100%;width:0;background:#111;transition:width .2s}
+    .kbd{font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:#f4f4f4;padding:2px 6px;border-radius:6px}
   </style>
+  <!-- ZIP lib -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
-  <h1>MXD – Shopee → affiliates.json <span class="badge">Auto-Price</span></h1>
-  <p class="muted">Dán danh sách vào ô dưới. Hỗ trợ 2 định dạng dòng:</p>
+  <h1>MXD – Shopee → affiliates.json <span class="badge">Auto-Price + Images</span></h1>
+  <p class="muted">Dán danh sách vào ô dưới. Hỗ trợ 2 định dạng:</p>
   <ul>
     <li><b>Mode A:</b> <code>https://shopee.vn/product/&lt;shopId&gt;/&lt;itemId&gt;</code></li>
     <li><b>Mode B:</b> <code>Tên sản phẩm | giá (số) | link Shopee</code></li>
@@ -41,15 +48,15 @@ https://shopee.vn/product/772892494/21507014059"></textarea>
       <div class="tips">
         <b>Quy ước MXD:</b>
         <ul>
-          <li><b>sku</b> = slug tên SP → khớp tên ảnh <code>/assets/img/products/&lt;sku&gt;.webp</code></li>
-          <li><b>merchant</b> = <code>shopee</code>, <b>origin</b> = link Shopee gốc</li>
-          <li>Nếu <code>name</code> trống, tool sẽ lấy tiêu đề từ Worker.</li>
+          <li><b>sku</b> = slug tên SP → khớp ảnh <code>/assets/img/products/&lt;sku&gt;.webp</code></li>
+          <li><b>merchant</b>=<code>shopee</code>, <b>origin</b>= link Shopee gốc</li>
+          <li>Thiếu <code>name</code> → tool tự lấy tiêu đề từ Worker.</li>
         </ul>
       </div>
 
       <div class="row" style="margin-top:10px">
-        <label class="row"><input type="checkbox" id="autolowerprice" checked> Giảm giá hiển thị 3% (hút click)</label>
-        <label class="row"><input type="checkbox" id="forceMin" checked> Dùng <code>priceMin</code> nếu có min/max</label>
+        <label class="row"><input type="checkbox" id="autolowerprice" checked> Giảm giá hiển thị 3%</label>
+        <label class="row"><input type="checkbox" id="forceMin" checked> Dùng <code>priceMin</code> khi có min/max</label>
       </div>
 
       <div style="margin-top:10px">
@@ -64,6 +71,7 @@ https://shopee.vn/product/772892494/21507014059"></textarea>
         </div>
       </div>
       <p id="status" class="muted"></p>
+      <div class="progress"><div id="prog" class="bar"></div></div>
     </section>
 
     <section>
@@ -79,29 +87,70 @@ https://shopee.vn/product/772892494/21507014059"></textarea>
     </section>
   </div>
 
+  <hr style="margin:24px 0">
+
+  <h2>4) Ảnh (Resize + WebP + ZIP)</h2>
+  <p class="muted">Dùng cùng Proxy Worker URL để lấy ảnh Shopee qua proxy (tránh CORS). Có thể dán URL ảnh / tải ảnh từ máy.</p>
+
+  <div class="row" style="margin-bottom:8px">
+    <label>SKU (đặt tên file): <input id="img-sku" type="text" placeholder="vd: may-cat-cam-tay-dekton-dk-ag950s"></label>
+    <label>WebP quality: <input id="img-q" type="number" min="0" max="1" step="0.01" value="0.82" style="width:90px"></label>
+  </div>
+
+  <div class="row" style="margin-bottom:8px">
+    <label style="flex:1 1 100%">URL ảnh (1 dòng/ảnh):</label>
+    <textarea id="img-urls" placeholder="https://down-vn.img.susercontent.com/file/xxx
+https://down-vn.img.susercontent.com/file/yyy"></textarea>
+  </div>
+
+  <div class="row" style="margin-bottom:8px">
+    <input id="img-file" type="file" accept="image/*" multiple>
+    <button id="img-fetch-from-worker">Lấy ảnh từ Worker theo link Shopee ở ô trên</button>
+  </div>
+
+  <div class="row" style="margin-bottom:8px">
+    <label>Preset:
+      <select id="img-preset">
+        <option value="product">Sản phẩm (1200, 800, 400)</option>
+        <option value="og">OG 1200x630</option>
+        <option value="hero">Hero/Nền (1920x1080, 1600x900)</option>
+        <option value="icon">Icon (512, 256)</option>
+        <option value="custom">Tự chọn</option>
+      </select>
+    </label>
+    <label>Kích thước tuỳ chọn (W×H, dấu phẩy):
+      <input id="img-sizes" type="text" placeholder="1200x1200,800x800" disabled>
+    </label>
+  </div>
+
+  <div class="row" style="margin-bottom:8px">
+    <button id="img-generate" class="primary">Tạo ảnh & ZIP</button>
+    <span id="img-log" class="muted"></span>
+  </div>
+
   <script>
-  // ===== Helpers =====
+  // ===== Helpers chung =====
   const el = id => document.getElementById(id);
-  const setStatus = (msg)=>{ el('status').textContent = msg; };
+  const setStatus = (msg, cls='')=>{ const s=el('status'); s.textContent=msg; s.className='muted '+cls; };
+  const setProg = (num, den)=>{ const p=el('prog'); const v = !den?0: Math.min(100, Math.round(num/den*100)); p.style.width = v+'%'; };
+  const persist = {
+    save(){ localStorage.setItem('mxd_proxy', el('proxy').value.trim()); localStorage.setItem('mxd_lower', el('autolowerprice').checked?'1':'0'); localStorage.setItem('mxd_forceMin', el('forceMin').checked?'1':'0'); },
+    load(){ const p=localStorage.getItem('mxd_proxy'); if(p) el('proxy').value=p; el('autolowerprice').checked = localStorage.getItem('mxd_lower')!=='0'; el('forceMin').checked = localStorage.getItem('mxd_forceMin')!=='0'; }
+  };
+  persist.load();
 
   function slugify(s){
     return (s||'').toString()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // bỏ dấu
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g,'-')
-      .replace(/^-+|-+$/g,'')
-      .replace(/--+/g,'-');
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase().replace(/[^a-z0-9]+/g,'-')
+      .replace(/^-+|-+$/g,'').replace(/--+/g,'-');
   }
   function parseShopeeId(url){
-    try{
-      const u=new URL(url.trim());
-      const m=u.pathname.match(/\/product\/(\d+)\/(\d+)/);
-      return m?{shopId:m[1],itemId:m[2]}:null;
-    }catch(e){return null;}
+    try{ const u=new URL(url.trim()); const m=u.pathname.match(/\/product\/(\d+)\/(\d+)/); return m?{shopId:m[1],itemId:m[2]}:null; }
+    catch(e){return null;}
   }
   function canonShopee(url){
-    const ids=parseShopeeId(url);
-    return ids?`https://shopee.vn/product/${ids.shopId}/${ids.itemId}`:url.trim();
+    const ids=parseShopeeId(url); return ids?`https://shopee.vn/product/${ids.shopId}/${ids.itemId}`:url.trim();
   }
   const fmtPrice = n => Math.max(0, Math.round(n||0));
 
@@ -111,129 +160,194 @@ https://shopee.vn/product/772892494/21507014059"></textarea>
       const target = btn.dataset.copy;
       const text = el(target).textContent;
       navigator.clipboard.writeText(text).then(()=>{
-        const old = btn.textContent; btn.textContent='Copied!';
-        setTimeout(()=>btn.textContent=old,900);
+        const old=btn.textContent; btn.textContent='Copied!'; setTimeout(()=>btn.textContent=old,900);
       });
     });
   });
 
-  // Khử trùng link (loại trùng shopId_itemId)
+  // Khử trùng link
   el('dedup').addEventListener('click', ()=>{
     const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
-    const seen = new Set();
-    const out = [];
+    const seen=new Set(); const out=[];
     for (let line of lines){
       const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
-      const ids = parseShopeeId(link);
-      const key = ids ? `${ids.shopId}_${ids.itemId}` : line.trim();
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push(line);
+      const ids = parseShopeeId(link); const key = ids ? `${ids.shopId}_${ids.itemId}` : line.trim();
+      if (seen.has(key)) continue; seen.add(key); out.push(line);
     }
-    el('input').value = out.join('\n');
-    setStatus(`Đã khử trùng: còn ${out.length} dòng.`);
+    el('input').value = out.join('\n'); setStatus(`Đã khử trùng: còn ${out.length} dòng.`, 'ok'); persist.save();
   });
 
   // Xoá input
-  el('clear').addEventListener('click', ()=>{
-    el('input').value='';
-    setStatus('Đã xoá input.');
-  });
+  el('clear').addEventListener('click', ()=>{ el('input').value=''; setStatus('Đã xoá input.'); setProg(0,1); });
 
-  // Auto-price bằng Cloudflare Worker (nếu có URL)
+  // Auto-price qua Worker
   async function fetchDetail(proxy, link){
-    if(!proxy) return null; // Không có Worker thì bỏ qua
     try{
-      const u = new URL(proxy);
-      u.searchParams.set('url', canonShopee(link));
-      const r = await fetch(u.toString());
-      if(!r.ok) throw new Error('fetch fail');
+      const u = new URL(proxy); u.searchParams.set('url', canonShopee(link));
+      const r = await fetch(u.toString()); if(!r.ok) throw new Error('fetch fail '+r.status);
       return await r.json(); // { title, priceMin, priceMax, price, images[] }
     }catch(e){ return null; }
   }
 
   el('autoprice').addEventListener('click', async ()=>{
     const proxy = el('proxy').value.trim();
-    if (!proxy){ setStatus('Chưa nhập Proxy Worker URL – tool vẫn chạy nhưng không tự lấy giá.'); }
+    if (!proxy){ setStatus('Chưa nhập Proxy Worker URL. Tool vẫn chạy nhưng không tự lấy giá.', 'warn'); }
+    persist.save();
 
     const lines = el('input').value.trim().split(/\r?\n/);
-    const out = [];
-    const useMin = el('forceMin').checked;
-    let ok=0, miss=0;
+    const out=[]; const useMin = el('forceMin').checked;
+    let ok=0, miss=0; setProg(0, lines.length);
 
     for (let i=0;i<lines.length;i++){
-      let line = lines[i].trim();
-      if (!line) continue;
-
+      let line = lines[i].trim(); if (!line) continue;
       let name='', price=0, link='';
-      if (line.includes('|')){
-        const [n, p, l] = line.split('|').map(s=>s.trim());
-        name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||'';
-      } else {
-        link=line;
-      }
+      if (line.includes('|')){ const [n, p, l] = line.split('|').map(s=>s.trim()); name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||''; }
+      else { link=line; }
 
       if (/shopee\.vn\/product\//.test(link) && proxy){
-        const detail = await fetchDetail(proxy, link);
-        if (detail){
-          let auto = useMin ? (detail.priceMin||detail.price||0) : (detail.price||detail.priceMin||0);
+        const d = await fetchDetail(proxy, link);
+        if (d){
+          let auto = useMin ? (d.priceMin||d.price||0) : (d.price||d.priceMin||0);
           if (!price) price = auto;
-          if (!name || /^need_name/i.test(name)) name = detail.title || name || '';
+          if (!name || /^need_name/i.test(name)) name = d.title || name || '';
           ok++;
-        } else { miss++; }
+        } else miss++;
       }
       out.push(`${name||'NEED_NAME'} | ${price||0} | ${link}`);
+      setProg(i+1, lines.length);
     }
 
     el('input').value = out.join('\n');
-    setStatus(`Auto-price xong. Thành công ${ok}, lỗi ${miss}.`);
+    setStatus(`Auto-price xong. Thành công ${ok}, lỗi ${miss}.`, miss? 'warn':'ok');
   });
 
   // Generate JSON + Meta
   el('gen').addEventListener('click', ()=>{
-    const wantLower = el('autolowerprice').checked;
+    const wantLower = el('autolowerprice').checked; persist.save();
     const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
 
-    const seen=new Set();
-    const items=[];
-    const metas=[];
-
+    const seen=new Set(); const items=[]; const metas=[];
     for (const line of lines){
       let name='', price=0, link='';
-      if (line.includes('|')){
-        const [n, p, l] = line.split('|').map(s=>s.trim());
-        name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||'';
-      } else {
-        link=line.trim();
-      }
-      const ids = parseShopeeId(link);
-      if (!ids) continue;
-      const key = `${ids.shopId}_${ids.itemId}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
+      if (line.includes('|')){ const [n, p, l] = line.split('|').map(s=>s.trim()); name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||''; }
+      else { link=line.trim(); }
+      const ids = parseShopeeId(link); if (!ids) continue;
+      const key = `${ids.shopId}_${ids.itemId}`; if (seen.has(key)) continue; seen.add(key);
 
       const origin = canonShopee(link);
       let sku = name ? slugify(name) : `p-${ids.itemId}`;
       if (wantLower && price>0) price=Math.round(price*0.97);
 
-      const rec = {
-        sku,
-        name: name || `NEED_NAME_${ids.itemId}`,
-        price: fmtPrice(price),
-        origin,
-        merchant: "shopee"
-      };
+      const rec = { sku, name: name || `NEED_NAME_${ids.itemId}`, price: fmtPrice(price), origin, merchant: "shopee" };
       items.push(rec);
 
       metas.push(
         `<a class="product-meta" href="${rec.origin}" data-merchant="shopee" data-sku="${rec.sku}" data-img="/assets/img/products/${rec.sku}.webp" data-price="${rec.price}">${rec.name}</a>\n<a class="buy" href="${rec.origin}" data-merchant="shopee">Mua ngay</a>`
       );
     }
-
     el('json').textContent = JSON.stringify(items, null, 2);
     el('meta').textContent = metas.join('\n\n') || '<!-- no items parsed -->';
-    setStatus(`Generate xong: ${items.length} sản phẩm.`);
+    setStatus(`Generate xong: ${items.length} sản phẩm.`, 'ok');
+  });
+
+  // ===== Ảnh =====
+  const presetSizes = (p)=> p==='product' ? ['1200x1200','800x800','400x400']
+                     : p==='og' ? ['1200x630']
+                     : p==='hero' ? ['1920x1080','1600x900']
+                     : p==='icon' ? ['512x512','256x256'] : [];
+
+  el('img-preset').addEventListener('change', e=>{
+    const v=e.target.value, inp=el('img-sizes');
+    if(v==='custom'){ inp.disabled=false; inp.focus(); }
+    else { inp.disabled=true; inp.value=presetSizes(v).join(','); }
+  });
+
+  function drawResize(img, w, h, q){
+    const c=document.createElement('canvas'); c.width=w; c.height=h;
+    const ctx=c.getContext('2d');
+    // cover center crop
+    const ratio=Math.max(w/img.naturalWidth, h/img.naturalHeight);
+    const nw=img.naturalWidth*ratio, nh=img.naturalHeight*ratio;
+    const dx=(w-nw)/2, dy=(h-nh)/2; ctx.drawImage(img, dx, dy, nw, nh);
+    return new Promise(res=> c.toBlob(b=>res(b), 'image/webp', q));
+  }
+
+  async function fetchImageViaWorker(proxy, rawUrl){
+    const u = new URL(proxy); u.pathname = u.pathname.replace(/\/?$/, '/img'); u.searchParams.set('url', rawUrl);
+    const r = await fetch(u.toString(), { mode:'cors' }); if(!r.ok) throw new Error('fetch image '+r.status);
+    return await r.blob();
+  }
+
+  async function collectSourceImages(){
+    const list = [];
+    const ta = el('img-urls').value.trim();
+    if (ta){ ta.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).forEach(u=>list.push({type:'url', url:u})); }
+    const files = Array.from(el('img-file').files||[]);
+    const local = await Promise.all(files.map(f => new Promise(res=>{
+      const reader = new FileReader(); reader.onload = () => res({ type:'dataurl', dataUrl: reader.result, name: f.name }); reader.readAsDataURL(f);
+    })));
+    local.forEach(x=>list.push(x));
+    return list;
+  }
+
+  el('img-fetch-from-worker').addEventListener('click', async ()=>{
+    const proxy = el('proxy').value.trim(); if (!proxy){ el('img-log').textContent='Chưa nhập Proxy Worker URL.'; return; }
+    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
+    const imgBox = el('img-urls'); let found=0;
+    for(const line of lines){
+      const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
+      if (!/shopee\.vn\/product\//.test(link)) continue;
+      try{
+        const u = new URL(proxy); u.searchParams.set('url', link);
+        const r = await fetch(u.toString()); if(!r.ok) continue;
+        const d = await r.json(); (d.images||[]).forEach(href=>{ imgBox.value += (imgBox.value?'\n':'') + href; found++; });
+      }catch(e){}
+    }
+    el('img-log').textContent = `Đã lấy ${found} URL ảnh từ Worker.`;
+  });
+
+  el('img-generate').addEventListener('click', async ()=>{
+    const proxy = el('proxy').value.trim();
+    const sku = (el('img-sku').value||'mxd').trim();
+    const q = Math.max(0, Math.min(1, parseFloat(el('img-q').value)||0.82));
+
+    let sizes = []; const preset = el('img-preset').value;
+    sizes = preset==='custom' ? (el('img-sizes').value.trim()? el('img-sizes').value.trim().split(',').map(s=>s.trim()) : [])
+                              : presetSizes(preset);
+    if (!sizes.length){ el('img-log').textContent='Chưa có kích thước.'; return; }
+
+    const sources = await collectSourceImages(); if(!sources.length){ el('img-log').textContent='Chưa có ảnh nguồn.'; return; }
+
+    const zip = new JSZip(); let done=0, total=sources.length*sizes.length; setProg(0, total);
+    for(const src of sources){
+      const img = new Image(); img.crossOrigin='anonymous';
+      try{
+        if (src.type==='url'){ const blob = await fetchImageViaWorker(proxy, src.url); img.src = URL.createObjectURL(blob); }
+        else if (src.type==='dataurl'){ img.src = src.dataUrl; } else { continue; }
+        await new Promise((res, rej)=>{ img.onload=res; img.onerror=rej; });
+
+        for(const s of sizes){
+          const [w,h] = s.toLowerCase().split('x').map(n=>parseInt(n,10)); if(!w||!h) continue;
+          const blob = await drawResize(img, w, h, q);
+          // Hậu tố tên
+          const suffix = (preset==='og' && w===1200 && h===630) ? 'og' :
+                         (preset==='hero' ? `${w}x${h}` :
+                         (preset==='icon' ? `${w}` : `${w}`));
+          const fname = `${sku}-${suffix}.webp`;
+          zip.file(fname, blob);
+          done++; setProg(done, total);
+          el('img-log').textContent = `Đang xử lý ${done}/${total}…`;
+        }
+      }catch(e){}
+      finally{ URL.revokeObjectURL(img.src); }
+    }
+    const content = await zip.generateAsync({ type:'blob' });
+    const a = document.createElement('a'); a.href=URL.createObjectURL(content); a.download=`${sku}-images.zip`; document.body.appendChild(a); a.click(); a.remove();
+    el('img-log').textContent = `Xong. ZIP ${sources.length} ảnh × ${sizes.length} kích thước.`;
   });
   </script>
+  <p class="muted" style="margin-top:32px">
+    Gợi ý: Giá trị “giảm 3%” chỉ để hút click; số hiển thị không ảnh hưởng tới deep link. Nếu muốn luôn tươi giá khi render ở <span class="kbd">store.html</span>, có thể gọi Worker ở client để refetch khi mở trang (giữ JSON làm “giá nền” cho SEO).
+  </p>
 </body>
 </html>
