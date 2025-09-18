@@ -108,3 +108,95 @@ a{color:#111;text-decoration:none}a:hover{text-decoration:underline}img{max-widt
 @media (max-width:640px){.post-grid{grid-template-columns:1fr}.cat-grid{grid-template-columns:1fr}.prod-grid{grid-template-columns:1fr}}
 /* Intro under hero title */
 .intro { max-width: 640px; line-height: 1.6; opacity: .9; }
+/* === Featured (compact, dense grid) === */
+.featured .products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem 0.5rem;
+}
+
+/* Desktop rộng: tăng số cột, nhìn giống app */
+@media (min-width: 1200px){
+  .featured .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+.featured .product-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;                /* giảm padding để tăng mật độ */
+}
+
+.featured .product-card img{
+  width: 100%;
+  aspect-ratio: 4 / 5;            /* hoặc 1/1 nếu ảnh vuông */
+  object-fit: cover;
+  border-radius: 10px;
+  background: #f4f6f8;
+}
+
+.featured .title{
+  font-size: clamp(12px, 2.2vw, 13px);
+  margin: 0.4rem 0 0.25rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;          /* 2 dòng */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.7em;              /* giữ chiều cao đều */
+}
+
+.featured .price{
+  font-weight: 700;
+  color: #d0021b;
+  font-size: clamp(12px, 2.4vw, 14px);
+  margin-bottom: 0.35rem;
+}
+
+/* Nút mua nhỏ gọn vẫn đủ 44px cao */
+.featured a.buy{
+  margin: 0;
+  padding: 0.5rem;
+  font-size: clamp(12px, 2.2vw, 13px);
+  border-radius: 9px;
+}
+
+/* Nhãn nổi bật tuỳ chọn */
+.badge {
+  position: absolute;
+  top: 6px; left: 6px;
+  padding: 2px 6px;
+  background: #ff8a00;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Highlight nhẹ khi card vừa vào viewport, 2 chu kỳ rồi tự dừng */
+@keyframes mxd-highlight {
+  0%   { box-shadow: 0 0 0 0 rgba(10,102,194,0.15); }
+  60%  { box-shadow: 0 0 0 8px rgba(10,102,194,0); }
+  100% { box-shadow: 0 0 0 0 rgba(10,102,194,0); }
+}
+.featured .product-card.is-new {
+  animation: mxd-highlight 2.2s ease-out 2;
+}
+
+/* Tôn trọng người dùng không thích chuyển động */
+@media (prefers-reduced-motion: reduce){
+  .featured .product-card.is-new { animation: none; }
+}
+
+/* Card siêu gọn (tuỳ chọn thêm class .ultra) */
+.featured.ultra .products-grid {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+.featured.ultra .title { -webkit-line-clamp: 1; min-height: 1.4em; }
+.featured.ultra a.buy  { padding: 0.45rem; }
