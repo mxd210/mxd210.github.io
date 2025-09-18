@@ -147,18 +147,22 @@
         injectProductLD({ name:p.name, sku:skuReal, price:priceNum, image:`https://mxd210.github.io${image}`, link:link });
 
         // buybox
-        let buyBox = '';
-        if (Array.isArray(p.links) && p.links.length){
-          buyBox = p.links.map((u,i)=>{
-            const m = getMerchant(u);
-            return `<a class="buy" href="${u}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ${i+1} (${m})</a>`;
-          }).join('');
-        } else if (link){
-          const m = getMerchant(link);
-          buyBox = `<a class="buy" href="${link}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ngay</a>`;
-        } else {
-          buyBox = `<span class="muted">Chưa có link mua</span>`;
-        }
+       
+let buyBox = '';
+const metaHref = p.origin || link || '';
+
+if (Array.isArray(p.links) && p.links.length){
+  buyBox = p.links.map((u,i)=>{
+    const m = getMerchant(u);
+    return `<a class="buy" href="${u}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ${i+1} (${m})</a>`;
+  }).join('');
+} else if (metaHref){
+  const m = getMerchant(metaHref);
+  buyBox = `<a class="buy" href="${metaHref}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ngay</a>`;
+} else {
+  buyBox = `<span class="muted">Chưa có link mua</span>`;
+}
+
 
         // render: META phải TRƯỚC .buy
         root.innerHTML = `
