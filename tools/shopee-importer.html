@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MXD – Shopee Importer (Auto-Price + Image WebP/ZIP)</title>
+  <title>MXD – Shopee Importer (Auto-Price + Affiliate + Images)</title>
   <style>
-    :root { --bg:#0b0b0b; --fg:#eee; --card:#141414; --muted:#666; --brand:#111; }
+    :root { --bg:#0b0b0b; --fg:#eee; --muted:#666; --brand:#111; }
     *{box-sizing:border-box}
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:1100px;margin:24px auto;padding:0 12px;line-height:1.55;color:#111}
     h1{margin:0 0 6px}
@@ -26,13 +26,13 @@
     .progress{height:8px;background:#eee;border-radius:999px;overflow:hidden}
     .bar{height:100%;width:0;background:#111;transition:width .2s}
     .kbd{font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:#f4f4f4;padding:2px 6px;border-radius:6px}
+    .small{font-size:12px}
   </style>
-  <!-- ZIP lib -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
-  <h1>MXD – Shopee → affiliates.json <span class="badge">Auto-Price + Images</span></h1>
-  <p class="muted">Dán danh sách vào ô dưới. Hỗ trợ 2 định dạng:</p>
+  <h1>MXD – Shopee → affiliates.json <span class="badge">Auto-Price + Affiliate + Images</span></h1>
+  <p class="muted">Dán danh sách 1 dòng/1 sản phẩm. Hỗ trợ:</p>
   <ul>
     <li><b>Mode A:</b> <code>https://shopee.vn/product/&lt;shopId&gt;/&lt;itemId&gt;</code></li>
     <li><b>Mode B:</b> <code>Tên sản phẩm | giá (số) | link Shopee</code></li>
@@ -49,12 +49,12 @@ https://shopee.vn/product/772892494/21507014059"></textarea>
         <b>Quy ước MXD:</b>
         <ul>
           <li><b>sku</b> = slug tên SP → khớp ảnh <code>/assets/img/products/&lt;sku&gt;.webp</code></li>
-          <li><b>merchant</b>=<code>shopee</code>, <b>origin</b>= link Shopee gốc</li>
+          <li><b>merchant</b>=<code>shopee</code>, <b>origin</b>= link Shopee gốc (hoặc deep link nếu bật Affiliate).</li>
           <li>Thiếu <code>name</code> → tool tự lấy tiêu đề từ Worker.</li>
         </ul>
       </div>
 
-      <div class="row" style="margin-top:10px">
+      <div class="row small" style="margin-top:10px">
         <label class="row"><input type="checkbox" id="autolowerprice" checked> Giảm giá hiển thị 3%</label>
         <label class="row"><input type="checkbox" id="forceMin" checked> Dùng <code>priceMin</code> khi có min/max</label>
       </div>
@@ -70,17 +70,41 @@ https://shopee.vn/product/772892494/21507014059"></textarea>
           <button id="clear">Xoá</button>
         </div>
       </div>
+
+      <h3 style="margin-top:18px">2) Affiliate (chuyển link gốc → deep link)</h3>
+      <p class="muted small">Nhập <b>template</b> deep link. Template phải chứa <code>{url}</code> (đích là link Shopee gốc). Có thể dùng <code>{sub1}</code>…<code>{sub4}</code>.</p>
+      <div class="row">
+        <label style="flex:1">Template:
+          <input id="aff-tpl" type="text" placeholder="https://example-aff.com/deep?url={url}&sub1={sub1}&sub2={sub2}">
+        </label>
+      </div>
+      <div class="row">
+        <label>sub1: <input id="aff-sub1" type="text" placeholder="store"></label>
+        <label>sub2: <input id="aff-sub2" type="text" placeholder="list_01"></label>
+        <label>sub3: <input id="aff-sub3" type="text" placeholder=""></label>
+        <label>sub4: <input id="aff-sub4" type="text" placeholder=""></label>
+      </div>
+      <div class="row small">
+        <label class="row"><input type="checkbox" id="aff-use" checked> Xuất JSON dùng <b>affiliate link</b> (nếu tắt → dùng origin)</label>
+        <button id="aff-convert">Chuyển toàn bộ input → affiliate</button>
+        <button id="aff-test">Test 5 link đầu (HEAD)</button>
+      </div>
+      <p class="small muted">Gợi ý template (AccessTrade – cậu chỉ cần dán template thật của mình):  
+        <br>• <i>Ví dụ</i>: <code>https://go.isclix.com/deep_link?url={url}&amp;aff_sub1={sub1}&amp;aff_sub2={sub2}</code>
+        <br>• Hoặc dạng mới của network cậu đang dùng, miễn có <code>{url}</code>.
+      </p>
+
       <p id="status" class="muted"></p>
       <div class="progress"><div id="prog" class="bar"></div></div>
     </section>
 
     <section>
-      <h3>2) Kết quả – dán vào <code>assets/data/affiliates.json</code>
+      <h3>3) Kết quả – dán vào <code>assets/data/affiliates.json</code>
         <button class="copy" data-copy="json">Copy JSON</button>
       </h3>
       <div id="json" class="out">{ }</div>
 
-      <h3 style="margin-top:16px">3) HTML meta (dán vào trang danh mục)
+      <h3 style="margin-top:16px">4) HTML meta (dán vào trang danh mục)
         <button class="copy" data-copy="meta">Copy Meta</button>
       </h3>
       <div id="meta" class="out">&lt;!-- meta links --&gt;</div>
@@ -89,7 +113,7 @@ https://shopee.vn/product/772892494/21507014059"></textarea>
 
   <hr style="margin:24px 0">
 
-  <h2>4) Ảnh (Resize + WebP + ZIP)</h2>
+  <h2>5) Ảnh (Resize + WebP + ZIP)</h2>
   <p class="muted">Dùng cùng Proxy Worker URL để lấy ảnh Shopee qua proxy (tránh CORS). Có thể dán URL ảnh / tải ảnh từ máy.</p>
 
   <div class="row" style="margin-bottom:8px">
@@ -125,7 +149,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
 
   <div class="row" style="margin-bottom:8px">
     <button id="img-generate" class="primary">Tạo ảnh & ZIP</button>
-    <span id="img-log" class="muted"></span>
+    <span id="img-log" class="muted small"></span>
   </div>
 
   <script>
@@ -134,8 +158,28 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
   const setStatus = (msg, cls='')=>{ const s=el('status'); s.textContent=msg; s.className='muted '+cls; };
   const setProg = (num, den)=>{ const p=el('prog'); const v = !den?0: Math.min(100, Math.round(num/den*100)); p.style.width = v+'%'; };
   const persist = {
-    save(){ localStorage.setItem('mxd_proxy', el('proxy').value.trim()); localStorage.setItem('mxd_lower', el('autolowerprice').checked?'1':'0'); localStorage.setItem('mxd_forceMin', el('forceMin').checked?'1':'0'); },
-    load(){ const p=localStorage.getItem('mxd_proxy'); if(p) el('proxy').value=p; el('autolowerprice').checked = localStorage.getItem('mxd_lower')!=='0'; el('forceMin').checked = localStorage.getItem('mxd_forceMin')!=='0'; }
+    save(){
+      localStorage.setItem('mxd_proxy', el('proxy').value.trim());
+      localStorage.setItem('mxd_lower', el('autolowerprice').checked?'1':'0');
+      localStorage.setItem('mxd_forceMin', el('forceMin').checked?'1':'0');
+      localStorage.setItem('mxd_affTpl', el('aff-tpl').value.trim());
+      localStorage.setItem('mxd_affUse', el('aff-use').checked?'1':'0');
+      localStorage.setItem('mxd_affSub1', el('aff-sub1').value);
+      localStorage.setItem('mxd_affSub2', el('aff-sub2').value);
+      localStorage.setItem('mxd_affSub3', el('aff-sub3').value);
+      localStorage.setItem('mxd_affSub4', el('aff-sub4').value);
+    },
+    load(){
+      const p=localStorage.getItem('mxd_proxy'); if(p) el('proxy').value=p;
+      el('autolowerprice').checked = localStorage.getItem('mxd_lower')!=='0';
+      el('forceMin').checked = localStorage.getItem('mxd_forceMin')!=='0';
+      el('aff-tpl').value = localStorage.getItem('mxd_affTpl') || '';
+      el('aff-use').checked = localStorage.getItem('mxd_affUse')!=='0';
+      el('aff-sub1').value = localStorage.getItem('mxd_affSub1') || 'store';
+      el('aff-sub2').value = localStorage.getItem('mxd_affSub2') || 'list_01';
+      el('aff-sub3').value = localStorage.getItem('mxd_affSub3') || '';
+      el('aff-sub4').value = localStorage.getItem('mxd_affSub4') || '';
+    }
   };
   persist.load();
 
@@ -180,7 +224,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
   // Xoá input
   el('clear').addEventListener('click', ()=>{ el('input').value=''; setStatus('Đã xoá input.'); setProg(0,1); });
 
-  // Auto-price qua Worker
+  // Worker: detail
   async function fetchDetail(proxy, link){
     try{
       const u = new URL(proxy); u.searchParams.set('url', canonShopee(link));
@@ -189,6 +233,36 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
     }catch(e){ return null; }
   }
 
+  // Worker: build affiliate
+  async function buildAffiliate(proxy, dest, {tpl, sub1, sub2, sub3, sub4}){
+    if (!tpl || !tpl.includes('{url}')) return dest;
+    try{
+      const u = new URL(proxy); u.pathname = u.pathname.replace(/\/?$/, '/aff');
+      u.searchParams.set('url', dest);
+      u.searchParams.set('tpl', tpl);
+      if (sub1) u.searchParams.set('sub1', sub1);
+      if (sub2) u.searchParams.set('sub2', sub2);
+      if (sub3) u.searchParams.set('sub3', sub3);
+      if (sub4) u.searchParams.set('sub4', sub4);
+      const r = await fetch(u.toString());
+      if (!r.ok) throw new Error('aff fail');
+      const j = await r.json();
+      return j.affiliate || dest;
+    } catch (e) {
+      return dest;
+    }
+  }
+
+  // Worker: head check
+  async function headCheck(proxy, url){
+    try{
+      const u = new URL(proxy); u.pathname = u.pathname.replace(/\/?$/, '/head'); u.searchParams.set('url', url);
+      const r = await fetch(u.toString()); if(!r.ok) return { ok:false, status:r.status };
+      return await r.json();
+    }catch(e){ return { ok:false, error:String(e) }; }
+  }
+
+  // Auto-price
   el('autoprice').addEventListener('click', async ()=>{
     const proxy = el('proxy').value.trim();
     if (!proxy){ setStatus('Chưa nhập Proxy Worker URL. Tool vẫn chạy nhưng không tự lấy giá.', 'warn'); }
@@ -221,11 +295,75 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
     setStatus(`Auto-price xong. Thành công ${ok}, lỗi ${miss}.`, miss? 'warn':'ok');
   });
 
-  // Generate JSON + Meta
-  el('gen').addEventListener('click', ()=>{
-    const wantLower = el('autolowerprice').checked; persist.save();
-    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
+  // Affiliate convert (thay link trong input)
+  el('aff-convert').addEventListener('click', async ()=>{
+    const proxy = el('proxy').value.trim();
+    const tpl = el('aff-tpl').value.trim();
+    const opt = {
+      tpl,
+      sub1: el('aff-sub1').value.trim(),
+      sub2: el('aff-sub2').value.trim(),
+      sub3: el('aff-sub3').value.trim(),
+      sub4: el('aff-sub4').value.trim()
+    };
+    persist.save();
 
+    if (!tpl || !tpl.includes('{url}')) { setStatus('Template affiliate thiếu {url}.', 'bad'); return; }
+    if (!proxy){ setStatus('Cần Proxy Worker URL để build affiliate.', 'bad'); return; }
+
+    const lines = el('input').value.trim().split(/\r?\n/);
+    const out=[]; setProg(0, lines.length);
+    for (let i=0;i<lines.length;i++){
+      let line = lines[i].trim(); if (!line) continue;
+      let name='', price=0, link='';
+      if (line.includes('|')){ const [n, p, l] = line.split('|').map(s=>s.trim()); name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||''; }
+      else { link=line; }
+
+      if (/^https?:\/\//.test(link)) {
+        const aff = await buildAffiliate(proxy, link, opt);
+        if (line.includes('|')) out.push(`${name||'NEED_NAME'} | ${price||0} | ${aff}`);
+        else out.push(aff);
+      } else {
+        out.push(line);
+      }
+      setProg(i+1, lines.length);
+    }
+    el('input').value = out.join('\n');
+    setStatus('Đã chuyển toàn bộ link sang affiliate theo template.', 'ok');
+  });
+
+  // Test 5 link đầu (HEAD)
+  el('aff-test').addEventListener('click', async ()=>{
+    const proxy = el('proxy').value.trim();
+    if (!proxy){ setStatus('Nhập Proxy Worker URL để test HEAD.', 'bad'); return; }
+    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean).slice(0,5);
+    const results = [];
+    for (const line of lines){
+      const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
+      if (!/^https?:\/\//.test(link)) continue;
+      const h = await headCheck(proxy, link);
+      results.push({ link, ...h });
+    }
+    setStatus('HEAD test: ' + results.map(r=>`${r.ok?'OK':'BAD'} ${r.status||''}`).join(' | '));
+    console.log('HEAD results', results);
+  });
+
+  // Generate JSON + Meta
+  el('gen').addEventListener('click', async ()=>{
+    persist.save();
+    const wantLower = el('autolowerprice').checked;
+    const useAff = el('aff-use').checked;
+    const tpl = el('aff-tpl').value.trim();
+    const opt = {
+      tpl,
+      sub1: el('aff-sub1').value.trim(),
+      sub2: el('aff-sub2').value.trim(),
+      sub3: el('aff-sub3').value.trim(),
+      sub4: el('aff-sub4').value.trim()
+    };
+    const proxy = el('proxy').value.trim();
+
+    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
     const seen=new Set(); const items=[]; const metas=[];
     for (const line of lines){
       let name='', price=0, link='';
@@ -235,14 +373,20 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       const key = `${ids.shopId}_${ids.itemId}`; if (seen.has(key)) continue; seen.add(key);
 
       const origin = canonShopee(link);
+      // chọn URL xuất
+      let outUrl = origin;
+      if (useAff && tpl && tpl.includes('{url}') && proxy) {
+        outUrl = await buildAffiliate(proxy, origin, opt);
+      }
+
       let sku = name ? slugify(name) : `p-${ids.itemId}`;
       if (wantLower && price>0) price=Math.round(price*0.97);
 
-      const rec = { sku, name: name || `NEED_NAME_${ids.itemId}`, price: fmtPrice(price), origin, merchant: "shopee" };
+      const rec = { sku, name: name || `NEED_NAME_${ids.itemId}`, price: fmtPrice(price), origin: outUrl, merchant: "shopee" };
       items.push(rec);
 
       metas.push(
-        `<a class="product-meta" href="${rec.origin}" data-merchant="shopee" data-sku="${rec.sku}" data-img="/assets/img/products/${rec.sku}.webp" data-price="${rec.price}">${rec.name}</a>\n<a class="buy" href="${rec.origin}" data-merchant="shopee">Mua ngay</a>`
+        `<a class="product-meta" href="${rec.origin}" data-merchant="shopee" data-sku="${rec.sku}" data-img="/assets/img/products/${rec.sku}.webp" data-price="${rec.price}">${rec.name}</a>\n<a class="buy" href="${rec.origin}" data-merchant="shopee" data-sub1="${opt.sub1||''}" data-sub2="${opt.sub2||''}" data-sub3="${opt.sub3||''}" data-sub4="${opt.sub4||''}">Mua ngay</a>`
       );
     }
     el('json').textContent = JSON.stringify(items, null, 2);
@@ -265,7 +409,6 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
   function drawResize(img, w, h, q){
     const c=document.createElement('canvas'); c.width=w; c.height=h;
     const ctx=c.getContext('2d');
-    // cover center crop
     const ratio=Math.max(w/img.naturalWidth, h/img.naturalHeight);
     const nw=img.naturalWidth*ratio, nh=img.naturalHeight*ratio;
     const dx=(w-nw)/2, dy=(h-nh)/2; ctx.drawImage(img, dx, dy, nw, nh);
@@ -329,7 +472,6 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
         for(const s of sizes){
           const [w,h] = s.toLowerCase().split('x').map(n=>parseInt(n,10)); if(!w||!h) continue;
           const blob = await drawResize(img, w, h, q);
-          // Hậu tố tên
           const suffix = (preset==='og' && w===1200 && h===630) ? 'og' :
                          (preset==='hero' ? `${w}x${h}` :
                          (preset==='icon' ? `${w}` : `${w}`));
@@ -346,8 +488,10 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
     el('img-log').textContent = `Xong. ZIP ${sources.length} ảnh × ${sizes.length} kích thước.`;
   });
   </script>
-  <p class="muted" style="margin-top:32px">
-    Gợi ý: Giá trị “giảm 3%” chỉ để hút click; số hiển thị không ảnh hưởng tới deep link. Nếu muốn luôn tươi giá khi render ở <span class="kbd">store.html</span>, có thể gọi Worker ở client để refetch khi mở trang (giữ JSON làm “giá nền” cho SEO).
+
+  <p class="muted small" style="margin-top:24px">
+    Gợi ý: nếu network của cậu có format khác, chỉ cần thay <b>Template</b> sao cho chứa <code>{url}</code>. Tool sẽ URL-encode đích và chèn <code>sub1..sub4</code>.  
+    Dù xuất JSON dùng affiliate hay origin, khối <code>&lt;a class="product-meta"&gt;</code> vẫn kèm <code>data-merchant</code> và sub* để <span class="kbd">mxd-affiliate.js</span> có thể theo dõi/ghi log click nếu cậu giữ script đó.
   </p>
 </body>
 </html>
