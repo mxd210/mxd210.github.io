@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="format-detection" content="telephone=no" />
+
   <title>MXD – Cửa hàng & Dịch vụ thi công uy tín</title>
   <meta name="description" content="MXD: thi công & mua sắm dụng cụ xây dựng. Chọn một lần – yên tâm nhiều năm: keo ốp lát, chống thấm, máy cắt, bay răng cưa… nội dung thực chiến, uy tín chất lượng.">
 
@@ -22,8 +23,8 @@
   <meta property="og:description" content="Cửa hàng MXD, tổng hợp dụng cụ & vật tư thi công. Có tư vấn, kinh nghiệm thực tế, và ưu đãi cho khách hàng thân thiết." />
   <meta property="og:image" content="/assets/og-home.jpg" />
 
-  <!-- Structured data -->
-  <script> type="application/ld+json">
+  <!-- Structured data (fixed type attribute) -->
+  <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -51,7 +52,12 @@
   }
   </script>
 
-  <!-- Google Fonts -->
+  <!-- VERIFY + ROBOTS -->
+  <meta name="google-site-verification" content="PASTE_GOOGLE_CODE">
+  <meta name="msvalidate.01" content="PASTE_BING_CODE">
+  <meta name="robots" content="index,follow">
+
+  <!-- Fonts (giữ nguyên) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -82,9 +88,14 @@
     .brand img { width: 36px; height: 36px; }
     .brand strong { letter-spacing: 0.5px; }
 
-    nav.menu { display:flex; align-items:center; gap: 16px; flex-wrap: wrap; }
+    nav.menu { display:flex; align-items:center; gap: 12px; flex-wrap: wrap; }
     nav.menu a { padding: 8px 10px; border-radius: 10px; }
     nav.menu a.active, nav.menu a:hover { background: #111; color:#fff; }
+
+    /* Quick nav dưới hero */
+    .quick-nav { display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 0; }
+    .quick-nav a { padding:8px 10px; border:1px solid #111; border-radius:10px; background:#fff; }
+    .quick-nav a:hover { background:#111; color:#fff; }
 
     .hero {
       display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items:center;
@@ -128,6 +139,19 @@
     .float-btn .icon { font-size:20px; }
     .float-btn:hover { transform: translateY(-1px); }
 
+    /* ===== Nút Mua ngay (theo merchant) cho phần Featured ===== */
+    .buy{
+      display:inline-block; width:100%; text-align:center;
+      padding:10px 12px; border-radius:12px; font-weight:800;
+      text-decoration:none; color:#fff; border:1px solid transparent;
+    }
+    .buy{ background:#1746ff; border-color:#1746ff }               /* mặc định */
+    .buy[data-merchant="shopee"] { background:#ee4d2d; border-color:#ee4d2d; }
+    .buy[data-merchant="lazada"] { background:#0f146d; border-color:#0f146d; }
+    .buy[data-merchant="tiki"]   { background:#1a94ff; border-color:#1a94ff; }
+    .buy[data-merchant="tiktok"] { background:#000;    border-color:#000; }
+    .buy:hover{ filter:brightness(1.05) }
+
     /* Responsive */
     @media (max-width: 768px) {
       .hero { grid-template-columns: 1fr; text-align: center; }
@@ -137,18 +161,10 @@
       .float-btn .label { display:none; }
     }
   </style>
-  
+
+  <!-- GA4 trước – Affiliate sau (duy nhất 1 lần) -->
   <script src="/assets/analytics.js" defer></script>
-  <!-- VERIFY + ROBOTS + CANONICAL -->
-<meta name="google-site-verification" content="PASTE_GOOGLE_CODE">
-<meta name="msvalidate.01" content="PASTE_BING_CODE">
-<link rel="canonical" href="https://mxd210.github.io/">
-<meta name="robots" content="index,follow">
-
-<!-- Chuẩn MXD: GA4 trước, Affiliate sau (mỗi trang chỉ 1 lần) -->
-<script src="/assets/analytics.js" defer></script>
-<script src="/assets/mxd-affiliate.js" defer></script>
-
+  <script src="/assets/mxd-affiliate.js" defer></script>
 </head>
 <body>
   <!-- Header -->
@@ -177,17 +193,17 @@
           <a class="btn primary" href="/store.html">🛒 Vào Cửa hàng MXD</a>
           <a class="btn" href="/tu-van.html">📅 Đặt lịch tư vấn</a>
         </div>
+        <nav aria-label="Điểm đến quan trọng" class="quick-nav">
+          <a href="/store.html">Cửa hàng</a>
+          <a href="/store/bay-rang-cua.html">Bay răng cưa</a>
+          <a href="/blog/may-cat-gach.html">Máy cắt gạch</a>
+          <a href="/blog/chong-tham-wc.html">Chống thấm WC</a>
+        </nav>
       </div>
       <div>
         <img src="/assets/img/hero.webp" alt="Dụng cụ & vật tư MXD" loading="lazy" />
       </div>
     </section>
-<nav aria-label="Điểm đến quan trọng" class="quick-nav">
-  <a href="/store.html">Cửa hàng</a>
-  <a href="/store/bay-rang-cua.html">Bay răng cưa</a>
-  <a href="/blog/may-cat-gach.html">Máy cắt gạch</a>
-  <a href="/blog/chong-tham-wc.html">Chống thấm WC</a>
-</nav>
 
     <!-- Danh mục nổi bật -->
     <div class="section-title">
@@ -225,7 +241,7 @@
       </a>
     </section>
 
-    <!-- Sản phẩm nổi bật -->
+    <!-- Sản phẩm nổi bật (render tĩnh mẫu + grid động ở dưới) -->
     <div class="section-title">
       <h2>Sản phẩm nổi bật</h2>
       <a href="/store.html">Xem thêm →</a>
@@ -267,6 +283,12 @@
           <a class="btn" href="#" data-merchant="shopee">Mua ngay</a>
         </div>
       </article>
+    </section>
+
+    <!-- Featured (động từ affiliates.json) -->
+    <section id="featured" class="container mx-auto px-4 py-8" style="padding-left:0;padding-right:0">
+      <h2 class="text-2xl font-bold mb-4">Sản phẩm nổi bật</h2>
+      <div id="featured-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px"></div>
     </section>
 
     <!-- Tin tức -->
@@ -311,12 +333,6 @@
         </div>
       </div>
     </section>
-    <section id="featured" class="container mx-auto px-4 py-8">
-  <h2 class="text-2xl font-bold mb-4">Sản phẩm nổi bật</h2>
-  <div id="featured-grid"
-       style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px"></div>
-</section>
-
   </main>
 
   <!-- Footer -->
@@ -370,46 +386,25 @@
     </a>
   </div>
 
-  <script>
-    document.getElementById('y').textContent = new Date().getFullYear();
-  </script>
+  <!-- Năm footer -->
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
 
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js', { scope: '/' })
-        .catch(err => console.warn('SW register failed:', err));
-    });
-  }
-  </script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!window.__swRld) { window.__swRld = true; location.reload(); }
-    });
-    navigator.serviceWorker.ready.then(reg => {
-      if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-    });
-  }
-  </script>
-
-  <script src="/assets/js/floating-contact.js" defer></script>
+  <!-- Service Worker (giữ logic cũ, gộp gọn – không đổi hành vi) -->
   <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
       try {
         const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-        // ép trình duyệt check update
         reg.update();
-        // Nếu có SW mới chờ, cho nó skipWaiting ngay
         if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-        // Khi SW có trạng thái new -> installed -> waiting
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!window.__swRld) { window.__swRld = true; location.reload(); }
+        });
         reg.addEventListener('updatefound', () => {
           const nw = reg.installing;
           nw?.addEventListener('statechange', () => {
             if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              // reload nhẹ để nhận SW mới (tuỳ chọn)
-              // location.reload();
+              /* tuỳ chọn: location.reload(); */
             }
           });
         });
@@ -418,11 +413,7 @@
       }
     });
   }
-</script>
-  <!-- Google Analytics -->
-  <script src="/assets/analytics.js" defer></script>
-  <!-- Affiliate -->
-  <script src="/assets/mxd-affiliate.js" defer></script>
+  </script>
 
   <!-- Featured Products render -->
   <script>
@@ -440,7 +431,7 @@
       const $grid = document.getElementById('featured-grid');
 
       $grid.innerHTML = featured.map(p => `
-        <article style="border:1px solid #eee;border-radius:16px;padding:12px">
+        <article style="border:1px solid #eee;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px">
           <a href="/g.html?sku=${p.sku}" style="text-decoration:none;color:inherit">
             <img src="/assets/img/products/${p.sku}.webp"
                  alt="${p.name}" width="480" height="480"
@@ -452,14 +443,13 @@
           <a class="buy"
              href="${p.origin}"
              data-merchant="${p.merchant||'shopee'}"
-             data-sub1="home" data-sub2="featured"
-             style="display:inline-block;padding:8px 12px;border-radius:10px;border:1px solid #222">
+             data-sub1="home" data-sub2="featured">
             Mua ngay
           </a>
         </article>
       `).join('');
 
-      // SEO JSON-LD
+      // SEO JSON-LD cho danh sách featured
       const ld = {
         "@context":"https://schema.org","@type":"ItemList",
         "itemListElement": featured.map((p,i)=>({
@@ -479,6 +469,5 @@
     }
   })();
   </script>
-
 </body>
 </html>
