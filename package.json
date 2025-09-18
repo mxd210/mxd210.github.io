@@ -1,0 +1,16 @@
+{
+  "name": "mxd210-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:links": "node scripts/check-links.js",
+    "check:links:headful": "node scripts/check-links-puppeteer.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "fs-extra": "^11.2.0",
+    "node-fetch": "2",
+    "p-limit": "^5.0.0",
+    "puppeteer": "^23.5.0"
+  }
+}
