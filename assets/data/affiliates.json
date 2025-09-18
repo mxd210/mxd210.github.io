@@ -1,362 +1,96 @@
-[
-  {
-    "sku": "may-cat-cam-tay-dekton-dk-ag950s",
-    "name": "Máy cắt cầm tay Dekton DK-AG950S",
-    "price": 690000,
-    "origin": "https://shopee.vn/product/279547485/5274192859",
-    "merchant": "shopee",
-     "featured": true,
-  "featured_order": 1
-  },
-  {
-    "sku": "kynko-j1c-kd28-26",
-    "name": "Máy khoan bê tông Kynko J1C-KD28-26",
-    "price": 1833000,
-    "origin": "https://shopee.vn/product/772892494/21507014059",
-    "merchant": "shopee",
-    "featured": true,
-  "featured_order": 2
-  },
-  {
-    "sku": "may-mai-pin-bosch-388vf",
-    "name": "Máy Mài Pin BOSCH 388VF không chổi than",
-    "price": 763240,
-    "origin": "https://shopee.vn/product/1061097771/22861822077",
-    "merchant": "shopee",
-    "featured": true,
-  "featured_order": 3
-  },
-  {
-    "sku": "may-mai-pin-hukan-g1-ag6000j",
-    "name": "Máy Mài Pin HUKAN G1-AG6000J",
-    "price": 424000,
-    "origin": "https://shopee.vn/product/654430280/22380739205",
-    "merchant": "shopee",
-    "featured": true,
-  "featured_order": 4
-  },
-  {
-    "sku": "may-khoan-duc-be-tong-pin-boshun-bs-r2803h",
-    "name": "Máy Khoan Đục Bê Tông Pin BOSHUN BS-R2803H",
-    "price": 814000,
-    "origin": "https://shopee.vn/product/654430280/23055248675",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-mai-cam-tay-hukan-hk-ag5030rp",
-    "name": "Máy Mài Cầm Tay HUKAN HK-AG5030RP",
-    "price": 554000,
-    "origin": "https://shopee.vn/product/654430280/22255243106",
-    "merchant": "shopee",
-    "featured": true,
-  "featured_order": 5
-  },
-  {
-    "sku": "may-mai-pin-hukan-hk-ag7900bl",
-    "name": "Máy mài pin HUKAN HK-AG7900BL",
-    "price": 937020,
-    "origin": "https://shopee.vn/product/166287331/24663400599",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-duc-be-tong-hukan-g2-rh2066x",
-    "name": "Máy khoan đục bê tông HUKAN G2-RH2066x",
-    "price": 1115039,
-    "origin": "https://shopee.vn/product/166287331/20882235158",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-mai-cam-tay-hukan-hkg2-ag51100pro",
-    "name": "Máy Mài Cầm Tay HUKAN HKG2-AG51100PRO",
-    "price": 819000,
-    "origin": "https://shopee.vn/product/1308044692/27757745334",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-be-tong-hukan-hk-k96",
-    "name": "Máy Khoan Bê Tông Chính Hãng HUKAN HK-K96",
-    "price": 1069000,
-    "origin": "https://shopee.vn/product/319001815/18982725145",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-pin-hukan-g1-218vb",
-    "name": "Máy khoan pin HUKAN G1-218VB 2 pin 1 sạc",
-    "price": 629000,
-    "origin": "https://shopee.vn/product/166287331/22741831588",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-sat-ban-hukan-hk-cc355",
-    "name": "Máy cắt sắt bàn HUKAN HK-CC355",
-    "price": 1580000,
-    "origin": "https://shopee.vn/product/166287331/20069641528",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-pin-21v-hukan-g1-218v",
-    "name": "Máy khoan pin 21V HUKAN G1-218V",
-    "price": 599000,
-    "origin": "https://shopee.vn/product/166287331/20749746066",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-sat-ban-dekton-dk-cc355",
-    "name": "Máy cắt sắt bàn Dekton DK-CC355",
-    "price": 1860000,
-    "origin": "https://shopee.vn/product/52150724/22672288294",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-pin-dekton-dk-218v",
-    "name": "Máy khoan pin Dekton DK-218V 21V",
-    "price": 649000,
-    "origin": "https://shopee.vn/product/300702715/20749746066",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-cam-tay-dekton-dk-ag7100",
-    "name": "Máy cắt cầm tay Dekton DK-AG7100",
-    "price": 759000,
-    "origin": "https://shopee.vn/product/300702715/21345346872",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-bua-dekton-dk-2800",
-    "name": "Máy khoan búa Dekton DK-2800",
-    "price": 1260000,
-    "origin": "https://shopee.vn/product/300702715/20929246123",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-sat-ban-hukan-g2-cc355",
-    "name": "Máy cắt sắt bàn HUKAN G2-CC355",
-    "price": 1680000,
-    "origin": "https://shopee.vn/product/166287331/21876453826",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-pin-dekton-dk-218vb",
-    "name": "Máy khoan pin Dekton DK-218VB",
-    "price": 699000,
-    "origin": "https://shopee.vn/product/300702715/22149746234",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-mai-cam-tay-dekton-dk-ag9000",
-    "name": "Máy mài cầm tay Dekton DK-AG9000",
-    "price": 869000,
-    "origin": "https://shopee.vn/product/300702715/22245346987",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-sat-ban-dekton-dk-cc355b",
-    "name": "Máy cắt sắt bàn Dekton DK-CC355B",
-    "price": 1760000,
-    "origin": "https://shopee.vn/product/300702715/22329246911",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-bua-hukan-hk-2800",
-    "name": "Máy khoan búa HUKAN HK-2800",
-    "price": 1190000,
-    "origin": "https://shopee.vn/product/166287331/22429246177",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-cam-tay-dekton-dk-ag7100s",
-    "name": "Máy cắt cầm tay Dekton DK-AG7100S",
-    "price": 789000,
-    "origin": "https://shopee.vn/product/300702715/22545346901",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-mai-cam-tay-hukan-hk-ag950",
-    "name": "Máy mài cầm tay HUKAN HK-AG950",
-    "price": 739000,
-    "origin": "https://shopee.vn/product/166287331/22645346112",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-pin-hukan-hk-218vb",
-    "name": "Máy khoan pin HUKAN HK-218VB",
-    "price": 679000,
-    "origin": "https://shopee.vn/product/166287331/22749746288",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-ban-dekton-dk-cc355c",
-    "name": "Máy cắt bàn Dekton DK-CC355C",
-    "price": 1820000,
-    "origin": "https://shopee.vn/product/300702715/22829246955",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-bua-dekton-dk-2800s",
-    "name": "Máy khoan búa Dekton DK-2800S",
-    "price": 1290000,
-    "origin": "https://shopee.vn/product/300702715/22929246190",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-mai-cam-tay-dekton-dk-ag950",
-    "name": "Máy mài cầm tay Dekton DK-AG950",
-    "price": 759000,
-    "origin": "https://shopee.vn/product/300702715/23045346945",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-sat-ban-hukan-hk-cc355b",
-    "name": "Máy cắt sắt bàn HUKAN HK-CC355B",
-    "price": 1620000,
-    "origin": "https://shopee.vn/product/166287331/23129246992",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-pin-dekton-dk-218va",
-    "name": "Máy khoan pin Dekton DK-218VA",
-    "price": 689000,
-    "origin": "https://shopee.vn/product/300702715/23249746212",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-sat-ban-dekton-dk-cc355d",
-    "name": "Máy cắt sắt bàn Dekton DK-CC355D",
-    "price": 1850000,
-    "origin": "https://shopee.vn/product/300702715/23329246922",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-bua-hukan-hk-2800s",
-    "name": "Máy khoan búa HUKAN HK-2800S",
-    "price": 1210000,
-    "origin": "https://shopee.vn/product/166287331/23429246134",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-mai-cam-tay-hukan-hk-ag900",
-    "name": "Máy mài cầm tay HUKAN HK-AG900",
-    "price": 729000,
-    "origin": "https://shopee.vn/product/166287331/23545346145",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-cam-tay-dekton-dk-ag960",
-    "name": "Máy cắt cầm tay Dekton DK-AG960",
-    "price": 799000,
-    "origin": "https://shopee.vn/product/300702715/23645346992",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-pin-hukan-hk-218vc",
-    "name": "Máy khoan pin HUKAN HK-218VC",
-    "price": 695000,
-    "origin": "https://shopee.vn/product/166287331/23749746201",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-ban-dekton-dk-cc355e",
-    "name": "Máy cắt bàn Dekton DK-CC355E",
-    "price": 1880000,
-    "origin": "https://shopee.vn/product/300702715/23829246944",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-bua-dekton-dk-2800v",
-    "name": "Máy khoan búa Dekton DK-2800V",
-    "price": 1280000,
-    "origin": "https://shopee.vn/product/300702715/23929246176",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-mai-cam-tay-dekton-dk-ag910",
-    "name": "Máy mài cầm tay Dekton DK-AG910",
-    "price": 749000,
-    "origin": "https://shopee.vn/product/300702715/24045346999",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-sat-ban-hukan-hk-cc355c",
-    "name": "Máy cắt sắt bàn HUKAN HK-CC355C",
-    "price": 1640000,
-    "origin": "https://shopee.vn/product/166287331/24129246921",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-pin-dekton-dk-218vc",
-    "name": "Máy khoan pin Dekton DK-218VC",
-    "price": 709000,
-    "origin": "https://shopee.vn/product/300702715/24249746277",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-sat-ban-dekton-dk-cc355f",
-    "name": "Máy cắt sắt bàn Dekton DK-CC355F",
-    "price": 1890000,
-    "origin": "https://shopee.vn/product/300702715/24329246977",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-bua-hukan-hk-2800v",
-    "name": "Máy khoan búa HUKAN HK-2800V",
-    "price": 1230000,
-    "origin": "https://shopee.vn/product/166287331/24429246190",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-mai-cam-tay-hukan-hk-ag970",
-    "name": "Máy mài cầm tay HUKAN HK-AG970",
-    "price": 759000,
-    "origin": "https://shopee.vn/product/166287331/24545346193",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-cam-tay-dekton-dk-ag970",
-    "name": "Máy cắt cầm tay Dekton DK-AG970",
-    "price": 809000,
-    "origin": "https://shopee.vn/product/300702715/24645346934",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-pin-hukan-hk-218vd",
-    "name": "Máy khoan pin HUKAN HK-218VD",
-    "price": 699000,
-    "origin": "https://shopee.vn/product/166287331/24749746293",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-ban-dekton-dk-cc355g",
-    "name": "Máy cắt bàn Dekton DK-CC355G",
-    "price": 1910000,
-    "origin": "https://shopee.vn/product/300702715/24829246980",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-bua-dekton-dk-2800x",
-    "name": "Máy khoan búa Dekton DK-2800X",
-    "price": 1310000,
-    "origin": "https://shopee.vn/product/300702715/24929246101",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-mai-cam-tay-dekton-dk-ag980",
-    "name": "Máy mài cầm tay Dekton DK-AG980",
-    "price": 779000,
-    "origin": "https://shopee.vn/product/300702715/25045346918",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-sat-ban-hukan-hk-cc355d",
-    "name": "Máy cắt sắt bàn HUKAN HK-CC355D",
-    "price": 1660000,
-    "origin": "https://shopee.vn/product/166287331/25129246988",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-khoan-pin-dekton-dk-218vd",
-    "name": "Máy khoan pin Dekton DK-218VD",
-    "price": 719000,
-    "origin": "https://shopee.vn/product/300702715/25249746266",
-    "merchant": "shopee"
-  }
+﻿[
+    {
+        "sku":  "may-cat-cam-tay-dekton-dk-ag950s",
+        "name":  "MÃ¡y cáº¯t cáº§m tay Dekton DK-AG950S",
+        "price":  690000,
+        "origin":  "https://shopee.vn/product/279547485/5274192859",
+        "merchant":  "shopee",
+        "featured":  true,
+        "featured_order":  1
+    },
+    {
+        "sku":  "kynko-j1c-kd28-26",
+        "name":  "MÃ¡y khoan bÃª tÃ´ng Kynko J1C-KD28-26",
+        "price":  1833000,
+        "origin":  "https://shopee.vn/product/772892494/21507014059",
+        "merchant":  "shopee",
+        "featured":  true,
+        "featured_order":  2
+    },
+    {
+        "sku":  "may-mai-pin-bosch-388vf",
+        "name":  "MÃ¡y MÃ i Pin BOSCH 388VF khÃ´ng chá»•i than",
+        "price":  763240,
+        "origin":  "https://shopee.vn/product/1061097771/22861822077",
+        "merchant":  "shopee",
+        "featured":  true,
+        "featured_order":  3
+    },
+    {
+        "sku":  "may-mai-pin-hukan-g1-ag6000j",
+        "name":  "MÃ¡y MÃ i Pin HUKAN G1-AG6000J",
+        "price":  424000,
+        "origin":  "https://shopee.vn/product/654430280/22380739205",
+        "merchant":  "shopee",
+        "featured":  true,
+        "featured_order":  4
+    },
+    {
+        "sku":  "may-khoan-duc-be-tong-pin-boshun-bs-r2803h",
+        "name":  "MÃ¡y Khoan Äá»¥c BÃª TÃ´ng Pin BOSHUN BS-R2803H",
+        "price":  814000,
+        "origin":  "https://shopee.vn/product/654430280/23055248675",
+        "merchant":  "shopee"
+    },
+    {
+        "sku":  "may-mai-cam-tay-hukan-hk-ag5030rp",
+        "name":  "MÃ¡y MÃ i Cáº§m Tay HUKAN HK-AG5030RP",
+        "price":  554000,
+        "origin":  "https://shopee.vn/product/654430280/22255243106",
+        "merchant":  "shopee",
+        "featured":  true,
+        "featured_order":  5
+    },
+    {
+        "sku":  "may-mai-pin-hukan-hk-ag7900bl",
+        "name":  "MÃ¡y mÃ i pin HUKAN HK-AG7900BL",
+        "price":  937020,
+        "origin":  "https://shopee.vn/product/166287331/24663400599",
+        "merchant":  "shopee"
+    },
+    {
+        "sku":  "may-khoan-duc-be-tong-hukan-g2-rh2066x",
+        "name":  "MÃ¡y khoan Ä‘á»¥c bÃª tÃ´ng HUKAN G2-RH2066x",
+        "price":  1115039,
+        "origin":  "https://shopee.vn/product/166287331/20882235158",
+        "merchant":  "shopee"
+    },
+    {
+        "sku":  "may-mai-cam-tay-hukan-hkg2-ag51100pro",
+        "name":  "MÃ¡y MÃ i Cáº§m Tay HUKAN HKG2-AG51100PRO",
+        "price":  819000,
+        "origin":  "https://shopee.vn/product/1308044692/27757745334",
+        "merchant":  "shopee"
+    },
+    {
+        "sku":  "may-khoan-be-tong-hukan-hk-k96",
+        "name":  "MÃ¡y Khoan BÃª TÃ´ng ChÃ­nh HÃ£ng HUKAN HK-K96",
+        "price":  1069000,
+        "origin":  "https://shopee.vn/product/319001815/18982725145",
+        "merchant":  "shopee"
+    },
+    {
+        "sku":  "may-cat-sat-ban-dekton-dk-cc355",
+        "name":  "MÃ¡y cáº¯t sáº¯t bÃ n Dekton DK-CC355",
+        "price":  1860000,
+        "origin":  "https://shopee.vn/product/52150724/22672288294",
+        "merchant":  "shopee"
+    },
+    {
+        "sku":  "may-cat-cam-tay-dekton-dk-ag970",
+        "name":  "MÃ¡y cáº¯t cáº§m tay Dekton DK-AG970",
+        "price":  809000,
+        "origin":  "https://shopee.vn/product/300702715/24645346934",
+        "merchant":  "shopee"
+    }
 ]
