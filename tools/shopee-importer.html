@@ -34,7 +34,7 @@
   <h1>MXD – Shopee → affiliates.json <span class="badge">Auto-Price + Affiliate + Images</span></h1>
   <p class="muted">Dán danh sách 1 dòng/1 sản phẩm. Hỗ trợ:</p>
   <ul>
-    <li><b>Mode A:</b> <code>https://shopee.vn/product/&lt;shopId&gt;/&lt;itemId&gt;</code></li>
+    <li><b>Mode A:</b> <code>https://shopee.vn/product/&lt;shopId&gt;/&lt;itemId&gt;</code> (mọi dạng link Shopee đều được: có slug, có <code>i.&lt;sid&gt;.&lt;iid&gt;</code>…)</li>
     <li><b>Mode B:</b> <code>Tên sản phẩm | giá (số) | link Shopee</code></li>
   </ul>
 
@@ -43,7 +43,7 @@
       <h3>1) Dữ liệu đầu vào</h3>
       <textarea id="input" placeholder="Ví dụ:
 NEED_NAME | 0 | https://shopee.vn/product/279547485/5274192859
-https://shopee.vn/product/772892494/21507014059"></textarea>
+https://shopee.vn/HUKAN-...i.1109739439.245575152525?sp_atk=..."></textarea>
 
       <div class="tips">
         <b>Quy ước MXD:</b>
@@ -67,12 +67,23 @@ https://shopee.vn/product/772892494/21507014059"></textarea>
           <button id="autoprice">Lấy giá tự động</button>
           <button id="gen" class="primary">Generate JSON &amp; Meta</button>
           <button id="dedup">Khử trùng link</button>
+          <button id="normalize">Chuẩn hoá link</button>
+          <button id="check-worker">Kiểm tra Worker</button>
           <button id="clear">Xoá</button>
         </div>
       </div>
 
       <h3 style="margin-top:18px">2) Affiliate (chuyển link gốc → deep link)</h3>
-      <p class="muted small">Nhập <b>template</b> deep link. Template phải chứa <code>{url}</code> (đích là link Shopee gốc). Có thể dùng <code>{sub1}</code>…<code>{sub4}</code>.</p>
+      <div class="row">
+        <label>Preset affiliate:
+          <select id="aff-preset">
+            <option value="custom">— Tự điền —</option>
+            <option value="at-full">AccessTrade (đủ sub1..sub4)</option>
+            <option value="sap">Shopee Affiliate Program</option>
+          </select>
+        </label>
+      </div>
+      <p class="muted small">Template deep link <b>bắt buộc</b> chứa <code>{url}</code> (đích là link Shopee gốc). Có thể dùng <code>{sub1}</code>…<code>{sub4}</code>.</p>
       <div class="row">
         <label style="flex:1">Template:
           <input id="aff-tpl" type="text" placeholder="https://example-aff.com/deep?url={url}&sub1={sub1}&sub2={sub2}">
@@ -80,19 +91,15 @@ https://shopee.vn/product/772892494/21507014059"></textarea>
       </div>
       <div class="row">
         <label>sub1: <input id="aff-sub1" type="text" placeholder="store"></label>
-        <label>sub2: <input id="aff-sub2" type="text" placeholder="list_01"></label>
-        <label>sub3: <input id="aff-sub3" type="text" placeholder=""></label>
-        <label>sub4: <input id="aff-sub4" type="text" placeholder=""></label>
+        <label>sub2: <input id="aff-sub2" type="text" placeholder="xaydung"></label>
+        <label>sub3: <input id="aff-sub3" type="text" placeholder="mxd210"></label>
+        <label>sub4: <input id="aff-sub4" type="text" placeholder="YYYYMMDD"></label>
       </div>
       <div class="row small">
-        <label class="row"><input type="checkbox" id="aff-use" checked> Xuất JSON dùng <b>affiliate link</b> (nếu tắt → dùng origin)</label>
+        <label class="row"><input type="checkbox" id="aff-use" checked> Xuất JSON dùng <b>affiliate link</b> (tắt → dùng origin)</label>
         <button id="aff-convert">Chuyển toàn bộ input → affiliate</button>
         <button id="aff-test">Test 5 link đầu (HEAD)</button>
       </div>
-      <p class="small muted">Gợi ý template (AccessTrade – cậu chỉ cần dán template thật của mình):  
-        <br>• <i>Ví dụ</i>: <code>https://go.isclix.com/deep_link?url={url}&amp;aff_sub1={sub1}&amp;aff_sub2={sub2}</code>
-        <br>• Hoặc dạng mới của network cậu đang dùng, miễn có <code>{url}</code>.
-      </p>
 
       <p id="status" class="muted"></p>
       <div class="progress"><div id="prog" class="bar"></div></div>
@@ -107,7 +114,7 @@ https://shopee.vn/product/772892494/21507014059"></textarea>
       <h3 style="margin-top:16px">4) HTML meta (dán vào trang danh mục)
         <button class="copy" data-copy="meta">Copy Meta</button>
       </h3>
-      <div id="meta" class="out">&lt;!-- meta links --&gt;</div>
+      <div id="meta" class="out">&lt;!-- no items parsed --&gt;</div>
     </section>
   </div>
 
@@ -176,9 +183,9 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       el('aff-tpl').value = localStorage.getItem('mxd_affTpl') || '';
       el('aff-use').checked = localStorage.getItem('mxd_affUse')!=='0';
       el('aff-sub1').value = localStorage.getItem('mxd_affSub1') || 'store';
-      el('aff-sub2').value = localStorage.getItem('mxd_affSub2') || 'list_01';
-      el('aff-sub3').value = localStorage.getItem('mxd_affSub3') || '';
-      el('aff-sub4').value = localStorage.getItem('mxd_affSub4') || '';
+      el('aff-sub2').value = localStorage.getItem('mxd_affSub2') || 'xaydung';
+      el('aff-sub3').value = localStorage.getItem('mxd_affSub3') || 'mxd210';
+      el('aff-sub4').value = localStorage.getItem('mxd_affSub4') || todayYYYYMMDD();
     }
   };
   persist.load();
@@ -188,41 +195,45 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
       .toLowerCase().replace(/[^a-z0-9]+/g,'-')
       .replace(/^-+|-+$/g,'').replace(/--+/g,'-');
- function parseShopeeId(url){
-  try{
-    const u = new URL(url.trim());
-    const p = u.pathname;
-
-    // 1) /product/<shopId>/<itemId>
-    let m = p.match(/\/product\/(\d+)\/(\d+)/);
-    if (m) return { shopId: m[1], itemId: m[2] };
-
-    // 2) /shop/<shopId>/item/<itemId>
-    m = p.match(/\/shop\/(\d+)\/item\/(\d+)/);
-    if (m) return { shopId: m[1], itemId: m[2] };
-
-    // 3) ... i.<shopId>.<itemId> ... (thường có trong link chia sẻ)
-    m = url.match(/i\.(\d+)\.(\d+)/);
-    if (m) return { shopId: m[1], itemId: m[2] };
-
-    // 4) ?shopid=...&itemid=... (hoặc viết hoa)
-    const sh = u.searchParams.get('shopid') || u.searchParams.get('shopId');
-    const it = u.searchParams.get('itemid') || u.searchParams.get('itemId');
-    if (sh && it) return { shopId: sh, itemId: it };
-
-    return null;
-  }catch(e){
-    return null;
   }
-}
 
+  // === robust parser for Shopee links ===
+  function parseShopeeId(url){
+    try{
+      const u = new URL((url||'').trim());
+      const p = u.pathname;
+
+      // /product/<shopId>/<itemId>
+      let m = p.match(/\/product\/(\d+)\/(\d+)/);
+      if (m) return { shopId: m[1], itemId: m[2] };
+
+      // /shop/<shopId>/item/<itemId>
+      m = p.match(/\/shop\/(\d+)\/item\/(\d+)/);
+      if (m) return { shopId: m[1], itemId: m[2] };
+
+      // ... i.<shopId>.<itemId> ... (link chia sẻ)
+      m = (url||'').match(/i\.(\d+)\.(\d+)/);
+      if (m) return { shopId: m[1], itemId: m[2] };
+
+      // ?shopid=...&itemid=...
+      const sh = u.searchParams.get('shopid') || u.searchParams.get('shopId');
+      const it = u.searchParams.get('itemid') || u.searchParams.get('itemId');
+      if (sh && it) return { shopId: sh, itemId: it };
+
+      return null;
+    }catch(e){ return null; }
   }
- function canonShopee(url){
-  const ids = parseShopeeId(url);
-  return ids ? `https://shopee.vn/product/${ids.shopId}/${ids.itemId}` : (url||'').trim();
-}
-
+  function canonShopee(url){
+    const ids = parseShopeeId(url);
+    return ids ? `https://shopee.vn/product/${ids.shopId}/${ids.itemId}` : (url||'').trim();
+  }
   const fmtPrice = n => Math.max(0, Math.round(n||0));
+
+  // Utility: today YYYYMMDD
+  function todayYYYYMMDD(){
+    const d=new Date(); const mm=('0'+(d.getMonth()+1)).slice(-2), dd=('0'+d.getDate()).slice(-2);
+    return `${d.getFullYear()}${mm}${dd}`;
+  }
 
   // Copy buttons
   document.querySelectorAll('button.copy').forEach(btn=>{
@@ -247,8 +258,32 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
     el('input').value = out.join('\n'); setStatus(`Đã khử trùng: còn ${out.length} dòng.`, 'ok'); persist.save();
   });
 
-  // Xoá input
-  el('clear').addEventListener('click', ()=>{ el('input').value=''; setStatus('Đã xoá input.'); setProg(0,1); });
+  // Chuẩn hoá link → /product/<sid>/<iid>
+  el('normalize').addEventListener('click', ()=>{
+    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
+    const out = lines.map(line=>{
+      const parts = line.includes('|') ? line.split('|').map(s=>s.trim()) : [null,null,line.trim()];
+      let [n,p,l] = parts.length===3 ? parts : [null,null, line.trim()];
+      const ids = parseShopeeId(l||'');
+      const canon = ids ? `https://shopee.vn/product/${ids.shopId}/${ids.itemId}` : (l||'');
+      return line.includes('|') ? `${n||'NEED_NAME'} | ${parseInt((p||'0').replace(/[^\d]/g,''),10)||0} | ${canon}` : canon;
+    });
+    el('input').value = out.join('\n');
+    setStatus('Đã chuẩn hoá tất cả link.', 'ok');
+  });
+
+  // Kiểm tra Worker
+  el('check-worker').addEventListener('click', async ()=>{
+    const proxy = el('proxy').value.trim();
+    if(!proxy){ setStatus('Chưa nhập Proxy Worker URL.', 'bad'); return; }
+    const test = 'https://shopee.vn/product/772892494/21507014059';
+    try{
+      const u = new URL(proxy); u.searchParams.set('url', test);
+      const r = await fetch(u.toString());
+      const ok = r.ok && (await r.clone().json()).title;
+      setStatus(ok ? 'Worker OK (trả JSON).' : 'Worker trả về không hợp lệ.', ok?'ok':'warn');
+    }catch(e){ setStatus('Worker lỗi hoặc URL sai.', 'bad'); }
+  });
 
   // Worker: detail
   async function fetchDetail(proxy, link){
@@ -288,6 +323,30 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
     }catch(e){ return { ok:false, error:String(e) }; }
   }
 
+  // Preset affiliate filler
+  function fillAffiliatePreset(kind){
+    if(kind==='at-full'){
+      el('aff-tpl').value = 'https://go.isclix.com/deep_link?url={url}&aff_sub1={sub1}&aff_sub2={sub2}&aff_sub3={sub3}&aff_sub4={sub4}';
+      el('aff-sub1').value = el('aff-sub1').value || 'store';
+      el('aff-sub2').value = el('aff-sub2').value || 'xaydung';
+      el('aff-sub3').value = el('aff-sub3').value || 'mxd210';
+      el('aff-sub4').value = el('aff-sub4').value || todayYYYYMMDD();
+      el('aff-use').checked = true;
+      setStatus('Preset AccessTrade đã được điền.', 'ok');
+    } else if(kind==='sap'){
+      el('aff-tpl').value = 'https://affiliate.shopee.vn/track?deep_url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
+      el('aff-sub1').value = el('aff-sub1').value || 'store';
+      el('aff-sub2').value = el('aff-sub2').value || 'xaydung';
+      el('aff-sub3').value = el('aff-sub3').value || 'mxd210';
+      el('aff-sub4').value = el('aff-sub4').value || todayYYYYMMDD();
+      el('aff-use').checked = true;
+      setStatus('Preset Shopee Affiliate đã được điền.', 'ok');
+    }
+  }
+  document.getElementById('aff-preset').addEventListener('change', e=>fillAffiliatePreset(e.target.value));
+  // Prime defaults on first load (if no local storage)
+  if(!localStorage.getItem('mxd_affTpl')) fillAffiliatePreset('at-full');
+
   // Auto-price
   el('autoprice').addEventListener('click', async ()=>{
     const proxy = el('proxy').value.trim();
@@ -304,7 +363,8 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       if (line.includes('|')){ const [n, p, l] = line.split('|').map(s=>s.trim()); name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||''; }
       else { link=line; }
 
-      if (/shopee\.vn\/product\//.test(link) && proxy){
+      const ids = parseShopeeId(link);
+      if (ids && proxy){
         const d = await fetchDetail(proxy, link);
         if (d){
           let auto = useMin ? (d.priceMin||d.price||0) : (d.price||d.priceMin||0);
@@ -313,7 +373,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
           ok++;
         } else miss++;
       }
-      out.push(`${name||'NEED_NAME'} | ${price||0} | ${link}`);
+      out.push(`${name||'NEED_NAME'} | ${price||0} | ${canonShopee(link)}`);
       setProg(i+1, lines.length);
     }
 
@@ -346,7 +406,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       else { link=line; }
 
       if (/^https?:\/\//.test(link)) {
-        const aff = await buildAffiliate(proxy, link, opt);
+        const aff = await buildAffiliate(proxy, canonShopee(link), opt);
         if (line.includes('|')) out.push(`${name||'NEED_NAME'} | ${price||0} | ${aff}`);
         else out.push(aff);
       } else {
@@ -367,8 +427,8 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
     for (const line of lines){
       const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
       if (!/^https?:\/\//.test(link)) continue;
-      const h = await headCheck(proxy, link);
-      results.push({ link, ...h });
+      const h = await headCheck(proxy, canonShopee(link));
+      results.push({ link: canonShopee(link), ...h });
     }
     setStatus('HEAD test: ' + results.map(r=>`${r.ok?'OK':'BAD'} ${r.status||''}`).join(' | '));
     console.log('HEAD results', results);
@@ -412,12 +472,14 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       items.push(rec);
 
       metas.push(
-        `<a class="product-meta" href="${rec.origin}" data-merchant="shopee" data-sku="${rec.sku}" data-img="/assets/img/products/${rec.sku}.webp" data-price="${rec.price}">${rec.name}</a>\n<a class="buy" href="${rec.origin}" data-merchant="shopee" data-sub1="${opt.sub1||''}" data-sub2="${opt.sub2||''}" data-sub3="${opt.sub3||''}" data-sub4="${opt.sub4||''}">Mua ngay</a>`
+        `<a class="product-meta" href="${rec.origin}" data-merchant="shopee" data-sku="${rec.sku}" data-img="/assets/img/products/${rec.sku}.webp" data-price="${rec.price}">${rec.name}</a>
+<a class="buy" href="${rec.origin}" data-merchant="shopee" data-sub1="${opt.sub1||''}" data-sub2="${opt.sub2||''}" data-sub3="${opt.sub3||''}" data-sub4="${opt.sub4||''}">Mua ngay</a>`
       );
     }
     el('json').textContent = JSON.stringify(items, null, 2);
     el('meta').textContent = metas.join('\n\n') || '<!-- no items parsed -->';
-    setStatus(`Generate xong: ${items.length} sản phẩm.`, 'ok');
+    const skipped = el('input').value.trim().split(/\r?\n/).filter(Boolean).length - items.length;
+    setStatus(skipped>0 ? `Generate xong: ${items.length} SP, bỏ qua ${skipped} dòng (không nhận diện được shopId/itemId).` : `Generate xong: ${items.length} SP.`, skipped>0?'warn':'ok');
   });
 
   // ===== Ảnh =====
@@ -450,7 +512,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
   async function collectSourceImages(){
     const list = [];
     const ta = el('img-urls').value.trim();
-    if (ta){ ta.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).forEach(u=>list.push({type:'url', url:u})); }
+    if (ta){ ta.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).forEach(u=>list.push({type:'url', url=u})); }
     const files = Array.from(el('img-file').files||[]);
     const local = await Promise.all(files.map(f => new Promise(res=>{
       const reader = new FileReader(); reader.onload = () => res({ type:'dataurl', dataUrl: reader.result, name: f.name }); reader.readAsDataURL(f);
@@ -465,9 +527,10 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
     const imgBox = el('img-urls'); let found=0;
     for(const line of lines){
       const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
-      if (!/shopee\.vn\/product\//.test(link)) continue;
+      const ids = parseShopeeId(link);
+      if (!ids) continue;
       try{
-        const u = new URL(proxy); u.searchParams.set('url', link);
+        const u = new URL(proxy); u.searchParams.set('url', canonShopee(link));
         const r = await fetch(u.toString()); if(!r.ok) continue;
         const d = await r.json(); (d.images||[]).forEach(href=>{ imgBox.value += (imgBox.value?'\n':'') + href; found++; });
       }catch(e){}
@@ -516,8 +579,8 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
   </script>
 
   <p class="muted small" style="margin-top:24px">
-    Gợi ý: nếu network của cậu có format khác, chỉ cần thay <b>Template</b> sao cho chứa <code>{url}</code>. Tool sẽ URL-encode đích và chèn <code>sub1..sub4</code>.  
-    Dù xuất JSON dùng affiliate hay origin, khối <code>&lt;a class="product-meta"&gt;</code> vẫn kèm <code>data-merchant</code> và sub* để <span class="kbd">mxd-affiliate.js</span> có thể theo dõi/ghi log click nếu cậu giữ script đó.
+    Preset affiliate chuẩn MXD: AccessTrade (sub1=<b>store</b>, sub2=<b>xaydung</b>, sub3=<b>mxd210</b>, sub4=<b>YYYYMMDD</b>). Có thể chọn Shopee Affiliate tuỳ network.
+    Dù xuất JSON dùng affiliate hay origin, khối <code>&lt;a class="product-meta"&gt;</code> vẫn kèm <code>data-merchant</code> và sub* để <span class="kbd">mxd-affiliate.js</span> có thể theo dõi click.
   </p>
 </body>
 </html>
