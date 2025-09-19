@@ -14,7 +14,7 @@
     @media (max-width:980px){.grid{grid-template-columns:1fr}}
     textarea, input[type="url"], input[type="text"], input[type="number"]{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px}
     textarea{min-height:220px}
-    .out{white-space:pre; background:var(--bg); color:var(--fg); padding:12px;border-radius:10px;overflow:auto;min-height:220px}
+    .out{white-space:pre;background:var(--bg);color:var(--fg);padding:12px;border-radius:10px;overflow:auto;min-height:220px}
     .muted{color:var(--muted)}
     .tips{background:#fff7e6;border:1px solid #ffe0a3;padding:10px;border-radius:10px}
     .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -34,7 +34,7 @@
   <h1>MXD – Shopee → affiliates.json <span class="badge">Auto-Price + Affiliate + Images</span></h1>
   <p class="muted">Dán danh sách 1 dòng/1 sản phẩm. Hỗ trợ:</p>
   <ul>
-    <li><b>Mode A:</b> <code>https://shopee.vn/product/&lt;shopId&gt;/&lt;itemId&gt;</code> (mọi dạng link Shopee đều được: có slug, có <code>i.&lt;sid&gt;.&lt;iid&gt;</code>…)</li>
+    <li><b>Mode A:</b> <code>https://shopee.vn/product/&lt;shopId&gt;/&lt;itemId&gt;</code></li>
     <li><b>Mode B:</b> <code>Tên sản phẩm | giá (số) | link Shopee</code></li>
   </ul>
 
@@ -43,7 +43,7 @@
       <h3>1) Dữ liệu đầu vào</h3>
       <textarea id="input" placeholder="Ví dụ:
 NEED_NAME | 0 | https://shopee.vn/product/279547485/5274192859
-https://shopee.vn/HUKAN-...i.1109739439.245575152525?sp_atk=..."></textarea>
+https://shopee.vn/product/772892494/21507014059"></textarea>
 
       <div class="tips">
         <b>Quy ước MXD:</b>
@@ -61,42 +61,31 @@ https://shopee.vn/HUKAN-...i.1109739439.245575152525?sp_atk=..."></textarea>
 
       <div style="margin-top:10px">
         <label>Proxy Worker URL:
-          <input id="proxy" type="url" placeholder="https://mxd-price-worker.<subdomain>.workers.dev/">
+          <input id="proxy" type="url" placeholder="https://mxd-price-worker.&lt;subdomain&gt;.workers.dev/">
         </label>
         <div class="row" style="margin-top:8px">
           <button id="autoprice">Lấy giá tự động</button>
           <button id="gen" class="primary">Generate JSON &amp; Meta</button>
           <button id="dedup">Khử trùng link</button>
-          <button id="normalize">Chuẩn hoá link</button>
-          <button id="check-worker">Kiểm tra Worker</button>
           <button id="clear">Xoá</button>
         </div>
       </div>
 
       <h3 style="margin-top:18px">2) Affiliate (chuyển link gốc → deep link)</h3>
-      <div class="row">
-        <label>Preset affiliate:
-          <select id="aff-preset">
-            <option value="custom">— Tự điền —</option>
-            <option value="at-full">AccessTrade (đủ sub1..sub4)</option>
-            <option value="sap">Shopee Affiliate Program</option>
-          </select>
-        </label>
-      </div>
-      <p class="muted small">Template deep link <b>bắt buộc</b> chứa <code>{url}</code> (đích là link Shopee gốc). Có thể dùng <code>{sub1}</code>…<code>{sub4}</code>.</p>
+      <p class="muted small">Nhập <b>template</b> deep link. Template phải chứa <code>{url}</code> (đích là link Shopee gốc). Có thể dùng <code>{sub1}</code>…<code>{sub4}</code>.</p>
       <div class="row">
         <label style="flex:1">Template:
-          <input id="aff-tpl" type="text" placeholder="https://example-aff.com/deep?url={url}&sub1={sub1}&sub2={sub2}">
+          <input id="aff-tpl" type="text" placeholder="https://go.isclix.com/deep_link?url={url}&aff_sub1={sub1}&aff_sub2={sub2}">
         </label>
       </div>
       <div class="row">
         <label>sub1: <input id="aff-sub1" type="text" placeholder="store"></label>
-        <label>sub2: <input id="aff-sub2" type="text" placeholder="xaydung"></label>
-        <label>sub3: <input id="aff-sub3" type="text" placeholder="mxd210"></label>
-        <label>sub4: <input id="aff-sub4" type="text" placeholder="YYYYMMDD"></label>
+        <label>sub2: <input id="aff-sub2" type="text" placeholder="list_01"></label>
+        <label>sub3: <input id="aff-sub3" type="text" placeholder=""></label>
+        <label>sub4: <input id="aff-sub4" type="text" placeholder=""></label>
       </div>
       <div class="row small">
-        <label class="row"><input type="checkbox" id="aff-use" checked> Xuất JSON dùng <b>affiliate link</b> (tắt → dùng origin)</label>
+        <label class="row"><input type="checkbox" id="aff-use" checked> Xuất JSON dùng <b>affiliate link</b> (nếu tắt → dùng origin)</label>
         <button id="aff-convert">Chuyển toàn bộ input → affiliate</button>
         <button id="aff-test">Test 5 link đầu (HEAD)</button>
       </div>
@@ -114,7 +103,7 @@ https://shopee.vn/HUKAN-...i.1109739439.245575152525?sp_atk=..."></textarea>
       <h3 style="margin-top:16px">4) HTML meta (dán vào trang danh mục)
         <button class="copy" data-copy="meta">Copy Meta</button>
       </h3>
-      <div id="meta" class="out">&lt;!-- no items parsed --&gt;</div>
+      <div id="meta" class="out">&lt;!-- meta links --&gt;</div>
     </section>
   </div>
 
@@ -164,6 +153,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
   const el = id => document.getElementById(id);
   const setStatus = (msg, cls='')=>{ const s=el('status'); s.textContent=msg; s.className='muted '+cls; };
   const setProg = (num, den)=>{ const p=el('prog'); const v = !den?0: Math.min(100, Math.round(num/den*100)); p.style.width = v+'%'; };
+
   const persist = {
     save(){
       localStorage.setItem('mxd_proxy', el('proxy').value.trim());
@@ -183,9 +173,9 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       el('aff-tpl').value = localStorage.getItem('mxd_affTpl') || '';
       el('aff-use').checked = localStorage.getItem('mxd_affUse')!=='0';
       el('aff-sub1').value = localStorage.getItem('mxd_affSub1') || 'store';
-      el('aff-sub2').value = localStorage.getItem('mxd_affSub2') || 'xaydung';
-      el('aff-sub3').value = localStorage.getItem('mxd_affSub3') || 'mxd210';
-      el('aff-sub4').value = localStorage.getItem('mxd_affSub4') || todayYYYYMMDD();
+      el('aff-sub2').value = localStorage.getItem('mxd_affSub2') || 'list_01';
+      el('aff-sub3').value = localStorage.getItem('mxd_affSub3') || '';
+      el('aff-sub4').value = localStorage.getItem('mxd_affSub4') || '';
     }
   };
   persist.load();
@@ -195,27 +185,22 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
       .toLowerCase().replace(/[^a-z0-9]+/g,'-')
       .replace(/^-+|-+$/g,'').replace(/--+/g,'-');
-  }
+  } // <-- đã đóng đúng hàm slugify (bản cũ thiếu dấu '}' ở đây)
 
-  // === robust parser for Shopee links ===
   function parseShopeeId(url){
     try{
-      const u = new URL((url||'').trim());
+      const u = new URL(url.trim());
       const p = u.pathname;
 
-      // /product/<shopId>/<itemId>
       let m = p.match(/\/product\/(\d+)\/(\d+)/);
       if (m) return { shopId: m[1], itemId: m[2] };
 
-      // /shop/<shopId>/item/<itemId>
       m = p.match(/\/shop\/(\d+)\/item\/(\d+)/);
       if (m) return { shopId: m[1], itemId: m[2] };
 
-      // ... i.<shopId>.<itemId> ... (link chia sẻ)
-      m = (url||'').match(/i\.(\d+)\.(\d+)/);
+      m = url.match(/i\.(\d+)\.(\d+)/);
       if (m) return { shopId: m[1], itemId: m[2] };
 
-      // ?shopid=...&itemid=...
       const sh = u.searchParams.get('shopid') || u.searchParams.get('shopId');
       const it = u.searchParams.get('itemid') || u.searchParams.get('itemId');
       if (sh && it) return { shopId: sh, itemId: it };
@@ -223,17 +208,13 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       return null;
     }catch(e){ return null; }
   }
+
   function canonShopee(url){
     const ids = parseShopeeId(url);
     return ids ? `https://shopee.vn/product/${ids.shopId}/${ids.itemId}` : (url||'').trim();
   }
-  const fmtPrice = n => Math.max(0, Math.round(n||0));
 
-  // Utility: today YYYYMMDD
-  function todayYYYYMMDD(){
-    const d=new Date(); const mm=('0'+(d.getMonth()+1)).slice(-2), dd=('0'+d.getDate()).slice(-2);
-    return `${d.getFullYear()}${mm}${dd}`;
-  }
+  const fmtPrice = n => Math.max(0, Math.round(n||0));
 
   // Copy buttons
   document.querySelectorAll('button.copy').forEach(btn=>{
@@ -258,32 +239,8 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
     el('input').value = out.join('\n'); setStatus(`Đã khử trùng: còn ${out.length} dòng.`, 'ok'); persist.save();
   });
 
-  // Chuẩn hoá link → /product/<sid>/<iid>
-  el('normalize').addEventListener('click', ()=>{
-    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
-    const out = lines.map(line=>{
-      const parts = line.includes('|') ? line.split('|').map(s=>s.trim()) : [null,null,line.trim()];
-      let [n,p,l] = parts.length===3 ? parts : [null,null, line.trim()];
-      const ids = parseShopeeId(l||'');
-      const canon = ids ? `https://shopee.vn/product/${ids.shopId}/${ids.itemId}` : (l||'');
-      return line.includes('|') ? `${n||'NEED_NAME'} | ${parseInt((p||'0').replace(/[^\d]/g,''),10)||0} | ${canon}` : canon;
-    });
-    el('input').value = out.join('\n');
-    setStatus('Đã chuẩn hoá tất cả link.', 'ok');
-  });
-
-  // Kiểm tra Worker
-  el('check-worker').addEventListener('click', async ()=>{
-    const proxy = el('proxy').value.trim();
-    if(!proxy){ setStatus('Chưa nhập Proxy Worker URL.', 'bad'); return; }
-    const test = 'https://shopee.vn/product/772892494/21507014059';
-    try{
-      const u = new URL(proxy); u.searchParams.set('url', test);
-      const r = await fetch(u.toString());
-      const ok = r.ok && (await r.clone().json()).title;
-      setStatus(ok ? 'Worker OK (trả JSON).' : 'Worker trả về không hợp lệ.', ok?'ok':'warn');
-    }catch(e){ setStatus('Worker lỗi hoặc URL sai.', 'bad'); }
-  });
+  // Xoá input
+  el('clear').addEventListener('click', ()=>{ el('input').value=''; setStatus('Đã xoá input.'); setProg(0,1); });
 
   // Worker: detail
   async function fetchDetail(proxy, link){
@@ -309,9 +266,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       if (!r.ok) throw new Error('aff fail');
       const j = await r.json();
       return j.affiliate || dest;
-    } catch (e) {
-      return dest;
-    }
+    } catch { return dest; }
   }
 
   // Worker: head check
@@ -322,30 +277,6 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       return await r.json();
     }catch(e){ return { ok:false, error:String(e) }; }
   }
-
-  // Preset affiliate filler
-  function fillAffiliatePreset(kind){
-    if(kind==='at-full'){
-      el('aff-tpl').value = 'https://go.isclix.com/deep_link?url={url}&aff_sub1={sub1}&aff_sub2={sub2}&aff_sub3={sub3}&aff_sub4={sub4}';
-      el('aff-sub1').value = el('aff-sub1').value || 'store';
-      el('aff-sub2').value = el('aff-sub2').value || 'xaydung';
-      el('aff-sub3').value = el('aff-sub3').value || 'mxd210';
-      el('aff-sub4').value = el('aff-sub4').value || todayYYYYMMDD();
-      el('aff-use').checked = true;
-      setStatus('Preset AccessTrade đã được điền.', 'ok');
-    } else if(kind==='sap'){
-      el('aff-tpl').value = 'https://affiliate.shopee.vn/track?deep_url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
-      el('aff-sub1').value = el('aff-sub1').value || 'store';
-      el('aff-sub2').value = el('aff-sub2').value || 'xaydung';
-      el('aff-sub3').value = el('aff-sub3').value || 'mxd210';
-      el('aff-sub4').value = el('aff-sub4').value || todayYYYYMMDD();
-      el('aff-use').checked = true;
-      setStatus('Preset Shopee Affiliate đã được điền.', 'ok');
-    }
-  }
-  document.getElementById('aff-preset').addEventListener('change', e=>fillAffiliatePreset(e.target.value));
-  // Prime defaults on first load (if no local storage)
-  if(!localStorage.getItem('mxd_affTpl')) fillAffiliatePreset('at-full');
 
   // Auto-price
   el('autoprice').addEventListener('click', async ()=>{
@@ -363,8 +294,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       if (line.includes('|')){ const [n, p, l] = line.split('|').map(s=>s.trim()); name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||''; }
       else { link=line; }
 
-      const ids = parseShopeeId(link);
-      if (ids && proxy){
+      if (/shopee\.vn\/product\//.test(link) && proxy){
         const d = await fetchDetail(proxy, link);
         if (d){
           let auto = useMin ? (d.priceMin||d.price||0) : (d.price||d.priceMin||0);
@@ -373,7 +303,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
           ok++;
         } else miss++;
       }
-      out.push(`${name||'NEED_NAME'} | ${price||0} | ${canonShopee(link)}`);
+      out.push(`${name||'NEED_NAME'} | ${price||0} | ${link}`);
       setProg(i+1, lines.length);
     }
 
@@ -406,7 +336,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       else { link=line; }
 
       if (/^https?:\/\//.test(link)) {
-        const aff = await buildAffiliate(proxy, canonShopee(link), opt);
+        const aff = await buildAffiliate(proxy, link, opt);
         if (line.includes('|')) out.push(`${name||'NEED_NAME'} | ${price||0} | ${aff}`);
         else out.push(aff);
       } else {
@@ -427,8 +357,8 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
     for (const line of lines){
       const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
       if (!/^https?:\/\//.test(link)) continue;
-      const h = await headCheck(proxy, canonShopee(link));
-      results.push({ link: canonShopee(link), ...h });
+      const h = await headCheck(proxy, link);
+      results.push({ link, ...h });
     }
     setStatus('HEAD test: ' + results.map(r=>`${r.ok?'OK':'BAD'} ${r.status||''}`).join(' | '));
     console.log('HEAD results', results);
@@ -461,9 +391,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       const origin = canonShopee(link);
       // chọn URL xuất
       let outUrl = origin;
-      if (useAff && tpl && tpl.includes('{url}') && proxy) {
-        outUrl = await buildAffiliate(proxy, origin, opt);
-      }
+      if (useAff && tpl && tpl.includes('{url}') && proxy) outUrl = await buildAffiliate(proxy, origin, opt);
 
       let sku = name ? slugify(name) : `p-${ids.itemId}`;
       if (wantLower && price>0) price=Math.round(price*0.97);
@@ -472,14 +400,12 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
       items.push(rec);
 
       metas.push(
-        `<a class="product-meta" href="${rec.origin}" data-merchant="shopee" data-sku="${rec.sku}" data-img="/assets/img/products/${rec.sku}.webp" data-price="${rec.price}">${rec.name}</a>
-<a class="buy" href="${rec.origin}" data-merchant="shopee" data-sub1="${opt.sub1||''}" data-sub2="${opt.sub2||''}" data-sub3="${opt.sub3||''}" data-sub4="${opt.sub4||''}">Mua ngay</a>`
+        `<a class="product-meta" href="${rec.origin}" data-merchant="shopee" data-sku="${rec.sku}" data-img="/assets/img/products/${rec.sku}.webp" data-price="${rec.price}">${rec.name}</a>\n<a class="buy" href="${rec.origin}" data-merchant="shopee" data-sub1="${opt.sub1||''}" data-sub2="${opt.sub2||''}" data-sub3="${opt.sub3||''}" data-sub4="${opt.sub4||''}">Mua ngay</a>`
       );
     }
     el('json').textContent = JSON.stringify(items, null, 2);
     el('meta').textContent = metas.join('\n\n') || '<!-- no items parsed -->';
-    const skipped = el('input').value.trim().split(/\r?\n/).filter(Boolean).length - items.length;
-    setStatus(skipped>0 ? `Generate xong: ${items.length} SP, bỏ qua ${skipped} dòng (không nhận diện được shopId/itemId).` : `Generate xong: ${items.length} SP.`, skipped>0?'warn':'ok');
+    setStatus(`Generate xong: ${items.length} sản phẩm.`, 'ok');
   });
 
   // ===== Ảnh =====
@@ -512,7 +438,7 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
   async function collectSourceImages(){
     const list = [];
     const ta = el('img-urls').value.trim();
-    if (ta){ ta.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).forEach(u=>list.push({type:'url', url=u})); }
+    if (ta){ ta.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).forEach(u=>list.push({type:'url', url:u})); }
     const files = Array.from(el('img-file').files||[]);
     const local = await Promise.all(files.map(f => new Promise(res=>{
       const reader = new FileReader(); reader.onload = () => res({ type:'dataurl', dataUrl: reader.result, name: f.name }); reader.readAsDataURL(f);
@@ -527,13 +453,12 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
     const imgBox = el('img-urls'); let found=0;
     for(const line of lines){
       const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
-      const ids = parseShopeeId(link);
-      if (!ids) continue;
+      if (!/shopee\.vn\/product\//.test(link)) continue;
       try{
-        const u = new URL(proxy); u.searchParams.set('url', canonShopee(link));
+        const u = new URL(proxy); u.searchParams.set('url', link);
         const r = await fetch(u.toString()); if(!r.ok) continue;
         const d = await r.json(); (d.images||[]).forEach(href=>{ imgBox.value += (imgBox.value?'\n':'') + href; found++; });
-      }catch(e){}
+      }catch{}
     }
     el('img-log').textContent = `Đã lấy ${found} URL ảnh từ Worker.`;
   });
@@ -561,26 +486,23 @@ https://down-vn.img.susercontent.com/file/yyy"></textarea>
         for(const s of sizes){
           const [w,h] = s.toLowerCase().split('x').map(n=>parseInt(n,10)); if(!w||!h) continue;
           const blob = await drawResize(img, w, h, q);
-          const suffix = (preset==='og' && w===1200 && h===630) ? 'og' :
-                         (preset==='hero' ? `${w}x${h}` :
-                         (preset==='icon' ? `${w}` : `${w}`));
+          const suffix = (preset==='og' && w===1200 && h===630) ? 'og'
+                        : (preset==='hero' ? `${w}x${h}`
+                        : (preset==='icon' ? `${w}` : `${w}`));
           const fname = `${sku}-${suffix}.webp`;
           zip.file(fname, blob);
           done++; setProg(done, total);
           el('img-log').textContent = `Đang xử lý ${done}/${total}…`;
         }
-      }catch(e){}
+      }catch{}
       finally{ URL.revokeObjectURL(img.src); }
     }
     const content = await zip.generateAsync({ type:'blob' });
     const a = document.createElement('a'); a.href=URL.createObjectURL(content); a.download=`${sku}-images.zip`; document.body.appendChild(a); a.click(); a.remove();
     el('img-log').textContent = `Xong. ZIP ${sources.length} ảnh × ${sizes.length} kích thước.`;
   });
-  </script>
 
-  <p class="muted small" style="margin-top:24px">
-    Preset affiliate chuẩn MXD: AccessTrade (sub1=<b>store</b>, sub2=<b>xaydung</b>, sub3=<b>mxd210</b>, sub4=<b>YYYYMMDD</b>). Có thể chọn Shopee Affiliate tuỳ network.
-    Dù xuất JSON dùng affiliate hay origin, khối <code>&lt;a class="product-meta"&gt;</code> vẫn kèm <code>data-merchant</code> và sub* để <span class="kbd">mxd-affiliate.js</span> có thể theo dõi click.
-  </p>
+  console.log('[MXD importer] JS loaded & handlers attached');
+  </script>
 </body>
 </html>
