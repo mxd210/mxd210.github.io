@@ -1,34 +1,35 @@
-﻿// sw.js â€” MXD PWA v31
-const VERSION = 'v32';
+// sw.js — MXD PWA v33
+const VERSION = 'v33';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
-// ---- Precache (nháº¹) ----
-// LÆ¯U Ã: KHÃ”NG thÃªm /assets/data/affiliates.json vÃ o precache
+// ---- Precache (nhẹ) ----
+// LƯU Ý: KHÔNG thêm /assets/data/affiliates.json vào precache
 const ASSETS = [
-  '/',                  // shell trang chá»§
-  '/store.html',        // precache trang store (náº¿u cÃ³)
+  '/',                  // shell trang chủ
+  '/store.html',        // precache trang store (nếu có)
+  '/tools/shopee-importer.html', // importer mới
   '/assets/site.css',
   '/assets/mxd-affiliate.js',
   '/assets/analytics.js',
 ];
 
-// Chuáº©n hoÃ¡ URL same-origin (bá» query) Ä‘á»ƒ á»•n Ä‘á»‹nh key cache
+// Chuẩn hoá URL same-origin (bỏ query) để ổn định key cache
 const normalize = (input) => {
   const u = typeof input === 'string'
-    ? new URL(input, location.origin)
+    ? new URL(input, self.location.origin)
     : new URL(input.url);
-  return u.origin === location.origin ? u.pathname : u.href;
+  return u.origin === self.location.origin ? u.pathname : u.href;
 };
 
-// Trang offline ná»™i tuyáº¿n
+// Trang offline nội tuyến
 const offlinePage = () => new Response(
   `<!doctype html><meta charset="utf-8">
-   <title>MXD â€“ Offline</title>
+   <title>MXD – Offline</title>
    <main style="max-width:640px;margin:20vh auto;font:16px/1.6 system-ui;text-align:center">
-     <h1>KhÃ´ng cÃ³ máº¡ng</h1>
-     <p>Vui lÃ²ng káº¿t ná»‘i Internet Ä‘á»ƒ tiáº¿p tá»¥c.</p>
-     <p><a href="/" rel="nofollow">Vá» trang chá»§</a> Â· <a href="/store.html">VÃ o cá»­a hÃ ng</a></p>
+     <h1>Không có mạng</h1>
+     <p>Vui lòng kết nối Internet để tiếp tục.</p>
+     <p><a href="/" rel="nofollow">Về trang chủ</a> · <a href="/store.html">Vào cửa hàng</a></p>
    </main>`,
   { headers: {'content-type':'text/html; charset=utf-8'} }
 );
@@ -56,7 +57,7 @@ self.addEventListener('activate', (e) => {
   })());
 });
 
-// Cho phÃ©p SKIP_WAITING thá»§ cÃ´ng
+// Cho phép SKIP_WAITING thủ công
 self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
@@ -68,19 +69,19 @@ self.addEventListener('fetch', (e) => {
 
   const url = new URL(req.url);
 
-  // /sw-version â†’ xem phiÃªn báº£n
+  // /sw-version → xem phiên bản
   if (url.pathname === '/sw-version') {
     e.respondWith(new Response(VERSION, { headers: {'content-type':'text/plain'} }));
     return;
   }
 
-  // KhÃ´ng can thiá»‡p Analytics + Affiliate + MXH (trÃ¡nh áº£nh hÆ°á»Ÿng redirect/conversion)
+  // Không can thiệp Analytics + Affiliate + MXH (tránh ảnh hưởng redirect/conversion)
   const BYPASS_HOSTS = new Set([
     // Analytics
     'www.googletagmanager.com','googletagmanager.com',
     'www.google-analytics.com','google-analytics.com',
     'analytics.google.com','g.doubleclick.net',
-    // Affiliate / TMÄT
+    // Affiliate / TMĐT
     'go.isclix.com',
     'shopee.vn','cf.shopee.vn','s.shopee.vn',
     'lazada.vn','s.lazada.vn','pages.lazada.vn',
@@ -90,19 +91,19 @@ self.addEventListener('fetch', (e) => {
   ]);
   if (BYPASS_HOSTS.has(url.hostname)) return;
 
-  // Äáº¶C BIá»†T: JSON dá»¯ liá»‡u Ä‘á»™ng â†’ always network-first, khÃ´ng cache
-  if (url.origin === location.origin &&
+  // ĐẶC BIỆT: JSON dữ liệu động → always network-first, không cache
+  if (url.origin === self.location.origin &&
       url.pathname.startsWith('/assets/data/') &&
       url.pathname.endsWith('.json')) {
     e.respondWith(fetch(req, { cache: 'no-store' }).catch(() => caches.match(req)));
     return;
   }
 
-  // Äiá»u hÆ°á»›ng HTML?
+  // Điều hướng HTML?
   const isHTMLNav = req.mode === 'navigate' ||
     (req.headers.get('accept') || '').includes('text/html');
 
-  // 1) HTML â†’ network-first (+ preload); lá»—i máº¡ng â†’ cache theo trang, rá»“i '/', cuá»‘i cÃ¹ng offlinePage()
+  // 1) HTML → network-first (+ preload); lỗi mạng → cache theo trang, rồi '/', cuối cùng offlinePage()
   if (isHTMLNav) {
     e.respondWith((async () => {
       try {
@@ -129,9 +130,9 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // 2) Static same-origin â†’ stale-while-revalidate
+  // 2) Static same-origin → stale-while-revalidate
   const isStatic =
-    url.origin === location.origin && (
+    url.origin === self.location.origin && (
       url.pathname.startsWith('/assets/') ||
       /\.(css|js|webp|png|jpg|jpeg|svg|woff2)$/.test(url.pathname)
     );
@@ -153,7 +154,7 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // 3) KhÃ¡c origin â†’ network-first; rá»›t máº¡ng â†’ cache (náº¿u cÃ³)
+  // 3) Khác origin → network-first; rớt mạng → cache (nếu có)
   e.respondWith((async () => {
     try { return await fetch(req); }
     catch {
@@ -162,27 +163,3 @@ self.addEventListener('fetch', (e) => {
     }
   })());
 });
-
-
-\n/* === MXD_SAFE_FETCH: clone() before caching to avoid 'body used' === */
-self.addEventListener('fetch', event => {
-  try {
-    const req = event.request;
-    if (req.method !== 'GET') return;
-    const url = new URL(req.url);
-    // chỉ xử lý same-origin để không đụng tài nguyên ngoài
-    if (url.origin !== self.location.origin) return;
-
-    event.respondWith((async () => {
-      const cache = await caches.open(typeof CACHE !== 'undefined' ? CACHE : (typeof CACHE_NAME !== 'undefined' ? CACHE_NAME : 'mxd-cache'));
-      const cached = await cache.match(req);
-      if (cached) return cached;
-
-      const net = await fetch(req);
-      // clone trước khi ghi vào cache để không tiêu thụ body
-      try { await cache.put(req, net.clone()); } catch(e) { /* ignore quota */ }
-      return net;
-    })());
-  } catch(e) { /* noop */ }
-});
-
