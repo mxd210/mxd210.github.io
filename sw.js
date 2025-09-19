@@ -1,5 +1,5 @@
-// sw.js — MXD PWA v33
-const VERSION = 'v33';
+// sw.js — MXD PWA v34
+const VERSION = 'v34';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
@@ -62,6 +62,28 @@ self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
+// === Runtime cache ảnh qua Worker với TTL 1 ngày ===
+const ONE_DAY = 24 * 60 * 60 * 1000;
+
+// Giúp chuẩn hóa key cache: chỉ dựa vào đích 'url=' (tránh khác query phụ)
+function imgCacheKey(u) {
+  const raw = new URL(u);
+  const qs = new URLSearchParams(raw.search);
+  const target = qs.get('url') || '';
+  // Chỉ dùng origin+path của Worker + url đích để làm key
+  return `${raw.origin}${raw.pathname}?url=${target}`;
+}
+
+async function cachePutWithStamp(cache, keyReq, res) {
+  const cloned = res.clone();
+  const buf = await cloned.arrayBuffer();
+  const headers = new Headers(cloned.headers);
+  headers.set('x-sw-cached-at', Date.now().toString());
+  const stamped = new Response(buf, { status: cloned.status, statusText: cloned.statusText, headers });
+  await cache.put(keyReq, stamped.clone());
+  return stamped;
+}
+
 // ---- Fetch ----
 self.addEventListener('fetch', (e) => {
   const req = e.request;
@@ -90,6 +112,46 @@ self.addEventListener('fetch', (e) => {
     'facebook.com','www.facebook.com','m.me','zalo.me'
   ]);
   if (BYPASS_HOSTS.has(url.hostname)) return;
+
+  // ==== ƯU TIÊN 0: ẢNH QUA WORKER (/img) → TTL 1 ngày (stale-while-revalidate) ====
+  // Nhận diện ảnh proxy qua Worker:
+  //  - domain Workers.dev (hoặc domain Worker riêng)
+  //  - path kết thúc bằng /img
+  const isWorkerImg = /workers\.dev$/i.test(url.hostname) && url.pathname.endsWith('/img');
+  // Nếu dùng custom domain cho Worker, thay điều kiện trên cho phù hợp.
+  if (isWorkerImg) {
+    e.respondWith((async () => {
+      const cache = await caches.open(CACHE);
+      const key = imgCacheKey(req.url);
+      const keyReq = new Request(key, { method: 'GET', mode: 'no-cors' });
+
+      const cached = await cache.match(keyReq);
+      if (cached) {
+        const ts = parseInt(cached.headers.get('x-sw-cached-at') || '0', 10);
+        const fresh = ts && (Date.now() - ts) < ONE_DAY;
+        if (fresh) return cached; // còn hạn TTL → trả luôn
+
+        // hết hạn → trả cached và revalidate nền
+        e.waitUntil((async () => {
+          try {
+            const net = await fetch(req, { cache: 'no-store' });
+            if (net && net.ok) await cachePutWithStamp(cache, keyReq, net);
+          } catch {}
+        })());
+        return cached;
+      }
+
+      // chưa có cache → fetch mạng và lưu
+      try {
+        const net = await fetch(req, { cache: 'no-store' });
+        if (net && net.ok) return await cachePutWithStamp(cache, keyReq, net);
+        return net;
+      } catch {
+        return new Response('', { status: 504 });
+      }
+    })());
+    return; // đừng rơi xuống các nhánh phía dưới
+  }
 
   // ĐẶC BIỆT: JSON dữ liệu động → always network-first, không cache
   if (url.origin === self.location.origin &&
