@@ -1,508 +1,314 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MXD – Shopee Importer (Auto-Price + Affiliate + Images)</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MXD Affiliate Importer v3.3 — Profiles + Presets + CSV + Renamer</title>
+  <meta name="description" content="Tool MXD: Shopee/Lazada presets, UTM/sub presets lưu LocalStorage, dán/nhập tệp, sinh JSON/HTML/CSV và PowerShell rename ảnh.">
   <style>
-    :root { --bg:#0b0b0b; --fg:#eee; --muted:#666; --brand:#111; }
-    *{box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:1100px;margin:24px auto;padding:0 12px;line-height:1.55;color:#111}
-    h1{margin:0 0 6px}
-    h2,h3{margin:18px 0 8px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    @media (max-width:980px){.grid{grid-template-columns:1fr}}
-    textarea, input[type="url"], input[type="text"], input[type="number"]{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px}
-    textarea{min-height:220px}
-    .out{white-space:pre;background:var(--bg);color:var(--fg);padding:12px;border-radius:10px;overflow:auto;min-height:220px}
-    .muted{color:var(--muted)}
-    .tips{background:#fff7e6;border:1px solid #ffe0a3;padding:10px;border-radius:10px}
-    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    button{padding:10px 14px;border-radius:10px;border:1px solid #ddd;background:#fafafa;cursor:pointer}
-    button.primary{background:var(--brand);color:#fff}
-    .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #ddd;background:#fafafa}
-    .copy{float:right;margin-left:8px}
-    .ok{color:#0a7c2f}.warn{color:#a66b00}.bad{color:#b91c1c}
-    .progress{height:8px;background:#eee;border-radius:999px;overflow:hidden}
-    .bar{height:100%;width:0;background:#111;transition:width .2s}
-    .kbd{font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:#f4f4f4;padding:2px 6px;border-radius:6px}
-    .small{font-size:12px}
+    :root{--bg:#0b0f14;--fg:#e6eef7;--muted:#9fb1c7;--card:#121821;--accent:#4ea1ff;--ok:#2ecc71;--warn:#f1c40f;--bad:#e74c3c}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    header{position:sticky;top:0;background:linear-gradient(180deg,#0b0f14 70%,#0b0f1400);padding:16px 12px;border-bottom:1px solid #1d2633;z-index:5}
+    h1{margin:0;font-size:18px} .wrap{max-width:1100px;margin:0 auto;padding:16px} .grid{display:grid;gap:12px}
+    @media(min-width:900px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid #1d2633;border-radius:14px;padding:12px}
+    .card h2{margin:0 0 8px;font-size:16px} label{display:block;margin:8px 0 4px}
+    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #263242;background:#0e141c;color:var(--fg)}
+    textarea{min-height:140px;font-family:ui-monospace,Menlo,Consolas,monospace} .row{display:flex;gap:8px;flex-wrap:wrap} .row>*{flex:1}
+    button{border:1px solid #284a7a;background:#103255;color:#e7f1ff;padding:10px 14px;border-radius:12px;cursor:pointer}
+    button.primary{background:var(--accent);border-color:#2d79c7;color:#001b33} .mini{font-size:12px;color:var(--muted)}
+    .out{min-height:140px;background:#0e141c;border-radius:10px;border:1px dashed #2a3850;padding:10px;white-space:pre;overflow:auto}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#172235;border:1px solid #263242;color:var(--muted);font-size:12px;margin-right:6px}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)} .kbd{background:#0e141c;border:1px solid #2b3a55;border-bottom-width:2px;padding:2px 4px;border-radius:6px}
+    .drop{border:1px dashed #36527a;border-radius:10px;padding:10px;text-align:center;color:#9fb1c7}
+    .drop.drag{background:#0f1622}
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
-  <h1>MXD – Shopee → affiliates.json <span class="badge">Auto-Price + Affiliate + Images</span></h1>
-  <p class="muted">Dán danh sách 1 dòng/1 sản phẩm. Hỗ trợ:</p>
-  <ul>
-    <li><b>Mode A:</b> <code>https://shopee.vn/product/&lt;shopId&gt;/&lt;itemId&gt;</code></li>
-    <li><b>Mode B:</b> <code>Tên sản phẩm | giá (số) | link Shopee</code></li>
-  </ul>
+<header class="wrap">
+  <h1>MXD Affiliate Importer v3.3
+    <span class="pill">Shopee/Lazada Presets</span><span class="pill">UTM/Sub Presets</span><span class="pill">CSV + Renamer</span>
+  </h1>
+  <div class="mini">Lưu cấu hình vào LocalStorage. Không gửi/ghi AT ID ra ngoài.</div>
+</header>
 
-  <div class="grid">
-    <section>
-      <h3>1) Dữ liệu đầu vào</h3>
-      <textarea id="input" placeholder="Ví dụ:
-NEED_NAME | 0 | https://shopee.vn/product/279547485/5274192859
-https://shopee.vn/product/772892494/21507014059"></textarea>
-
-      <div class="tips">
-        <b>Quy ước MXD:</b>
-        <ul>
-          <li><b>sku</b> = slug tên SP → khớp ảnh <code>/assets/img/products/&lt;sku&gt;.webp</code></li>
-          <li><b>merchant</b>=<code>shopee</code>, <b>origin</b>= link Shopee gốc (hoặc deep link nếu bật Affiliate).</li>
-          <li>Thiếu <code>name</code> → tool tự lấy tiêu đề từ Worker.</li>
-        </ul>
+<main class="wrap grid">
+  <section class="card">
+    <h2>1) Profile & Preset</h2>
+    <div class="row">
+      <div>
+        <label>Affiliate Profile</label>
+        <select id="profile">
+          <option value="auto" selected>Auto theo link</option>
+          <option value="shopee">Shopee — isclix</option>
+          <option value="lazada">Lazada — isclix</option>
+          <option value="tiki">Tiki — placeholder</option>
+        </select>
       </div>
-
-      <div class="row small" style="margin-top:10px">
-        <label class="row"><input type="checkbox" id="autolowerprice" checked> Giảm giá hiển thị 3%</label>
-        <label class="row"><input type="checkbox" id="forceMin" checked> Dùng <code>priceMin</code> khi có min/max</label>
+      <div>
+        <label>AT ID (local only)</label>
+        <input id="atid" type="text" value="AT2099179" />
       </div>
-
-      <div style="margin-top:10px">
-        <label>Proxy Worker URL:
-          <input id="proxy" type="url" placeholder="https://mxd-price-worker.&lt;subdomain&gt;.workers.dev/">
-        </label>
-        <div class="row" style="margin-top:8px">
-          <button id="autoprice">Lấy giá tự động</button>
-          <button id="gen" class="primary">Generate JSON &amp; Meta</button>
-          <button id="dedup">Khử trùng link</button>
-          <button id="clear">Xoá</button>
-        </div>
+      <div>
+        <label>Mode</label>
+        <select id="mode">
+          <option value="data" selected>Data-* (rewrite bằng mxd-affiliate.js)</option>
+          <option value="deeplink">Deep Link AccessTrade</option>
+        </select>
       </div>
-
-      <h3 style="margin-top:18px">2) Affiliate (chuyển link gốc → deep link)</h3>
-      <p class="muted small">Nhập <b>template</b> deep link. Template phải chứa <code>{url}</code> (đích là link Shopee gốc). Có thể dùng <code>{sub1}</code>…<code>{sub4}</code>.</p>
-      <div class="row">
-        <label style="flex:1">Template:
-          <input id="aff-tpl" type="text" placeholder="https://go.isclix.com/deep_link?url={url}&aff_sub1={sub1}&aff_sub2={sub2}">
-        </label>
+      <div>
+        <label>Template</label>
+        <select id="tpl">
+          <option value="isclix" selected>isclix</option>
+          <option value="vn">accesstrade.vn</option>
+        </select>
       </div>
-      <div class="row">
-        <label>sub1: <input id="aff-sub1" type="text" placeholder="store"></label>
-        <label>sub2: <input id="aff-sub2" type="text" placeholder="list_01"></label>
-        <label>sub3: <input id="aff-sub3" type="text" placeholder=""></label>
-        <label>sub4: <input id="aff-sub4" type="text" placeholder=""></label>
+    </div>
+    <div class="row">
+      <div>
+        <label>Preset UTM/Sub</label>
+        <select id="preset">
+          <option value="store-grid" selected>store-grid: sub1=store, sub2=grid_main</option>
+          <option value="store-featured">store-featured: sub1=store, sub2=featured_home</option>
+          <option value="product-inline">product-inline: sub1=product, sub2=inline</option>
+          <option value="blog-inline">blog-inline: sub1=blog, sub2=inline</option>
+          <option value="custom">Tùy chỉnh</option>
+        </select>
       </div>
-      <div class="row small">
-        <label class="row"><input type="checkbox" id="aff-use" checked> Xuất JSON dùng <b>affiliate link</b> (nếu tắt → dùng origin)</label>
-        <button id="aff-convert">Chuyển toàn bộ input → affiliate</button>
-        <button id="aff-test">Test 5 link đầu (HEAD)</button>
+      <div>
+        <label>sub1</label>
+        <input id="sub1" value="store" />
       </div>
+      <div>
+        <label>sub2</label>
+        <input id="sub2" value="grid_main" />
+      </div>
+      <div>
+        <label>sub3 (dùng {idx})</label>
+        <input id="sub3" value="p{idx}" />
+      </div>
+      <div>
+        <label>sub4 (dùng {sku})</label>
+        <input id="sub4" value="{sku}" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Thư mục ảnh</label>
+        <input id="imgBase" value="/assets/img/products/" />
+      </div>
+      <div>
+        <label>Preview aff_sub*</label>
+        <select id="previewUtm"><option value="on" selected>on</option><option value="off">off</option></select>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button id="saveCfg">Lưu preset (Local)</button>
+      </div>
+    </div>
+    <div id="cfgInfo" class="mini"></div>
+  </section>
 
-      <p id="status" class="muted"></p>
-      <div class="progress"><div id="prog" class="bar"></div></div>
-    </section>
+  <section class="card">
+    <h2>2) Nhập dữ liệu (Paste / CSV / TXT)</h2>
+    <div class="mini">Dán theo dòng: <b>Tên | giá | link</b> hoặc chỉ <b>link</b>. Hoặc kéo thả tệp .txt/.csv vào khung dưới.</div>
+    <textarea id="raw" placeholder="Máy cắt... | ₫690.000 | https://shopee.vn/product/..."></textarea>
+    <div id="drop" class="drop">Kéo & thả tệp .txt/.csv vào đây</div>
+    <div class="row" style="margin-top:8px">
+      <button class="primary" id="gen">Generate</button>
+      <button id="clear">Xoá</button>
+    </div>
+    <div id="parseInfo" class="mini"></div>
+  </section>
 
-    <section>
-      <h3>3) Kết quả – dán vào <code>assets/data/affiliates.json</code>
-        <button class="copy" data-copy="json">Copy JSON</button>
-      </h3>
-      <div id="json" class="out">{ }</div>
+  <section class="card">
+    <h2>3) JSON (assets/data/affiliates.json)</h2>
+    <div class="row">
+      <button id="copyJson">Copy JSON</button>
+      <button id="dlJson">Tải affiliates.json</button>
+    </div>
+    <pre id="outJson" class="out">[]</pre>
+    <div id="dupInfo" class="mini"></div>
+  </section>
 
-      <h3 style="margin-top:16px">4) HTML meta (dán vào trang danh mục)
-        <button class="copy" data-copy="meta">Copy Meta</button>
-      </h3>
-      <div id="meta" class="out">&lt;!-- meta links --&gt;</div>
-    </section>
-  </div>
+  <section class="card">
+    <h2>4) HTML chuẩn MXD (meta + buy)</h2>
+    <div class="row">
+      <button id="copyHtml">Copy HTML</button>
+      <button id="dlHtml">Tải meta+buy.html</button>
+    </div>
+    <pre id="outHtml" class="out"></pre>
+  </section>
 
-  <hr style="margin:24px 0">
+  <section class="card">
+    <h2>5) SKU Map + Renamer</h2>
+    <div class="row">
+      <button id="dlCsv">Tải sku-map.csv</button>
+      <button id="dlPs1">Tải img-rename.ps1</button>
+      <button id="dlCommit">Copy commit message</button>
+    </div>
+    <pre id="outPreview" class="out"></pre>
+  </section>
+</main>
 
-  <h2>5) Ảnh (Resize + WebP + ZIP)</h2>
-  <p class="muted">Dùng cùng Proxy Worker URL để lấy ảnh Shopee qua proxy (tránh CORS). Có thể dán URL ảnh / tải ảnh từ máy.</p>
+<footer class="wrap mini">MXD Importer v3.3 — Lưu cấu hình cục bộ; không gửi dữ liệu ra ngoài.</footer>
 
-  <div class="row" style="margin-bottom:8px">
-    <label>SKU (đặt tên file): <input id="img-sku" type="text" placeholder="vd: may-cat-cam-tay-dekton-dk-ag950s"></label>
-    <label>WebP quality: <input id="img-q" type="number" min="0" max="1" step="0.01" value="0.82" style="width:90px"></label>
-  </div>
+<script>
+(function(){
+  const $=s=>document.querySelector(s);
+  const cfgKeys=['profile','atid','mode','tpl','preset','sub1','sub2','sub3','sub4','imgBase','previewUtm'];
+  function loadCfg(){ try{ const j=JSON.parse(localStorage.getItem('mxdImporterCfg')||'{}'); cfgKeys.forEach(k=>{ if(j[k]&&$( '#'+k)) $( '#'+k).value=j[k]; }); }catch(e){} applyPreset(); }
+  function saveCfg(){ const j={}; cfgKeys.forEach(k=> j[k]=$( '#'+k).value ); localStorage.setItem('mxdImporterCfg', JSON.stringify(j)); $('#cfgInfo').textContent='Đã lưu cấu hình.'; setTimeout(()=>$('#cfgInfo').textContent='',1500); }
 
-  <div class="row" style="margin-bottom:8px">
-    <label style="flex:1 1 100%">URL ảnh (1 dòng/ảnh):</label>
-    <textarea id="img-urls" placeholder="https://down-vn.img.susercontent.com/file/xxx
-https://down-vn.img.susercontent.com/file/yyy"></textarea>
-  </div>
-
-  <div class="row" style="margin-bottom:8px">
-    <input id="img-file" type="file" accept="image/*" multiple>
-    <button id="img-fetch-from-worker">Lấy ảnh từ Worker theo link Shopee ở ô trên</button>
-  </div>
-
-  <div class="row" style="margin-bottom:8px">
-    <label>Preset:
-      <select id="img-preset">
-        <option value="product">Sản phẩm (1200, 800, 400)</option>
-        <option value="og">OG 1200x630</option>
-        <option value="hero">Hero/Nền (1920x1080, 1600x900)</option>
-        <option value="icon">Icon (512, 256)</option>
-        <option value="custom">Tự chọn</option>
-      </select>
-    </label>
-    <label>Kích thước tuỳ chọn (W×H, dấu phẩy):
-      <input id="img-sizes" type="text" placeholder="1200x1200,800x800" disabled>
-    </label>
-  </div>
-
-  <div class="row" style="margin-bottom:8px">
-    <button id="img-generate" class="primary">Tạo ảnh & ZIP</button>
-    <span id="img-log" class="muted small"></span>
-  </div>
-
-  <script>
-  // ===== Helpers chung =====
-  const el = id => document.getElementById(id);
-  const setStatus = (msg, cls='')=>{ const s=el('status'); s.textContent=msg; s.className='muted '+cls; };
-  const setProg = (num, den)=>{ const p=el('prog'); const v = !den?0: Math.min(100, Math.round(num/den*100)); p.style.width = v+'%'; };
-
-  const persist = {
-    save(){
-      localStorage.setItem('mxd_proxy', el('proxy').value.trim());
-      localStorage.setItem('mxd_lower', el('autolowerprice').checked?'1':'0');
-      localStorage.setItem('mxd_forceMin', el('forceMin').checked?'1':'0');
-      localStorage.setItem('mxd_affTpl', el('aff-tpl').value.trim());
-      localStorage.setItem('mxd_affUse', el('aff-use').checked?'1':'0');
-      localStorage.setItem('mxd_affSub1', el('aff-sub1').value);
-      localStorage.setItem('mxd_affSub2', el('aff-sub2').value);
-      localStorage.setItem('mxd_affSub3', el('aff-sub3').value);
-      localStorage.setItem('mxd_affSub4', el('aff-sub4').value);
-    },
-    load(){
-      const p=localStorage.getItem('mxd_proxy'); if(p) el('proxy').value=p;
-      el('autolowerprice').checked = localStorage.getItem('mxd_lower')!=='0';
-      el('forceMin').checked = localStorage.getItem('mxd_forceMin')!=='0';
-      el('aff-tpl').value = localStorage.getItem('mxd_affTpl') || '';
-      el('aff-use').checked = localStorage.getItem('mxd_affUse')!=='0';
-      el('aff-sub1').value = localStorage.getItem('mxd_affSub1') || 'store';
-      el('aff-sub2').value = localStorage.getItem('mxd_affSub2') || 'list_01';
-      el('aff-sub3').value = localStorage.getItem('mxd_affSub3') || '';
-      el('aff-sub4').value = localStorage.getItem('mxd_affSub4') || '';
-    }
-  };
-  persist.load();
-
-  function slugify(s){
-    return (s||'').toString()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-      .toLowerCase().replace(/[^a-z0-9]+/g,'-')
-      .replace(/^-+|-+$/g,'').replace(/--+/g,'-');
-  } // <-- đã đóng đúng hàm slugify (bản cũ thiếu dấu '}' ở đây)
-
-  function parseShopeeId(url){
-    try{
-      const u = new URL(url.trim());
-      const p = u.pathname;
-
-      let m = p.match(/\/product\/(\d+)\/(\d+)/);
-      if (m) return { shopId: m[1], itemId: m[2] };
-
-      m = p.match(/\/shop\/(\d+)\/item\/(\d+)/);
-      if (m) return { shopId: m[1], itemId: m[2] };
-
-      m = url.match(/i\.(\d+)\.(\d+)/);
-      if (m) return { shopId: m[1], itemId: m[2] };
-
-      const sh = u.searchParams.get('shopid') || u.searchParams.get('shopId');
-      const it = u.searchParams.get('itemid') || u.searchParams.get('itemId');
-      if (sh && it) return { shopId: sh, itemId: it };
-
-      return null;
-    }catch(e){ return null; }
+  $('#preset').addEventListener('change', applyPreset);
+  function applyPreset(){
+    const p=$('#preset').value;
+    if(p==='store-grid'){ $('#sub1').value='store'; $('#sub2').value='grid_main'; }
+    else if(p==='store-featured'){ $('#sub1').value='store'; $('#sub2').value='featured_home'; }
+    else if(p==='product-inline'){ $('#sub1').value='product'; $('#sub2').value='inline'; }
+    else if(p==='blog-inline'){ $('#sub1').value='blog'; $('#sub2').value='inline'; }
   }
 
-  function canonShopee(url){
-    const ids = parseShopeeId(url);
-    return ids ? `https://shopee.vn/product/${ids.shopId}/${ids.itemId}` : (url||'').trim();
-  }
+  function slugVN(s){ return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+  function priceNum(s){ const d=(s||'').replace(/[^0-9]/g,''); return d?parseInt(d,10):0; }
+  function merchantFromHost(u){ try{const h=new URL(u).hostname; if(/shopee\.vn$/i.test(h)) return 'shopee'; if(/lazada\.vn$/i.test(h)) return 'lazada'; if(/tiki\.vn$/i.test(h)) return 'tiki'; }catch(e){} return 'unknown'; }
+  function subs(i,sku){ const map={'{idx}':(i+1).toString().padStart(2,'0'), '{sku}':sku}; const fill=t=>t.replace(/\{idx\}|\{sku\}/g, m=>map[m]||m); return {sub1:fill($('#sub1').value), sub2:fill($('#sub2').value), sub3:fill($('#sub3').value), sub4:fill($('#sub4').value)}; }
+  function deep(origin,s){ const tpl=$('#tpl').value, at=$('#atid').value.trim(); const enc=x=>encodeURIComponent(x); if(tpl==='isclix') return `https://go.isclix.com/deep_link/${at}?url=${enc(origin)}&aff_sub1=${enc(s.sub1)}&aff_sub2=${enc(s.sub2)}&aff_sub3=${enc(s.sub3)}&aff_sub4=${enc(s.sub4)}`; return `https://go.accesstrade.vn/deeplink?at=${at}&url=${enc(origin)}&aff_sub1=${enc(s.sub1)}&aff_sub2=${enc(s.sub2)}&aff_sub3=${enc(s.sub3)}&aff_sub4=${enc(s.sub4)}`; }
 
-  const fmtPrice = n => Math.max(0, Math.round(n||0));
-
-  // Copy buttons
-  document.querySelectorAll('button.copy').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const target = btn.dataset.copy;
-      const text = el(target).textContent;
-      navigator.clipboard.writeText(text).then(()=>{
-        const old=btn.textContent; btn.textContent='Copied!'; setTimeout(()=>btn.textContent=old,900);
-      });
-    });
-  });
-
-  // Khử trùng link
-  el('dedup').addEventListener('click', ()=>{
-    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
-    const seen=new Set(); const out=[];
-    for (let line of lines){
-      const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
-      const ids = parseShopeeId(link); const key = ids ? `${ids.shopId}_${ids.itemId}` : line.trim();
-      if (seen.has(key)) continue; seen.add(key); out.push(line);
-    }
-    el('input').value = out.join('\n'); setStatus(`Đã khử trùng: còn ${out.length} dòng.`, 'ok'); persist.save();
-  });
-
-  // Xoá input
-  el('clear').addEventListener('click', ()=>{ el('input').value=''; setStatus('Đã xoá input.'); setProg(0,1); });
-
-  // Worker: detail
-  async function fetchDetail(proxy, link){
-    try{
-      const u = new URL(proxy); u.searchParams.set('url', canonShopee(link));
-      const r = await fetch(u.toString()); if(!r.ok) throw new Error('fetch fail '+r.status);
-      return await r.json(); // { title, priceMin, priceMax, price, images[] }
-    }catch(e){ return null; }
-  }
-
-  // Worker: build affiliate
-  async function buildAffiliate(proxy, dest, {tpl, sub1, sub2, sub3, sub4}){
-    if (!tpl || !tpl.includes('{url}')) return dest;
-    try{
-      const u = new URL(proxy); u.pathname = u.pathname.replace(/\/?$/, '/aff');
-      u.searchParams.set('url', dest);
-      u.searchParams.set('tpl', tpl);
-      if (sub1) u.searchParams.set('sub1', sub1);
-      if (sub2) u.searchParams.set('sub2', sub2);
-      if (sub3) u.searchParams.set('sub3', sub3);
-      if (sub4) u.searchParams.set('sub4', sub4);
-      const r = await fetch(u.toString());
-      if (!r.ok) throw new Error('aff fail');
-      const j = await r.json();
-      return j.affiliate || dest;
-    } catch { return dest; }
-  }
-
-  // Worker: head check
-  async function headCheck(proxy, url){
-    try{
-      const u = new URL(proxy); u.pathname = u.pathname.replace(/\/?$/, '/head'); u.searchParams.set('url', url);
-      const r = await fetch(u.toString()); if(!r.ok) return { ok:false, status:r.status };
-      return await r.json();
-    }catch(e){ return { ok:false, error:String(e) }; }
-  }
-
-  // Auto-price
-  el('autoprice').addEventListener('click', async ()=>{
-    const proxy = el('proxy').value.trim();
-    if (!proxy){ setStatus('Chưa nhập Proxy Worker URL. Tool vẫn chạy nhưng không tự lấy giá.', 'warn'); }
-    persist.save();
-
-    const lines = el('input').value.trim().split(/\r?\n/);
-    const out=[]; const useMin = el('forceMin').checked;
-    let ok=0, miss=0; setProg(0, lines.length);
-
-    for (let i=0;i<lines.length;i++){
-      let line = lines[i].trim(); if (!line) continue;
-      let name='', price=0, link='';
-      if (line.includes('|')){ const [n, p, l] = line.split('|').map(s=>s.trim()); name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||''; }
-      else { link=line; }
-
-      if (/shopee\.vn\/product\//.test(link) && proxy){
-        const d = await fetchDetail(proxy, link);
-        if (d){
-          let auto = useMin ? (d.priceMin||d.price||0) : (d.price||d.priceMin||0);
-          if (!price) price = auto;
-          if (!name || /^need_name/i.test(name)) name = d.title || name || '';
-          ok++;
-        } else miss++;
-      }
-      out.push(`${name||'NEED_NAME'} | ${price||0} | ${link}`);
-      setProg(i+1, lines.length);
-    }
-
-    el('input').value = out.join('\n');
-    setStatus(`Auto-price xong. Thành công ${ok}, lỗi ${miss}.`, miss? 'warn':'ok');
-  });
-
-  // Affiliate convert (thay link trong input)
-  el('aff-convert').addEventListener('click', async ()=>{
-    const proxy = el('proxy').value.trim();
-    const tpl = el('aff-tpl').value.trim();
-    const opt = {
-      tpl,
-      sub1: el('aff-sub1').value.trim(),
-      sub2: el('aff-sub2').value.trim(),
-      sub3: el('aff-sub3').value.trim(),
-      sub4: el('aff-sub4').value.trim()
-    };
-    persist.save();
-
-    if (!tpl || !tpl.includes('{url}')) { setStatus('Template affiliate thiếu {url}.', 'bad'); return; }
-    if (!proxy){ setStatus('Cần Proxy Worker URL để build affiliate.', 'bad'); return; }
-
-    const lines = el('input').value.trim().split(/\r?\n/);
-    const out=[]; setProg(0, lines.length);
-    for (let i=0;i<lines.length;i++){
-      let line = lines[i].trim(); if (!line) continue;
-      let name='', price=0, link='';
-      if (line.includes('|')){ const [n, p, l] = line.split('|').map(s=>s.trim()); name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||''; }
-      else { link=line; }
-
-      if (/^https?:\/\//.test(link)) {
-        const aff = await buildAffiliate(proxy, link, opt);
-        if (line.includes('|')) out.push(`${name||'NEED_NAME'} | ${price||0} | ${aff}`);
-        else out.push(aff);
-      } else {
-        out.push(line);
-      }
-      setProg(i+1, lines.length);
-    }
-    el('input').value = out.join('\n');
-    setStatus('Đã chuyển toàn bộ link sang affiliate theo template.', 'ok');
-  });
-
-  // Test 5 link đầu (HEAD)
-  el('aff-test').addEventListener('click', async ()=>{
-    const proxy = el('proxy').value.trim();
-    if (!proxy){ setStatus('Nhập Proxy Worker URL để test HEAD.', 'bad'); return; }
-    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean).slice(0,5);
-    const results = [];
-    for (const line of lines){
-      const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
-      if (!/^https?:\/\//.test(link)) continue;
-      const h = await headCheck(proxy, link);
-      results.push({ link, ...h });
-    }
-    setStatus('HEAD test: ' + results.map(r=>`${r.ok?'OK':'BAD'} ${r.status||''}`).join(' | '));
-    console.log('HEAD results', results);
-  });
-
-  // Generate JSON + Meta
-  el('gen').addEventListener('click', async ()=>{
-    persist.save();
-    const wantLower = el('autolowerprice').checked;
-    const useAff = el('aff-use').checked;
-    const tpl = el('aff-tpl').value.trim();
-    const opt = {
-      tpl,
-      sub1: el('aff-sub1').value.trim(),
-      sub2: el('aff-sub2').value.trim(),
-      sub3: el('aff-sub3').value.trim(),
-      sub4: el('aff-sub4').value.trim()
-    };
-    const proxy = el('proxy').value.trim();
-
-    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
-    const seen=new Set(); const items=[]; const metas=[];
-    for (const line of lines){
-      let name='', price=0, link='';
-      if (line.includes('|')){ const [n, p, l] = line.split('|').map(s=>s.trim()); name=n||''; price=parseInt((p||'0').replace(/[^\d]/g,''),10)||0; link=l||''; }
-      else { link=line.trim(); }
-      const ids = parseShopeeId(link); if (!ids) continue;
-      const key = `${ids.shopId}_${ids.itemId}`; if (seen.has(key)) continue; seen.add(key);
-
-      const origin = canonShopee(link);
-      // chọn URL xuất
-      let outUrl = origin;
-      if (useAff && tpl && tpl.includes('{url}') && proxy) outUrl = await buildAffiliate(proxy, origin, opt);
-
-      let sku = name ? slugify(name) : `p-${ids.itemId}`;
-      if (wantLower && price>0) price=Math.round(price*0.97);
-
-      const rec = { sku, name: name || `NEED_NAME_${ids.itemId}`, price: fmtPrice(price), origin: outUrl, merchant: "shopee" };
-      items.push(rec);
-
-      metas.push(
-        `<a class="product-meta" href="${rec.origin}" data-merchant="shopee" data-sku="${rec.sku}" data-img="/assets/img/products/${rec.sku}.webp" data-price="${rec.price}">${rec.name}</a>\n<a class="buy" href="${rec.origin}" data-merchant="shopee" data-sub1="${opt.sub1||''}" data-sub2="${opt.sub2||''}" data-sub3="${opt.sub3||''}" data-sub4="${opt.sub4||''}">Mua ngay</a>`
-      );
-    }
-    el('json').textContent = JSON.stringify(items, null, 2);
-    el('meta').textContent = metas.join('\n\n') || '<!-- no items parsed -->';
-    setStatus(`Generate xong: ${items.length} sản phẩm.`, 'ok');
-  });
-
-  // ===== Ảnh =====
-  const presetSizes = (p)=> p==='product' ? ['1200x1200','800x800','400x400']
-                     : p==='og' ? ['1200x630']
-                     : p==='hero' ? ['1920x1080','1600x900']
-                     : p==='icon' ? ['512x512','256x256'] : [];
-
-  el('img-preset').addEventListener('change', e=>{
-    const v=e.target.value, inp=el('img-sizes');
-    if(v==='custom'){ inp.disabled=false; inp.focus(); }
-    else { inp.disabled=true; inp.value=presetSizes(v).join(','); }
-  });
-
-  function drawResize(img, w, h, q){
-    const c=document.createElement('canvas'); c.width=w; c.height=h;
-    const ctx=c.getContext('2d');
-    const ratio=Math.max(w/img.naturalWidth, h/img.naturalHeight);
-    const nw=img.naturalWidth*ratio, nh=img.naturalHeight*ratio;
-    const dx=(w-nw)/2, dy=(h-nh)/2; ctx.drawImage(img, dx, dy, nw, nh);
-    return new Promise(res=> c.toBlob(b=>res(b), 'image/webp', q));
-  }
-
-  async function fetchImageViaWorker(proxy, rawUrl){
-    const u = new URL(proxy); u.pathname = u.pathname.replace(/\/?$/, '/img'); u.searchParams.set('url', rawUrl);
-    const r = await fetch(u.toString(), { mode:'cors' }); if(!r.ok) throw new Error('fetch image '+r.status);
-    return await r.blob();
-  }
-
-  async function collectSourceImages(){
-    const list = [];
-    const ta = el('img-urls').value.trim();
-    if (ta){ ta.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).forEach(u=>list.push({type:'url', url:u})); }
-    const files = Array.from(el('img-file').files||[]);
-    const local = await Promise.all(files.map(f => new Promise(res=>{
-      const reader = new FileReader(); reader.onload = () => res({ type:'dataurl', dataUrl: reader.result, name: f.name }); reader.readAsDataURL(f);
-    })));
-    local.forEach(x=>list.push(x));
-    return list;
-  }
-
-  el('img-fetch-from-worker').addEventListener('click', async ()=>{
-    const proxy = el('proxy').value.trim(); if (!proxy){ el('img-log').textContent='Chưa nhập Proxy Worker URL.'; return; }
-    const lines = el('input').value.trim().split(/\r?\n/).filter(Boolean);
-    const imgBox = el('img-urls'); let found=0;
+  function parseLines(text){
+    const lines=(text||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const items=[];
     for(const line of lines){
-      const link = line.includes('|') ? (line.split('|')[2]||'').trim() : line.trim();
-      if (!/shopee\.vn\/product\//.test(link)) continue;
-      try{
-        const u = new URL(proxy); u.searchParams.set('url', link);
-        const r = await fetch(u.toString()); if(!r.ok) continue;
-        const d = await r.json(); (d.images||[]).forEach(href=>{ imgBox.value += (imgBox.value?'\n':'') + href; found++; });
-      }catch{}
+      const parts=line.split('|').map(s=>s.trim());
+      let name='',price=0,url='';
+      if(parts.length>=3){ name=parts[0]; price=priceNum(parts[1]); url=parts.slice(2).join('|'); }
+      else { url=line; name='Sản phẩm MXD'; price=0; }
+      const sku=slugVN(name);
+      let merchant=merchantFromHost(url);
+      const p=$('#profile').value;
+      if(p!=='auto'){ merchant=p; }
+      items.push({sku,name,price,origin:url,merchant});
     }
-    el('img-log').textContent = `Đã lấy ${found} URL ảnh từ Worker.`;
+    // dedupe by sku and by origin
+    const seenSku=new Set(), seenOrigin=new Set(), out=[], dSku=[], dUrl=[];
+    for(const it of items){
+      if(seenOrigin.has(it.origin)){ dUrl.push(it.origin); continue; }
+      if(seenSku.has(it.sku)){ dSku.push(it.sku); continue; }
+      seenOrigin.add(it.origin); seenSku.add(it.sku); out.push(it);
+    }
+    return {out, dSku:[...new Set(dSku)], dUrl:[...new Set(dUrl)]};
+  }
+
+  function toJson(items){ return JSON.stringify(items,null,2); }
+  function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  function toHtml(items){
+    return items.map((p,i)=>{
+      const s=subs(i,p.sku); const href=($('#mode').value==='deeplink')?deep(p.origin,s):p.origin;
+      const img=$('#imgBase').value.replace(/\/?$/,'/')+p.sku+'.webp';
+      return `<a class="product-meta" href="${href}" data-merchant="${p.merchant}" data-sku="${p.sku}" data-img="${img}" data-price="${p.price}">${esc(p.name)}</a>
+<a class="buy" href="${href}" data-merchant="${p.merchant}" data-sub1="${s.sub1}" data-sub2="${s.sub2}" data-sub3="${s.sub3}" data-sub4="${s.sub4}">Mua ngay</a>`;
+    }).join("\n\n");
+  }
+
+  function csvMap(items){
+    const head='sku,name,img,origin,merchant,price'; 
+    const rows=items.map(p=>[p.sku, p.name.replace(/"/g,'""'), ($('#imgBase').value.replace(/\/?$/,'/')+p.sku+'.webp'), p.origin, p.merchant, p.price].map(x=>`"${x}"`).join(','));
+    return [head, ...rows].join('\n');
+  }
+
+  function ps1Script(){
+return `# MXD img-rename.ps1 — dùng kèm sku-map.csv (sku,name,img,origin,merchant,price)
+Param(
+  [string]$CsvPath = "sku-map.csv",
+  [string]$SrcDir = ".",
+  [string]$DestDir = "./assets/img/products"
+)
+if (!(Test-Path $CsvPath)) { Write-Error "Không thấy $CsvPath"; exit 1 }
+if (!(Test-Path $DestDir)) { New-Item -ItemType Directory -Force -Path $DestDir | Out-Null }
+$csv = Import-Csv -Path $CsvPath
+$renamed = 0
+foreach ($row in $csv) {
+  $sku = $row.sku
+  $target = Join-Path $DestDir "$sku.webp"
+  # Tìm file nguồn theo sku (tự thay phần này nếu cần match theo TT/ảnh gốc)
+  $candidates = Get-ChildItem -Path $SrcDir -Recurse -File | Where-Object { $_.BaseName -match $sku }
+  if ($candidates.Count -gt 0) {
+    Copy-Item $candidates[0].FullName $target -Force
+    Write-Host "→ $($candidates[0].Name) -> $target"
+    $renamed++
+  } else {
+    Write-Warning "Không tìm thấy ảnh cho $sku"
+  }
+}
+Write-Host "Đổi tên xong: $renamed file"`; }
+
+  function download(name,text){
+    const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+
+  // Drag & drop
+  const drop=$('#drop');
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault(); drop.classList.add('drag');}));
+  ;['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault(); drop.classList.remove('drag');}));
+  drop.addEventListener('drop', e=>{
+    const f=e.dataTransfer.files[0]; if(!f) return;
+    const reader=new FileReader(); reader.onload=ev=>{ $('#raw').value = ($('#raw').value? $('#raw').value+'\n':'') + ev.target.result; };
+    reader.readAsText(f,'utf-8');
   });
 
-  el('img-generate').addEventListener('click', async ()=>{
-    const proxy = el('proxy').value.trim();
-    const sku = (el('img-sku').value||'mxd').trim();
-    const q = Math.max(0, Math.min(1, parseFloat(el('img-q').value)||0.82));
+  // Events
+  $('#saveCfg').addEventListener('click', saveCfg);
+  loadCfg();
 
-    let sizes = []; const preset = el('img-preset').value;
-    sizes = preset==='custom' ? (el('img-sizes').value.trim()? el('img-sizes').value.trim().split(',').map(s=>s.trim()) : [])
-                              : presetSizes(preset);
-    if (!sizes.length){ el('img-log').textContent='Chưa có kích thước.'; return; }
-
-    const sources = await collectSourceImages(); if(!sources.length){ el('img-log').textContent='Chưa có ảnh nguồn.'; return; }
-
-    const zip = new JSZip(); let done=0, total=sources.length*sizes.length; setProg(0, total);
-    for(const src of sources){
-      const img = new Image(); img.crossOrigin='anonymous';
-      try{
-        if (src.type==='url'){ const blob = await fetchImageViaWorker(proxy, src.url); img.src = URL.createObjectURL(blob); }
-        else if (src.type==='dataurl'){ img.src = src.dataUrl; } else { continue; }
-        await new Promise((res, rej)=>{ img.onload=res; img.onerror=rej; });
-
-        for(const s of sizes){
-          const [w,h] = s.toLowerCase().split('x').map(n=>parseInt(n,10)); if(!w||!h) continue;
-          const blob = await drawResize(img, w, h, q);
-          const suffix = (preset==='og' && w===1200 && h===630) ? 'og'
-                        : (preset==='hero' ? `${w}x${h}`
-                        : (preset==='icon' ? `${w}` : `${w}`));
-          const fname = `${sku}-${suffix}.webp`;
-          zip.file(fname, blob);
-          done++; setProg(done, total);
-          el('img-log').textContent = `Đang xử lý ${done}/${total}…`;
+  $('#gen').addEventListener('click', ()=>{
+    const parsed=parseLines($('#raw').value);
+    const items=parsed.out.map((p,i)=>{
+      // enrich origin if deep link chosen
+      const s=subs(i,p.sku);
+      const origin=($('#mode').value==='deeplink')?deep(p.origin,s):p.origin;
+      return {...p, origin};
+    });
+    $('#outJson').textContent = toJson(items);
+    $('#outHtml').textContent = toHtml(items);
+    const prev = items.map((p,i)=>{
+      const s=subs(i,p.sku);
+      if($('#mode').value==='deeplink'){
+        return `[${i+1}] ${p.merchant.toUpperCase()} — ${p.name}\nSKU: ${p.sku}\nDeepLink: ${p.origin}\n`;
+      } else {
+        const u=new URL(p.origin, location.origin);
+        if($('#previewUtm').value==='on'){
+          u.searchParams.set('aff_sub1', s.sub1); u.searchParams.set('aff_sub2', s.sub2); u.searchParams.set('aff_sub3', s.sub3); u.searchParams.set('aff_sub4', s.sub4);
         }
-      }catch{}
-      finally{ URL.revokeObjectURL(img.src); }
-    }
-    const content = await zip.generateAsync({ type:'blob' });
-    const a = document.createElement('a'); a.href=URL.createObjectURL(content); a.download=`${sku}-images.zip`; document.body.appendChild(a); a.click(); a.remove();
-    el('img-log').textContent = `Xong. ZIP ${sources.length} ảnh × ${sizes.length} kích thước.`;
+        return `[${i+1}] ${p.merchant.toUpperCase()} — ${p.name}\nSKU: ${p.sku}\nOrigin: ${p.origin}\nPreview: ${u.toString()}\n`;
+      }
+    }).join("\n");
+    $('#outPreview').textContent = prev;
+    const dupMsg = [];
+    if(parsed.dSku.length) dupMsg.push(`SKU trùng: ${parsed.dSku.join(', ')}`);
+    if(parsed.dUrl.length) dupMsg.push(`URL trùng: ${parsed.dUrl.length}`);
+    $('#dupInfo').innerHTML = dupMsg.length? `<span class="warn">${dupMsg.join(' | ')}</span>` : `<span class="ok">Không có trùng SKU/URL.</span>`;
+    $('#parseInfo').textContent = `Tạo ${items.length} sản phẩm — Mode ${$('#mode').value} — Preset ${$('#preset').value}`;
   });
 
-  console.log('[MXD importer] JS loaded & handlers attached');
-  </script>
+  $('#clear').addEventListener('click', ()=>{
+    $('#raw').value=''; $('#outJson').textContent='[]'; $('#outHtml').textContent=''; $('#outPreview').textContent=''; $('#dupInfo').textContent=''; $('#parseInfo').textContent='';
+  });
+
+  $('#copyJson').addEventListener('click', ()=>navigator.clipboard.writeText($('#outJson').textContent).then(()=>alert('Đã copy JSON.')));
+  $('#copyHtml').addEventListener('click', ()=>navigator.clipboard.writeText($('#outHtml').textContent).then(()=>alert('Đã copy HTML.')));
+  $('#dlJson').addEventListener('click', ()=>download('affiliates.json', $('#outJson').textContent));
+  $('#dlHtml').addEventListener('click', ()=>download('meta-buy.html', $('#outHtml').textContent));
+  $('#dlCsv').addEventListener('click', ()=>download('sku-map.csv', csvMap(JSON.parse($('#outJson').textContent))));
+  $('#dlPs1').addEventListener('click', ()=>download('img-rename.ps1', ps1Script()));
+  $('#dlCommit').addEventListener('click', ()=>{
+    const n=(JSON.parse($('#outJson').textContent)||[]).length||0;
+    const msg=`feat(store): import ${n} sản phẩm (${ $('#preset').value }) — ${ new Date().toISOString().slice(0,10) }`;
+    navigator.clipboard.writeText(msg).then(()=>alert('Đã copy commit message.'));
+  });
+})();
+</script>
 </body>
 </html>
