@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MXD Affiliate Importer v3.6 — Auto Fetch + HEAD + Presets</title>
-  <meta name="description" content="Tool MXD: dán link Shopee/Lazada → tự lấy tên/giá qua Cloudflare Worker, expand short-link, sinh affiliates.json / HTML / CSV / PowerShell.">
+  <title>MXD Affiliate Importer v4.0 — Auto Fetch + HEAD + JSON Push</title>
+  <meta name="description" content="Dán link Shopee/Lazada → tự lấy tên/giá (Worker), expand short-link (HEAD), sinh affiliates.json + HTML + CSV + Renamer, và đẩy thẳng vào repo qua GitHub API.">
   <style>
     :root{--bg:#0b0f14;--fg:#e6eef7;--muted:#9fb1c7;--card:#121821;--accent:#4ea1ff;--ok:#2ecc71;--warn:#f1c40f;--bad:#e74c3c}
     *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
@@ -23,22 +23,26 @@
     button.primary{background:var(--accent);border-color:#2d79c7;color:#001b33}
     .mini{font-size:12px;color:var(--muted)}
     .out{min-height:140px;background:#0e141c;border-radius:10px;border:1px dashed #2a3850;padding:10px;white-space:pre;overflow:auto}
-    .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#172235;border:1px solid #263242;color:var(--muted);font-size:12px;margin-right:6px}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#172235;border:1px solid #263242;color:#9fb1c7;font-size:12px;margin-right:6px}
     .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
     .drop{border:1px dashed #36527a;border-radius:10px;padding:10px;text-align:center;color:#9fb1c7}
     .drop.drag{background:#0f1622}
+    details{border:1px solid #1d2633;border-radius:10px;padding:8px}
   </style>
 </head>
 <body>
 <header class="wrap">
-  <h1>MXD Affiliate Importer v3.6
-    <span class="pill">Auto-Fetch</span><span class="pill">HEAD expand</span><span class="pill">Presets + CSV + Renamer</span>
+  <h1>MXD Affiliate Importer v4.0
+    <span class="pill">Auto-Fetch</span>
+    <span class="pill">HEAD expand</span>
+    <span class="pill">Presets + CSV + Renamer</span>
+    <span class="pill">GitHub JSON Push</span>
   </h1>
-  <div class="mini">Mặc định **KHÔNG** gắn affiliate trong JSON; deeplink chỉ dùng cho phần HTML preview khi chọn “Deep Link”.</div>
+  <div class="mini">JSON chỉ chứa <b>origin</b> + <b>merchant</b> (không deeplink). Deeplink sẽ được gắn <i>lúc runtime</i> bởi <code>mxd-affiliate.js</code>.</div>
 </header>
 
 <main class="wrap grid">
-  <!-- Cấu hình -->
+  <!-- 1) Profiles / Presets / Fetch -->
   <section class="card">
     <h2>1) Profiles • Presets • Fetch</h2>
     <div class="row">
@@ -90,38 +94,25 @@
 
     <div class="row">
       <div><label>Thư mục ảnh</label><input id="imgBase" value="/assets/img/products/"></div>
-      <div><label>Preview aff_sub*</label>
-        <select id="previewUtm"><option value="on" selected>on</option><option value="off">off</option></select>
-      </div>
+      <div><label>Preview aff_sub*</label><select id="previewUtm"><option value="on" selected>on</option><option value="off">off</option></select></div>
       <div><label>&nbsp;</label><button id="saveCfg">Lưu preset (Local)</button></div>
     </div>
 
     <hr style="border-color:#1d2633;border-width:0 0 1px;margin:8px 0">
     <div class="row">
-      <div><label>Worker URL</label>
-        <input id="worker" value="https://mxd210.mxd6686.workers.dev">
-      </div>
-      <div>
-        <label>Fetch Settings</label>
-        <select id="autoFetch"><option value="on" selected>Tự lấy tên/giá</option><option value="off">Không fetch (chỉ dùng input)</option></select>
-      </div>
-      <div>
-        <label>Expand short-link (HEAD)</label>
-        <select id="useHead"><option value="on" selected>on</option><option value="off">off</option></select>
-      </div>
-      <div>
-        <label>Throttle (ms)</label>
-        <input id="throttle" type="number" value="120">
-      </div>
+      <div><label>Worker URL</label><input id="worker" value="https://mxd210.mxd6686.workers.dev"></div>
+      <div><label>Tự lấy tên/giá</label><select id="autoFetch"><option value="on" selected>on</option><option value="off">off</option></select></div>
+      <div><label>Expand short-link (HEAD)</label><select id="useHead"><option value="on" selected>on</option><option value="off">off</option></select></div>
+      <div><label>Throttle (ms)</label><input id="throttle" type="number" value="120"></div>
     </div>
     <div id="cfgInfo" class="mini"></div>
   </section>
 
-  <!-- Nhập liệu -->
+  <!-- 2) Input -->
   <section class="card">
     <h2>2) Nhập dữ liệu (Paste / CSV / TXT)</h2>
-    <div class="mini">Dán theo dòng: <b>Tên | giá | link</b> hoặc chỉ <b>link</b>. Kéo-thả .txt/.csv vào khung dưới.</div>
-    <textarea id="raw" placeholder="Máy cắt... | ₫690.000 | https://shopee.vn/product/..."></textarea>
+    <div class="mini">Dán: <b>Tên | giá | link</b> hoặc chỉ <b>link</b>. Kéo-thả .txt/.csv vào khung dưới.</div>
+    <textarea id="raw" placeholder="Máy cắt... | ₫690.000 | https://shopee.vn/product/...\nhttps://s.shopee.vn/xxxxx"></textarea>
     <div id="drop" class="drop">Kéo & thả tệp .txt/.csv vào đây</div>
     <div class="row" style="margin-top:8px">
       <button class="primary" id="gen">Generate</button>
@@ -130,7 +121,7 @@
     <div id="parseInfo" class="mini"></div>
   </section>
 
-  <!-- JSON -->
+  <!-- 3) JSON -->
   <section class="card">
     <h2>3) JSON (assets/data/affiliates.json)</h2>
     <div class="row">
@@ -141,7 +132,7 @@
     <div id="dupInfo" class="mini"></div>
   </section>
 
-  <!-- HTML -->
+  <!-- 4) HTML -->
   <section class="card">
     <h2>4) HTML chuẩn MXD (meta + buy)</h2>
     <div class="row">
@@ -151,7 +142,7 @@
     <pre id="outHtml" class="out"></pre>
   </section>
 
-  <!-- CSV / Renamer -->
+  <!-- 5) CSV / Renamer -->
   <section class="card">
     <h2>5) SKU Map + Renamer</h2>
     <div class="row">
@@ -161,17 +152,51 @@
     </div>
     <pre id="outPreview" class="out"></pre>
   </section>
+
+  <!-- 6) GitHub Push (JSON) -->
+  <section class="card" style="grid-column:1/-1">
+    <h2>6) Đẩy JSON vào GitHub (Content API)</h2>
+    <div class="mini">Nhập PAT (repo scope). Lưu local. Tool sẽ <b>merge</b> với file hiện có (tránh mất dữ liệu cũ).</div>
+    <div class="row">
+      <div><label>Repo Owner</label><input id="ghOwner" value="mxd210"></div>
+      <div><label>Repo Name</label><input id="ghRepo" value="mxd210.github.io"></div>
+      <div><label>Branch</label><input id="ghBranch" value="main"></div>
+      <div><label>JSON Path</label><input id="ghJsonPath" value="assets/data/affiliates.json"></div>
+    </div>
+    <div class="row">
+      <div><label>GitHub Token (local)</label><input id="ghToken" type="password" placeholder="ghp_..."/></div>
+      <div><label>Merge Mode</label>
+        <select id="mergeMode">
+          <option value="upsert" selected>Upsert by SKU (cập nhật nếu trùng)</option>
+          <option value="add">Add-only (chỉ thêm mới, bỏ qua trùng)</option>
+          <option value="replace">Replace-all (ghi đè toàn bộ)</option>
+        </select>
+      </div>
+      <div><label>Commit message</label><input id="ghMsg" value="feat(data): update affiliates.json (importer v4.0)"></div>
+    </div>
+    <div class="row">
+      <button id="ghSave">Lưu cấu hình GH (Local)</button>
+      <button class="primary" id="ghPush">Đẩy JSON vào repo</button>
+    </div>
+    <details><summary>Nhật ký GitHub</summary><pre id="ghLog" class="out">—</pre></details>
+  </section>
 </main>
 
-<footer class="wrap mini">MXD Importer v3.6 — Không gửi dữ liệu ra ngoài trừ khi gọi Worker do bạn cấu hình.</footer>
+<footer class="wrap mini">v4.0 — JSON clean (no deeplink). Deeplink gắn lúc runtime. Token lưu trong LocalStorage ở máy bạn.</footer>
 
 <script>
 (function(){
-  const $ = s => document.querySelector(s);
-  const cfgKeys = ['profile','atid','mode','tpl','preset','sub1','sub2','sub3','sub4','imgBase','previewUtm','worker','autoFetch','useHead','throttle'];
-  function loadCfg(){ try{const j=JSON.parse(localStorage.getItem('mxdImporterCfg')||'{}'); cfgKeys.forEach(k=>{ if(j[k] && $('#'+k)) $('#'+k).value=j[k]; }); }catch(e){} applyPreset(); }
-  function saveCfg(){ const j={}; cfgKeys.forEach(k=> j[k]=$('#'+k).value ); localStorage.setItem('mxdImporterCfg', JSON.stringify(j)); $('#cfgInfo').textContent='Đã lưu cấu hình.'; setTimeout(()=>$('#cfgInfo').textContent='',1500); }
+  const $=s=>document.querySelector(s);
+  const cfgKeys=['profile','atid','mode','tpl','preset','sub1','sub2','sub3','sub4','imgBase','previewUtm','worker','autoFetch','useHead','throttle'];
+  const ghKeys=['ghOwner','ghRepo','ghBranch','ghJsonPath','ghToken','ghMsg','mergeMode'];
+
+  function loadCfg(){ try{const j=JSON.parse(localStorage.getItem('mxdImporterCfg')||'{}'); cfgKeys.forEach(k=>{ if(j[k]&&$('#'+k)) $('#'+k).value=j[k]; }); }catch(e){} applyPreset(); }
+  function saveCfg(){ const j={}; cfgKeys.forEach(k=> j[k]=$('#'+k).value ); localStorage.setItem('mxdImporterCfg', JSON.stringify(j)); note('#cfgInfo','Đã lưu preset.'); }
+  function loadGh(){ try{const j=JSON.parse(localStorage.getItem('mxdImporterGh')||'{}'); ghKeys.forEach(k=>{ if(j[k]&&$('#'+k)) $('#'+k).value=j[k]; }); }catch(e){} }
+  function saveGh(){ const j={}; ghKeys.forEach(k=> j[k]=$('#'+k).value ); localStorage.setItem('mxdImporterGh', JSON.stringify(j)); note('#ghLog','[local] Đã lưu cấu hình GH.'); }
+
   $('#saveCfg').addEventListener('click', saveCfg);
+  $('#ghSave').addEventListener('click', saveGh);
 
   $('#preset').addEventListener('change', applyPreset);
   function applyPreset(){
@@ -182,176 +207,88 @@
     else if(p==='blog-inline'){ $('#sub1').value='blog'; $('#sub2').value='inline'; }
   }
 
-  function slugVN(s){ return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+  function slugVN(s){ return (s||'').normalize('NFD').replace(/\p{Diacritic}/gu,'').replace(/đ/g,'d').replace(/Đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
   function priceNum(s){ const d=(s||'').replace(/[^0-9]/g,''); return d?parseInt(d,10):0; }
   function merchantFromHost(u){ try{const h=new URL(u).hostname; if(/(shopee|s\.shopee|shp\.ee)/i.test(h)) return 'shopee'; if(/lazada\./i.test(h)) return 'lazada'; if(/tiki\./i.test(h)) return 'tiki'; }catch(e){} return 'unknown'; }
-  function subs(i,sku){ const map={'{idx}':(i+1).toString().padStart(2,'0'), '{sku}':sku}; const fill=t=>t.replace(/\{idx\}|\{sku\}/g, m=>map[m]||m); return {sub1:fill($('#sub1').value), sub2:fill($('#sub2').value), sub3:fill($('#sub3').value), sub4:fill($('#sub4').value)}; }
+  function subs(i,sku){ const map={'{idx}':(i+1).toString().padStart(2,'0'),'{sku}':sku}; const fill=t=>t.replace(/\{idx\}|\{sku\}/g,m=>map[m]||m); return {sub1:fill($('#sub1').value),sub2:fill($('#sub2').value),sub3:fill($('#sub3').value),sub4:fill($('#sub4').value)}; }
   function deep(origin,s){ const tpl=$('#tpl').value, at=$('#atid').value.trim(); const enc=x=>encodeURIComponent(x); if(tpl==='isclix') return `https://go.isclix.com/deep_link/${at}?url=${enc(origin)}&aff_sub1=${enc(s.sub1)}&aff_sub2=${enc(s.sub2)}&aff_sub3=${enc(s.sub3)}&aff_sub4=${enc(s.sub4)}`; return `https://go.accesstrade.vn/deeplink?at=${at}&url=${enc(origin)}&aff_sub1=${enc(s.sub1)}&aff_sub2=${enc(s.sub2)}&aff_sub3=${enc(s.sub3)}&aff_sub4=${enc(s.sub4)}`; }
 
-  async function headExpand(worker, url){
-    try{
-      const u = worker.replace(/\/+$/,'') + '/head?url=' + encodeURIComponent(url);
-      const r = await fetch(u, {headers:{'accept':'application/json'}});
-      if (!r.ok) return {ok:false, url};
-      const j = await r.json();
-      return {ok:!!j.ok, url:j.url||url, status:j.status||0};
-    }catch(e){ return {ok:false, url}; }
-  }
-  async function fetchInfo(worker, url){
-    try{
-      const u = worker.replace(/\/+$/,'') + '/?url=' + encodeURIComponent(url);
-      const r = await fetch(u, {headers:{'accept':'application/json'}});
-      if (!r.ok) throw new Error('HTTP '+r.status);
-      return await r.json(); // kỳ vọng {name, price}
-    }catch(e){ return {}; }
-  }
+  async function headExpand(worker, url){ try{ const u=worker.replace(/\/+$/,'')+ '/head?url='+encodeURIComponent(url); const r=await fetch(u,{headers:{accept:'application/json'}}); if(!r.ok) return {ok:false,url}; const j=await r.json(); return {ok:!!j.ok,url:j.url||url,status:j.status||0}; }catch(e){ return {ok:false,url}; } }
+  async function fetchInfo(worker, url){ try{ const u=worker.replace(/\/+$/,'')+ '/?url='+encodeURIComponent(url); const r=await fetch(u,{headers:{accept:'application/json'}}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); }catch(e){ return {}; } }
 
-  function parseLines(text){
-    const lines=(text||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const raw=[];
-    for(const line of lines){
-      const parts=line.split('|').map(s=>s.trim());
-      if(parts.length>=3){
-        raw.push({name:parts[0], price:priceNum(parts[1]), url:parts.slice(2).join('|')});
-      }else{
-        raw.push({name:'', price:0, url:line});
-      }
-    }
-    return raw;
-  }
-
+  function parseLines(text){ const lines=(text||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean); const raw=[]; for(const line of lines){ const parts=line.split('|').map(s=>s.trim()); if(parts.length>=3){ raw.push({name:parts[0],price:priceNum(parts[1]),url:parts.slice(2).join('|')}); } else { raw.push({name:'',price:0,url:line}); } } return raw; }
   function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-  function toHtml(items){
-    return items.map((p,i)=>{
-      const s=subs(i,p.sku);
-      const href = ($('#mode').value==='deeplink') ? deep(p.origin,s) : p.origin;
-      const img=$('#imgBase').value.replace(/\/?$/,'/')+p.sku+'.webp';
-      return `<a class="product-meta" href="${href}" data-merchant="${p.merchant}" data-sku="${p.sku}" data-img="${img}" data-price="${p.price}">${esc(p.name)}</a>
-<a class="buy" href="${href}" data-merchant="${p.merchant}" data-sub1="${s.sub1}" data-sub2="${s.sub2}" data-sub3="${s.sub3}" data-sub4="${s.sub4}">Mua ngay</a>`;
-    }).join("\n\n");
-  }
-  function csvMap(items){
-    const head='sku,name,img,origin,merchant,price';
-    const rows=items.map(p=>[p.sku, p.name.replace(/"/g,'""'), ($('#imgBase').value.replace(/\/?$/,'/')+p.sku+'.webp'), p.origin, p.merchant, p.price].map(x=>`"${x}"`).join(','));
-    return [head, ...rows].join('\n');
-  }
-  function ps1Script(){return `# MXD img-rename.ps1 — dùng kèm sku-map.csv (sku,name,img,origin,merchant,price)
-Param([string]$CsvPath="sku-map.csv",[string]$SrcDir=".",[string]$DestDir="./assets/img/products")
-if(!(Test-Path $CsvPath)){Write-Error "Không thấy $CsvPath";exit 1}
-if(!(Test-Path $DestDir)){New-Item -ItemType Directory -Force -Path $DestDir|Out-Null}
-$csv=Import-Csv -Path $CsvPath
-$renamed=0
-foreach($row in $csv){
-  $sku=$row.sku; $target=Join-Path $DestDir "$sku.webp"
-  $candidates=Get-ChildItem -Path $SrcDir -Recurse -File | Where-Object { $_.BaseName -match $sku }
-  if($candidates.Count -gt 0){ Copy-Item $candidates[0].FullName $target -Force; Write-Host "→ $($candidates[0].Name) -> $target"; $renamed++ }
-  else{ Write-Warning "Không tìm thấy ảnh cho $sku" }
-}
-Write-Host "Đổi tên xong: $renamed file"`;}
-
+  function toHtml(items){ return items.map((p,i)=>{ const s=subs(i,p.sku); const href=($('#mode').value==='deeplink')?deep(p.origin,s):p.origin; const img=$('#imgBase').value.replace(/\/?$/,'/')+p.sku+'.webp'; return `<a class="product-meta" href="${href}" data-merchant="${p.merchant}" data-sku="${p.sku}" data-img="${img}" data-price="${p.price}">${esc(p.name)}</a>\n<a class="buy" href="${href}" data-merchant="${p.merchant}" data-sub1="${s.sub1}" data-sub2="${s.sub2}" data-sub3="${s.sub3}" data-sub4="${s.sub4}">Mua ngay</a>`; }).join("\n\n"); }
+  function csvMap(items){ const head='sku,name,img,origin,merchant,price'; const rows=items.map(p=>[p.sku,p.name.replace(/"/g,'""'),($('#imgBase').value.replace(/\/?$/,'/')+p.sku+'.webp'),p.origin,p.merchant,p.price].map(x=>`"${x}"`).join(',')); return [head,...rows].join('\n'); }
+  function ps1Script(){return `# MXD img-rename.ps1 — dùng kèm sku-map.csv (sku,name,img,origin,merchant,price)\nParam([string]$CsvPath="sku-map.csv",[string]$SrcDir=".",[string]$DestDir="./assets/img/products")\nif(!(Test-Path $CsvPath)){Write-Error "Không thấy $CsvPath";exit 1}\nif(!(Test-Path $DestDir)){New-Item -ItemType Directory -Force -Path $DestDir|Out-Null}\n$csv=Import-Csv -Path $CsvPath\n$renamed=0\nforeach($row in $csv){\n  $sku=$row.sku; $target=Join-Path $DestDir "$sku.webp"\n  $candidates=Get-ChildItem -Path $SrcDir -Recurse -File | Where-Object { $_.BaseName -match $sku }\n  if($candidates.Count -gt 0){ Copy-Item $candidates[0].FullName $target -Force; Write-Host "→ $($candidates[0].Name) -> $target"; $renamed++ }\n  else{ Write-Warning "Không tìm thấy ảnh cho $sku" }\n}\nWrite-Host "Đổi tên xong: $renamed file"`; }
   function download(name,text){ const blob=new Blob([text],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
 
   // Drag & drop
   const drop=$('#drop');
   ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault(); drop.classList.add('drag');}));
   ;['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault(); drop.classList.remove('drag');}));
-  drop.addEventListener('drop', e=>{
-    const f=e.dataTransfer.files[0]; if(!f) return;
-    const reader=new FileReader(); reader.onload=ev=>{ $('#raw').value = ($('#raw').value? $('#raw').value+'\n':'') + ev.target.result; };
-    reader.readAsText(f,'utf-8');
-  });
+  drop.addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(!f) return; const reader=new FileReader(); reader.onload=ev=>{ $('#raw').value = ($('#raw').value? $('#raw').value+'\n':'') + ev.target.result; }; reader.readAsText(f,'utf-8'); });
+
+  // Notifier
+  function note(sel,msg){ const el=$(sel); if(!el) return; const t=(sel==='#ghLog')? (el.textContent==='—'?'':el.textContent+'\n')+msg : msg; el.textContent=t; }
 
   // MAIN generate
   $('#gen').addEventListener('click', async ()=>{
-    const worker=$('#worker').value.trim();
-    const doFetch=$('#autoFetch').value==='on';
-    const doHead=$('#useHead').value==='on';
-    const throttle= Math.max(0, parseInt($('#throttle').value||'120',10));
-
-    const rows=parseLines($('#raw').value);
-    if(!rows.length){ alert('Dán danh sách trước đã nhé.'); return; }
-
-    const profile=$('#profile').value;
-
-    const out=[], seenSku=new Set(), seenUrl=new Set();
-    let ok=0, fail=0;
-    $('#parseInfo').textContent='Đang xử lý…';
+    const worker=$('#worker').value.trim(); const doFetch=$('#autoFetch').value==='on'; const doHead=$('#useHead').value==='on'; const throttle=Math.max(0, parseInt($('#throttle').value||'120',10));
+    const rows=parseLines($('#raw').value); if(!rows.length){ alert('Dán danh sách trước đã nhé.'); return; }
+    const profile=$('#profile').value; const out=[], seenSku=new Set(), seenUrl=new Set(); let ok=0, fail=0; $('#parseInfo').textContent='Đang xử lý…';
 
     for(let i=0;i<rows.length;i++){
       let {name, price, url} = rows[i];
       try{
-        // Expand short link (HEAD)
-        if(doHead){ const h = await headExpand(worker, url); url = h.url || url; }
-
-        // Merchant
-        let merchant = merchantFromHost(url);
-        if(profile!=='auto') merchant = profile;
-
-        // Auto fetch name/price
-        if(doFetch){
-          const info = await fetchInfo(worker, url);
-          if(info && info.name) name = info.name;
-          if(info && info.price) price = priceNum(String(info.price));
-        }
-
-        // Fallbacks
-        if(!name) name = 'Sản phẩm MXD';
-        price = Number(price)||0;
-
-        // Build item
-        const sku = slugVN(name);
-        if(seenUrl.has(url)) { fail++; continue; }
-        if(seenSku.has(sku)) { fail++; continue; }
-        seenUrl.add(url); seenSku.add(sku);
-
-        out.push({sku, name, price, origin: url, merchant});
-        ok++;
-        if(throttle) await new Promise(r=>setTimeout(r, throttle));
-      }catch(e){
-        fail++;
-      }
+        if(doHead){ const h=await headExpand(worker,url); url=h.url||url; }
+        let merchant=merchantFromHost(url); if(profile!=='auto') merchant=profile;
+        if(doFetch){ const info=await fetchInfo(worker,url); if(info&&info.name) name=info.name; if(info&&info.price) price=priceNum(String(info.price)); }
+        if(!name) name='Sản phẩm MXD'; price=Number(price)||0; const sku=slugVN(name);
+        if(seenUrl.has(url)){ fail++; continue; } if(seenSku.has(sku)){ fail++; continue; }
+        seenUrl.add(url); seenSku.add(sku); out.push({sku,name,price,origin:url,merchant}); ok++; if(throttle) await new Promise(r=>setTimeout(r,throttle));
+      }catch(e){ fail++; }
     }
 
-    const json = JSON.stringify(out, null, 2);
-    $('#outJson').textContent = json;
-    $('#outHtml').textContent = toHtml(out);
-    $('#outPreview').textContent = out.map((p,idx)=>{
-      const s=subs(idx,p.sku);
-      const u=new URL(p.origin, location.origin);
-      if($('#mode').value==='data' && $('#previewUtm').value==='on'){
-        u.searchParams.set('aff_sub1',s.sub1); u.searchParams.set('aff_sub2',s.sub2); u.searchParams.set('aff_sub3',s.sub3); u.searchParams.set('aff_sub4',s.sub4);
-      }
-      return `[${idx+1}] ${p.merchant.toUpperCase()} — ${p.name}\nSKU: ${p.sku}\nOrigin: ${p.origin}\nPreview: ${u.toString()}\n`;
-    }).join('\n');
-
-    $('#dupInfo').innerHTML = `<span class="ok">${ok} ok</span> · <span class="warn">${fail} skip (dup/err)</span>`;
-    $('#parseInfo').textContent = `Tạo ${out.length} sản phẩm — AutoFetch=${doFetch} — HEAD=${doHead}`;
+    const json = JSON.stringify(out,null,2); $('#outJson').textContent=json; $('#outHtml').textContent=toHtml(out);
+    $('#outPreview').textContent = out.map((p,idx)=>{ const s=subs(idx,p.sku); const u=new URL(p.origin, location.origin); if($('#mode').value==='data' && $('#previewUtm').value==='on'){ u.searchParams.set('aff_sub1',s.sub1); u.searchParams.set('aff_sub2',s.sub2); u.searchParams.set('aff_sub3',s.sub3); u.searchParams.set('aff_sub4',s.sub4);} return `[${idx+1}] ${p.merchant.toUpperCase()} — ${p.name}\nSKU: ${p.sku}\nOrigin: ${p.origin}\nPreview: ${u.toString()}\n`; }).join('\n');
+    $('#dupInfo').innerHTML = `<span class="ok">${ok} ok</span> · <span class="warn">${fail} skip (dup/err)</span>`; $('#parseInfo').textContent=`Tạo ${out.length} sản phẩm — AutoFetch=${doFetch} — HEAD=${doHead}`;
   });
 
-  // Helpers
+  // Buttons
   $('#clear').addEventListener('click', ()=>{ $('#raw').value=''; $('#outJson').textContent='[]'; $('#outHtml').textContent=''; $('#outPreview').textContent=''; $('#dupInfo').textContent=''; $('#parseInfo').textContent=''; });
   $('#copyJson').addEventListener('click', ()=>navigator.clipboard.writeText($('#outJson').textContent).then(()=>alert('Đã copy JSON.')));
   $('#copyHtml').addEventListener('click', ()=>navigator.clipboard.writeText($('#outHtml').textContent).then(()=>alert('Đã copy HTML.')));
   $('#dlJson').addEventListener('click', ()=>download('affiliates.json', $('#outJson').textContent));
   $('#dlHtml').addEventListener('click', ()=>download('meta-buy.html', $('#outHtml').textContent));
-  $('#dlCsv').addEventListener('click', ()=>download('sku-map.csv', (function(items){ return (function head(items){const H='sku,name,img,origin,merchant,price';const rows=items.map(p=>[p.sku,p.name.replace(/"/g,'""'),($('#imgBase').value.replace(/\/?$/,'/')+p.sku+'.webp'),p.origin,p.merchant,p.price].map(x=>`"${x}"`).join(','));return [H,...rows].join('\n');})(JSON.parse($('#outJson').textContent||'[]')); })()));
-  $('#dlPs1').addEventListener('click', ()=>download('img-rename.ps1', (function(){return `# MXD img-rename.ps1 — dùng kèm sku-map.csv (sku,name,img,origin,merchant,price)
-Param([string]$CsvPath="sku-map.csv",[string]$SrcDir=".",[string]$DestDir="./assets/img/products")
-if(!(Test-Path $CsvPath)){Write-Error "Không thấy $CsvPath";exit 1}
-if(!(Test-Path $DestDir)){New-Item -ItemType Directory -Force -Path $DestDir|Out-Null}
-$csv=Import-Csv -Path $CsvPath
-$renamed=0
-foreach($row in $csv){
-  $sku=$row.sku; $target=Join-Path $DestDir "$sku.webp"
-  $candidates=Get-ChildItem -Path $SrcDir -Recurse -File | Where-Object { $_.BaseName -match $sku }
-  if($candidates.Count -gt 0){ Copy-Item $candidates[0].FullName $target -Force; Write-Host "→ $($candidates[0].Name) -> $target"; $renamed++ }
-  else{ Write-Warning "Không tìm thấy ảnh cho $sku" }
-}
-Write-Host "Đổi tên xong: $renamed file"`; })()));
-  $('#dlCommit').addEventListener('click', ()=>{const n=(JSON.parse($('#outJson').textContent||'[]')||[]).length||0; const msg=`feat(store): import ${n} sản phẩm (importer v3.6 auto-fetch)`; navigator.clipboard.writeText(msg).then(()=>alert('Đã copy commit message.'));});
+  $('#dlCsv').addEventListener('click', ()=>download('sku-map.csv', (function(items){ const H='sku,name,img,origin,merchant,price'; const rows=items.map(p=>[p.sku,p.name.replace(/"/g,'""'),($('#imgBase').value.replace(/\/?$/,'/')+p.sku+'.webp'),p.origin,p.merchant,p.price].map(x=>`"${x}"`).join(',')); return [H,...rows].join('\n'); })(JSON.parse($('#outJson').textContent||'[]'))));
+  $('#dlPs1').addEventListener('click', ()=>download('img-rename.ps1', ps1Script()));
+  $('#dlCommit').addEventListener('click', ()=>{ const n=(JSON.parse($('#outJson').textContent||'[]')||[]).length||0; const msg=`feat(store): import ${n} sản phẩm (importer v4.0 auto-fetch)`; navigator.clipboard.writeText(msg).then(()=>alert('Đã copy commit message.')); });
+
+  // ===== GitHub Push =====
+  async function ghFetch(path, init){ const tok=$('#ghToken').value.trim(); if(!tok) throw new Error('Thiếu GitHub Token'); const h=init&&init.headers?init.headers:{}; return fetch('https://api.github.com'+path, { ...init, headers:{ 'accept':'application/vnd.github+json', 'authorization':'Bearer '+tok, ...h } }); }
+  async function ghGetContent(owner,repo,path,branch){ const r=await ghFetch(`/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`); if(r.status===404) return {sha:null, content:null}; if(!r.ok) throw new Error('GET '+r.status); const j=await r.json(); const b64=j.content||''; const txt= b64? atob(b64.replace(/\n/g,'')) : null; return {sha:j.sha||null, content:txt}; }
+  async function ghPutContent(owner,repo,path,branch,message,text,sha){ const body={ message, content: btoa(unescape(encodeURIComponent(text))), branch }; if(sha) body.sha=sha; const r=await ghFetch(`/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, { method:'PUT', body: JSON.stringify(body) }); if(!r.ok) throw new Error('PUT '+r.status+' '+(await r.text())); return r.json(); }
+
+  function mergeJson(oldArr,newArr,mode){ const bySku=new Map(); (oldArr||[]).forEach(x=>{ if(x&&x.sku) bySku.set(x.sku,x); }); if(mode==='replace') return newArr; if(mode==='add'){ const out=[...(oldArr||[])]; for(const it of newArr){ if(!bySku.has(it.sku)) out.push(it); } return out; } // upsert
+    for(const it of newArr){ bySku.set(it.sku, { ...(bySku.get(it.sku)||{}), ...it }); } return Array.from(bySku.values()); }
+
+  $('#ghPush').addEventListener('click', async ()=>{
+    try{
+      const owner=$('#ghOwner').value.trim(), repo=$('#ghRepo').value.trim(), branch=$('#ghBranch').value.trim(); const path=$('#ghJsonPath').value.trim(); const mode=$('#mergeMode').value; const msg=$('#ghMsg').value.trim();
+      const newJsonText=$('#outJson').textContent||'[]'; const newArr=JSON.parse(newJsonText);
+      note('#ghLog','GET content…');
+      const cur=await ghGetContent(owner,repo,path,branch); let oldArr=[]; try{ oldArr=cur.content? JSON.parse(cur.content): []; }catch(e){ oldArr=[]; }
+      const merged=mergeJson(oldArr,newArr,mode); const mergedText=JSON.stringify(merged,null,2);
+      note('#ghLog',`PUT ${path} (${mode}) — ${merged.length} items`);
+      const res=await ghPutContent(owner,repo,path,branch,msg,mergedText,cur.sha);
+      note('#ghLog','Done: '+(res.commit&&res.commit.sha? res.commit.sha.slice(0,7):'ok'));
+      alert('Đã đẩy affiliates.json vào repo.');
+    }catch(e){ console.error(e); alert('GH error: '+e.message); note('#ghLog','ERR: '+e.message); }
+  });
 
   // init
-  loadCfg();
+  loadCfg(); loadGh();
 })();
 </script>
 </body>
