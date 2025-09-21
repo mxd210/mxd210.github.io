@@ -1,349 +1,84 @@
-/* ========== MXD BASE ========== */
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:400 16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#111;background:#fff}
-a{color:#111;text-decoration:none}a:hover{text-decoration:underline}img{max-width:100%;display:block;height:auto}
-
-/* Wrap & sections */
-.wrap{max-width:1100px;margin:0 auto;padding:16px}
-.mxd-section{padding:40px 0}.mxd-section.alt{background:#fafafa}
-.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:20px}
-.section-head h2{margin:0;font-size:28px}
-.section-head .link{font-weight:600}
-
-/* Header */
-.mxd-header{position:sticky;top:0;left:0;right:0;background:#fff;border-bottom:1px solid #eee;z-index:999;transition:transform .25s}
-.mxd-header.hide{transform:translateY(-100%)}.mxd-header .wrap{display:flex;align-items:center;justify-content:space-between}
-.brand{font-weight:800;font-size:22px;letter-spacing:.5px}
-.nav-toggle{display:none;padding:8px 10px;border:1px solid #ddd;background:#fff;border-radius:8px}
-.nav-list{display:flex;gap:16px;list-style:none;margin:0;padding:0}
-.nav-list a{display:block;padding:10px 0}
-
-/* Hero */
-/* Hero (figure cover dùng chung blog + store) */
-.hero { margin: 8px 0 20px; }
-.hero img{
-  display:block;
-  width:100%;
-  height:auto;           /* giữ đúng tỉ lệ ảnh */
-  border-radius:12px;
-}
-
-/* Banner ngang (1600x500) – crop ổn trên màn lớn */
-@media (min-width: 640px){
-  .hero img[width="1600"][height="500"]{
-    aspect-ratio: 16 / 5;
-    object-fit: cover;   /* luôn fill khung, không méo */
-  }
-}
-
-/* Ảnh trong các card (blog/store) */
-.cards img,
-.prod-card img{
-  display:block;
-  width:100%;
-  height:auto;
-  aspect-ratio: 16 / 9;  /* thumbnail 16:9 */
-  object-fit: cover;
-  border-radius:12px;
-}
-
-.mxd-hero{padding:32px 0;background:linear-gradient(180deg,#f8f8f8,#fff)}
-.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}
-.hero-copy h1{margin:0 0 8px 0;font-size:36px}
-.hero-copy .highlight{background:#111;color:#fff;padding:0 8px;border-radius:8px}
-.hero-cta{display:flex;gap:12px;margin-top:12px}
-.btn{display:inline-block;padding:10px 14px;border:1px solid #111;border-radius:10px;background:#fff}
-.btn.btn-primary{background:#111;color:#fff}
-.btn.btn-small{padding:8px 12px}
-
-/* Categories */
-.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.cat{border:1px solid #eee;border-radius:14px;background:#fff;overflow:hidden;transition:transform .15s, box-shadow .15s}
-.cat:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.06)}
-.cat-link{display:block;padding-bottom:8px}
-.cat h3{margin:10px 12px 4px 12px}
-.cat p{margin:0 12px 12px 12px;color:#444}
-
-/* Products */
-.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.prod{border:1px solid #eee;border-radius:14px;background:#fff;overflow:hidden;transition:transform .15s, box-shadow .15s}
-.prod:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.06)}
-.prod-link{display:block;padding-bottom:6px}
-.prod h3{margin:10px 12px 4px 12px;font-size:16px}
-.prod .desc{margin:0 12px 8px 12px;color:#444}
-.prod .meta{display:flex;justify-content:space-between;align-items:center;padding:0 12px 10px 12px;color:#222}
-.price{font-weight:700}
-
-/* Checklist */
-.checklist{border:1px solid #eee;border-radius:14px;background:#fff}
-.checklist .checklist-list{margin:0 0 14px 20px;padding:0}
-.checklist .checklist-list li{margin:8px 0}
-
-/* Blog */
-.post-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.post{border:1px solid #eee;border-radius:14px;background:#fff;overflow:hidden;transition:transform .15s, box-shadow .15s}
-.post:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.06)}
-.post h3{margin:10px 12px 6px 12px;font-size:18px}
-.post p{margin:0 12px 12px 12px;color:#444}
-
-/* Lead box */
-.lead-box{border:1px solid #eee;border-radius:14px;background:#fafafa;text-align:center}
-.lead-form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0}
-.lead-form input{padding:10px;border:1px solid #ddd;border-radius:8px;min-width:240px}
-
-/* Footer */
-.mxd-footer{background:#111;color:#eee;padding:28px 0;margin-top:20px}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:20px}
-.mxd-footer a{color:#eee}
-.mxd-footer h4{margin:0 0 8px 0;color:#fff}
-.mxd-footer ul{margin:0;padding-left:18px}
-.copyright{text-align:center;color:#bbb;padding-top:12px;border-top:1px solid #222;margin-top:18px}
-
-/* FAB */
-.mxd-fab{position:fixed;right:16px;bottom:16px;display:flex;gap:8px;z-index:9999}
-.mxd-fab .fab{padding:10px 12px;border-radius:999px;background:#111;color:#fff;font:600 14px/1.1 system-ui;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,.2)}
-.mxd-fab .fb{background:#1877f2}.mxd-fab .zl{background:#008fe5}.mxd-fab .call{background:#16a34a}
-
-/* Responsive */
-@media (max-width:1024px){.hero-grid{grid-template-columns:1fr}.cat-grid{grid-template-columns:repeat(2,1fr)}.prod-grid{grid-template-columns:repeat(2,1fr)}.post-grid{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr 1fr}}
-@media (max-width:640px){.post-grid{grid-template-columns:1fr}.cat-grid{grid-template-columns:1fr}.prod-grid{grid-template-columns:1fr}}
-/* Intro under hero title */
-.intro { max-width: 640px; line-height: 1.6; opacity: .9; }
-/* === Featured (compact, dense grid) === */
-.featured .products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.5rem;
-  padding: 0.75rem 0.5rem;
-}
-
-/* Desktop rộng: tăng số cột, nhìn giống app */
-@media (min-width: 1200px){
-  .featured .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  }
-}
-
-.featured .product-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.06);
-  background: #fff;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 0.5rem;                /* giảm padding để tăng mật độ */
-}
-
-.featured .product-card img{
-  width: 100%;
-  aspect-ratio: 4 / 5;            /* hoặc 1/1 nếu ảnh vuông */
-  object-fit: cover;
-  border-radius: 10px;
-  background: #f4f6f8;
-}
-
-.featured .title{
-  font-size: clamp(12px, 2.2vw, 13px);
-  margin: 0.4rem 0 0.25rem;
-  line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;          /* 2 dòng */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  min-height: 2.7em;              /* giữ chiều cao đều */
-}
-
-.featured .price{
-  font-weight: 700;
-  color: #d0021b;
-  font-size: clamp(12px, 2.4vw, 14px);
-  margin-bottom: 0.35rem;
-}
-
-/* Nút mua nhỏ gọn vẫn đủ 44px cao */
-.featured a.buy{
-  margin: 0;
-  padding: 0.5rem;
-  font-size: clamp(12px, 2.2vw, 13px);
-  border-radius: 9px;
-}
-
-/* Nhãn nổi bật tuỳ chọn */
-.badge {
-  position: absolute;
-  top: 6px; left: 6px;
-  padding: 2px 6px;
-  background: #ff8a00;
-  color: #fff;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-/* Highlight nhẹ khi card vừa vào viewport, 2 chu kỳ rồi tự dừng */
-@keyframes mxd-highlight {
-  0%   { box-shadow: 0 0 0 0 rgba(10,102,194,0.15); }
-  60%  { box-shadow: 0 0 0 8px rgba(10,102,194,0); }
-  100% { box-shadow: 0 0 0 0 rgba(10,102,194,0); }
-}
-.featured .product-card.is-new {
-  animation: mxd-highlight 2.2s ease-out 2;
-}
-
-/* Tôn trọng người dùng không thích chuyển động */
-@media (prefers-reduced-motion: reduce){
-  .featured .product-card.is-new { animation: none; }
-}
-
-/* Card siêu gọn (tuỳ chọn thêm class .ultra) */
-.featured.ultra .products-grid {
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-}
-.featured.ultra .title { -webkit-line-clamp: 1; min-height: 1.4em; }
-.featured.ultra a.buy  { padding: 0.45rem; }
-.blog-list{padding:1rem 0}
-.post-list{list-style:none;margin:0;padding:0}
-.post-list li{padding:.75rem 0;border-bottom:1px solid #eee}
-.post-list a{font-weight:600}
-.post-list time{display:block;font-size:.85rem;color:#666;margin-top:.25rem}
-/* === Blog Index (MXD) === */
-.container{max-width:1100px;margin:0 auto;padding:0 16px}
-
-.blog-hero{
-  margin: 10px 0 14px;
-  padding: 18px 16px;
-  background: linear-gradient(180deg,#f7fafc, #f1f5f9);
-  border: 1px solid #e6eaf0; border-radius: 14px;
-}
-.blog-hero h1{margin:0 0 6px; font-size: clamp(20px, 4vw, 28px);}
-.blog-hero p{margin:0; color:#5b6777}
-
-.blog-quicknav{
-  display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 6px;
-}
-.blog-quicknav a{
-  display:inline-flex; align-items:center; gap:6px;
-  padding:6px 10px; border-radius:999px; background:#fff;
-  border:1px solid #e6eaf0; text-decoration:none;
-  font-size:13px;
-}
-.blog-quicknav a:hover{background:#f6f9ff}
-
-.post-grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px;
-  margin: 10px 0 28px;
-}
-.post-card{
-  display:flex; flex-direction:column; background:#fff; border-radius:14px;
-  border:1px solid #e6eaf0; overflow:hidden; text-decoration:none;
-  box-shadow: 0 2px 8px rgba(0,0,0,.04);
-}
-.post-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.06)}
-.post-thumb{
-  width:100%; aspect-ratio:16/9; object-fit:cover; background:#eef2f6;
-}
-.post-body{padding:12px}
-.post-meta{
-  display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px;
-  font-size:12px; color:#617081;
-}
-.post-meta .pill{
-  padding:2px 8px; border-radius:999px; background:#f1f5f9; border:1px solid #e6eaf0;
-  font-weight:600; color:#445264
-}
-.post-title{
-  font-size: clamp(14px, 3.2vw, 18px);
-  line-height:1.35; margin:2px 0 6px; color:#111827;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-  min-height: 2.7em;
-}
-.post-excerpt{
-  color:#4b5563; font-size:14px; line-height:1.45; margin:0 0 10px;
-  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
-  min-height: 3.9em;
-}
-.post-actions{margin-top:auto; display:flex; justify-content:space-between; align-items:center}
-a.readmore{
-  display:inline-flex; align-items:center; gap:6px;
-  padding:8px 10px; border-radius:10px; background:#f6f9ff; text-decoration:none;
-  border:1px solid #dde6f5; font-weight:600;
-}
-a.readmore:hover{background:#eaf2ff}
-/* ===== MXD PRODUCT GRID/CARD — v2 (override) ===== */
+/* === MXD PRODUCT UI — PATCH GỌN & PRO (override cuối) === */
 :root{
-  --surface:#f6f7f9;
-  --border-strong:#e3e6ea;
-  --text:#111;
-}
-@media (prefers-color-scheme: dark){
-  :root{ --surface:#161a1f; --border-strong:#2a313a; --text:#e8e8e8; }
+  --card-bg:#fff;
+  --card-border:#e6eaf0;
+  --card-shadow:0 6px 18px rgba(0,0,0,.06);
+  --card-shadow-hover:0 10px 24px rgba(0,0,0,.08);
+  --surface:#f6f8fb;
+  --title:#111;
+  --price:#d0021b;
+  --radius:12px;
+  --gap:20px;
 }
 
-/* Lưới chỉ áp cho 2 khối sản phẩm hiện dùng */
+/* Chỉ áp cho 2 khối đang dùng */
 #product-list.grid, #featured-grid.grid{
   display:grid;
-  gap:20px;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:var(--gap);
+  grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
 }
 
-/* Card */
+/* Card tối giản */
 #product-list .card, #featured-grid .card{
-  display:flex; flex-direction:column; overflow:hidden;
-  border:1px solid var(--border-strong); border-radius:14px;
-  background:#fff; box-shadow:0 6px 18px rgba(0,0,0,.06);
+  display:flex;flex-direction:column;overflow:hidden;
+  border:1px solid var(--card-border);border-radius:var(--radius);
+  background:var(--card-bg);box-shadow:var(--card-shadow);
   transition:transform .15s ease, box-shadow .15s ease;
 }
 #product-list .card:hover, #featured-grid .card:hover{
-  transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.08);
+  transform:translateY(-2px);box-shadow:var(--card-shadow-hover);
 }
 
-/* Ảnh: khung vuông, ảnh "contain" */
+/* Ảnh: khung vuông, contain, nền xám nhạt */
 #product-list .thumb, #featured-grid .thumb{
-  position:relative; aspect-ratio:1; display:grid; place-items:center;
-  background:var(--surface); border-bottom:1px solid var(--border-strong); padding:10px;
+  aspect-ratio:1;display:grid;place-items:center;padding:10px;
+  background:var(--surface);border-bottom:1px solid var(--card-border);
 }
 #product-list .thumb img, #featured-grid .thumb img{
-  width:100%; height:100%; object-fit:contain;
+  width:100%;height:100%;object-fit:contain;
 }
 
 /* Thân card */
-#product-list .body, #featured-grid .body{ padding:14px; display:flex; flex-direction:column; gap:8px; min-height:140px }
+#product-list .body, #featured-grid .body{
+  padding:14px;display:flex;flex-direction:column;gap:8px;min-height:136px;
+}
 #product-list .name, #featured-grid .name{
-  margin:0; font-weight:700; font-size:15px; line-height:1.35;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.7em;
+  margin:0;font-weight:700;font-size:15px;line-height:1.35;color:var(--title);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em;
 }
-#product-list .name a, #featured-grid .name a{ color:var(--text); text-decoration:none }
-#product-list .name a:hover, #featured-grid .name a:hover{ text-decoration:underline }
-#product-list .price, #featured-grid .price{ font-weight:900; font-size:16px; letter-spacing:.2px; color:#d0021b }
+#product-list .name a, #featured-grid .name a{color:inherit;text-decoration:none}
+#product-list .name a:hover, #featured-grid .name a:hover{text-decoration:underline}
 
-/* Nút mua gọn, màu theo sàn */
-#product-list .actions, #featured-grid .actions{ margin-top:auto }
+#product-list .price, #featured-grid .price{
+  margin-top:2px;font-weight:900;font-size:16px;color:var(--price);letter-spacing:.2px;
+}
+
+/* Nút mua — gọn, sắc nét; màu theo sàn */
+#product-list .actions, #featured-grid .actions{margin-top:auto}
 #product-list .buy, #featured-grid .buy{
-  display:inline-block; width:100%; text-align:center;
-  padding:10px 12px; border-radius:12px; font-weight:900;
-  color:#fff; border:1px solid transparent;
-  transition:transform .05s ease, box-shadow .15s ease, filter .1s ease;
+  display:inline-block;width:100%;text-align:center;
+  padding:10px 12px;border-radius:10px;font-weight:900;
+  color:#fff;border:1px solid transparent;background:#1746ff;border-color:#1746ff;
+  transition:transform .05s ease, box-shadow .12s ease, filter .1s ease;
 }
-#product-list .buy:active, #featured-grid .buy:active{ transform:translateY(1px) }
-#product-list .buy:hover, #featured-grid .buy:hover{ box-shadow:0 6px 16px rgba(0,0,0,.12); filter:brightness(1.03) }
-#product-list .buy, #featured-grid .buy{ background:#1746ff; border-color:#1746ff }
-#product-list .buy[data-merchant="shopee"], #featured-grid .buy[data-merchant="shopee"]{ background:#ee4d2d; border-color:#ee4d2d }
-#product-list .buy[data-merchant="lazada"], #featured-grid .buy[data-merchant="lazada"]{ background:#0f146d; border-color:#0f146d }
-#product-list .buy[data-merchant="tiki"],   #featured-grid .buy[data-merchant="tiki"]{ background:#1a94ff; border-color:#1a94ff }
-#product-list .buy[data-merchant="tiktok"], #featured-grid .buy[data-merchant="tiktok"]{ background:#111;    border-color:#111 }
+#product-list .buy:active, #featured-grid .buy:active{transform:translateY(1px)}
+#product-list .buy:hover,  #featured-grid .buy:hover {box-shadow:0 6px 16px rgba(0,0,0,.12);filter:brightness(1.03)}
+#product-list .buy[data-merchant="shopee"], #featured-grid .buy[data-merchant="shopee"]{background:#ee4d2d;border-color:#ee4d2d}
+#product-list .buy[data-merchant="lazada"], #featured-grid .buy[data-merchant="lazada"]{background:#0f146d;border-color:#0f146d}
+#product-list .buy[data-merchant="tiki"],   #featured-grid .buy[data-merchant="tiki"]{background:#1a94ff;border-color:#1a94ff}
+#product-list .buy[data-merchant="tiktok"], #featured-grid .buy[data-merchant="tiktok"]{background:#111;border-color:#111}
 
-/* Skeleton tông nhã */
+/* Skeleton đồng bộ tông */
 #product-list .skeleton, #featured-grid .skeleton{
-  position:relative; overflow:hidden;
+  position:relative;overflow:hidden;
   background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%);
 }
 #product-list .skeleton::after, #featured-grid .skeleton::after{
-  content:''; position:absolute; inset:0; animation:shimmer 1.4s infinite;
+  content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite;
 }
 @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 
 @media (max-width:480px){
-  #product-list.grid, #featured-grid.grid{ gap:14px }
-  #product-list .body, #featured-grid .body{ padding:12px }
+  #product-list.grid, #featured-grid.grid{gap:14px}
+  #product-list .body, #featured-grid .body{padding:12px}
 }
