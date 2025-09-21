@@ -1,4 +1,3 @@
-<script>
 // MXD renderer v3 — chống trống kể cả thiếu ảnh/placeholder
 (async()=>{
   const MXD = window.MXD = window.MXD || {};
@@ -106,4 +105,3 @@
     if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
   };
 })();
-</script>
