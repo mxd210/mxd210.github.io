@@ -1,5 +1,12 @@
 [
   {
+    "sku": "may-cat-da-125mm-900w",
+    "name": "Máy cắt đá 125mm – 900W",
+    "price": 520000,
+    "origin": "https://shopee.vn/product/279547485/5274192863",
+    "merchant": "shopee"
+  },
+  {
     "sku": "may-cat-cam-tay-dekton-dk-ag950s",
     "name": "Máy cắt cầm tay Dekton DK-AG950S",
     "price": 690000,
@@ -11,69 +18,6 @@
     "name": "Máy khoan bê tông Kynko J1C-KD28-26",
     "price": 1833000,
     "origin": "https://shopee.vn/product/772892494/21507014059",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "bosch-388vf-bo-khoan-pin",
-    "name": "Bộ khoan pin Bosch 388VF (combo)",
-    "price": 1150000,
-    "origin": "https://shopee.vn/product/166287331/22741831588",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "bo-khoan-pin-2pin-1-sac-166287331-20069641528",
-    "name": "Bộ khoan pin 2 pin 1 sạc",
-    "price": 799000,
-    "origin": "https://shopee.vn/product/166287331/20069641528",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "bo-phu-kien-khoan-166287331-20749746066",
-    "name": "Bộ phụ kiện khoan đa dụng",
-    "price": 239000,
-    "origin": "https://shopee.vn/product/166287331/20749746066",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "hukan-g1-ag6000j",
-    "name": "Máy cắt Hukan G1-AG6000J",
-    "price": 620000,
-    "origin": "https://shopee.vn/product/300702715/21345346872",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-gach-ban-day-800mm",
-    "name": "Máy cắt gạch bàn đẩy 800mm",
-    "price": 1280000,
-    "origin": "https://shopee.vn/product/300702715/20749746066",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-laze-can-bang-12-tia",
-    "name": "Máy laser cân bằng 12 tia",
-    "price": 950000,
-    "origin": "https://shopee.vn/product/279547485/5274192860",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "bay-rang-cua-6mm",
-    "name": "Bay răng cưa 6mm (ốp lát)",
-    "price": 45000,
-    "origin": "https://shopee.vn/product/279547485/5274192861",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "keo-dan-gach-chiu-nuoc-25kg",
-    "name": "Keo dán gạch chịu nước (bao 25kg)",
-    "price": 245000,
-    "origin": "https://shopee.vn/product/279547485/5274192862",
-    "merchant": "shopee"
-  },
-  {
-    "sku": "may-cat-da-125mm-900w",
-    "name": "Máy cắt đá 125mm – 900W",
-    "price": 520000,
-    "origin": "https://shopee.vn/product/279547485/5274192863",
     "merchant": "shopee"
   }
 ]

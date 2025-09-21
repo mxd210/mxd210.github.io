@@ -4,7 +4,15 @@
     "origin": "https://shopee.vn/product/279547485/5274192859",
     "ok": false,
     "status": 0,
-    "checked_at": "2025-09-21T05:54:20.235Z",
+    "checked_at": "2025-09-21T08:37:52.361Z",
+    "is_dead": true
+  },
+  {
+    "sku": "may-cat-da-125mm-900w",
+    "origin": "https://shopee.vn/product/279547485/5274192863",
+    "ok": false,
+    "status": 0,
+    "checked_at": "2025-09-21T08:37:52.147Z",
     "is_dead": true
   },
   {
@@ -12,79 +20,7 @@
     "origin": "https://shopee.vn/product/772892494/21507014059",
     "ok": false,
     "status": 0,
-    "checked_at": "2025-09-21T05:54:20.296Z",
-    "is_dead": true
-  },
-  {
-    "sku": "may-cat-da-125mm-900w",
-    "origin": "https://shopee.vn/product/279547485/5274192863",
-    "ok": true,
-    "status": 200,
-    "checked_at": "2025-09-21T05:54:21.069Z",
-    "is_dead": false
-  },
-  {
-    "sku": "bosch-388vf-bo-khoan-pin",
-    "origin": "https://shopee.vn/product/166287331/22741831588",
-    "ok": false,
-    "status": 0,
-    "checked_at": "2025-09-21T05:54:20.297Z",
-    "is_dead": true
-  },
-  {
-    "sku": "bo-khoan-pin-2pin-1-sac-166287331-20069641528",
-    "origin": "https://shopee.vn/product/166287331/20069641528",
-    "ok": false,
-    "status": 0,
-    "checked_at": "2025-09-21T05:54:20.298Z",
-    "is_dead": true
-  },
-  {
-    "sku": "bo-phu-kien-khoan-166287331-20749746066",
-    "origin": "https://shopee.vn/product/166287331/20749746066",
-    "ok": false,
-    "status": 0,
-    "checked_at": "2025-09-21T05:54:20.299Z",
-    "is_dead": true
-  },
-  {
-    "sku": "hukan-g1-ag6000j",
-    "origin": "https://shopee.vn/product/300702715/21345346872",
-    "ok": false,
-    "status": 0,
-    "checked_at": "2025-09-21T05:54:20.300Z",
-    "is_dead": true
-  },
-  {
-    "sku": "may-cat-gach-ban-day-800mm",
-    "origin": "https://shopee.vn/product/300702715/20749746066",
-    "ok": false,
-    "status": 0,
-    "checked_at": "2025-09-21T05:54:20.301Z",
-    "is_dead": true
-  },
-  {
-    "sku": "may-laze-can-bang-12-tia",
-    "origin": "https://shopee.vn/product/279547485/5274192860",
-    "ok": false,
-    "status": 0,
-    "checked_at": "2025-09-21T05:54:20.302Z",
-    "is_dead": true
-  },
-  {
-    "sku": "bay-rang-cua-6mm",
-    "origin": "https://shopee.vn/product/279547485/5274192861",
-    "ok": false,
-    "status": 0,
-    "checked_at": "2025-09-21T05:54:20.304Z",
-    "is_dead": true
-  },
-  {
-    "sku": "keo-dan-gach-chiu-nuoc-25kg",
-    "origin": "https://shopee.vn/product/279547485/5274192862",
-    "ok": false,
-    "status": 0,
-    "checked_at": "2025-09-21T05:54:20.305Z",
+    "checked_at": "2025-09-21T08:37:52.362Z",
     "is_dead": true
   }
 ]
