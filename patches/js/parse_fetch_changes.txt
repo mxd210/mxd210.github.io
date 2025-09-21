@@ -1,0 +1,9 @@
+// overlay helpers: bulk sub1 during export
+(function(){
+  window.MXD_TOAFF_WRAP = function(p){
+    try{ if(document.querySelector('#bulk-sub1')?.checked){ p.sub1 = p.sku; } }catch(e){}
+    // adjust price on output if needed
+    try{ const apply = !!(window.SETTINGS && SETTINGS.price_apply_out); if(apply && isFinite(p.price)) p.price = Number(p.price); else if(!apply && isFinite(p.price)) p.price = adjPrice(p.price); }catch(e){}
+    return p;
+  }
+})();

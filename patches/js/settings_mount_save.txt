@@ -1,0 +1,9 @@
+// --- load/mount/save overlay for patch ---
+(function(){
+  function q(s){ return document.querySelector(s); }
+  function ensureSET(){ window.SETTINGS = window.SETTINGS || {}; const S=window.SETTINGS; if(S.price_adj==null) S.price_adj=-3; if(S.price_apply_out==null) S.price_apply_out=true; if(S.price_round==null) S.price_round=false; if(!S.worker_mode) S.worker_mode='default'; if(S.worker==null) S.worker=''; return S; }
+  function mount(){ const S=ensureSET(); if(q('#worker-mode')) q('#worker-mode').value=S.worker_mode; if(q('#set-worker')) q('#set-worker').value=S.worker; if(q('#set-price-adj')) q('#set-price-adj').value=S.price_adj; if(q('#set-price-apply-out')) q('#set-price-apply-out').checked=!!S.price_apply_out; if(q('#set-price-round')) q('#set-price-round').checked=!!S.price_round; }
+  function save(){ const S=ensureSET(); if(q('#worker-mode')) S.worker_mode=q('#worker-mode').value; if(q('#set-worker')) S.worker=(q('#set-worker').value||'').trim(); if(q('#set-price-adj')) S.price_adj=Number(q('#set-price-adj').value)||0; if(q('#set-price-apply-out')) S.price_apply_out=q('#set-price-apply-out').checked; if(q('#set-price-round')) S.price_round=q('#set-price-round').checked; }
+  document.addEventListener('change', (e)=>{ if(e.target && ['worker-mode','set-worker','set-price-adj','set-price-apply-out','set-price-round'].includes(e.target.id)) save(); });
+  document.addEventListener('DOMContentLoaded', mount);
+})();

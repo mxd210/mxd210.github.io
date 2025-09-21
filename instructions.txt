@@ -1,0 +1,10 @@
+=== MXD Importer Patch Pack v4.0.1 Clean — Fixed Auto-Applier ===
+1) Chạy Node script apply_patch_401.js với tham số --file trỏ tới tools/shopee-importer.html
+   Ví dụ:
+     node apply_patch_401.js --file ../mxd210.github.io/tools/shopee-importer.html
+2) Script sẽ:
+   - Thêm <style id="mxd-401"> vào trước </head>
+   - Thêm <script id="mxd-401-helpers">, <script id="mxd-401-fetchhead">, <script id="mxd-401-overlay"> trước </body>
+   - Chèn block HTML Worker/Price vào khu Settings nếu tìm thấy; nếu không sẽ thêm fallback <section id="mxd-401-settings"> trong <body>
+   - Thêm checkbox bulk sub1 vào khu Import nếu tìm thấy; nếu không sẽ thêm fallback <section id="mxd-401-import"> cuối body
+3) Reload trang importer. Kiểm tra: font VN OK, chọn Worker, chỉnh giá -3% mặc định, bulk sub1 hoạt động.
