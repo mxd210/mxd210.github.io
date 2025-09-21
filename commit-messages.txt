@@ -1,0 +1,1 @@
+feat(control): MXD-Control v2 — chạy chuỗi check/prune/sitemaps/image-validate

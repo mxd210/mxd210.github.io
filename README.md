@@ -1,37 +1,38 @@
+# MXD-Control v2
 
-# MXD Importer — Patch Pack v4.0.1 Clean (Fixed)
+Bảng điều khiển tác vụ cho site MXD (không phụ thuộc thư viện ngoài). Hỗ trợ:
+- Kiểm tra link gốc (Shopee/Lazada) → `affiliates.checked.json`
+- Lọc link chết → `affiliates.json` sạch
+- Sinh sitemap (`sitemap.xml`, `sitemap-store.xml`, `sitemap-blog.xml`) vào `out/sitemaps`
+- Kiểm tra ảnh theo SKU trong `/assets/img/products/` → báo thiếu
+- Chạy toàn bộ chuỗi và commit/push (tuỳ chọn)
 
-Đây là bản vá đã đóng gói đúng **thư mục + auto-applier**.
-Bạn **không** kéo thả JSON vào repo nữa; thay vào đó:
+> Yêu cầu: Node 18+; Git (nếu dùng commit); PowerShell (để dùng `mxd-control.ps1`).
 
 ## Cách dùng nhanh
-1) Giải nén gói này.
-2) Mở PowerShell tại thư mục đã giải nén.
-3) Chạy:
-```powershell
-.\MXD-Patch-Importer-401.ps1 -File ../mxd210.github.io/tools/shopee-importer.html
+1) Giải nén gói này cạnh repo site (ví dụ cùng cấp với `mxd210.github.io/`).
+2) Mở PowerShell tại thư mục này và chạy:
 ```
-(Chỉnh đường dẫn `-File` cho đúng vị trí importer của bạn.)
-
-Hoặc dùng Node trực tiếp:
-```bash
-node apply_patch_401.js --file ../mxd210.github.io/tools/shopee-importer.html
+.\mxd-control.ps1 -SiteRepo ../mxd210.github.io -DoCommit
 ```
+Mặc định sẽ chạy: check → prune → sitemaps → kiểm tra ảnh → (commit sitemaps & data nếu `-DoCommit`).
 
-## Script sẽ làm gì
-- Chèn CSS (font & polish) vào `<head>`
-- Chèn JS helpers + `fetchHead` override + overlay settings
-- Thêm UI Worker/Price vào **Settings** (hoặc fallback section nếu không tìm được)
-- Thêm checkbox **bulk sub1={sku}** vào **Import** (hoặc fallback section)
+## Chạy lẻ từng nhiệm vụ
+```
+# Chỉ check link
+node tasks/check-affiliates.js --repo ../mxd210.github.io
 
-> Cách này **không phụ thuộc** mã gốc chính xác 100%: nếu không tìm được anchor, script thêm **khu riêng** để bạn vẫn dùng được tính năng.
+# Chỉ prune (ghi đè affiliates.json)
+node tasks/prune-affiliates.js --repo ../mxd210.github.io --write
+
+# Chỉ sitemap
+node tasks/build-sitemaps.js --repo ../mxd210.github.io --base https://mxd210.github.io
+
+# Chỉ kiểm tra ảnh
+node tasks/validate-images.js --repo ../mxd210.github.io
+```
 
 ## Commit message gợi ý
 ```
-feat(importer): apply Patch Pack v4.0.1 Clean
-- Font VN + layout polish
-- SKU chuẩn hóa + bulk sub1={sku}
-- Worker modes (Default/Custom/None)
-- Default price adjust -3% + optional round 1.000đ
-- fetchHead via Worker (/head)
+chore(automation): mxd-control v2 — check/prune/sitemaps/image-validate
 ```
