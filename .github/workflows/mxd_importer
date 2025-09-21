@@ -1,0 +1,84 @@
+name: mxd_importer
+
+on:
+  workflow_dispatch:
+    inputs:
+      links:
+        description: "Dán 1–N dòng: 'Tên | giá | link' hoặc chỉ 'link'"
+        required: true
+        type: string
+  repository_dispatch:
+    types: [mxd_importer]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mxd_importer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute env (LINKS, COMMIT_SUBJECT)
+        shell: bash
+        run: |
+          LINKS_INPUT="${{ github.event.inputs.links }}"
+          LINKS_PAYLOAD="${{ github.event.client_payload.links }}"
+          LINKS="${LINKS_INPUT:-$LINKS_PAYLOAD}"
+          # normalize CRLF
+          LINKS="$(printf "%s" "$LINKS" | tr -d '\r')"
+          echo "LINKS<<__EOF__" >> $GITHUB_ENV
+          echo "$LINKS" >> $GITHUB_ENV
+          echo "__EOF__" >> $GITHUB_ENV
+
+          FIRST_LINE="$(printf "%s\n" "$LINKS" | head -n1)"
+          # lấy tên trước dấu |
+          BASE="$(printf "%s" "$FIRST_LINE" | awk -F'|' '{gsub(/^[ \t]+|[ \t]+$/,"",$1); print $1}')"
+          [ -z "$BASE" ] && BASE="auto-import"
+          # cắt 60 ký tự cho an toàn
+          BASE="$(printf "%.60s" "$BASE")"
+          echo "COMMIT_SUBJECT=$BASE" >> $GITHUB_ENV
+          echo "REPO_ROOT=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: tools/ci/package-lock.json
+
+      - name: Install deps
+        working-directory: tools/ci
+        run: npm ci || npm install
+
+      - name: Run importer
+        env:
+          LINKS: ${{ env.LINKS }}
+          REPO_ROOT: ${{ env.REPO_ROOT }}
+        run: node tools/ci/mxd_importer.js
+
+      - name: Configure git
+        run: |
+          git config --global user.name "mxd-bot"
+          git config --global user.email "mxd-bot@users.noreply.github.com"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Commit & push
+        shell: bash
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes; skipping commit."
+          else
+            git commit -m "feat(data): add ${COMMIT_SUBJECT}"
+            git push
+          fi
