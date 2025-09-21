@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "name": "Kéo răng cưa 8mm",
+    "price": 159000,
+    "origin": "https://shopee.vn/product/166287331/22741831588 https://shopee.vn/product/300702715/21345346872",
+    "merchant": "shopee",
+    "sku": "keo-rang-cua-8mm",
+    "image": "/assets/img/products/keo-rang-cua-8mm.webp",
+    "updated_at": "2025-09-21T18:33:26.420Z",
+    "featured": false,
+    "status": true
+  }
+]
