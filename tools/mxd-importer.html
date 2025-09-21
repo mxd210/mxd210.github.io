@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MXD Importer v3 — Shopee & Lazada → affiliates.json</title>
+  <style>
+    body{font:16px/1.5 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:16px;max-width:1100px;margin:auto}
+    h1{margin:0 0 12px} .row{display:flex;gap:12px;flex-wrap:wrap}
+    textarea{width:100%;min-height:180px}
+    input,select,button{font:inherit;padding:8px 10px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Consolas,Monaco,monospace}
+    .card{border:1px solid #ddd;border-radius:10px;padding:12px}
+    .muted{color:#666;font-size:14px}
+    .ok{color:#0a7d00} .warn{color:#a15c00} .err{color:#b00020}
+    .preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+    .p{border:1px solid #e6e6e6;border-radius:12px;padding:10px}
+    .p h4{margin:0 0 6px;font-size:16px}
+    .p img{width:100%;height:150px;object-fit:cover;border-radius:8px;background:#f6f6f6}
+    .small{font-size:13px}
+  </style>
+</head>
+<body>
+  <h1>MXD Importer v3</h1>
+  <p class="muted">Dán <b>link Shopee/Lazada</b> hoặc từng dòng dạng <code class="mono">Tên | giá | link</code>. Bấm <b>Generate</b> → xuất <code>affiliates.json</code>.</p>
+
+  <div class="grid">
+    <div class="card">
+      <label for="worker">Worker base URL (tùy chọn để enrich):</label>
+      <input id="worker" placeholder="https://mxd210.mxd6686.workers.dev" style="width:100%"/>
+      <div class="row">
+        <label><input type="checkbox" id="useWorker"> Enrich bằng Worker (/detail)</label>
+      </div>
+      <textarea id="input" placeholder="Ví dụ:\nMáy cắt gạch Dekton | 1290000 | https://shopee.vn/product/300702715/21345346872\nhttps://www.lazada.vn/products/abc123.html\n..."></textarea>
+      <div class="row">
+        <button id="gen">Generate</button>
+        <button id="copy">Copy JSON</button>
+        <button id="download">Download JSON</button>
+        <button id="reset">Reset</button>
+      </div>
+      <div id="status" class="muted"></div>
+    </div>
+    <div class="card">
+      <h3>Kết quả JSON</h3>
+      <textarea id="out" class="mono" style="min-height:260px"></textarea>
+      <p class="small muted">Trường chuẩn: <code>name, price(number), origin, merchant(shopee|lazada), sku, image, category, brand, featured, status, updated_at</code></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Xem nhanh</h3>
+    <div id="preview" class="preview"></div>
+  </div>
+
+<script>
+const el = id => document.getElementById(id);
+const toSlug = s => (s||"")
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .toLowerCase().replace(/[^a-z0-9\s-]/g,' ')
+  .replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-|-$'/g,'').replace(/^-|-$/g,'');
+const cleanPrice = s => { const m = (s+"").match(/[0-9]+([.,][0-9]{3})*|[0-9]+/g); if(!m) return 0; return Number(m.join('').replace(/\D/g,'')); };
+const detectMerchant = url => /lazada\./i.test(url)?'lazada':(/shopee\./i.test(url)?'shopee':'');
+const inferSku = (name, url) => {
+  const n = toSlug(name||'');
+  if(n) return n;
+  try{
+    const u = new URL(url);
+    if(/shopee\./i.test(u.hostname)){
+      const m = u.pathname.match(/\/product\/(\d+)\/(\d+)/);
+      if(m) return `sp-${m[1]}-${m[2]}`;
+    }
+    if(/lazada\./i.test(u.hostname)){
+      const m = u.pathname.match(/\/products\/([a-z0-9-]+)/i);
+      if(m) return toSlug(m[1]);
+    }
+  }catch(e){}
+  return toSlug(url).slice(0,48);
+};
+
+async function enrichViaWorker(url){
+  const base = el('worker').value.trim();
+  if(!base) return null;
+  try{
+    const r = await fetch(`${base.replace(/\/$/,'')}/detail?url=${encodeURIComponent(url)}`);
+    if(!r.ok) return null;
+    const j = await r.json();
+    return { name: j.name||'', price: Number(j.price)||0 };
+  }catch(e){ return null; }
+}
+
+function makeItem({name, price, origin}){
+  const merchant = detectMerchant(origin);
+  const sku = inferSku(name, origin);
+  return {
+    name: name||'',
+    price: Number(price)||0,
+    origin,
+    merchant,
+    sku,
+    image: `/assets/img/products/${sku}.webp`,
+    category: '',
+    brand: '',
+    featured: false,
+    status: true,
+    updated_at: new Date().toISOString()
+  };
+}
+
+function dedupe(arr){
+  const seen = new Map(); // key by origin then sku
+  for(const it of arr){
+    const k = it.origin||it.sku;
+    if(!seen.has(k)) seen.set(k, it);
+  }
+  return [...seen.values()];
+}
+
+function renderPreview(items){
+  const wrap = el('preview');
+  wrap.innerHTML = items.map(it=>`
+    <div class="p">
+      <img src="${it.image}" onerror="this.src='/assets/img/products/placeholder.webp'" alt="${it.sku}">
+      <h4>${it.name||'(chưa có tên)'} </h4>
+      <div class="small muted">SKU: <b>${it.sku}</b></div>
+      <div class="small">Giá: <b>${it.price.toLocaleString('vi-VN')}</b></div>
+      <div class="small muted">Merchant: ${it.merchant||'?'}</div>
+    </div>
+  `).join('');
+}
+
+async function generate(){
+  const raw = el('input').value.trim().split(/\n+/).filter(Boolean);
+  if(!raw.length){ el('status').textContent = 'Không có dữ liệu.'; return; }
+  const useWorker = el('useWorker').checked;
+  const out = [];
+
+  for(const line of raw){
+    let name='', price=0, url='';
+    const parts = line.split('|');
+    if(parts.length>=3){
+      name = parts[0].trim();
+      price = cleanPrice(parts[1]);
+      url   = parts.slice(2).join('|').trim();
+    }else{ // chỉ có link
+      url = line.trim();
+    }
+
+    if(!/^https?:\/\//i.test(url)) continue;
+
+    if(useWorker && (!name || !price)){
+      const info = await enrichViaWorker(url);
+      if(info){
+        name = name || info.name;
+        price = price || info.price;
+      }
+    }
+
+    out.push(makeItem({name, price, origin:url}));
+  }
+
+  const final = dedupe(out);
+  el('out').value = JSON.stringify(final, null, 2);
+  renderPreview(final);
+  el('status').innerHTML = `<span class="ok">Tạo xong</span>: ${final.length} mục. ` +
+    `<span class="muted">Copy/Download để lưu vào <code>assets/data/affiliates.json</code>.</span>`;
+}
+
+el('gen').onclick = generate;
+
+el('copy').onclick = async () => {
+  try{ await navigator.clipboard.writeText(el('out').value||'[]'); el('status').innerHTML = '<span class="ok">✔ Đã copy JSON.</span>'; }
+  catch(e){ el('status').innerHTML = '<span class="err">Không copy được.</span>'; }
+};
+
+el('download').onclick = () => {
+  const blob = new Blob([el('out').value||'[]'], {type:'application/json'});
+  const a = Object.assign(document.createElement('a'),{download:'affiliates.json',href:URL.createObjectURL(blob)});
+  a.click(); URL.revokeObjectURL(a.href);
+};
+
+el('reset').onclick = () => { el('input').value=''; el('out').value=''; el('preview').innerHTML=''; el('status').textContent=''; };
+</script>
+</body>
+</html>
