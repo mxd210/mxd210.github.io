@@ -270,3 +270,80 @@ a.readmore{
   border:1px solid #dde6f5; font-weight:600;
 }
 a.readmore:hover{background:#eaf2ff}
+/* ===== MXD PRODUCT GRID/CARD — v2 (override) ===== */
+:root{
+  --surface:#f6f7f9;
+  --border-strong:#e3e6ea;
+  --text:#111;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --surface:#161a1f; --border-strong:#2a313a; --text:#e8e8e8; }
+}
+
+/* Lưới chỉ áp cho 2 khối sản phẩm hiện dùng */
+#product-list.grid, #featured-grid.grid{
+  display:grid;
+  gap:20px;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+}
+
+/* Card */
+#product-list .card, #featured-grid .card{
+  display:flex; flex-direction:column; overflow:hidden;
+  border:1px solid var(--border-strong); border-radius:14px;
+  background:#fff; box-shadow:0 6px 18px rgba(0,0,0,.06);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+#product-list .card:hover, #featured-grid .card:hover{
+  transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.08);
+}
+
+/* Ảnh: khung vuông, ảnh "contain" */
+#product-list .thumb, #featured-grid .thumb{
+  position:relative; aspect-ratio:1; display:grid; place-items:center;
+  background:var(--surface); border-bottom:1px solid var(--border-strong); padding:10px;
+}
+#product-list .thumb img, #featured-grid .thumb img{
+  width:100%; height:100%; object-fit:contain;
+}
+
+/* Thân card */
+#product-list .body, #featured-grid .body{ padding:14px; display:flex; flex-direction:column; gap:8px; min-height:140px }
+#product-list .name, #featured-grid .name{
+  margin:0; font-weight:700; font-size:15px; line-height:1.35;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.7em;
+}
+#product-list .name a, #featured-grid .name a{ color:var(--text); text-decoration:none }
+#product-list .name a:hover, #featured-grid .name a:hover{ text-decoration:underline }
+#product-list .price, #featured-grid .price{ font-weight:900; font-size:16px; letter-spacing:.2px; color:#d0021b }
+
+/* Nút mua gọn, màu theo sàn */
+#product-list .actions, #featured-grid .actions{ margin-top:auto }
+#product-list .buy, #featured-grid .buy{
+  display:inline-block; width:100%; text-align:center;
+  padding:10px 12px; border-radius:12px; font-weight:900;
+  color:#fff; border:1px solid transparent;
+  transition:transform .05s ease, box-shadow .15s ease, filter .1s ease;
+}
+#product-list .buy:active, #featured-grid .buy:active{ transform:translateY(1px) }
+#product-list .buy:hover, #featured-grid .buy:hover{ box-shadow:0 6px 16px rgba(0,0,0,.12); filter:brightness(1.03) }
+#product-list .buy, #featured-grid .buy{ background:#1746ff; border-color:#1746ff }
+#product-list .buy[data-merchant="shopee"], #featured-grid .buy[data-merchant="shopee"]{ background:#ee4d2d; border-color:#ee4d2d }
+#product-list .buy[data-merchant="lazada"], #featured-grid .buy[data-merchant="lazada"]{ background:#0f146d; border-color:#0f146d }
+#product-list .buy[data-merchant="tiki"],   #featured-grid .buy[data-merchant="tiki"]{ background:#1a94ff; border-color:#1a94ff }
+#product-list .buy[data-merchant="tiktok"], #featured-grid .buy[data-merchant="tiktok"]{ background:#111;    border-color:#111 }
+
+/* Skeleton tông nhã */
+#product-list .skeleton, #featured-grid .skeleton{
+  position:relative; overflow:hidden;
+  background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%);
+}
+#product-list .skeleton::after, #featured-grid .skeleton::after{
+  content:''; position:absolute; inset:0; animation:shimmer 1.4s infinite;
+}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+@media (max-width:480px){
+  #product-list.grid, #featured-grid.grid{ gap:14px }
+  #product-list .body, #featured-grid .body{ padding:12px }
+}
