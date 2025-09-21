@@ -1,185 +1,62 @@
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MXD Importer v3 — Shopee & Lazada → affiliates.json</title>
-  <style>
-    body{font:16px/1.5 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:16px;max-width:1100px;margin:auto}
-    h1{margin:0 0 12px} .row{display:flex;gap:12px;flex-wrap:wrap}
-    textarea{width:100%;min-height:180px}
-    input,select,button{font:inherit;padding:8px 10px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .mono{font-family:ui-monospace,SFMono-Regular,Consolas,Monaco,monospace}
-    .card{border:1px solid #ddd;border-radius:10px;padding:12px}
-    .muted{color:#666;font-size:14px}
-    .ok{color:#0a7d00} .warn{color:#a15c00} .err{color:#b00020}
-    .preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
-    .p{border:1px solid #e6e6e6;border-radius:12px;padding:10px}
-    .p h4{margin:0 0 6px;font-size:16px}
-    .p img{width:100%;height:150px;object-fit:cover;border-radius:8px;background:#f6f6f6}
-    .small{font-size:13px}
-  </style>
-</head>
-<body>
-  <h1>MXD Importer v3</h1>
-  <p class="muted">Dán <b>link Shopee/Lazada</b> hoặc từng dòng dạng <code class="mono">Tên | giá | link</code>. Bấm <b>Generate</b> → xuất <code>affiliates.json</code>.</p>
 
-  <div class="grid">
-    <div class="card">
-      <label for="worker">Worker base URL (tùy chọn để enrich):</label>
-      <input id="worker" placeholder="https://mxd210.mxd6686.workers.dev" style="width:100%"/>
-      <div class="row">
-        <label><input type="checkbox" id="useWorker"> Enrich bằng Worker (/detail)</label>
-      </div>
-      <textarea id="input" placeholder="Ví dụ:\nMáy cắt gạch Dekton | 1290000 | https://shopee.vn/product/300702715/21345346872\nhttps://www.lazada.vn/products/abc123.html\n..."></textarea>
-      <div class="row">
-        <button id="gen">Generate</button>
-        <button id="copy">Copy JSON</button>
-        <button id="download">Download JSON</button>
-        <button id="reset">Reset</button>
-      </div>
-      <div id="status" class="muted"></div>
-    </div>
-    <div class="card">
-      <h3>Kết quả JSON</h3>
-      <textarea id="out" class="mono" style="min-height:260px"></textarea>
-      <p class="small muted">Trường chuẩn: <code>name, price(number), origin, merchant(shopee|lazada), sku, image, category, brand, featured, status, updated_at</code></p>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>Xem nhanh</h3>
-    <div id="preview" class="preview"></div>
-  </div>
-
-<script>
-const el = id => document.getElementById(id);
-const toSlug = s => (s||"")
-  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-  .toLowerCase().replace(/[^a-z0-9\s-]/g,' ')
-  .replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-|-$'/g,'').replace(/^-|-$/g,'');
-const cleanPrice = s => { const m = (s+"").match(/[0-9]+([.,][0-9]{3})*|[0-9]+/g); if(!m) return 0; return Number(m.join('').replace(/\D/g,'')); };
-const detectMerchant = url => /lazada\./i.test(url)?'lazada':(/shopee\./i.test(url)?'shopee':'');
-const inferSku = (name, url) => {
-  const n = toSlug(name||'');
-  if(n) return n;
-  try{
-    const u = new URL(url);
-    if(/shopee\./i.test(u.hostname)){
-      const m = u.pathname.match(/\/product\/(\d+)\/(\d+)/);
-      if(m) return `sp-${m[1]}-${m[2]}`;
+{
+  "name": "MXD Importer — Patch Pack v4.0.1 Clean",
+  "target": "tools/shopee-importer.html (layout 4.0)",
+  "purpose": "Giữ layout 4.0, vá font tiếng Việt, chuẩn hóa SKU, Worker Default/Custom/None, thêm giảm giá -3% + bulk sub1={sku}. Kèm snippet EN/VN.",
+  "how_to_apply": 
+[
+    "1) Mở file tools/shopee-importer.html hiện tại (bản 4.0).",
+    "2) Thêm/ghi đè CSS ở cuối <style>.",
+    "3) Thêm các helper JS (decode/slug/humanName/currentWorker/adjPrice) cạnh nhóm Utils.",
+    "4) Sửa 2 handler Parse & Fetch theo hướng dẫn find/replace.",
+    "5) Thay block HTML Worker (Settings) bằng snippet worker_mode.html.",
+    "6) Thêm block HTML chỉnh giá (Settings) bằng snippet price_adjust.html.",
+    "7) Thêm checkbox bulk sub1 vào khu Import bằng snippet import_bulk_sub1.html.",
+    "8) Lưu. Kiểm tra: tên hiển thị tiếng Việt sạch, SKU kebab-case, Worker chọn được, giá mặc định -3%."
+  ],
+  "files": [
+    {
+      "path": "patches/css/401_clean.css",
+      "content": "/* --- 4.0.1: font & layout polish --- */\nbody{font-family:ui-sans-serif,system-ui,-apple-system,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",\"Liberation Sans\",sans-serif}\ntable{table-layout:fixed}\nth,td{word-break:break-word;overflow-wrap:anywhere}\n.card{padding:12px}\n.btn{padding:7px 10px}\ntextarea{resize:vertical}\n"
+    },
+    {
+      "path": "patches/js/helpers_401.js",
+      "content": "// --- 4.0.1 Helpers ---\nfunction decodeURIComponentSafe(s){ try{ return decodeURIComponent(s) }catch{ return s } }\nfunction humanNameFromURL(u){\n  try{\n    const url=new URL(u);\n    const last=url.pathname.split('/').filter(Boolean).pop()||url.hostname;\n    const dec=decodeURIComponentSafe(last).replace(/[-_]+/g,' ').trim();\n    return /^\\d+$/.test(dec) ? url.hostname : dec;\n  }catch{ return u }\n}\nfunction slugifyVN(s){\n  s=String(s||'').trim();\n  if(/%[0-9A-Fa-f]{2}/.test(s)) s=decodeURIComponentSafe(s);\n  s=s.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase();\n  s=s.replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');\n  if(s.length>80) s=s.slice(0,80).replace(/-+$/,'');\n  return s || ('mxd-'+Date.now().toString(36));\n}\n// Worker mode helper (uses SETTINGS.worker_mode + SETTINGS.worker)\nfunction currentWorker(){\n  const mode = (SETTINGS.worker_mode||'default');\n  if(mode==='default') return 'https://mxd210.mxd6686.workers.dev';\n  if(mode==='custom')  return (SETTINGS.worker||'').trim();\n  return ''; // none\n}\n// Price adjust helper\nfunction adjPrice(p){\n  let v = Number(p)||0;\n  v = v * (1 + (Number(SETTINGS.price_adj)||0)/100);\n  if (SETTINGS.price_round) v = Math.round(v/1000)*1000;\n  return Math.max(0, Math.floor(v));\n}\n"
+    },
+    {
+      "path": "patches/js/fetchHead_override.js",
+      "content": "// --- 4.0.1: fetchHead using currentWorker ---\nasync function fetchHead(url){\n  const base = (currentWorker()||'').replace(/\\/+$/,'');\n  if(!base) return {status:0, parser:'fallback', title:'', image:'', price:null, brand:''};\n  const res = await fetch(base + '/head?url=' + encodeURIComponent(url), {mode:'cors'});\n  let data={}; try{ data = await res.json() }catch(_){}\n  return {\n    status: res.status||0, parser:'worker-head',\n    title: data.title||data.ogTitle||'', image: data.image||data.ogImage||'',\n    price: (data.price!=null && isFinite(Number(data.price))) ? Number(data.price) : null,\n    brand: data.brand||''\n  };\n}\n"
+    },
+    {
+      "path": "snippets/html/worker_mode.html",
+      "content": "<!-- Worker (mặc định / tùy chỉnh / tắt) -->\n<label>Worker (mặc định / tùy chỉnh / tắt)</label>\n<div class=\"row\">\n  <select id=\"worker-mode\" style=\"max-width:200px\">\n    <option value=\"default\">Default (mxd210)</option>\n    <option value=\"custom\">Custom…</option>\n    <option value=\"none\">None</option>\n  </select>\n  <input id=\"set-worker\" type=\"url\" placeholder=\"https://your-worker.workers.dev\" style=\"flex:1\">\n</div>\n"
+    },
+    {
+      "path": "snippets/html/price_adjust.html",
+      "content": "<!-- Price adjust -->\n<div class=\"grid\" style=\"gap:8px;margin-top:8px\">\n  <label>Price adjust (%) — Điều chỉnh giá (%):</label>\n  <div class=\"row\">\n    <input id=\"set-price-adj\" type=\"number\" step=\"0.1\" value=\"-3\" style=\"max-width:120px\">\n    <label class=\"row\"><input id=\"set-price-apply-out\" type=\"checkbox\" checked> Áp dụng lên bảng Output</label>\n    <label class=\"row\"><input id=\"set-price-round\" type=\"checkbox\"> Làm tròn 1.000đ</label>\n  </div>\n</div>\n"
+    },
+    {
+      "path": "snippets/html/import_bulk_sub1.html",
+      "content": "<!-- Bulk sub1 toggle -->\n<label class=\"row\"><input id=\"bulk-sub1\" type=\"checkbox\"> sub1 = {sku}</label>\n"
+    },
+    {
+      "path": "patches/js/settings_mount_save.txt",
+      "content": "// --- loadSettings(): add defaults ---\n// price_adj: -3, price_apply_out: true, price_round: false, worker_mode: 'default', worker: ''\n\n// --- mountSettings(): add ---\nq('#worker-mode').value = SETTINGS.worker_mode || 'default';\nq('#set-worker').value  = SETTINGS.worker || '';\nq('#set-price-adj').value = SETTINGS.price_adj ?? -3;\nq('#set-price-apply-out').checked = !!SETTINGS.price_apply_out;\nq('#set-price-round').checked = !!SETTINGS.price_round;\n\n// --- saveSettings(): add ---\nSETTINGS.worker_mode = q('#worker-mode').value;\nSETTINGS.worker      = q('#set-worker').value.trim();\nSETTINGS.price_adj   = Number(q('#set-price-adj').value)||0;\nSETTINGS.price_apply_out = q('#set-price-apply-out').checked;\nSETTINGS.price_round = q('#set-price-round').checked;\n"
+    },
+    {
+      "path": "patches/js/parse_fetch_changes.txt",
+      "content": "// --- In Parse handler ---\nconst fbName = humanNameFromURL(r.origin);\nconst name = r.name || fbName;\nconst m = r.merchant || guessMerchant(r.origin);\nlet price = Number(r.price)||0;\nif (SETTINGS.price_apply_out) price = adjPrice(price);\nlet sku = slugifyVN(name || fbName || r.origin);\nif ((!name || name.length<2) && m==='shopee'){ const ids=parseShopeeIDs(r.origin); if (ids) sku=`sp${ids.shop}-${ids.item}`; }\n\n// --- In Fetch handler ---\nconst fbName = humanNameFromURL(r.origin);\nlet name = r.name || head.title || fbName;\nlet price = (isFinite(r.price)&&r.price>0) ? r.price : (isFinite(head.price)?head.price:0);\nif (SETTINGS.price_apply_out) price = adjPrice(price);\nlet sku = slugifyVN(name || fbName || r.origin);\nif ((!name || name.length<2) && m==='shopee'){ const ids=parseShopeeIDs(r.origin); if (ids) sku=`sp${ids.shop}-${ids.item}`; }\n\n// --- In syncDerived or where building deeplink ---\nif (document.querySelector('#bulk-sub1')?.checked) it.sub1 = it.sku;\n"
+    },
+    {
+      "path": "patches/js/toAffJSON_snippet.txt",
+      "content": "// price field inside toAffJSON():\nprice: isFinite(it.price) ? (SETTINGS.price_apply_out ? Number(it.price) : adjPrice(it.price)) : 0,\n"
+    },
+    {
+      "path": "patches/js/snippet_price_data_attr.txt",
+      "content": "// when building product-meta snippet, ensure data-price uses adjusted value:\ndata-price=\"${isFinite(it.price)? (SETTINGS.price_apply_out?it.price:adjPrice(it.price)) : 0}\"\n"
+    },
+    {
+      "path": "instructions.txt",
+      "content": " === MXD Importer Patch Pack v4.0.1 Clean — Steps ===\n 1) Append CSS from patches/css/401_clean.css to the <style> block.\n 2) Add JS helpers from patches/js/helpers_401.js near your Utils.\n 3) Replace your fetchHead function with patches/js/fetchHead_override.js.\n 4) In Settings (HTML), replace Worker block with snippets/html/worker_mode.html.\n 5) In Settings (HTML), add snippets/html/price_adjust.html (below Worker is fine).\n 6) In Import area (HTML), add snippets/html/import_bulk_sub1.html near sub1 input.\n 7) In JS: apply patches from patches/js/settings_mount_save.txt to load/mount/save settings.\n 8) Update Parse & Fetch handlers using patches/js/parse_fetch_changes.txt.\n 9) Update toAffJSON() price line as in patches/js/toAffJSON_snippet.txt.\n10) If you output data-price in snippets, use patches/js/snippet_price_data_attr.txt.\n 11) Save and reload. Verify: VN text renders fine, SKU kebab-case, Worker mode works, default price adjust -3%.\n"
     }
-    if(/lazada\./i.test(u.hostname)){
-      const m = u.pathname.match(/\/products\/([a-z0-9-]+)/i);
-      if(m) return toSlug(m[1]);
-    }
-  }catch(e){}
-  return toSlug(url).slice(0,48);
-};
-
-async function enrichViaWorker(url){
-  const base = el('worker').value.trim();
-  if(!base) return null;
-  try{
-    const r = await fetch(`${base.replace(/\/$/,'')}/detail?url=${encodeURIComponent(url)}`);
-    if(!r.ok) return null;
-    const j = await r.json();
-    return { name: j.name||'', price: Number(j.price)||0 };
-  }catch(e){ return null; }
-}
-
-function makeItem({name, price, origin}){
-  const merchant = detectMerchant(origin);
-  const sku = inferSku(name, origin);
-  return {
-    name: name||'',
-    price: Number(price)||0,
-    origin,
-    merchant,
-    sku,
-    image: `/assets/img/products/${sku}.webp`,
-    category: '',
-    brand: '',
-    featured: false,
-    status: true,
-    updated_at: new Date().toISOString()
-  };
-}
-
-function dedupe(arr){
-  const seen = new Map(); // key by origin then sku
-  for(const it of arr){
-    const k = it.origin||it.sku;
-    if(!seen.has(k)) seen.set(k, it);
-  }
-  return [...seen.values()];
-}
-
-function renderPreview(items){
-  const wrap = el('preview');
-  wrap.innerHTML = items.map(it=>`
-    <div class="p">
-      <img src="${it.image}" onerror="this.src='/assets/img/products/placeholder.webp'" alt="${it.sku}">
-      <h4>${it.name||'(chưa có tên)'} </h4>
-      <div class="small muted">SKU: <b>${it.sku}</b></div>
-      <div class="small">Giá: <b>${it.price.toLocaleString('vi-VN')}</b></div>
-      <div class="small muted">Merchant: ${it.merchant||'?'}</div>
-    </div>
-  `).join('');
-}
-
-async function generate(){
-  const raw = el('input').value.trim().split(/\n+/).filter(Boolean);
-  if(!raw.length){ el('status').textContent = 'Không có dữ liệu.'; return; }
-  const useWorker = el('useWorker').checked;
-  const out = [];
-
-  for(const line of raw){
-    let name='', price=0, url='';
-    const parts = line.split('|');
-    if(parts.length>=3){
-      name = parts[0].trim();
-      price = cleanPrice(parts[1]);
-      url   = parts.slice(2).join('|').trim();
-    }else{ // chỉ có link
-      url = line.trim();
-    }
-
-    if(!/^https?:\/\//i.test(url)) continue;
-
-    if(useWorker && (!name || !price)){
-      const info = await enrichViaWorker(url);
-      if(info){
-        name = name || info.name;
-        price = price || info.price;
-      }
-    }
-
-    out.push(makeItem({name, price, origin:url}));
-  }
-
-  const final = dedupe(out);
-  el('out').value = JSON.stringify(final, null, 2);
-  renderPreview(final);
-  el('status').innerHTML = `<span class="ok">Tạo xong</span>: ${final.length} mục. ` +
-    `<span class="muted">Copy/Download để lưu vào <code>assets/data/affiliates.json</code>.</span>`;
-}
-
-el('gen').onclick = generate;
-
-el('copy').onclick = async () => {
-  try{ await navigator.clipboard.writeText(el('out').value||'[]'); el('status').innerHTML = '<span class="ok">✔ Đã copy JSON.</span>'; }
-  catch(e){ el('status').innerHTML = '<span class="err">Không copy được.</span>'; }
-};
-
-el('download').onclick = () => {
-  const blob = new Blob([el('out').value||'[]'], {type:'application/json'});
-  const a = Object.assign(document.createElement('a'),{download:'affiliates.json',href:URL.createObjectURL(blob)});
-  a.click(); URL.revokeObjectURL(a.href);
-};
-
-el('reset').onclick = () => { el('input').value=''; el('out').value=''; el('preview').innerHTML=''; el('status').textContent=''; };
-</script>
-</body>
-</html>
+  ]
