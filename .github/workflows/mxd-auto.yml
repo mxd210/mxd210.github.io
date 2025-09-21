@@ -1,81 +1,46 @@
-name: MXD Auto v0.2
+name: mxd_importer
 
 on:
-  schedule:
-    - cron: '13 */4 * * *'
   workflow_dispatch:
-  push:
-    paths:
-      - 'assets/data/affiliates.json'
-      - 'assets/data/affiliates.csv'
-      - 'assets/img/products/**'
-      - 'blog/**'
-      - 'store/**'
-      - 'mxd.auto.config.json'
+    inputs:
+      links:
+        description: "Dán 1–N dòng: 'Tên | giá | link' hoặc chỉ 'link'"
+        required: true
+        type: string
+  repository_dispatch:
+    types: [mxd_importer]
 
 permissions:
   contents: write
 
 jobs:
-  run:
+  import:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0    # cần full history để pull --rebase ổn định
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: "20"
 
-      - name: Import from CSV/Sheet (optional)
-        run: node tools/sync-from-sheet.mjs || true
+      - name: Install deps
+        working-directory: tools/ci
+        run: npm install
 
-      - name: Validate & Check links
-        run: |
-          node tools/validate-affiliates.mjs || true
-          node tools/check-links.mjs
-
-      - name: Prune dead links
-        run: node tools/prune-dead-links.mjs
-
-      - name: Generate featured + Sitemaps
-        run: |
-          node tools/generate-featured.mjs
-          node tools/build-sitemaps.mjs
-
-      - name: Telegram alert (optional)
+      - name: Run importer
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: node tools/report-telegram.mjs || true
+          LINKS: ${{ github.event.inputs.links || github.event.client_payload.links }}
+          REPO_ROOT: ${{ github.workspace }}
+        run: node tools/ci/mxd_importer.js
 
-      - name: Commit changes
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: ${{ github.ref_name }}
+      - name: Commit & push
         run: |
-          set -e
-          # cấu hình bot
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # push bằng token để tránh 403
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
-
-          # đồng bộ trước khi đẩy
-          git fetch --prune origin "${BRANCH}"
-
-          # stage thay đổi
+          git config user.name "mxd-bot"
+          git config user.email "mxd-bot@users.noreply.github.com"
           git add -A
-
-          # không có gì để commit thì thoát êm
           if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
+            echo "No changes; skipping commit."
+          else
+            git commit -m "feat(data): add ${{ env.COMMIT_SUBJECT }}"
+            git push
           fi
-
-          # commit + rebase rồi push
-          git commit -m "chore(auto): import, check, prune, featured, sitemaps, alert [skip ci]"
-          git pull --rebase origin "${BRANCH}" || true
-          git push origin HEAD:"${BRANCH}"
