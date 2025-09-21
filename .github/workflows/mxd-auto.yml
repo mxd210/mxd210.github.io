@@ -21,6 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # cần full history để pull --rebase ổn định
+
       - uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -47,33 +50,32 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: node tools/report-telegram.mjs || true
 
-                 - name: Commit changes
+      - name: Commit changes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: ${{ github.ref_name }}
         run: |
           set -e
-
-          # Cấu hình user cho commit
+          # cấu hình bot
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Đảm bảo remote dùng token (tránh lỗi Permission denied)
+          # push bằng token để tránh 403
           git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
 
-          # Đồng bộ để tránh xung đột do commit tay
-          git fetch origin "${BRANCH}"
+          # đồng bộ trước khi đẩy
+          git fetch --prune origin "${BRANCH}"
 
-          # Stage thay đổi
+          # stage thay đổi
           git add -A
 
-          # Không có gì để commit thì thoát êm
+          # không có gì để commit thì thoát êm
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
 
-          # Commit + rebase rồi push về đúng nhánh
+          # commit + rebase rồi push
           git commit -m "chore(auto): import, check, prune, featured, sitemaps, alert [skip ci]"
           git pull --rebase origin "${BRANCH}" || true
           git push origin HEAD:"${BRANCH}"
