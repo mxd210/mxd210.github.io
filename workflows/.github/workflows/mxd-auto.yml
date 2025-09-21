@@ -1,0 +1,56 @@
+name: MXD Auto v0.2
+
+on:
+  schedule:
+    - cron: '13 */4 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'assets/data/affiliates.json'
+      - 'assets/data/affiliates.csv'
+      - 'assets/img/products/**'
+      - 'blog/**'
+      - 'store/**'
+      - 'mxd.auto.config.json'
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Import from CSV/Sheet (optional)
+        run: node tools/sync-from-sheet.mjs || true
+
+      - name: Validate & Check links
+        run: |
+          node tools/validate-affiliates.mjs || true
+          node tools/check-links.mjs
+
+      - name: Prune dead links
+        run: node tools/prune-dead-links.mjs
+
+      - name: Generate featured + Sitemaps
+        run: |
+          node tools/generate-featured.mjs
+          node tools/build-sitemaps.mjs
+
+      - name: Telegram alert (optional)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node tools/report-telegram.mjs || true
+
+      - name: Commit changes
+        run: |
+          git config user.name "MXD Bot"
+          git config user.email "bot@mxd210.github.io"
+          git add -A
+          git diff --quiet && echo "No changes to commit" || git commit -m "chore(auto): import, check, prune, featured, sitemaps, alert [skip ci]"
+          git push
