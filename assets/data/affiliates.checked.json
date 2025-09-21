@@ -4,15 +4,7 @@
     "origin": "https://shopee.vn/product/279547485/5274192859",
     "ok": false,
     "status": 0,
-    "checked_at": "2025-09-21T08:37:52.361Z",
-    "is_dead": true
-  },
-  {
-    "sku": "may-cat-da-125mm-900w",
-    "origin": "https://shopee.vn/product/279547485/5274192863",
-    "ok": false,
-    "status": 0,
-    "checked_at": "2025-09-21T08:37:52.147Z",
+    "checked_at": "2025-09-21T13:05:03.682Z",
     "is_dead": true
   },
   {
@@ -20,7 +12,7 @@
     "origin": "https://shopee.vn/product/772892494/21507014059",
     "ok": false,
     "status": 0,
-    "checked_at": "2025-09-21T08:37:52.362Z",
+    "checked_at": "2025-09-21T13:05:03.857Z",
     "is_dead": true
   }
 ]
