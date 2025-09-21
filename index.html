@@ -107,16 +107,28 @@
       .name{font-size:15px}
     }
   </style>
-<div id="featured-products"></div>
+<!-- ===== SẢN PHẨM NỔI BẬT ===== -->
+<section class="wrap">
+  <h2>Sản phẩm nổi bật</h2>
+  <div id="featured-grid" class="grid"></div>
+</section>
 
-<!-- Giữ thứ tự GA4 trước – Affiliate sau – rồi mới JS hiển thị -->
-<script src="/assets/analytics.js" defer></script>
-<script src="/assets/mxd-affiliate.js" defer></script>
-<script src="/assets/js/featured.js" defer></script>
+<!-- ===== THỨ TỰ SCRIPT CHUẨN MXD ===== -->
+<!-- 1) GA4: luôn nhúng trước -->
+<script defer src="/assets/analytics.js"></script>
 
-  <!-- GA4 trước, Affiliate sau -->
-  <script src="/assets/analytics.js" defer></script>
-  <script src="/assets/mxd-affiliate.js" defer></script>
+<!-- 2) Render sản phẩm (đọc affiliates.json và vẽ thẻ) -->
+<script defer src="/assets/js/render-products.js"></script>
+<script>
+  // Gọi render sau khi DOM sẵn sàng
+  window.addEventListener('DOMContentLoaded', () => {
+    MXD.renderProducts('#featured-grid', 8); // đổi selector nếu bạn dùng ID khác
+  });
+</script>
+
+<!-- 3) Affiliate rewrite: đặt SAU GA4 và SAU render -->
+<script defer src="/assets/mxd-affiliate.js"></script>
+
 </head>
 <body>
   <!-- Header có điều hướng -->
