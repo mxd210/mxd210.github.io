@@ -1,15 +1,11 @@
-// sw.js — MXD PWA v35
-const VERSION = 'v35';
+// sw.js — MXD PWA v36
+const VERSION = 'v36';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
 // ---- Precache (nhẹ) ----
-// LƯU Ý: KHÔNG thêm /assets/data/affiliates*.json vào precache
 const ASSETS = [
-  '/',                  // shell
-  '/index.html',
-  '/store.html',
-  '/g.html',
+  '/', '/index.html', '/store.html', '/g.html',
   '/tools/shopee-importer.html',
   '/assets/site.css',
   '/assets/js/render-products.js',
@@ -22,14 +18,13 @@ const ASSETS = [
 const normalize = (input) => {
   const u = typeof input === 'string'
     ? new URL(input, self.location.origin)
-    : new URL(input.url);
+    : new URL(input.url, self.location.origin);
   return u.origin === self.location.origin ? u.pathname : u.href;
 };
 
-// Trang offline nội tuyến
+// Offline page gọn
 const offlinePage = () => new Response(
-  `<!doctype html><meta charset="utf-8">
-   <title>MXD – Offline</title>
+  `<!doctype html><meta charset="utf-8"><title>MXD – Offline</title>
    <main style="max-width:640px;margin:20vh auto;font:16px/1.6 system-ui;text-align:center">
      <h1>Không có mạng</h1>
      <p>Vui lòng kết nối Internet để tiếp tục.</p>
@@ -51,8 +46,7 @@ self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(
-      keys.filter(k => k.startsWith(CACHE_PREFIX) && k !== CACHE)
-          .map(k => caches.delete(k))
+      keys.filter(k => k.startsWith(CACHE_PREFIX) && k !== CACHE).map(k => caches.delete(k))
     );
     if ('navigationPreload' in self.registration) {
       try { await self.registration.navigationPreload.enable(); } catch {}
@@ -66,68 +60,59 @@ self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// === Runtime cache ảnh qua Worker với TTL 1 ngày ===
+// === Runtime cache ảnh qua Worker (/img) — TTL 1 ngày (SWR) ===
 const ONE_DAY = 24 * 60 * 60 * 1000;
-
-// Giúp chuẩn hóa key cache: chỉ dựa vào đích 'url=' (tránh khác query phụ)
 function imgCacheKey(u) {
   const raw = new URL(u);
   const qs = new URLSearchParams(raw.search);
   const target = qs.get('url') || '';
-  // Chỉ dùng origin+path của Worker + url đích để làm key
   return `${raw.origin}${raw.pathname}?url=${target}`;
 }
-
 async function cachePutWithStamp(cache, keyReq, res) {
-  const cloned = res.clone();
-  const buf = await cloned.arrayBuffer();
-  const headers = new Headers(cloned.headers);
+  const buf = await res.clone().arrayBuffer();        // clone TRƯỚC khi đọc
+  const headers = new Headers(res.headers);
   headers.set('x-sw-cached-at', Date.now().toString());
-  const stamped = new Response(buf, { status: cloned.status, statusText: cloned.statusText, headers });
+  const stamped = new Response(buf, { status: res.status, statusText: res.statusText, headers });
   await cache.put(keyReq, stamped.clone());
   return stamped;
 }
 
-// === Helpers nhận diện ===
+// ==== Domains bỏ qua (analytics / affiliate / mxh) ====
 const BYPASS_HOSTS = new Set([
-  // Analytics
   'www.googletagmanager.com','googletagmanager.com',
   'www.google-analytics.com','google-analytics.com',
   'analytics.google.com','g.doubleclick.net',
-  // Affiliate / TMĐT
   'go.isclix.com',
   'shopee.vn','cf.shopee.vn','s.shopee.vn',
   'lazada.vn','s.lazada.vn','pages.lazada.vn',
   'tiki.vn','api.tiki.vn',
-  // MXH
   'facebook.com','www.facebook.com','m.me','zalo.me'
 ]);
 
 const isDynamicJSON = (u) =>
   (u.origin === self.location.origin) && (
     (u.pathname.startsWith('/assets/data/') && u.pathname.endsWith('.json')) ||
-    u.pathname === '/products.json' // thêm: coi products.json là dữ liệu động
+    u.pathname === '/products.json'
   );
 
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
   if (req.method !== 'GET') return;
-
   const url = new URL(req.url);
 
-  // /sw-version → xem phiên bản
+  // version endpoint
   if (url.pathname === '/sw-version') {
-    e.respondWith(new Response(VERSION, { headers: {'content-type':'text/plain'} }));
+    event.respondWith(new Response(VERSION, { headers: {'content-type':'text/plain'} }));
     return;
   }
 
-  // Không can thiệp các host dưới (analytics/affiliate/mxh)
+  // bypass ngoại lệ
   if (BYPASS_HOSTS.has(url.hostname)) return;
 
-  // Ảnh qua Worker (domain *.workers.dev, path /img) → TTL 1 ngày (SWR)
+  // Ảnh qua Worker *.workers.dev/*/img → TTL 1d
   const isWorkerImg = /workers\.dev$/i.test(url.hostname) && url.pathname.endsWith('/img');
   if (isWorkerImg) {
-    e.respondWith((async () => {
+    event.respondWith((async () => {
       const cache = await caches.open(CACHE);
       const key = imgCacheKey(req.url);
       const keyReq = new Request(key, { method: 'GET', mode: 'no-cors' });
@@ -137,9 +122,7 @@ self.addEventListener('fetch', (e) => {
         const ts = parseInt(cached.headers.get('x-sw-cached-at') || '0', 10);
         const fresh = ts && (Date.now() - ts) < ONE_DAY;
         if (fresh) return cached;
-
-        // hết hạn → trả cached và revalidate nền
-        e.waitUntil((async () => {
+        event.waitUntil((async () => {
           try {
             const net = await fetch(req, { cache: 'no-store' });
             if (net && net.ok) await cachePutWithStamp(cache, keyReq, net);
@@ -147,8 +130,6 @@ self.addEventListener('fetch', (e) => {
         })());
         return cached;
       }
-
-      // chưa có cache → fetch mạng và lưu
       try {
         const net = await fetch(req, { cache: 'no-store' });
         if (net && net.ok) return await cachePutWithStamp(cache, keyReq, net);
@@ -160,59 +141,58 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // JSON dữ liệu động → luôn network-first (no-store)
+  // JSON động → network-first (no-store)
   if (isDynamicJSON(url)) {
-    e.respondWith(fetch(req, { cache: 'no-store' }).catch(() => caches.match(req)));
+    event.respondWith(fetch(req, { cache: 'no-store' }).catch(() => caches.match(req)));
     return;
   }
 
-  // Điều hướng HTML?
+  // HTML (điều hướng) → network-first + preload
   const isHTMLNav = req.mode === 'navigate' ||
-    (req.headers.get('accept') || '').includes('text/html');
-
-  // 1) HTML → network-first (+ preload); lỗi mạng → cache theo trang, rồi '/', cuối cùng offlinePage()
+                    (req.headers.get('accept') || '').includes('text/html');
   if (isHTMLNav) {
-    e.respondWith((async () => {
+    event.respondWith((async () => {
       try {
-        const preload = await e.preloadResponse;
+        const preload = await event.preloadResponse;
         if (preload) {
-          if (preload.ok) {
-            const key = normalize(req);
-            caches.open(CACHE).then(c => c.put(key, preload.clone()));
-          }
+          const copy = preload.clone(); // clone TRƯỚC khi trả về để tránh "body used"
+          event.waitUntil(caches.open(CACHE).then(c => c.put(normalize(req), copy)));
           return preload;
         }
         const res = await fetch(req, { cache: 'no-store' });
         if (res && res.ok) {
-          const key = normalize(req);
-          caches.open(CACHE).then(c => c.put(key, res.clone()));
+          const copy = res.clone();
+          event.waitUntil(caches.open(CACHE).then(c => c.put(normalize(req), copy)));
         }
         return res;
       } catch {
-        return (await caches.match(normalize(req), { ignoreSearch: true }))
-            || (await caches.match('/', { ignoreSearch: true }))
-            || offlinePage();
+        return (await caches.match(normalize(req), { ignoreSearch: true })) ||
+               (await caches.match('/', { ignoreSearch: true })) ||
+               offlinePage();
       }
     })());
     return;
   }
 
-  // 2) Static same-origin → stale-while-revalidate
+  // Assets tĩnh same-origin → stale-while-revalidate
   const isStatic =
     url.origin === self.location.origin && (
       url.pathname.startsWith('/assets/') ||
       /\.(css|js|webp|png|jpg|jpeg|svg|woff2)$/.test(url.pathname)
     );
-
   if (isStatic) {
-    e.respondWith((async () => {
+    event.respondWith((async () => {
       const cached = await caches.match(req, { ignoreSearch: true });
       const revalidate = fetch(req).then(async (res) => {
         if (res && res.ok) {
           const c = await caches.open(CACHE);
-          await c.put(req, res.clone());
+          const copy1 = res.clone();
+          await c.put(req, copy1);
           const normKey = normalize(req);
-          if (normKey !== req.url) await c.put(normKey, res.clone());
+          if (normKey !== req.url) {
+            const copy2 = res.clone();
+            await c.put(normKey, copy2);
+          }
         }
         return res;
       }).catch(() => null);
@@ -221,8 +201,8 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // 3) Khác origin → network-first; rớt mạng → cache (nếu có)
-  e.respondWith((async () => {
+  // Khác origin → network-first; offline → cache (nếu có)
+  event.respondWith((async () => {
     try { return await fetch(req); }
     catch {
       const hit = await caches.match(req, { ignoreSearch: true });
