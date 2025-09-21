@@ -47,25 +47,33 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: node tools/report-telegram.mjs || true
 
-           - name: Commit changes
+                 - name: Commit changes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.ref_name }}
         run: |
           set -e
-          git config user.name "MXD Bot"
-          git config user.email "bot@mxd210.github.io"
 
-          # Đồng bộ với remote để tránh xung đột
-          git fetch origin main
+          # Cấu hình user cho commit
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stage thay đổi (nếu có)
+          # Đảm bảo remote dùng token (tránh lỗi Permission denied)
+          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
+
+          # Đồng bộ để tránh xung đột do commit tay
+          git fetch origin "${BRANCH}"
+
+          # Stage thay đổi
           git add -A
 
-          # Nếu không có gì để commit thì thoát êm
+          # Không có gì để commit thì thoát êm
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
 
-          # Commit + rebase rồi mới push
+          # Commit + rebase rồi push về đúng nhánh
           git commit -m "chore(auto): import, check, prune, featured, sitemaps, alert [skip ci]"
-          git pull --rebase origin main || true
-          git push origin HEAD:main
+          git pull --rebase origin "${BRANCH}" || true
+          git push origin HEAD:"${BRANCH}"
