@@ -1,18 +1,18 @@
 [
   {
-    "sku": "may-cat-cam-tay-dekton-dk-ag950s",
-    "origin": "https://shopee.vn/product/279547485/5274192859",
-    "ok": false,
-    "status": 0,
-    "checked_at": "2025-09-21T05:25:31.237Z",
-    "is_dead": true
-  },
-  {
     "sku": "kynko-j1c-kd28-26",
     "origin": "https://shopee.vn/product/772892494/21507014059",
     "ok": false,
     "status": 0,
-    "checked_at": "2025-09-21T05:25:31.388Z",
+    "checked_at": "2025-09-21T05:29:55.121Z",
+    "is_dead": true
+  },
+  {
+    "sku": "may-cat-cam-tay-dekton-dk-ag950s",
+    "origin": "https://shopee.vn/product/279547485/5274192859",
+    "ok": false,
+    "status": 0,
+    "checked_at": "2025-09-21T05:29:54.936Z",
     "is_dead": true
   }
 ]
