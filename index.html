@@ -343,6 +343,26 @@
     }
   })();
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+    .then(reg => {
+      // nếu có SW mới chờ, kích hoạt luôn
+      if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        nw && nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            reg.waiting && reg.waiting.postMessage('SKIP_WAITING');
+          }
+        });
+      });
+    });
+
+  // Khi controller đổi (SW mới nắm quyền), reload 1 lần để đồng bộ
+  navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+}
+</script>
 
   <!-- JS khác (nếu tách riêng) -->
   <script src="/assets/js/floating-contact.js" defer></script>
