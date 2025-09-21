@@ -9,5 +9,16 @@
     "updated_at": "2025-09-21T18:36:39.652Z",
     "featured": false,
     "status": true
+  },
+  {
+    "name": "search",
+    "price": null,
+    "origin": "https://shopee.vn/search?keyword=Bosch%20GWS%20900-125%20S",
+    "merchant": "shopee",
+    "sku": "search",
+    "image": "/assets/img/products/search.webp",
+    "updated_at": "2025-09-21T20:43:08.969Z",
+    "featured": false,
+    "status": true
   }
 ]
