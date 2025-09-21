@@ -1,0 +1,19 @@
+{
+  "siteBase": "https://mxd210.github.io",
+  "featured": {
+    "count": 5,
+    "minPrice": 100000,
+    "maxPrice": 999999999
+  },
+  "sitemap": {
+    "blogDir": "blog",
+    "storeDir": "store"
+  },
+  "import": {
+    "sheetCsvUrl": "",
+    "csvPath": "assets/data/affiliates.csv"
+  },
+  "alerts": {
+    "deadLinkThreshold": 5
+  }
+}

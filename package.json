@@ -1,16 +1,17 @@
 {
-  "name": "mxd210-site",
+  "name": "mxd-auto",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
+  "description": "MXD automation: sheet import, link check, prune, featured, sitemaps, telegram alert",
   "scripts": {
-    "check:links": "node scripts/check-links.js",
-    "check:links:headful": "node scripts/check-links-puppeteer.js"
-  },
-  "dependencies": {
-    "cheerio": "^1.0.0",
-    "fs-extra": "^11.2.0",
-    "node-fetch": "2",
-    "p-limit": "^5.0.0",
-    "puppeteer": "^23.5.0"
+    "validate:aff": "node tools/validate-affiliates.mjs",
+    "import:csv": "node tools/sync-from-sheet.mjs",
+    "check:links": "node tools/check-links.mjs",
+    "prune:dead": "node tools/prune-dead-links.mjs",
+    "gen:featured": "node tools/generate-featured.mjs",
+    "build:sitemap": "node tools/build-sitemaps.mjs",
+    "alert:telegram": "node tools/report-telegram.mjs",
+    "auto": "npm run validate:aff && npm run import:csv && npm run check:links && npm run prune:dead && npm run gen:featured && npm run build:sitemap && npm run alert:telegram"
   }
 }
