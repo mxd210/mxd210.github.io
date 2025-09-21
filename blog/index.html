@@ -18,6 +18,36 @@
 </head>
   
 <body>
+  <nav class="mxd-topbar">
+  <a class="brand" href="/">MXD</a>
+  <div class="links">
+    <a href="/">Trang chủ</a>
+    <a href="/store/">Cửa hàng</a>  <!-- nếu site bạn là /store.html, đổi href thành /store.html -->
+    <a href="/blog/">Tin tức</a>
+    <a href="/tu-van.html">Tư vấn</a>
+    <a href="/lien-he.html">Liên hệ</a>
+  </div>
+</nav>
+
+<style>
+  /* tối thiểu để hiển thị đẹp ngay, không đụng style cũ */
+  .mxd-topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid #eee}
+  .mxd-topbar .brand{font-weight:700;text-decoration:none;color:inherit}
+  .mxd-topbar .links a{margin-left:12px;text-decoration:none;color:inherit}
+  .mxd-topbar .links a.active{font-weight:700;text-decoration:underline}
+</style>
+
+<script>
+  // đánh dấu mục đang xem là active
+  (function(){
+    var p = location.pathname.replace(/\/index\.html$/,'') || '/';
+    document.querySelectorAll('.mxd-topbar .links a').forEach(function(a){
+      var href = a.getAttribute('href');
+      if (href === p || href === p + '/' ) a.classList.add('active');
+    });
+  })();
+</script>
+
   <header class="container">
     
     <h1>Tin tức</h1>
