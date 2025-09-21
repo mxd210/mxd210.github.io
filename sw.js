@@ -1,17 +1,21 @@
-// sw.js — MXD PWA v34
-const VERSION = 'v34';
+// sw.js — MXD PWA v35
+const VERSION = 'v35';
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
 // ---- Precache (nhẹ) ----
-// LƯU Ý: KHÔNG thêm /assets/data/affiliates.json vào precache
+// LƯU Ý: KHÔNG thêm /assets/data/affiliates*.json vào precache
 const ASSETS = [
-  '/',                  // shell trang chủ
-  '/store.html',        // precache trang store (nếu có)
-  '/tools/shopee-importer.html', // importer mới
+  '/',                  // shell
+  '/index.html',
+  '/store.html',
+  '/g.html',
+  '/tools/shopee-importer.html',
   '/assets/site.css',
+  '/assets/js/render-products.js',
   '/assets/mxd-affiliate.js',
   '/assets/analytics.js',
+  '/assets/img/products/placeholder.webp'
 ];
 
 // Chuẩn hoá URL same-origin (bỏ query) để ổn định key cache
@@ -84,7 +88,27 @@ async function cachePutWithStamp(cache, keyReq, res) {
   return stamped;
 }
 
-// ---- Fetch ----
+// === Helpers nhận diện ===
+const BYPASS_HOSTS = new Set([
+  // Analytics
+  'www.googletagmanager.com','googletagmanager.com',
+  'www.google-analytics.com','google-analytics.com',
+  'analytics.google.com','g.doubleclick.net',
+  // Affiliate / TMĐT
+  'go.isclix.com',
+  'shopee.vn','cf.shopee.vn','s.shopee.vn',
+  'lazada.vn','s.lazada.vn','pages.lazada.vn',
+  'tiki.vn','api.tiki.vn',
+  // MXH
+  'facebook.com','www.facebook.com','m.me','zalo.me'
+]);
+
+const isDynamicJSON = (u) =>
+  (u.origin === self.location.origin) && (
+    (u.pathname.startsWith('/assets/data/') && u.pathname.endsWith('.json')) ||
+    u.pathname === '/products.json' // thêm: coi products.json là dữ liệu động
+  );
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
@@ -97,28 +121,11 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Không can thiệp Analytics + Affiliate + MXH (tránh ảnh hưởng redirect/conversion)
-  const BYPASS_HOSTS = new Set([
-    // Analytics
-    'www.googletagmanager.com','googletagmanager.com',
-    'www.google-analytics.com','google-analytics.com',
-    'analytics.google.com','g.doubleclick.net',
-    // Affiliate / TMĐT
-    'go.isclix.com',
-    'shopee.vn','cf.shopee.vn','s.shopee.vn',
-    'lazada.vn','s.lazada.vn','pages.lazada.vn',
-    'tiki.vn','api.tiki.vn',
-    // MXH
-    'facebook.com','www.facebook.com','m.me','zalo.me'
-  ]);
+  // Không can thiệp các host dưới (analytics/affiliate/mxh)
   if (BYPASS_HOSTS.has(url.hostname)) return;
 
-  // ==== ƯU TIÊN 0: ẢNH QUA WORKER (/img) → TTL 1 ngày (stale-while-revalidate) ====
-  // Nhận diện ảnh proxy qua Worker:
-  //  - domain Workers.dev (hoặc domain Worker riêng)
-  //  - path kết thúc bằng /img
+  // Ảnh qua Worker (domain *.workers.dev, path /img) → TTL 1 ngày (SWR)
   const isWorkerImg = /workers\.dev$/i.test(url.hostname) && url.pathname.endsWith('/img');
-  // Nếu dùng custom domain cho Worker, thay điều kiện trên cho phù hợp.
   if (isWorkerImg) {
     e.respondWith((async () => {
       const cache = await caches.open(CACHE);
@@ -129,7 +136,7 @@ self.addEventListener('fetch', (e) => {
       if (cached) {
         const ts = parseInt(cached.headers.get('x-sw-cached-at') || '0', 10);
         const fresh = ts && (Date.now() - ts) < ONE_DAY;
-        if (fresh) return cached; // còn hạn TTL → trả luôn
+        if (fresh) return cached;
 
         // hết hạn → trả cached và revalidate nền
         e.waitUntil((async () => {
@@ -150,13 +157,11 @@ self.addEventListener('fetch', (e) => {
         return new Response('', { status: 504 });
       }
     })());
-    return; // đừng rơi xuống các nhánh phía dưới
+    return;
   }
 
-  // ĐẶC BIỆT: JSON dữ liệu động → always network-first, không cache
-  if (url.origin === self.location.origin &&
-      url.pathname.startsWith('/assets/data/') &&
-      url.pathname.endsWith('.json')) {
+  // JSON dữ liệu động → luôn network-first (no-store)
+  if (isDynamicJSON(url)) {
     e.respondWith(fetch(req, { cache: 'no-store' }).catch(() => caches.match(req)));
     return;
   }
