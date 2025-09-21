@@ -1,0 +1,185 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>MXD Control v2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root { font-family: system-ui, sans-serif; line-height: 1.35; }
+  body { max-width: 920px; margin: 24px auto; padding: 0 16px; }
+  h1 { font-size: 22px; margin-bottom: 4px }
+  small { color:#666 }
+  fieldset { border:1px solid #ddd; border-radius:12px; padding:12px 12px 6px; margin:16px 0 }
+  legend { font-weight:600; padding:0 6px }
+  label { font-size: 13px; color:#333 }
+  input, textarea, button, select { font:inherit; }
+  input[type=text] { width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:10px; }
+  textarea { width:100%; min-height:120px; padding:8px 10px; border:1px solid #ccc; border-radius:10px; }
+  .row { display:grid; grid-template-columns: 1fr 170px; gap:10px; align-items: center; }
+  .btn { padding:8px 12px; border:1px solid #222; border-radius:10px; background:#111; color:#fff; cursor:pointer }
+  .btn.ghost { background:#fff; color:#111 }
+  .btn.w { width:100% }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px }
+  pre { white-space: pre-wrap; background:#f7f7f7; border:1px solid #eee; border-radius:10px; padding:10px; max-height:360px; overflow:auto }
+  .muted { color:#666 }
+</style>
+
+<h1>MXD Control v2</h1>
+<small>Điền <b>Worker URL</b> và <b>ADMIN_KEY</b> → Save. Sau đó có thể Queue → Publish now → xem Status.</small>
+
+<fieldset>
+  <legend>Settings</legend>
+  <div class="grid">
+    <div>
+      <label>Worker URL</label>
+      <input id="wurl" type="text" placeholder="https://mxd-control-v2.yourname.workers.dev">
+    </div>
+    <div>
+      <label>ADMIN_KEY</label>
+      <input id="akey" type="text" placeholder="mxd-2025-super">
+    </div>
+  </div>
+  <div style="margin-top:8px">
+    <button class="btn" id="save">Save</button>
+    <span class="muted" id="saved"></span>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>Queue</legend>
+  <div class="row">
+    <label class="muted">Dán 1–N dòng: <code>Tên | giá | link</code> hoặc chỉ <code>link</code></label>
+    <button class="btn w" id="btnQueueAdd">Add to queue</button>
+  </div>
+  <textarea id="links" placeholder="Ví dụ:
+Kéo răng cưa 8mm | 159000 | https://shopee.vn/product/166287331/22741831588
+https://shopee.vn/product/300702715/21345346872"></textarea>
+  <div class="row">
+    <button class="btn ghost w" id="btnQueueGet">Refresh queue</button>
+    <div class="muted">Size: <b id="qsize">0</b> — preview:
+      <span id="qpreview" class="muted"></span>
+    </div>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>Actions</legend>
+  <div class="grid">
+    <button class="btn w" id="btnPublish">Publish now</button>
+    <div class="row">
+      <button class="btn ghost w" id="btnPause">Pause</button>
+      <button class="btn ghost w" id="btnResume">Resume</button>
+    </div>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>Config</legend>
+  <div class="grid">
+    <div><label>max_products</label><input id="maxp" type="text" value="500"></div>
+    <div><label>price_adj (%)</label><input id="padj" type="text" value="-3"></div>
+  </div>
+  <div style="margin-top:8px">
+    <button class="btn" id="btnCfgGet">Get</button>
+    <button class="btn" id="btnCfgSet">Set</button>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>Status & Health</legend>
+  <div class="grid">
+    <button class="btn w" id="btnStatus">Status (Actions)</button>
+    <button class="btn w" id="btnHealth">Health (HEAD JSON)</button>
+  </div>
+  <pre id="out">{}</pre>
+</fieldset>
+
+<script>
+const $ = (id)=>document.getElementById(id);
+const SKEY = 'mxd-control-v2';
+const st = JSON.parse(localStorage.getItem(SKEY)||'{}');
+
+function load() {
+  if (st.wurl) $('wurl').value = st.wurl;
+  if (st.akey) $('akey').value = st.akey;
+}
+function save() {
+  const wurl = $('wurl').value.trim().replace(/\/+$/,'');
+  const akey = $('akey').value.trim();
+  localStorage.setItem(SKEY, JSON.stringify({ wurl, akey }));
+  $('saved').textContent = 'Saved ✓';
+  setTimeout(()=>$('saved').textContent='',1500);
+}
+function hdr(admin=false){
+  const h = { 'content-type': 'text/plain' };
+  if (admin) h['x-admin'] = (JSON.parse(localStorage.getItem(SKEY)||'{}')).akey || '';
+  return h;
+}
+function url(p){ const w = (JSON.parse(localStorage.getItem(SKEY)||'{}')).wurl || ''; return w + p; }
+function show(o){ $('out').textContent = typeof o==='string'? o : JSON.stringify(o,null,2); }
+
+$('save').onclick = save;
+
+$('btnQueueAdd').onclick = async () => {
+  try {
+    const res = await fetch(url('/queue'), { method:'POST', headers: hdr(true), body: $('links').value.trim() });
+    show(await res.json());
+    $('links').value = '';
+    $('btnQueueGet').click();
+  } catch(e){ show(String(e)); }
+};
+
+$('btnQueueGet').onclick = async () => {
+  try {
+    const res = await fetch(url('/queue'));
+    const js = await res.json();
+    $('qsize').textContent = js.size ?? 0;
+    $('qpreview').textContent = (js.items||[]).slice(0,3).join(' · ');
+    show(js);
+  } catch(e){ show(String(e)); }
+};
+
+$('btnPublish').onclick = async () => {
+  try {
+    const res = await fetch(url('/publish'), { headers: hdr(true) });
+    show(await res.json());
+  } catch(e){ show(String(e)); }
+};
+
+$('btnPause').onclick = async () => {
+  const res = await fetch(url('/pause'), { headers: hdr(true) });
+  show(await res.json());
+};
+$('btnResume').onclick = async () => {
+  const res = await fetch(url('/resume'), { headers: hdr(true) });
+  show(await res.json());
+};
+
+$('btnCfgGet').onclick = async () => {
+  const res = await fetch(url('/config'));
+  const js = await res.json();
+  $('maxp').value = js.max_products ?? $('maxp').value;
+  $('padj').value = js.price_adj ?? $('padj').value;
+  show(js);
+};
+$('btnCfgSet').onclick = async () => {
+  const body = JSON.stringify({ max_products: Number($('maxp').value), price_adj: Number($('padj').value) });
+  const res = await fetch(url('/config'), { method:'POST', headers: { 'content-type':'application/json', ...hdr(true) }, body });
+  show(await res.json());
+};
+
+$('btnStatus').onclick = async () => {
+  const js = await (await fetch(url('/status'))).json();
+  // Hiển thị gọn 5 run gần nhất
+  const runs = js.workflow_runs || js.runs || [];
+  show(runs.slice(0,5).map(r=>({
+    id: r.id, status: r.status, conclusion: r.conclusion,
+    name: r.name, event: r.event, created_at: r.created_at
+  })));
+};
+
+$('btnHealth').onclick = async () => {
+  const res = await fetch(url('/health'));
+  show(await res.json());
+};
+
+load();
+</script>
