@@ -1,39 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Home -->
   <url>
     <loc>https://mxd210.github.io/</loc>
-    <lastmod>2025-09-18</lastmod>
+    <lastmod>2025-09-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Hub -->
   <url>
     <loc>https://mxd210.github.io/store.html</loc>
-    <lastmod>2025-09-18</lastmod>
+    <lastmod>2025-09-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-  <url>
-    <loc>https://mxd210.github.io/blog.html</loc>
-    <lastmod>2025-09-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Danh mục (thêm dần khi có) -->
-  <url>
-    <loc>https://mxd210.github.io/store/bay-rang-cua.html</loc>
-    <lastmod>2025-09-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Chính sách -->
-  <url><loc>https://mxd210.github.io/chinh-sach/doi-tra.html</loc><lastmod>2025-09-18</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://mxd210.github.io/chinh-sach/giao-hang.html</loc><lastmod>2025-09-18</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://mxd210.github.io/chinh-sach/bao-hanh.html</loc><lastmod>2025-09-18</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://mxd210.github.io/chinh-sach/bao-mat.html</loc><lastmod>2025-09-18</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://mxd210.github.io/chinh-sach/dieu-khoan.html</loc><lastmod>2025-09-18</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
 </urlset>

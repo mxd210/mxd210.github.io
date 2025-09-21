@@ -1,9 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://mxd210.github.io/store.html</loc><lastmod>2025-09-18</lastmod></url>
-  <url><loc>https://mxd210.github.io/store/bay-rang-cua.html</loc><lastmod>2025-09-18</lastmod></url>
-  <url><loc>https://mxd210.github.io/store/chong-tham.html</loc><lastmod>2025-09-18</lastmod></url>
-  <url><loc>https://mxd210.github.io/store/keo-op-lat.html</loc><lastmod>2025-09-18</lastmod></url>
-  <url><loc>https://mxd210.github.io/store/may-cat.html</loc><lastmod>2025-09-18</lastmod></url>
-  <url><loc>https://mxd210.github.io/store/may-cat-mai.html</loc><lastmod>2025-09-18</lastmod></url>
+  <url>
+    <loc>https:/mxd210.github.io/store/bay-rang-cua.html</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https:/mxd210.github.io/store/chong-tham.html</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https:/mxd210.github.io/store/keo-op-lat.html</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https:/mxd210.github.io/store/may-cat-mai.html</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https:/mxd210.github.io/store/may-cat.html</loc>
+    <lastmod>2025-09-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
