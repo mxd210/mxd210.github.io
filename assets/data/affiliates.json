@@ -2,22 +2,11 @@
   {
     "name": "Kéo răng cưa 8mm",
     "price": 159000,
-    "origin": "https://shopee.vn/product/166287331/22741831588 https://shopee.vn/product/300702715/21345346872",
+    "origin": "https://shopee.vn/product/166287331/22741831588",
     "merchant": "shopee",
     "sku": "keo-rang-cua-8mm",
     "image": "/assets/img/products/keo-rang-cua-8mm.webp",
-    "updated_at": "2025-09-21T18:36:39.652Z",
-    "featured": false,
-    "status": true
-  },
-  {
-    "name": "search",
-    "price": null,
-    "origin": "https://shopee.vn/search?keyword=Bosch%20GWS%20900-125%20S",
-    "merchant": "shopee",
-    "sku": "search",
-    "image": "/assets/img/products/search.webp",
-    "updated_at": "2025-09-21T20:43:08.969Z",
+    "updated_at": "2025-09-21T18:36:30Z",
     "featured": false,
     "status": true
   }
