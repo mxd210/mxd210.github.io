@@ -91,6 +91,17 @@
     <div class="grid g2">
       <div>
         <h2>1) Input (Nhập dữ liệu)</h2>
+        <div class="card" style="margin-top:10px">
+  <h2>Auto-Search Shopee</h2>
+  <div class="row">
+    <input id="auto-q" type="text" placeholder="Từ khóa, ví dụ: máy cắt gạch" style="max-width:360px">
+    <input id="auto-pages" type="number" min="1" max="5" value="1" style="max-width:120px" title="Số trang (mỗi trang ~ vài chục link)">
+    <button class="btn" id="btn-auto-search">Get links</button>
+    <span class="small muted" id="auto-status"></span>
+  </div>
+  <p class="small muted">Hoặc dán link search Shopee vào ô “Input” rồi bấm Get links (tool sẽ tự nhận dạng).</p>
+</div>
+
         <div class="dropzone" id="drop">Drag & drop CSV/TXT here – hoặc dán từ Excel: <b>Tên|Giá|Link</b></div>
         <textarea id="txt-input" placeholder="https://shopee.vn/product/.../...\nMáy cắt KYNKO | 1390000 | https://..." ></textarea>
         <div class="row">
@@ -296,6 +307,32 @@
       const m = String(u||'').match(/product\/(\d+)\/(\d+)/i);
       return m ? {shop:m[1], item:m[2]} : null;
     }
+    <script>
+// ---- Auto-search helpers ----
+function isShopeeSearchURL(s){
+  try { const u = new URL(s); return u.hostname.includes('shopee') && u.pathname.replace(/\/+$/,'')==='/search'; }
+  catch { return false; }
+}
+async function searchShopeeLinks(qOrUrl, pages){
+  const base = (SETTINGS.worker||'').replace(/\/+$/,'');
+  if (!base) throw new Error('Worker chưa cấu hình (Settings → Worker Base).');
+  const results = new Set();
+  // Nếu người dùng dán hẳn URL search → dùng trực tiếp
+  if (isShopeeSearchURL(qOrUrl)) {
+    const r = await fetch(`${base}/search?url=${encodeURIComponent(qOrUrl)}`, {mode:'cors'});
+    const j = await r.json(); (j.links||[]).forEach(h=>results.add(h));
+  } else {
+    // Nhiều trang: thêm &page=1..N (Shopee đọc param page)
+    for (let p=1; p<=pages; p++){
+      const u = `https://shopee.vn/search?keyword=${encodeURIComponent(qOrUrl)}&page=${p-1}`;
+      const r = await fetch(`${base}/search?url=${encodeURIComponent(u)}`, {mode:'cors'});
+      const j = await r.json(); (j.links||[]).forEach(h=>results.add(h));
+      await sleep(200);
+    }
+  }
+  return Array.from(results);
+}
+</script>
     const isProductUrl = (u)=>{ try{ return /\/product\/\d+\/\d+$/i.test(new URL(u).pathname); }catch{ return false; } };
     const toNumber = (x)=>{ if (x==null) return null; const n = String(x).replace(/[^\d]/g,''); return n? Number(n): null; };
 
@@ -505,6 +542,29 @@
       const forceM = (qa('input[name="mrc"]').find(x=>x.checked)||{}).value || 'auto';
       const sub1 = q('#default-sub1').value.trim();
       const rows = parseInput(q('#txt-input').value, fmt, forceM);
+<script>
+q('#btn-auto-search').onclick = async ()=>{
+  const kw = (q('#auto-q').value || '').trim();
+  const pages = Number(q('#auto-pages').value)||1;
+  const raw = (q('#txt-input').value || '').trim();
+  const maybeUrl = raw.split(/\r?\n/).map(s=>s.trim()).find(isShopeeSearchURL) || '';
+  q('#auto-status').textContent = 'Đang lấy link…';
+  try {
+    const links = await searchShopeeLinks(maybeUrl || kw, Math.max(1, Math.min(pages,5)));
+    if (!links.length){ q('#auto-status').textContent = 'Không thấy link product.'; return; }
+    // đổ link vào ô input & auto-parse
+    const current = q('#txt-input').value.trim();
+    q('#txt-input').value = (current ? (current+'\n') : '') + links.join('\n');
+    // bật chế độ "Links per line" và merchant=Auto (giữ mặc định)
+    (qa('input[name="fmt"]').find(x=>x.value==='link')||{}).checked = true;
+    q('#btn-parse').click();           // chuyển OUT → table
+    q('#btn-fetch').click();           // gọi pipeline Fetch + Build (kể cả ảnh nếu bật)
+    q('#auto-status').textContent = `Đã lấy ${links.length} link.`;
+  } catch(e){
+    q('#auto-status').textContent = 'Lỗi: ' + e.message;
+  }
+};
+</script>
 
       OUT = rows.map(r=>{
         const m = r.merchant || guessMerchant(r.origin);
