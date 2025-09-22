@@ -65,10 +65,10 @@
   <header>
     <div class="toolbar">
       <div class="row">
-        <a class="btn ghost" href="/">Home</a>
-        <a class="btn ghost" href="/store.html">Store</a>
-        <a class="btn ghost" href="/blog/index.html">Blog</a>
-        <a class="btn ghost" href="/contact.html">Contact</a>
+        <a class="btn ghost" href="/">Home (Trang chủ)</a>
+        <a class="btn ghost" href="/store.html">Store (Cửa hàng)</a>
+        <a class="btn ghost" href="/blog/index.html">Blog (Tin tức)</a>
+        <a class="btn ghost" href="/contact.html">Contact (Liên hệ)</a>
       </div>
       <div class="row">
         <label class="switch"><input id="compact" type="checkbox"> <span class="small muted">Compact mode (Chế độ gọn)</span></label>
@@ -91,49 +91,62 @@
     <div class="grid g2">
       <div>
         <h2>1) Input (Nhập dữ liệu)</h2>
+
         <div class="card" style="margin-top:10px">
-  <h2>Auto-Search Shopee</h2>
-  <div class="row">
-    <input id="auto-q" type="text" placeholder="Từ khóa, ví dụ: máy cắt gạch" style="max-width:360px">
-    <input id="auto-pages" type="number" min="1" max="5" value="1" style="max-width:120px" title="Số trang (mỗi trang ~ vài chục link)">
-    <button class="btn" id="btn-auto-search">Get links</button>
-    <span class="small muted" id="auto-status"></span>
-  </div>
-  <p class="small muted">Hoặc dán link search Shopee vào ô “Input” rồi bấm Get links (tool sẽ tự nhận dạng).</p>
-</div>
+          <h2>Auto-Search Shopee</h2>
+          <div class="row">
+            <input id="auto-q" type="text" placeholder="Từ khóa, ví dụ: máy cắt gạch" style="max-width:360px">
+            <input id="auto-pages" type="number" min="1" max="5" value="1" style="max-width:120px" title="Số trang (mỗi trang ~ vài chục link)">
+            <button class="btn" id="btn-auto-search">Get links (Lấy link)</button>
+            <span class="small muted" id="auto-status"></span>
+          </div>
+          <p class="small muted">Hoặc dán link search Shopee vào ô “Input” rồi bấm Get links (tool sẽ tự nhận dạng).</p>
+        </div>
 
         <div class="dropzone" id="drop">Drag & drop CSV/TXT here – hoặc dán từ Excel: <b>Tên|Giá|Link</b></div>
         <textarea id="txt-input" placeholder="https://shopee.vn/product/.../...\nMáy cắt KYNKO | 1390000 | https://..." ></textarea>
+
         <div class="row">
           <div class="row">
-            <label class="small muted">Format:</label>
-            <label><input type="radio" name="fmt" value="link" checked> Links per line</label>
-            <label><input type="radio" name="fmt" value="pipe"> Name|Price|Link</label>
+            <label class="small muted">Format/Định dạng:</label>
+            <label><input type="radio" name="fmt" value="link" checked> Links per line (Mỗi dòng 1 link)</label>
+            <label><input type="radio" name="fmt" value="pipe"> Name|Price|Link (Tên|Giá|Link)</label>
           </div>
           <div class="row">
-            <label class="small muted">Merchant:</label>
-            <label><input type="radio" name="mrc" value="auto" checked> Auto</label>
+            <label class="small muted">Merchant/Nhà bán:</label>
+            <label><input type="radio" name="mrc" value="auto" checked> Auto (Tự động)</label>
             <label><input type="radio" name="mrc" value="shopee"> Shopee</label>
             <label><input type="radio" name="mrc" value="lazada"> Lazada</label>
             <label><input type="radio" name="mrc" value="tiki"> Tiki</label>
           </div>
-          <input id="default-sub1" type="text" placeholder="sub1 (optional)" style="max-width:220px">
-          <label class="row"><input id="bulk-sub1" type="checkbox"> Bulk sub1={sku}</label>
+          <input id="default-sub1" type="text" placeholder="sub1 (optional / tùy chọn)" style="max-width:220px">
+          <label class="row"><input id="bulk-sub1" type="checkbox"> Bulk sub1={sku} (Gán loạt sub1={sku})</label>
           <span class="spacer"></span>
-          <button class="btn" id="btn-parse">Parse</button>
-          <button class="btn primary" id="btn-fetch">Fetch + Build</button>
+          <button class="btn" id="btn-parse">Parse (Phân tích)</button>
+          <button class="btn primary" id="btn-fetch">Fetch + Build (Lấy & Build)</button>
         </div>
-        <label class="row"><input id="auto-pipeline" type="checkbox"> Auto image pipeline after Fetch</label>
+        <label class="row"><input id="auto-pipeline" type="checkbox"> Auto image pipeline after Fetch (Chạy pipeline ảnh sau Fetch)</label>
         <p class="small muted">Tool tự sinh <b>SKU</b>, <code>/assets/img/products/&lt;sku&gt;.webp</code>, và deeplink (nếu set AFF_ID + template).</p>
       </div>
 
       <div>
-        <h2>2) JSON (Tệp dữ liệu)</h2>
+        <!-- JSON link preview: ở NGAY CẠNH ô dán link -->
+        <div class="card">
+          <h2>JSON link (Liên kết JSON)</h2>
+          <div class="row">
+            <input id="json-link" type="text" value="/assets/data/affiliates.json" readonly style="max-width:100%">
+            <button class="btn" id="btn-copy-json-link">Copy link (Sao chép)</button>
+            <button class="btn" id="btn-open-json-link">Open (Mở tab)</button>
+          </div>
+          <p class="small muted">Đường dẫn tĩnh commit lên GitHub Pages. Không phải blob:URL. Dùng để dán vào site nhanh.</p>
+        </div>
+
+        <h2 style="margin-top:10px">2) JSON (Tệp dữ liệu)</h2>
         <div class="row">
-          <button class="btn" id="btn-load-existing">Load affiliates.json</button>
-          <button class="btn" id="btn-merge">Merge & dedupe</button>
-          <button class="btn" id="btn-copy-json">Copy JSON</button>
-          <button class="btn primary" id="btn-download-json">Download affiliates.json</button>
+          <button class="btn" id="btn-load-existing">Load affiliates.json (Tải)</button>
+          <button class="btn" id="btn-merge">Merge & dedupe (Gộp & loại trùng)</button>
+          <button class="btn" id="btn-copy-json">Copy JSON (Sao chép)</button>
+          <button class="btn primary" id="btn-download-json">Download affiliates.json (Tải xuống)</button>
         </div>
         <p id="out-msg" class="small muted"></p>
       </div>
@@ -145,10 +158,10 @@
     <div class="toolbar">
       <h2>Output table (Bảng kết quả)</h2>
       <div class="row">
-        <button class="btn" id="btn-validate-sku">Validate SKUs</button>
-        <button class="btn" id="btn-normalize-sku">Normalize SKUs</button>
-        <button class="btn" id="btn-commit">Commit message</button>
-        <button class="btn" id="btn-copy-commit">Copy commit</button>
+        <button class="btn" id="btn-validate-sku">Validate SKUs (Kiểm tra SKU)</button>
+        <button class="btn" id="btn-normalize-sku">Normalize SKUs (Chuẩn hóa SKU)</button>
+        <button class="btn" id="btn-commit">Commit message (Sinh commit)</button>
+        <button class="btn" id="btn-copy-commit">Copy commit (Sao chép)</button>
       </div>
     </div>
     <div style="max-height:60vh; overflow:auto; border:1px solid #eee; border-radius:10px;">
@@ -168,28 +181,28 @@
   <!-- Snippets -->
   <section id="tab-snippets" class="card hidden">
     <div class="row">
-      <label class="row"><input id="snip-deep" type="checkbox"> Use deep-link for buy</label>
-      <button class="btn" id="btn-build-snippets">Build snippets</button>
-      <button class="btn" id="btn-copy-snippets">Copy</button>
+      <label class="row"><input id="snip-deep" type="checkbox"> Use deep-link for buy (Dùng deep-link cho buy)</label>
+      <button class="btn" id="btn-build-snippets">Build snippets (Tạo đoạn chèn)</button>
+      <button class="btn" id="btn-copy-snippets">Copy (Sao chép)</button>
     </div>
     <textarea id="snippets" placeholder="Snippets chuẩn MXD…" style="margin-top:8px; min-height:140px"></textarea>
   </section>
 
   <!-- Images -->
   <section id="tab-images" class="card hidden">
-    <h2>Image tools</h2>
+    <h2>Image tools (Công cụ ảnh)</h2>
     <div class="grid g3">
       <div>
-        <h3 class="small">A) Extract images</h3>
+        <h3 class="small">A) Extract images (Lấy ảnh)</h3>
         <p class="small muted">Lấy og:image từ link sản phẩm (qua Worker /head).</p>
         <div class="row">
-          <button class="btn" id="btn-img-from-head">Extract via /head</button>
-          <button class="btn" id="btn-img-from-out">Use fetched images</button>
+          <button class="btn" id="btn-img-from-head">Extract via /head (Lấy qua /head)</button>
+          <button class="btn" id="btn-img-from-out">Use fetched images (Dùng ảnh đã lấy)</button>
         </div>
       </div>
       <div>
         <h3 class="small">B) Presets</h3>
-        <label>Context</label>
+        <label>Context (Ngữ cảnh)</label>
         <select id="img-preset">
           <option value="store">Store card 800×800 → /assets/img/products/&lt;sku&gt;.webp</option>
           <option value="home">Homepage 1200×800 → /assets/img/hero/&lt;sku&gt;-hero.webp</option>
@@ -198,13 +211,13 @@
           <option value="thumb">Thumb 400×400 → /assets/img/products/&lt;sku&gt;-thumb.webp</option>
         </select>
         <label class="small"><input id="img-fit" type="checkbox" checked> Cover (crop giữa) / bỏ chọn = Contain</label>
-        <label>Quality</label>
+        <label>Quality (Chất lượng)</label>
         <input id="img-q" type="number" min="0.6" max="0.95" step="0.01" value="0.86"/>
       </div>
       <div>
         <h3 class="small">C) Export</h3>
         <div class="row">
-          <button class="btn primary" id="btn-make-images">Generate & ZIP</button>
+          <button class="btn primary" id="btn-make-images">Generate & ZIP (Xuất ZIP)</button>
         </div>
         <p id="img-msg" class="small muted"></p>
       </div>
@@ -214,20 +227,20 @@
 
   <!-- Health -->
   <section id="tab-health" class="card hidden">
-    <h2>Health-check</h2>
+    <h2>Health-check (Kiểm tra)</h2>
     <div class="row">
       <label>Throttle (ms)</label>
       <input id="hc-throttle" type="number" min="50" step="10" value="120" style="max-width:120px">
-      <button class="btn" id="btn-hc-scan">Scan affiliates.json</button>
-      <button class="btn" id="btn-hc-copy">Copy report</button>
-      <button class="btn primary" id="btn-hc-download">Download affiliates.prune.json</button>
+      <button class="btn" id="btn-hc-scan">Scan affiliates.json (Quét)</button>
+      <button class="btn" id="btn-hc-copy">Copy report (Sao chép)</button>
+      <button class="btn primary" id="btn-hc-download">Download affiliates.prune.json (Tải xuống)</button>
     </div>
     <textarea id="hc-report" class="small" placeholder="Health report…" style="margin-top:8px; min-height:200px"></textarea>
   </section>
 
   <!-- Log -->
   <section id="tab-log" class="card hidden">
-    <h2>Fetch Log</h2>
+    <h2>Fetch Log (Nhật ký)</h2>
     <div style="max-height:60vh; overflow:auto; border:1px solid #eee; border-radius:10px;">
       <table id="log-table">
         <thead><tr>
@@ -237,7 +250,7 @@
       </table>
     </div>
     <div class="row" style="margin-top:8px">
-      <button class="btn" id="btn-clear-log">Clear log</button>
+      <button class="btn" id="btn-clear-log">Clear log (Xóa nhật ký)</button>
     </div>
   </section>
 
@@ -245,7 +258,7 @@
   <section id="tab-settings" class="card hidden">
     <div class="grid g2">
       <div>
-        <h2>Settings</h2>
+        <h2>Settings (Cài đặt)</h2>
         <label>Worker Base</label>
         <input id="set-worker" type="url" placeholder="https://mxd210.mxd6686.workers.dev">
         <label>AFF_ID (AccessTrade)</label>
@@ -256,15 +269,15 @@
         <input id="tpl-lazada" type="text" placeholder="https://go.accesstrade.vn/deep_link?url={url}&aff_id={aff_id}&merchant=lazada&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}">
         <label>Template Tiki</label>
         <input id="tpl-tiki" type="text" placeholder="https://go.accesstrade.vn/deep_link?url={url}&aff_id={aff_id}&merchant=tiki&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}">
-        <label class="row"><input id="override-deeplink" type="checkbox"> Deep-link override for buy</label>
+        <label class="row"><input id="override-deeplink" type="checkbox"> Deep-link override for buy (Ghi đè buy dùng deep-link)</label>
         <div class="row">
-          <button class="btn" id="btn-save-settings">Save</button>
-          <button class="btn" id="btn-test-head">Test /head</button>
+          <button class="btn" id="btn-save-settings">Save (Lưu)</button>
+          <button class="btn" id="btn-test-head">Test /head (Thử /head)</button>
           <span id="settings-msg" class="small muted"></span>
         </div>
       </div>
       <div>
-        <h2>Shortcuts</h2>
+        <h2>Shortcuts (Phím tắt)</h2>
         <ul class="small">
           <li><b>Ctrl+Enter</b> → Fetch</li>
           <li><b>Ctrl+S</b> → Save settings</li>
@@ -307,32 +320,6 @@
       const m = String(u||'').match(/product\/(\d+)\/(\d+)/i);
       return m ? {shop:m[1], item:m[2]} : null;
     }
-    <script>
-// ---- Auto-search helpers ----
-function isShopeeSearchURL(s){
-  try { const u = new URL(s); return u.hostname.includes('shopee') && u.pathname.replace(/\/+$/,'')==='/search'; }
-  catch { return false; }
-}
-async function searchShopeeLinks(qOrUrl, pages){
-  const base = (SETTINGS.worker||'').replace(/\/+$/,'');
-  if (!base) throw new Error('Worker chưa cấu hình (Settings → Worker Base).');
-  const results = new Set();
-  // Nếu người dùng dán hẳn URL search → dùng trực tiếp
-  if (isShopeeSearchURL(qOrUrl)) {
-    const r = await fetch(`${base}/search?url=${encodeURIComponent(qOrUrl)}`, {mode:'cors'});
-    const j = await r.json(); (j.links||[]).forEach(h=>results.add(h));
-  } else {
-    // Nhiều trang: thêm &page=1..N (Shopee đọc param page)
-    for (let p=1; p<=pages; p++){
-      const u = `https://shopee.vn/search?keyword=${encodeURIComponent(qOrUrl)}&page=${p-1}`;
-      const r = await fetch(`${base}/search?url=${encodeURIComponent(u)}`, {mode:'cors'});
-      const j = await r.json(); (j.links||[]).forEach(h=>results.add(h));
-      await sleep(200);
-    }
-  }
-  return Array.from(results);
-}
-</script>
     const isProductUrl = (u)=>{ try{ return /\/product\/\d+\/\d+$/i.test(new URL(u).pathname); }catch{ return false; } };
     const toNumber = (x)=>{ if (x==null) return null; const n = String(x).replace(/[^\d]/g,''); return n? Number(n): null; };
 
@@ -536,54 +523,7 @@ async function searchShopeeLinks(qOrUrl, pages){
       URL.revokeObjectURL(a.href);
     }
 
-    // ===== Actions: Import =====
-    q('#btn-parse').onclick = ()=>{
-      const fmt = (qa('input[name="fmt"]').find(x=>x.checked)||{}).value || 'link';
-      const forceM = (qa('input[name="mrc"]').find(x=>x.checked)||{}).value || 'auto';
-      const sub1 = q('#default-sub1').value.trim();
-      const rows = parseInput(q('#txt-input').value, fmt, forceM);
-<script>
-q('#btn-auto-search').onclick = async ()=>{
-  const kw = (q('#auto-q').value || '').trim();
-  const pages = Number(q('#auto-pages').value)||1;
-  const raw = (q('#txt-input').value || '').trim();
-  const maybeUrl = raw.split(/\r?\n/).map(s=>s.trim()).find(isShopeeSearchURL) || '';
-  q('#auto-status').textContent = 'Đang lấy link…';
-  try {
-    const links = await searchShopeeLinks(maybeUrl || kw, Math.max(1, Math.min(pages,5)));
-    if (!links.length){ q('#auto-status').textContent = 'Không thấy link product.'; return; }
-    // đổ link vào ô input & auto-parse
-    const current = q('#txt-input').value.trim();
-    q('#txt-input').value = (current ? (current+'\n') : '') + links.join('\n');
-    // bật chế độ "Links per line" và merchant=Auto (giữ mặc định)
-    (qa('input[name="fmt"]').find(x=>x.value==='link')||{}).checked = true;
-    q('#btn-parse').click();           // chuyển OUT → table
-    q('#btn-fetch').click();           // gọi pipeline Fetch + Build (kể cả ảnh nếu bật)
-    q('#auto-status').textContent = `Đã lấy ${links.length} link.`;
-  } catch(e){
-    q('#auto-status').textContent = 'Lỗi: ' + e.message;
-  }
-};
-</script>
-
-      OUT = rows.map(r=>{
-        const m = r.merchant || guessMerchant(r.origin);
-        const ids = (m==='shopee') ? parseShopeeIDs(r.origin) : null;
-        let sku = slugifyVN(r.name || r.origin);
-        if ((!r.name || r.name.length<2) && ids) sku = `sp${ids.shop}-${ids.item}`;
-        const it = {
-          name: r.name || r.origin, price:r.price||0, origin:r.origin, merchant:m,
-          sku, image:`/assets/img/products/${sku}.webp`, brand:'', category:'', featured:false, sub1, srcImage:''
-        };
-        if (q('#bulk-sub1').checked) it.sub1 = it.sku;
-        it.deeplink = deeplinkOf(it.merchant, it.origin, it.sub1);
-        return it;
-      });
-      OUT = dedupe(OUT);
-      renderOUT(); showTab('output');
-      q('#out-msg').textContent = `Parsed ${OUT.length} rows (valid only).`; setTimeout(()=> q('#out-msg').textContent='', 1600);
-    };
-
+    // ===== Worker helpers (/head, /img, /search) =====
     async function fetchHead(url){
       const base = (SETTINGS.worker||'').replace(/\/+$/,'');
       if (!base) return {status:0, parser:'fallback', title:'', image:'', price:null, brand:''};
@@ -607,6 +547,72 @@ q('#btn-auto-search').onclick = async ()=>{
         return {title: name, image:'', price:null, brand:''};
       } catch { return {title:'', image:'', price:null, brand:''}; }
     }
+    function isShopeeSearchURL(s){
+      try { const u = new URL(s); return u.hostname.includes('shopee') && u.pathname.replace(/\/+$/,'')==='/search'; }
+      catch { return false; }
+    }
+    async function searchShopeeLinks(qOrUrl, pages){
+      const base = (SETTINGS.worker||'').replace(/\/+$/,'');
+      if (!base) throw new Error('Worker chưa cấu hình (Settings → Worker Base).');
+      const results = new Set();
+      if (isShopeeSearchURL(qOrUrl)) {
+        const r = await fetch(`${base}/search?url=${encodeURIComponent(qOrUrl)}`, {mode:'cors'});
+        const j = await r.json(); (j.links||[]).forEach(h=>results.add(h));
+      } else {
+        for (let p=1; p<=pages; p++){
+          const u = `https://shopee.vn/search?keyword=${encodeURIComponent(qOrUrl)}&page=${p-1}`;
+          const r = await fetch(`${base}/search?url=${encodeURIComponent(u)}`, {mode:'cors'});
+          const j = await r.json(); (j.links||[]).forEach(h=>results.add(h));
+          await sleep(200);
+        }
+      }
+      return Array.from(results);
+    }
+
+    // ===== Actions: Import =====
+    q('#btn-parse').onclick = ()=>{
+      const fmt = (qa('input[name="fmt"]').find(x=>x.checked)||{}).value || 'link';
+      const forceM = (qa('input[name="mrc"]').find(x=>x.checked)||{}).value || 'auto';
+      const sub1 = q('#default-sub1').value.trim();
+      const rows = parseInput(q('#txt-input').value, fmt, forceM);
+
+      OUT = rows.map(r=>{
+        const m = r.merchant || guessMerchant(r.origin);
+        const ids = (m==='shopee') ? parseShopeeIDs(r.origin) : null;
+        let sku = slugifyVN(r.name || r.origin);
+        if ((!r.name || r.name.length<2) && ids) sku = `sp${ids.shop}-${ids.item}`;
+        const it = {
+          name: r.name || r.origin, price:r.price||0, origin:r.origin, merchant:m,
+          sku, image:`/assets/img/products/${sku}.webp`, brand:'', category:'', featured:false, sub1, srcImage:''
+        };
+        if (q('#bulk-sub1').checked) it.sub1 = it.sku;
+        it.deeplink = deeplinkOf(it.merchant, it.origin, it.sub1);
+        return it;
+      });
+      OUT = dedupe(OUT);
+      renderOUT(); showTab('output');
+      q('#out-msg').textContent = `Parsed ${OUT.length} rows (valid only).`; setTimeout(()=> q('#out-msg').textContent='', 1600);
+    };
+
+    q('#btn-auto-search').onclick = async ()=>{
+      const kw = (q('#auto-q').value || '').trim();
+      const pages = Number(q('#auto-pages').value)||1;
+      const raw = (q('#txt-input').value || '').trim();
+      const maybeUrl = raw.split(/\r?\n/).map(s=>s.trim()).find(isShopeeSearchURL) || '';
+      q('#auto-status').textContent = 'Đang lấy link…';
+      try {
+        const links = await searchShopeeLinks(maybeUrl || kw, Math.max(1, Math.min(pages,5)));
+        if (!links.length){ q('#auto-status').textContent = 'Không thấy link product.'; return; }
+        const current = q('#txt-input').value.trim();
+        q('#txt-input').value = (current ? (current+'\n') : '') + links.join('\n');
+        (qa('input[name="fmt"]').find(x=>x.value==='link')||{}).checked = true;
+        q('#btn-parse').click();
+        q('#btn-fetch').click();
+        q('#auto-status').textContent = `Đã lấy ${links.length} link.`;
+      } catch(e){
+        q('#auto-status').textContent = 'Lỗi: ' + e.message;
+      }
+    };
 
     q('#btn-fetch').onclick = async ()=>{
       const fmt = (qa('input[name="fmt"]').find(x=>x.checked)||{}).value || 'link';
@@ -616,7 +622,7 @@ q('#btn-auto-search').onclick = async ()=>{
       OUT = [];
       for (const r of rows){
         const m = r.merchant || guessMerchant(r.origin);
-        if (!isProductUrl(r.origin)) continue; // an toàn lần nữa
+        if (!isProductUrl(r.origin)) continue;
         try {
           const head = await fetchHead(r.origin);
           const fb = fallbackFromURL(r.origin);
@@ -843,7 +849,6 @@ q('#btn-auto-search').onclick = async ()=>{
       } catch(e){
         q('#hc-report').value = 'Cannot load affiliates.json.'; return;
       }
-      // chỉ quét item hợp lệ
       list = list.filter(x=> isProductUrl(x.origin));
       const report = [];
       const prune = [];
@@ -862,7 +867,7 @@ q('#btn-auto-search').onclick = async ()=>{
     };
     q('#btn-hc-copy').onclick = ()=> navigator.clipboard.writeText(q('#hc-report').value||'');
 
-    // ===== Log / Settings buttons =====
+    // ===== Log / Settings buttons / JSON link preview =====
     q('#btn-clear-log').onclick = ()=>{ LOGS=[]; q('#log-table tbody').innerHTML=''; };
     q('#btn-save-settings').onclick = saveSettings;
     q('#btn-test-head').onclick = async ()=>{
@@ -870,6 +875,10 @@ q('#btn-auto-search').onclick = async ()=>{
       const r = await fetchHead(demo);
       q('#settings-msg').textContent = `HEAD ${r.status} — parser: ${r.parser}`; setTimeout(()=> q('#settings-msg').textContent='', 1500);
     };
+
+    // JSON link: copy/open
+    q('#btn-copy-json-link').onclick = ()=> navigator.clipboard.writeText(q('#json-link').value||'');
+    q('#btn-open-json-link').onclick  = ()=> window.open(q('#json-link').value||'/assets/data/affiliates.json','_blank');
 
     // ===== Init =====
     mountSettings();
