@@ -1178,32 +1178,48 @@
   });
 })();
 </script>
-<!-- MXD Importer — Link Assistant (Get links + Affiliate preview + Guide) -->
 <!-- MXD Importer — Link Assistant PRO v4.3 -->
+<!-- MXD Importer — Link Assistant PRO v4.4 (buttons state + spinner + health + sku + commit) -->
 <style>
-  #link-assistant{border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:16px 0;background:#fff;box-shadow:0 6px 18px #0000000d}
-  #link-assistant h3{margin:0 0 10px;font-size:18px}
-  #link-assistant details{margin-bottom:12px}
+  #link-assistant,#health-panel,#sku-panel,#commit-panel{
+    border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:16px 0;background:#fff;box-shadow:0 6px 18px #0000000d
+  }
+  #link-assistant h3,#health-panel h3,#sku-panel h3,#commit-panel h3{margin:0 0 10px;font-size:18px}
   #link-assistant .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   #link-assistant label{font-size:13px;color:#374151}
   #link-assistant input[type="text"], #link-assistant textarea{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fafafa}
   #link-assistant .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-  #link-assistant button{padding:10px 14px;border-radius:10px;border:1px solid #d1d5db;background:#fff;cursor:pointer}
-  #link-assistant button.primary{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+  .btn{padding:10px 14px;border-radius:10px;border:1px solid #d1d5db;background:#fff;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+  .btn.primary{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+  .btn[disabled]{opacity:.6;cursor:not-allowed}
+  .btn[aria-busy="true"]{opacity:.8;pointer-events:none}
+  .spinner{width:14px;height:14px;border:2px solid #e5e7eb;border-top-color:#0ea5e9;border-radius:50%;display:inline-block;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
   #la-progress{font-size:12px;color:#64748b;margin-top:6px}
+  #la-bar{height:8px;background:#f1f5f9;border-radius:999px;overflow:hidden;margin-top:6px}
+  #la-bar > div{height:100%;width:0;background:#0ea5e9;transition:width .2s ease}
   #link-results{margin-top:12px}
-  #link-results .row{display:grid;grid-template-columns:44px 1fr 1fr 130px 120px;gap:8px;align-items:center;border:1px solid #eef2f7;border-radius:10px;padding:10px;margin-bottom:8px}
+  #link-results .row{display:grid;grid-template-columns:44px 1fr 1fr 160px 140px;gap:8px;align-items:center;border:1px solid #eef2f7;border-radius:10px;padding:10px;margin-bottom:8px}
   #link-results .thumb{width:44px;height:44px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;overflow:hidden}
   #link-results .thumb img{width:100%;height:100%;object-fit:cover}
   #link-results code{display:inline-block;max-width:100%;overflow:auto;white-space:nowrap}
-  #link-results .tag{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#1e3a8a}
+  #link-results .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#1e3a8a}
   #link-results .tag.warn{background:#fff7ed;color:#9a3412}
+  .dot{width:8px;height:8px;border-radius:999px;display:inline-block}
+  .dot.wait{background:#cbd5e1}
+  .dot.run{background:#0ea5e9;box-shadow:0 0 0 2px #bae6fd66}
+  .dot.ok{background:#10b981}
+  .dot.err{background:#ef4444}
+  .muted{color:#64748b}
   #link-results .qr{display:none}
   #link-results .qr img{width:120px;height:120px;border-radius:8px;border:1px solid #e5e7eb}
-  @media (max-width: 980px){
+  @media (max-width:980px){
     #link-assistant .grid{grid-template-columns:1fr}
     #link-results .row{grid-template-columns:44px 1fr}
   }
+  /* SKU panel small inputs */
+  #sku-panel .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  #sku-panel input[type="text"]{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fafafa}
 </style>
 
 <section id="link-assistant">
@@ -1211,9 +1227,9 @@
   <details open>
     <summary><strong>Hướng dẫn nhanh</strong></summary>
     <ol style="margin:6px 0 0 18px;padding:0">
-      <li>Dán <em>1 link</em> vào “Link gốc (1 sản phẩm)” → affiliate hiển thị ngay bên cạnh (có Copy/Mở/QR).</li>
-      <li>Dán <em>nhiều link</em> vào ô “Danh sách”, bấm <b>Lấy link</b> → bảng kết quả hiện Ảnh/Link gốc/Affiliate/Giá/QR.</li>
-      <li>Cấu hình (tuỳ chọn): <code>AFF_ID</code>, <code>AFF_*_TEMPLATE</code>, <code>AFF_ORIGIN</code> (Worker) qua <em>window</em> hoặc <em>localStorage</em>.</li>
+      <li>Dán <em>1 link</em> vào “Link gốc (1 sản phẩm)” → affiliate hiện ngay (nút đổi sang “Đã nhận” khi click).</li>
+      <li>Dán <em>50–200 link</em> vào ô “Danh sách”, bấm <b>Lấy link</b> → thấy spinner, tiến độ, thanh chạy, trạng thái từng dòng.</li>
+      <li>Muốn chính xác deep-link: cấu hình <code>AFF_ID</code>, <code>AFF_*_TEMPLATE</code>, <code>AFF_ORIGIN</code> (Worker).</li>
     </ol>
   </details>
 
@@ -1226,9 +1242,9 @@
       <label>Link affiliate (auto)</label>
       <input id="la-aff" type="text" readonly placeholder="— sẽ hiện sau khi dán link gốc —">
       <div class="actions">
-        <button id="la-copy" type="button">Copy</button>
-        <button id="la-open" type="button">Mở</button>
-        <button id="la-qr" type="button">QR</button>
+        <button id="la-copy" class="btn" type="button"><span class="ic">📋</span><span>Copy</span></button>
+        <button id="la-open" class="btn" type="button"><span class="ic">↗</span><span>Mở</span></button>
+        <button id="la-qr" class="btn" type="button"><span class="ic">▦</span><span>QR</span></button>
       </div>
     </div>
   </div>
@@ -1237,26 +1253,63 @@
     <label>Danh sách (nhiều link — tối đa 200, mỗi dòng 1 link)</label>
     <textarea id="la-bulk" rows="6" placeholder="https://shopee.vn/...\nhttps://www.lazada.vn/...\nhttps://www.tiktok.com/..."></textarea>
     <div class="actions">
-      <button id="la-extract" class="primary" type="button">Lấy link (Get links)</button>
-      <button id="la-export" type="button">Export JSON (bulk)</button>
-      <button id="la-clear" type="button">Xóa</button>
+      <button id="la-extract" class="btn primary" type="button"><span class="spinner" style="display:none"></span><span>Lấy link (Get links)</span></button>
+      <button id="la-export" class="btn" type="button"><span>⬇</span><span>Export JSON</span></button>
+      <button id="la-clear" class="btn" type="button"><span>✕</span><span>Xóa</span></button>
     </div>
-    <div id="la-progress"></div>
+    <div id="la-progress" class="muted">Chưa chạy.</div>
+    <div id="la-bar"><div></div></div>
   </div>
 
   <div id="link-results"></div>
+</section>
+
+<section id="health-panel">
+  <h3>🛡️ Health-check (HTTP status + redirect + latency)</h3>
+  <p class="muted">Kiểm tra nhanh các link trong bảng dưới. Ưu tiên dùng Worker <code>AFF_ORIGIN</code> → <code>/head?url=...</code>; nếu không có, fallback best-effort.</p>
+  <div class="actions">
+    <button id="hc-run" class="btn"><span class="spinner" style="display:none"></span><span>Chạy Health-check</span></button>
+    <button id="hc-clear" class="btn"><span>✕</span><span>Xóa kết quả HC</span></button>
+  </div>
+</section>
+
+<section id="sku-panel">
+  <h3>🆔 SKU Validator + g.html Tester</h3>
+  <div class="grid">
+    <div><label>Tên sản phẩm</label><input id="sku-name" type="text" placeholder="Ví dụ: Bosch GWS 900-125 S điều tốc"></div>
+    <div><label>Brand (tuỳ chọn)</label><input id="sku-brand" type="text" placeholder="Bosch"></div>
+  </div>
+  <div class="actions" style="margin-top:8px">
+    <button id="sku-gen" class="btn"><span>⚙</span><span>Tạo SKU</span></button>
+    <button id="sku-open" class="btn"><span>↗</span><span>Mở g.html</span></button>
+    <button id="sku-img" class="btn"><span>🖼</span><span>Check ảnh /assets/img/products/&lt;sku&gt;.webp</span></button>
+  </div>
+  <div id="sku-out" class="muted" style="margin-top:6px"></div>
+</section>
+
+<section id="commit-panel">
+  <h3>🧾 Commit Generator</h3>
+  <div class="actions">
+    <button id="cm-gen" class="btn"><span>🪪</span><span>Tạo commit theo kết quả</span></button>
+    <button id="cm-copy" class="btn"><span>📋</span><span>Copy</span></button>
+  </div>
+  <pre id="cm-out" style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-top:8px"></pre>
 </section>
 
 <script>
 (function(){
   const $ = s => document.querySelector(s);
   const els = {
-    origin: $('#la-origin'), aff: $('#la-aff'), copy: $('#la-copy'), open: $('#la-open'), qr: $('#la-qr'),
+    origin: $('#la-origin'), aff: $('#la-aff'),
+    copy: $('#la-copy'), open: $('#la-open'), qr: $('#la-qr'),
     bulk: $('#la-bulk'), extract: $('#la-extract'), export: $('#la-export'), clear: $('#la-clear'),
-    results: $('#link-results'), progress: $('#la-progress'),
+    results: $('#link-results'), progress: $('#la-progress'), bar: $('#la-bar > div'),
+    hcRun: $('#hc-run'), hcClear: $('#hc-clear'),
+    skuName: $('#sku-name'), skuBrand: $('#sku-brand'), skuGen: $('#sku-gen'), skuOpen: $('#sku-open'), skuImg: $('#sku-img'), skuOut: $('#sku-out'),
+    cmGen: $('#cm-gen'), cmCopy: $('#cm-copy'), cmOut: $('#cm-out')
   };
 
-  // ===== Config (có thể đặt trước bằng window.* hoặc localStorage) =====
+  // ===== Config =====
   const AFF = {
     ID: window.AFF_ID || localStorage.getItem('AFF_ID') || '',
     TPL: {
@@ -1267,6 +1320,24 @@
     ORIGIN: window.AFF_ORIGIN || localStorage.getItem('AFF_ORIGIN') || '' // ví dụ: https://mxd210.mxd6686.workers.dev
   };
 
+  // ===== Utils =====
+  function setBusy(btn, busy, textRun, textIdle){
+    const sp = btn.querySelector('.spinner');
+    if (busy){
+      btn.setAttribute('aria-busy','true'); btn.disabled = true;
+      if (sp) sp.style.display = 'inline-block';
+      if (textRun) btn.lastElementChild.textContent = textRun;
+    } else {
+      btn.removeAttribute('aria-busy'); btn.disabled = false;
+      if (sp) sp.style.display = 'none';
+      if (textIdle) btn.lastElementChild.textContent = textIdle;
+    }
+  }
+  function flash(btn, okText='Đã nhận ✓', backText='Copy'){
+    const old = btn.lastElementChild.textContent;
+    btn.lastElementChild.textContent = okText;
+    setTimeout(()=>{ btn.lastElementChild.textContent = backText || old; }, 900);
+  }
   function dedupe(arr){ return [...new Set(arr.filter(Boolean))]; }
   function getMerchant(u){
     try{
@@ -1279,24 +1350,19 @@
     return '';
   }
   function extractLinks(text){
-    const re = /\bhttps?:\/\/[^\s<>"']+/gi; // chấp mọi http/https
+    const re = /\bhttps?:\/\/[^\s<>"']+/gi; // nhận mọi http/https
     const raw = (text||'').match(re) || [];
     const filtered = raw.filter(u => !!getMerchant(u));
     return dedupe(filtered).slice(0,200);
   }
-
-  // ===== Worker helpers =====
   function affApi(path){ return (AFF.ORIGIN || '') + path; }
   async function fetchJSON(url){
     try{ const r = await fetch(url, {mode:'cors'}); if(r.ok) return await r.json(); }catch(e){}
     return null;
   }
-
-  // Deep-link builder: template → worker /aff → gốc
   async function makeAffiliate(url, sub){
     const merchant = getMerchant(url);
     const s = Object.assign({sub1:'importer',sub2:'tool',sub3:'mxda',sub4:''}, sub||{});
-    // 1) Template
     if (merchant && AFF.TPL[merchant] && AFF.ID){
       let out = AFF.TPL[merchant]
         .replace('{url}', encodeURIComponent(url))
@@ -1308,61 +1374,46 @@
         .replace('{sub4}', encodeURIComponent(s.sub4));
       return {url: out, via:'template', merchant};
     }
-    // 2) Worker /aff
     if (AFF.ORIGIN){
       const u = affApi(`/aff?url=${encodeURIComponent(url)}&merchant=${merchant}&sub1=${encodeURIComponent(s.sub1)}&sub2=${encodeURIComponent(s.sub2)}&sub3=${encodeURIComponent(s.sub3)}&sub4=${encodeURIComponent(s.sub4)}`);
       const data = await fetchJSON(u);
       if (data && data.url) return {url: data.url, via:'worker', merchant};
     }
-    // 3) Fallback
     return {url, via:'none', merchant};
   }
-
-  // Ảnh/giá qua Worker: /img?url=… và /?url=… (detail)
   async function getHeadInfo(url){
     let image = '', price = '';
     if (AFF.ORIGIN){
-      const img = await fetch(affApi(`/img?url=${encodeURIComponent(url)}`)).then(r=>r.ok?r.blob():null).catch(()=>null);
-      if (img){ image = URL.createObjectURL(img); }
       const det = await fetchJSON(affApi(`/?url=${encodeURIComponent(url)}`));
       if (det){
-        // cố gắng bắt các field phổ biến
         price = det.price || det.price_min || det.data?.price || '';
-        if (!image){
-          const og = det.og_image || det.image || det.images?.[0];
-          if (og) image = og;
-        }
+        const og = det.og_image || det.image || det.images?.[0];
+        if (og) image = og;
       }
     }
     return {image, price};
   }
-
   function qrUrl(u, size=120){ return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(u)}`; }
+  const CONCURRENCY = 5;
 
   // ===== Single mode =====
   async function refreshSingle(){
     const src = els.origin.value.trim();
     if (!src){ els.aff.value=''; return; }
-    const {url:aff, via} = await makeAffiliate(src, {sub1:'single',sub2:'importer'});
+    setBusy(els.open, true, 'Đang mở…', 'Mở'); // feedback trực quan khi tạo link
+    const {url:aff} = await makeAffiliate(src, {sub1:'single',sub2:'importer'});
     els.aff.value = aff || '';
-    els.aff.dataset.via = via;
+    setBusy(els.open, false, '', 'Mở');
   }
+  els.origin.addEventListener('input', refreshSingle);
+  els.copy.addEventListener('click', async ()=>{
+    if(!els.aff.value) return;
+    try{ await navigator.clipboard.writeText(els.aff.value); flash(els.copy,'Đã copy ✓','Copy'); }catch(e){}
+  });
+  els.open.addEventListener('click', ()=>{ if(els.aff.value) { window.open(els.aff.value,'_blank'); flash(els.open,'Đã mở ✓','Mở'); }});
+  els.qr.addEventListener('click', ()=>{ const v=els.aff.value||els.origin.value; if(v){ window.open(qrUrl(v,240),'_blank'); flash(els.qr,'Đã tạo ✓','QR'); }});
 
   // ===== Bulk mode =====
-  const CONCURRENCY = 5;
-  async function runQueue(items, worker){
-    let i=0, active=0, done=0;
-    return new Promise(resolve=>{
-      const next=()=>{
-        while(active<CONCURRENCY && i<items.length){
-          const idx=i++, item=items[idx]; active++;
-          worker(item, idx).finally(()=>{ active--; done++; els.progress.textContent = `Đã xử lý ${done}/${items.length}`; next(); if(done===items.length) resolve(); });
-        }
-      };
-      next();
-    });
-  }
-
   function rowTpl(idx){
     return `
       <div class="row" data-idx="${idx}">
@@ -1377,26 +1428,48 @@
           <div style="font-size:12px;color:#64748b;margin-top:4px">Giá: <span data-price>—</span></div>
         </div>
         <div>
-          <span data-tag class="tag">…</span>
+          <span data-tag class="tag"><span class="dot wait"></span> Đợi</span>
+          <div class="muted" style="font-size:12px" data-hc>HC: —</div>
         </div>
         <div>
-          <button data-copy>Copy</button>
-          <button data-open>Mở</button>
-          <button data-qr>QR</button>
+          <button class="btn" data-copy><span>📋</span><span>Copy</span></button>
+          <button class="btn" data-open><span>↗</span><span>Mở</span></button>
+          <button class="btn" data-qr><span>▦</span><span>QR</span></button>
           <div class="qr" data-qrbox></div>
         </div>
       </div>`;
   }
-
+  function setTag(elTag, status, label){
+    const dot = elTag.querySelector('.dot');
+    dot.className = 'dot ' + status; // wait|run|ok|err
+    elTag.className = 'tag' + (status==='err' ? ' warn' : '');
+    elTag.lastChild.textContent = ' ' + (label || elTag.lastChild.textContent.trim());
+  }
+  async function runQueue(items, worker, onProgress){
+    let i=0, active=0, done=0;
+    return new Promise(resolve=>{
+      const next=()=>{
+        while(active<CONCURRENCY && i<items.length){
+          const idx=i++, item=items[idx]; active++;
+          worker(item, idx).finally(()=>{
+            active--; done++; onProgress(done, items.length); next(); if(done===items.length) resolve();
+          });
+        }
+      }; next();
+    });
+  }
   async function renderBulk(){
     const links = extractLinks(els.bulk.value);
     if (!links.length){
-      els.results.innerHTML = `<div class="row"><div></div><div><span class="tag warn">NO-LINK</span> Không thấy link product hợp lệ.</div></div>`;
-      els.progress.textContent = '';
+      els.results.innerHTML = `<div class="row"><div></div><div><span class="tag warn"><span class="dot err"></span> NO-LINK</span> Không thấy link hợp lệ.</div></div>`;
+      els.progress.textContent = 'Không có link.';
+      els.bar.style.width = '0%';
       return;
     }
     els.results.innerHTML = links.map((_,i)=>rowTpl(i)).join('');
-    els.progress.textContent = `Đang xử lý 0/${links.length}`;
+    els.progress.textContent = `0/${links.length}`;
+    els.bar.style.width = '0%';
+    setBusy(els.extract, true, 'Đang chạy…', 'Lấy link');
 
     await runQueue(links, async (src, idx)=>{
       const row = els.results.querySelector(`.row[data-idx="${idx}"]`);
@@ -1407,39 +1480,40 @@
       const thumb = row.querySelector('[data-thumb]');
 
       elOrigin.textContent = src;
+      setTag(elTag,'run','Đang xử lý');
 
-      // Affiliate
       const {url:aff, via, merchant} = await makeAffiliate(src, {sub1:'bulk',sub2:'importer'});
       elAff.textContent = aff;
-      elTag.textContent = via==='none' ? 'NO-AFF' : (merchant||'link');
-      elTag.className = 'tag' + (via==='none' ? ' warn' : '');
+      const label = via==='none' ? 'NO-AFF' : (merchant||'link');
+      setTag(elTag, via==='none' ? 'err':'ok', label);
 
-      // Ảnh + giá (best-effort)
       const {image, price} = await getHeadInfo(src);
-      if (image){
-        thumb.innerHTML = `<img src="${image}" alt="thumb">`;
-      } else {
-        thumb.innerHTML = `<span>IMG</span>`;
-      }
+      if (image){ thumb.innerHTML = `<img src="${image}" alt="thumb">`; } else { thumb.innerHTML = `<span>IMG</span>`; }
       elPrice.textContent = price ? (Number(price)||price).toLocaleString('vi-VN') : '—';
 
-      // Wire row buttons
+      // wire row buttons
       const btnCopy = row.querySelector('[data-copy]');
       const btnOpen = row.querySelector('[data-open]');
       const btnQR = row.querySelector('[data-qr]');
       const qrBox = row.querySelector('[data-qrbox]');
-      btnCopy.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(aff); btnCopy.textContent='Đã copy'; setTimeout(()=>btnCopy.textContent='Copy',900);}catch(e){} });
-      btnOpen.addEventListener('click', ()=>{ if(aff) window.open(aff,'_blank'); });
-      btnQR.addEventListener('click', ()=>{
-        if (!qrBox.innerHTML){ qrBox.innerHTML = `<img src="${qrUrl(aff||src)}" alt="QR">`; }
-        qrBox.style.display = qrBox.style.display==='block' ? 'none' : 'block';
+      btnCopy.addEventListener('click', async ()=>{
+        try{ await navigator.clipboard.writeText(aff); flash(btnCopy,'Đã copy ✓','Copy'); }catch(e){}
       });
+      btnOpen.addEventListener('click', ()=>{ if(aff){ window.open(aff,'_blank'); flash(btnOpen,'Đã mở ✓','Mở'); }});
+      btnQR.addEventListener('click', ()=>{
+        const href = aff || src;
+        if (!qrBox.innerHTML){ qrBox.innerHTML = `<img src="${qrUrl(href)}" alt="QR">`; }
+        qrBox.style.display = qrBox.style.display==='block' ? 'none' : 'block';
+        flash(btnQR,'Đã tạo ✓','QR');
+      });
+    }, (done,total)=>{
+      els.progress.textContent = `${done}/${total}`;
+      els.bar.style.width = `${Math.round(done/total*100)}%`;
     });
 
+    setBusy(els.extract, false, '', 'Lấy link (Get links)');
     els.progress.textContent += ' — xong.';
   }
-
-  // ===== Export bulk JSON (origin/aff/merchant/price/image) =====
   function exportBulk(){
     const rows = [...els.results.querySelectorAll('.row')];
     if (!rows.length){ alert('Chưa có dữ liệu.'); return; }
@@ -1449,28 +1523,108 @@
       const price = r.querySelector('[data-price]').textContent||'';
       const imgEl = r.querySelector('[data-thumb] img');
       const image = imgEl ? imgEl.src : '';
-      const tag = r.querySelector('[data-tag]').textContent||'';
+      const tag = r.querySelector('[data-tag]').textContent.trim();
       return { origin, affiliate: aff, merchant: getMerchant(origin)||tag, price, image, updated_at: new Date().toISOString() };
     });
     const blob = new Blob([JSON.stringify(out,null,2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'links_affiliates_bulk.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'links_affiliates_bulk.json'; a.click(); URL.revokeObjectURL(a.href);
   }
-
-  // Wire events
-  els.origin.addEventListener('input', refreshSingle);
-  els.copy.addEventListener('click', async ()=>{ if(els.aff.value){ try{ await navigator.clipboard.writeText(els.aff.value); els.copy.textContent='Đã copy'; setTimeout(()=>els.copy.textContent='Copy',900);}catch(e){} }});
-  els.open.addEventListener('click', ()=>{ if(els.aff.value) window.open(els.aff.value,'_blank'); });
-  els.qr.addEventListener('click', ()=>{ const v=els.aff.value||els.origin.value; if(v) window.open(qrUrl(v,240),'_blank'); });
-
   els.extract.addEventListener('click', renderBulk);
   els.export.addEventListener('click', exportBulk);
-  els.clear.addEventListener('click', ()=>{ els.bulk.value=''; els.results.innerHTML=''; els.progress.textContent=''; });
+  els.clear.addEventListener('click', ()=>{ els.bulk.value=''; els.results.innerHTML=''; els.progress.textContent='Đã xoá.'; els.bar.style.width='0%'; });
+
+  // ===== Health-check =====
+  async function headCheck(url){
+    // ưu tiên worker
+    if (AFF.ORIGIN){
+      const data = await fetchJSON(affApi(`/head?url=${encodeURIComponent(url)}`));
+      if (data) return data; // {ok,status,latency,redirects}
+    }
+    // fallback best-effort
+    const t0 = performance.now();
+    try{
+      const r = await fetch(url, {mode:'no-cors'});
+      const t = Math.round(performance.now()-t0);
+      return { ok:true, status:'?', latency:t, redirects:[] };
+    }catch(e){
+      const t = Math.round(performance.now()-t0);
+      return { ok:false, status:'ERR', latency:t, redirects:[] };
+    }
+  }
+  async function runHealth(){
+    const rows = [...els.results.querySelectorAll('.row')];
+    if (!rows.length){ alert('Chưa có bảng kết quả.'); return; }
+    setBusy(els.hcRun, true, 'Đang kiểm…', 'Chạy Health-check');
+    for (const r of rows){
+      const aff = r.querySelector('[data-aff]').textContent || r.querySelector('[data-origin]').textContent;
+      const hcEl = r.querySelector('[data-hc]');
+      const tagEl = r.querySelector('[data-tag]');
+      setTag(tagEl,'run','Kiểm tra');
+      const hc = await headCheck(aff);
+      const msg = hc.ok ? `HC: ${hc.status||200} • ${hc.latency||'?'}ms${(hc.redirects&&hc.redirects.length)?' • '+hc.redirects.length+' redir':''}` : `HC: lỗi • ${hc.latency||'?'}ms`;
+      hcEl.textContent = msg;
+      setTag(tagEl, hc.ok ? 'ok':'err', (tagEl.textContent.trim()||'HC'));
+    }
+    setBusy(els.hcRun, false, '', 'Chạy Health-check');
+  }
+  els.hcRun.addEventListener('click', runHealth);
+  els.hcClear.addEventListener('click', ()=>{
+    [...els.results.querySelectorAll('[data-hc]')].forEach(x=>x.textContent='HC: —');
+    [...els.results.querySelectorAll('[data-tag]')].forEach(x=>setTag(x,'wait','Đợi'));
+  });
+
+  // ===== SKU Validator + g.html Tester =====
+  const slugify = s => (s||'').toString().normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d')
+    .replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase();
+  els.skuGen.addEventListener('click', ()=>{
+    const base = `${(els.skuBrand.value||'').trim()} ${els.skuName.value||''}`.trim();
+    const sku = slugify(base).replace(/-+/g,'-');
+    els.skuOut.textContent = sku ? `SKU: ${sku}` : 'SKU: (trống)';
+    els.skuOut.dataset.sku = sku || '';
+  });
+  els.skuOpen.addEventListener('click', ()=>{
+    const sku = els.skuOut.dataset.sku || slugify(els.skuName.value||'');
+    if (!sku){ alert('Chưa có SKU.'); return; }
+    window.open(`/g.html?sku=${encodeURIComponent(sku)}`,'_blank');
+  });
+  els.skuImg.addEventListener('click', ()=>{
+    const sku = els.skuOut.dataset.sku || slugify(els.skuName.value||'');
+    if (!sku){ alert('Chưa có SKU.'); return; }
+    const img = new Image(); const url = `/assets/img/products/${sku}.webp`;
+    const t0 = performance.now();
+    img.onload = ()=>{ const t=Math.round(performance.now()-t0); els.skuOut.textContent = `Ảnh OK (${t}ms): ${url}`; };
+    img.onerror = ()=>{ els.skuOut.textContent = `Thiếu ảnh: ${url}`; };
+    img.src = url + '?v=' + Date.now();
+  });
+
+  // ===== Commit Generator =====
+  els.cmGen.addEventListener('click', ()=>{
+    const rows = [...els.results.querySelectorAll('.row')];
+    const merchants = {};
+    rows.forEach(r=>{
+      const origin = r.querySelector('[data-origin]').textContent||'';
+      const m = getMerchant(origin)||'other';
+      merchants[m] = (merchants[m]||0)+1;
+    });
+    const total = rows.length;
+    let parts = Object.keys(merchants).map(k=>`${k}:${merchants[k]}`).join(', ');
+    const msg = `feat(importer): process ${total} links (${parts})\n\n`+
+                `• Buttons state + spinner + progress bar\n`+
+                `• Health-check panel (/head via Worker)\n`+
+                `• SKU validator + g.html tester + image check\n`+
+                `• Export JSON (bulk) origin/affiliate/merchant/price/image`;
+    els.cmOut.textContent = `git add tools/shopee-importer.html\n`+
+                             `git commit -m ${JSON.stringify(msg)}`;
+  });
+  els.cmCopy.addEventListener('click', async ()=>{
+    if (!els.cmOut.textContent.trim()) return;
+    try{ await navigator.clipboard.writeText(els.cmOut.textContent); flash(els.cmCopy,'Đã copy ✓','Copy'); }catch(e){}
+  });
 })();
 </script>
+
 
 
 </body>
