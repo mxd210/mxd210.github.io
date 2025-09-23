@@ -883,5 +883,300 @@
     // ===== Init =====
     mountSettings();
   </script>
+  <!-- MXD Importer — PRO Add-on (Layout + Badges + SEO) -->
+<style>
+  :root {
+    --mxd-accent: #0ea5e9; /* thay đổi qua UI */
+    --mxd-font: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  }
+  #pro-panel{font-family:var(--mxd-font);border:1px solid #2223; border-radius:14px; padding:16px; margin:24px 0; background:#fff; box-shadow:0 6px 18px #00000012}
+  #pro-panel h3{margin:0 0 12px; font-size:18px}
+  #pro-grid{display:grid; gap:12px; grid-template-columns:repeat(2,minmax(0,1fr))}
+  #pro-grid label{font-size:13px; color:#333}
+  #pro-grid input[type="text"], #pro-grid input[type="color"], #pro-grid select, #pro-grid textarea{
+    width:100%; padding:10px 12px; border:1px solid #d0d3d6; border-radius:10px; font-family:inherit; font-size:14px; background:#fafafa
+  }
+  #pro-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+  #pro-actions button{padding:10px 14px; border-radius:10px; border:1px solid #d0d3d6; background:#fff; cursor:pointer}
+  #pro-actions button.primary{background:var(--mxd-accent); color:#fff; border-color:transparent}
+  #pro-preview{margin-top:16px}
+  .card{position:relative; border:1px solid #e5e7eb; border-radius:16px; overflow:hidden; display:flex; flex-direction:column}
+  .card .img{aspect-ratio:1/1; background:#f3f4f6; display:flex; align-items:center; justify-content:center; font-size:12px; color:#777}
+  .card .img img{width:100%; height:100%; object-fit:cover}
+  .card .body{padding:12px}
+  .price{font-weight:700; margin-top:6px}
+  .buy{display:inline-flex; align-items:center; gap:6px; text-decoration:none; border:1px solid var(--mxd-accent); color:var(--mxd-accent); padding:8px 10px; border-radius:10px; font-size:13px}
+  .buy.primary{background:var(--mxd-accent); color:#fff; border-color:transparent}
+  /* Layout variants */
+  .layout-classic .body{display:flex; flex-direction:column; gap:8px}
+  .layout-media .card{flex-direction:row}
+  .layout-media .img{width:42%; min-width:42%}
+  .layout-banner .img{aspect-ratio:16/9}
+  .layout-minimal .card{border-radius:12px}
+  .layout-minimal .body{padding:10px}
+  /* Badges */
+  .badges{position:absolute; top:10px; left:10px; display:flex; gap:6px; flex-wrap:wrap}
+  .badge{font-size:11px; font-weight:700; padding:6px 8px; border-radius:999px; color:#fff}
+  .badge.new{background:#10b981}
+  .badge.hot{background:#ef4444}
+  .badge.sale{background:#f59e0b}
+  /* Tiny helper */
+  .muted{color:#6b7280; font-size:13px}
+</style>
+
+<section id="pro-panel">
+  <h3>⚙️ MXD PRO Add-on — Layout · Badges · SEO</h3>
+  <div id="pro-grid">
+    <div>
+      <label>Layout sản phẩm</label>
+      <select id="pro-layout">
+        <option value="layout-classic">Card Classic</option>
+        <option value="layout-media">Media Left</option>
+        <option value="layout-banner">Banner Horizontal</option>
+        <option value="layout-minimal">Minimal</option>
+      </select>
+    </div>
+    <div>
+      <label>Màu chủ đạo</label>
+      <input id="pro-accent" type="color" value="#0ea5e9">
+    </div>
+    <div>
+      <label>Font</label>
+      <select id="pro-font">
+        <option value='Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial'>Inter / System</option>
+        <option value='"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'>Segoe UI</option>
+        <option value='Roboto, "Helvetica Neue", Arial, sans-serif'>Roboto</option>
+        <option value='system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial'>System UI</option>
+      </select>
+    </div>
+    <div>
+      <label>Badges</label>
+      <div style="display:flex; gap:10px; align-items:center">
+        <label><input type="checkbox" id="badge-new"> Mới</label>
+        <label><input type="checkbox" id="badge-hot"> Hot</label>
+        <label><input type="checkbox" id="badge-sale"> Sale</label>
+        <button id="badge-auto" type="button">Auto</button>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
+      <label>Mô tả SEO (tự sinh / chỉnh tay)</label>
+      <textarea id="pro-desc" rows="3" placeholder="Ví dụ: Máy mài Bosch 900W điều tốc, phù hợp cắt mài gạch/kim loại, bảo hành 12 tháng..."></textarea>
+      <div id="pro-actions">
+        <button class="primary" id="btn-desc-generate" type="button">Sinh mô tả (Rule-based)</button>
+        <button id="btn-desc-ai" type="button" title="Tuỳ chọn: nếu có endpoint nội bộ">Sinh bằng AI (nếu có)</button>
+        <button id="btn-apply" class="primary" type="button">Áp vào sản phẩm đang chọn</button>
+        <button id="btn-export-extend" type="button">Export JSON (kèm layout/badges/seo)</button>
+      </div>
+      <div class="muted">Lưu ý: Export sẽ thêm các trường <code>layout</code>, <code>style</code>, <code>badges</code>, <code>seo</code> vào object sản phẩm.</div>
+    </div>
+  </div>
+
+  <div id="pro-preview"></div>
+</section>
+
+<script>
+(function(){
+  // ========== tiny helpers ==========
+  const $ = (s, p=document)=>p.querySelector(s);
+  const $$ = (s, p=document)=>[...p.querySelectorAll(s)];
+  const EL = {
+    layout: $('#pro-layout'),
+    accent: $('#pro-accent'),
+    font:   $('#pro-font'),
+    bNew:   $('#badge-new'),
+    bHot:   $('#badge-hot'),
+    bSale:  $('#badge-sale'),
+    bAuto:  $('#badge-auto'),
+    desc:   $('#pro-desc'),
+    gen:    $('#btn-desc-generate'),
+    genAI:  $('#btn-desc-ai'),
+    apply:  $('#btn-apply'),
+    export: $('#btn-export-extend'),
+    preview: $('#pro-preview'),
+  };
+
+  // cố gắng đọc "sản phẩm đang chọn" từ tool hiện có
+  function getSelectedProduct(){
+    // tuỳ tool chính: thử nhiều cách an toàn
+    if (window.MXD && MXD.currentProduct) return MXD.currentProduct;
+    if (window.currentProduct) return window.currentProduct;
+    // fallback: tạo dummy để preview
+    return {
+      name: 'Máy mài góc 125mm điều tốc Bosch GWS 900-125 S',
+      price: 1790000,
+      origin: 'https://shopee.vn/search?keyword=Bosch%20GWS%20900-125%20S',
+      merchant: 'shopee',
+      sku: 'bosch-gws-900-125s',
+      image: '/assets/img/products/bosch-gws-900-125s.webp',
+      category: 'may-mai',
+      brand: 'Bosch',
+      updated_at: new Date().toISOString(),
+      sub1: 'bosch-gws-900-125s',
+      notes: 'điều tốc, 900W',
+    };
+  }
+
+  function priceFmt(v){
+    if (typeof v!=='number') return v||'';
+    return v.toLocaleString('vi-VN')+'đ';
+  }
+
+  // ===== badges auto rules =====
+  function autoBadges(p){
+    const badges = new Set();
+    try{
+      const now = new Date();
+      const up = p.updated_at ? new Date(p.updated_at) : now;
+      const days = Math.round((now - up)/86400000);
+      if (days <= 7) badges.add('new');
+
+      // sale: nếu có price_compare > price, hay notes chứa từ khoá
+      if (p.price_compare && Number(p.price_compare) > Number(p.price)) badges.add('sale');
+      const txt = (p.notes||p.name||'').toLowerCase();
+      if (/\bgiảm|\bsale|\b%-|%/.test(txt)) badges.add('sale');
+
+      // hot: heuristic đơn giản theo brand/category phổ biến
+      if (/(bosch|makita|dekton|kynko|stanley)/i.test(p.brand||'')) badges.add('hot');
+    }catch(e){}
+    return [...badges];
+  }
+
+  // ===== SEO rule-based generator =====
+  function genSEO(p){
+    const brand = p.brand || '';
+    const cat = (p.category||'').replace(/-/g,' ');
+    const watts = (p.notes||'').match(/\b(\d{3,4})w\b/i)?.[1];
+    const kw = [
+      p.sku, brand, cat, watts? (watts+'W') : null, 'chính hãng', 'bảo hành', 'giá tốt'
+    ].filter(Boolean);
+    const features = [
+      brand? `Thương hiệu: ${brand}`:null,
+      p.category? `Nhóm: ${cat}`:null,
+      p.price? `Giá tham khảo: ${priceFmt(p.price)}`:null,
+      p.notes? `Ghi chú: ${p.notes}`:null
+    ].filter(Boolean).join(' · ');
+    const line1 = `${p.name} – lựa chọn phù hợp cho thợ và xưởng.`;
+    const line2 = features ? features : '';
+    const line3 = `Mua nhanh qua link chính hãng, nhận ưu đãi theo chương trình.`;
+    return `${line1} ${line2} ${line3}`.trim();
+  }
+
+  // ===== optional AI hook (tuỳ chọn endpoint) =====
+  async function genSEO_AI(p){
+    // Nếu đã có Worker nội bộ hay endpoint /ai, cắm tại đây:
+    // return fetch('/api/ai', {method:'POST', body:JSON.stringify({product:p})}).then(r=>r.text());
+    // Mặc định fallback sang rule-based
+    return genSEO(p);
+  }
+
+  function applyTheme(){
+    document.documentElement.style.setProperty('--mxd-accent', EL.accent.value);
+    document.documentElement.style.setProperty('--mxd-font', EL.font.value);
+  }
+
+  function badgeNodes(arr){
+    return `<div class="badges">${
+      (arr||[]).map(b=>`<span class="badge ${b}">${b.toUpperCase()}</span>`).join('')
+    }</div>`;
+  }
+
+  function preview(p){
+    applyTheme();
+    const layout = EL.layout.value;
+    const badges = [
+      EL.bNew.checked?'new':null,
+      EL.bHot.checked?'hot':null,
+      EL.bSale.checked?'sale':null
+    ].filter(Boolean);
+    const img = p.image || '/assets/img/products/placeholder.webp';
+    const name = p.name || p.sku || 'Sản phẩm';
+    const price = p.price? priceFmt(p.price) : '';
+    EL.preview.innerHTML = `
+      <div class="${layout}">
+        <div class="card">
+          ${badgeNodes(badges)}
+          <div class="img"><img src="${img}" alt="${name}" onerror="this.replaceWith(document.createTextNode('No image'))"></div>
+          <div class="body">
+            <div class="title"><strong>${name}</strong></div>
+            ${price? `<div class="price">${price}</div>`:``}
+            <div style="display:flex; gap:8px; margin-top:8px">
+              <a class="buy primary" href="${p.origin||'#'}" target="_blank" rel="noopener">Mua nhanh</a>
+              <a class="buy" href="#" onclick="return false">Sao chép link</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== Export wrapper thêm layout/badges/seo =====
+  function extendProduct(p){
+    const badges = [];
+    if (EL.bNew.checked) badges.push('new');
+    if (EL.bHot.checked) badges.push('hot');
+    if (EL.bSale.checked) badges.push('sale');
+
+    const seoDesc = (EL.desc.value||'').trim() || genSEO(p);
+    const obj = Object.assign({}, p, {
+      layout: EL.layout.value.replace(/^layout-/, ''), // classic|media|banner|minimal
+      style: { accent: EL.accent.value, font: EL.font.value },
+      badges,
+      seo: {
+        description: seoDesc,
+        title: p.name,
+        keywords: [p.sku, p.brand, p.category].filter(Boolean)
+      }
+    });
+    return obj;
+  }
+
+  // ===== wire events =====
+  function syncUIFrom(p){
+    // try set some sensible defaults
+    EL.bNew.checked = autoBadges(p).includes('new');
+    EL.bHot.checked = autoBadges(p).includes('hot');
+    EL.bSale.checked = autoBadges(p).includes('sale');
+    EL.desc.value = genSEO(p);
+    preview(p);
+  }
+
+  const initProduct = getSelectedProduct();
+  syncUIFrom(initProduct);
+
+  EL.bAuto.addEventListener('click', ()=>{
+    const a = autoBadges(getSelectedProduct());
+    EL.bNew.checked = a.includes('new');
+    EL.bHot.checked = a.includes('hot');
+    EL.bSale.checked = a.includes('sale');
+    preview(getSelectedProduct());
+  });
+  [EL.layout, EL.accent, EL.font, EL.bNew, EL.bHot, EL.bSale].forEach(x=>x.addEventListener('input', ()=>preview(getSelectedProduct())));
+  EL.gen.addEventListener('click', ()=>{ EL.desc.value = genSEO(getSelectedProduct()); });
+  EL.genAI.addEventListener('click', async ()=>{
+    EL.desc.value = 'Đang sinh mô tả...';
+    EL.desc.value = await genSEO_AI(getSelectedProduct());
+  });
+  EL.apply.addEventListener('click', ()=>{
+    const p = getSelectedProduct();
+    const out = extendProduct(p);
+    // cố gắng bơm ngược vào tool chính nếu có
+    if (window.MXD && typeof MXD.updateCurrentProduct==='function') MXD.updateCurrentProduct(out);
+    window.currentProduct = out;
+    preview(out);
+    alert('Đã áp layout/badges/SEO cho sản phẩm hiện tại.');
+  });
+  EL.export.addEventListener('click', ()=>{
+    const p = getSelectedProduct();
+    const out = extendProduct(p);
+    const blob = new Blob([JSON.stringify([out], null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `affiliates_extended_${(out.sku||'product')}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+})();
+</script>
+
 </body>
 </html>
