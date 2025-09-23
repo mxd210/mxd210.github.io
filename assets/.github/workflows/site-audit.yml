@@ -1,0 +1,44 @@
+name: site-audit
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 18 }
+      - name: Install HTML/JS tooling
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm i -D htmlhint@1 eslint@9 stylelint@16 lychee-action@1 @actions/core@1
+          echo '{ "extends": "htmlhint:recommended" }' > .htmlhintrc
+          npx eslint --init || true
+      - name: Run MXD scripts
+        run: |
+          node build-sitemaps.js --base https://mxd210.github.io
+          node validate-images.js
+          node check-affiliates.js || true
+          node prune-affiliates.js --write || true
+      - name: Enforce MXD conventions (custom)
+        run: |
+          node -e "
+          const fs = require('fs');
+          const htmls = fs.readdirSync('.').filter(f=>/\\.html$/.test(f));
+          const bad = []; 
+          for (const f of htmls) {
+            const s = fs.readFileSync(f,'utf8');
+            if (!/analytics\\.js[\"']\\s+defer/.test(s) || !/mxd-affiliate\\.js[\"']\\s+defer/.test(s)) bad.push(f+': missing GA4/affiliate defer');
+            if (s.indexOf('mxd-affiliate.js') < s.indexOf('analytics.js')) bad.push(f+': affiliate must come AFTER GA4');
+            if (!/rel=\\\"canonical\\\"\\s+href=\\\"https:\\/\\/mxd210\\.github\\.io\\//.test(s)) bad.push(f+': canonical not absolute https://mxd210.github.io/...'); 
+          }
+          if (fs.existsSync('assets/img/product')) bad.push('Found assets/img/product — must be assets/img/products');
+          if (bad.length) { console.error(bad.join('\\n')); process.exit(1); }"
+      - name: Link check (internal)
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: --no-progress --verbose --exclude-mail --base https://mxd210.github.io ./
