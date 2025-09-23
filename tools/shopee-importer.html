@@ -1179,6 +1179,7 @@
 })();
 </script>
 <!-- MXD Importer — Link Assistant (Get links + Affiliate preview + Guide) -->
+<!-- MXD Importer — Link Assistant PRO v4.3 -->
 <style>
   #link-assistant{border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:16px 0;background:#fff;box-shadow:0 6px 18px #0000000d}
   #link-assistant h3{margin:0 0 10px;font-size:18px}
@@ -1189,25 +1190,30 @@
   #link-assistant .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
   #link-assistant button{padding:10px 14px;border-radius:10px;border:1px solid #d1d5db;background:#fff;cursor:pointer}
   #link-assistant button.primary{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+  #la-progress{font-size:12px;color:#64748b;margin-top:6px}
   #link-results{margin-top:12px}
-  #link-results .row{display:grid;grid-template-columns:120px 1fr 1fr 110px;gap:8px;align-items:center;border:1px solid #eef2f7;border-radius:10px;padding:10px;margin-bottom:8px}
+  #link-results .row{display:grid;grid-template-columns:44px 1fr 1fr 130px 120px;gap:8px;align-items:center;border:1px solid #eef2f7;border-radius:10px;padding:10px;margin-bottom:8px}
+  #link-results .thumb{width:44px;height:44px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  #link-results .thumb img{width:100%;height:100%;object-fit:cover}
   #link-results code{display:inline-block;max-width:100%;overflow:auto;white-space:nowrap}
   #link-results .tag{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#1e3a8a}
   #link-results .tag.warn{background:#fff7ed;color:#9a3412}
-  @media (max-width: 840px){
+  #link-results .qr{display:none}
+  #link-results .qr img{width:120px;height:120px;border-radius:8px;border:1px solid #e5e7eb}
+  @media (max-width: 980px){
     #link-assistant .grid{grid-template-columns:1fr}
-    #link-results .row{grid-template-columns:1fr}
+    #link-results .row{grid-template-columns:44px 1fr}
   }
 </style>
 
 <section id="link-assistant">
-  <h3>🔗 Get links + Affiliate preview</h3>
+  <h3>🔗 Get links + Affiliate preview + Ảnh/giá + QR</h3>
   <details open>
     <summary><strong>Hướng dẫn nhanh</strong></summary>
     <ol style="margin:6px 0 0 18px;padding:0">
-      <li>Dán <em>1 link</em> vào “Link gốc (1 sản phẩm)” → affiliate hiện <em>bên cạnh</em>, có nút Copy/Mở.</li>
-      <li>Dán <em>nhiều link</em> (mỗi dòng một link, hoặc lẫn text) vào ô “Danh sách”, bấm <b>Lấy link</b>.</li>
-      <li>Nếu chưa cấu hình affiliate, tool vẫn nhận link gốc và gắn nhãn <code>NO-AFF</code> để cậu biết mà cấu hình.</li>
+      <li>Dán <em>1 link</em> vào “Link gốc (1 sản phẩm)” → affiliate hiển thị ngay bên cạnh (có Copy/Mở/QR).</li>
+      <li>Dán <em>nhiều link</em> vào ô “Danh sách”, bấm <b>Lấy link</b> → bảng kết quả hiện Ảnh/Link gốc/Affiliate/Giá/QR.</li>
+      <li>Cấu hình (tuỳ chọn): <code>AFF_ID</code>, <code>AFF_*_TEMPLATE</code>, <code>AFF_ORIGIN</code> (Worker) qua <em>window</em> hoặc <em>localStorage</em>.</li>
     </ol>
   </details>
 
@@ -1222,17 +1228,20 @@
       <div class="actions">
         <button id="la-copy" type="button">Copy</button>
         <button id="la-open" type="button">Mở</button>
+        <button id="la-qr" type="button">QR</button>
       </div>
     </div>
   </div>
 
   <div style="margin-top:12px">
-    <label>Danh sách (nhiều link — mỗi dòng 1 link, hoặc dán text lẫn link)</label>
-    <textarea id="la-bulk" rows="5" placeholder="Ví dụ: https://shopee.vn/...\nhttps://www.lazada.vn/products/..."></textarea>
+    <label>Danh sách (nhiều link — tối đa 200, mỗi dòng 1 link)</label>
+    <textarea id="la-bulk" rows="6" placeholder="https://shopee.vn/...\nhttps://www.lazada.vn/...\nhttps://www.tiktok.com/..."></textarea>
     <div class="actions">
       <button id="la-extract" class="primary" type="button">Lấy link (Get links)</button>
+      <button id="la-export" type="button">Export JSON (bulk)</button>
       <button id="la-clear" type="button">Xóa</button>
     </div>
+    <div id="la-progress"></div>
   </div>
 
   <div id="link-results"></div>
@@ -1242,18 +1251,23 @@
 (function(){
   const $ = s => document.querySelector(s);
   const els = {
-    origin: $('#la-origin'),
-    aff:    $('#la-aff'),
-    copy:   $('#la-copy'),
-    open:   $('#la-open'),
-    bulk:   $('#la-bulk'),
-    extract:$('#la-extract'),
-    clear:  $('#la-clear'),
-    results:$('#link-results'),
+    origin: $('#la-origin'), aff: $('#la-aff'), copy: $('#la-copy'), open: $('#la-open'), qr: $('#la-qr'),
+    bulk: $('#la-bulk'), extract: $('#la-extract'), export: $('#la-export'), clear: $('#la-clear'),
+    results: $('#link-results'), progress: $('#la-progress'),
+  };
+
+  // ===== Config (có thể đặt trước bằng window.* hoặc localStorage) =====
+  const AFF = {
+    ID: window.AFF_ID || localStorage.getItem('AFF_ID') || '',
+    TPL: {
+      shopee: window.AFF_SHOPEE_TEMPLATE || localStorage.getItem('AFF_SHOPEE_TEMPLATE') || '',
+      lazada: window.AFF_LAZADA_TEMPLATE || localStorage.getItem('AFF_LAZADA_TEMPLATE') || '',
+      tiktok: window.AFF_TIKTOK_TEMPLATE || localStorage.getItem('AFF_TIKTOK_TEMPLATE') || ''
+    },
+    ORIGIN: window.AFF_ORIGIN || localStorage.getItem('AFF_ORIGIN') || '' // ví dụ: https://mxd210.mxd6686.workers.dev
   };
 
   function dedupe(arr){ return [...new Set(arr.filter(Boolean))]; }
-
   function getMerchant(u){
     try{
       const h = new URL(u).hostname;
@@ -1264,112 +1278,200 @@
     }catch(e){}
     return '';
   }
-
-  // Deep-link builder: ưu tiên template; fallback gọi /aff; cuối cùng trả link gốc + cảnh báo
-  async function makeAffiliate(url, opts={}){
-    const merchant = getMerchant(url);
-    const AFF_ID = window.AFF_ID || localStorage.getItem('AFF_ID') || '';
-    const TPL = {
-      shopee: window.AFF_SHOPEE_TEMPLATE || '',
-      lazada: window.AFF_LAZADA_TEMPLATE || '',
-      tiktok: window.AFF_TIKTOK_TEMPLATE || ''
-    };
-
-    const sub = {
-      sub1: opts.sub1 || 'importer',
-      sub2: opts.sub2 || 'tool',
-      sub3: opts.sub3 || 'mxda',
-      sub4: opts.sub4 || ''
-    };
-
-    // 1) Template nội bộ (nhanh nhất)
-    if (merchant && TPL[merchant] && AFF_ID){
-      let out = TPL[merchant]
-        .replace('{url}', encodeURIComponent(url))
-        .replace('{aff_id}', encodeURIComponent(AFF_ID))
-        .replace('{merchant}', merchant)
-        .replace('{sub1}', encodeURIComponent(sub.sub1))
-        .replace('{sub2}', encodeURIComponent(sub.sub2))
-        .replace('{sub3}', encodeURIComponent(sub.sub3))
-        .replace('{sub4}', encodeURIComponent(sub.sub4));
-      return {url: out, merchant, via:'template'};
-    }
-
-    // 2) Worker /aff nếu có
-    try{
-      const affApi = `/aff?url=${encodeURIComponent(url)}&merchant=${merchant}&sub1=${encodeURIComponent(sub.sub1)}&sub2=${encodeURIComponent(sub.sub2)}&sub3=${encodeURIComponent(sub.sub3)}&sub4=${encodeURIComponent(sub.sub4)}`;
-      const r = await fetch(affApi, {mode:'cors'});
-      if (r.ok){
-        const data = await r.json().catch(()=> ({}));
-        if (data && data.url) return {url: data.url, merchant, via:'worker'};
-      }
-    }catch(e){ /* ignore network error */ }
-
-    // 3) Không có cấu hình → trả link gốc + cờ NO-AFF
-    return {url, merchant, via:'none'};
-  }
-
   function extractLinks(text){
-    // Tìm mọi http/https; chấp cả link search (shopee search vẫn deep được)
-    const re = /\bhttps?:\/\/[^\s<>"']+/gi;
+    const re = /\bhttps?:\/\/[^\s<>"']+/gi; // chấp mọi http/https
     const raw = (text||'').match(re) || [];
-    const filtered = raw.filter(u=>{
-      const m = getMerchant(u);
-      return !!m; // chỉ giữ shopee/lazada/tiki/tiktok
-    });
-    return dedupe(filtered);
+    const filtered = raw.filter(u => !!getMerchant(u));
+    return dedupe(filtered).slice(0,200);
   }
 
+  // ===== Worker helpers =====
+  function affApi(path){ return (AFF.ORIGIN || '') + path; }
+  async function fetchJSON(url){
+    try{ const r = await fetch(url, {mode:'cors'}); if(r.ok) return await r.json(); }catch(e){}
+    return null;
+  }
+
+  // Deep-link builder: template → worker /aff → gốc
+  async function makeAffiliate(url, sub){
+    const merchant = getMerchant(url);
+    const s = Object.assign({sub1:'importer',sub2:'tool',sub3:'mxda',sub4:''}, sub||{});
+    // 1) Template
+    if (merchant && AFF.TPL[merchant] && AFF.ID){
+      let out = AFF.TPL[merchant]
+        .replace('{url}', encodeURIComponent(url))
+        .replace('{aff_id}', encodeURIComponent(AFF.ID))
+        .replace('{merchant}', merchant)
+        .replace('{sub1}', encodeURIComponent(s.sub1))
+        .replace('{sub2}', encodeURIComponent(s.sub2))
+        .replace('{sub3}', encodeURIComponent(s.sub3))
+        .replace('{sub4}', encodeURIComponent(s.sub4));
+      return {url: out, via:'template', merchant};
+    }
+    // 2) Worker /aff
+    if (AFF.ORIGIN){
+      const u = affApi(`/aff?url=${encodeURIComponent(url)}&merchant=${merchant}&sub1=${encodeURIComponent(s.sub1)}&sub2=${encodeURIComponent(s.sub2)}&sub3=${encodeURIComponent(s.sub3)}&sub4=${encodeURIComponent(s.sub4)}`);
+      const data = await fetchJSON(u);
+      if (data && data.url) return {url: data.url, via:'worker', merchant};
+    }
+    // 3) Fallback
+    return {url, via:'none', merchant};
+  }
+
+  // Ảnh/giá qua Worker: /img?url=… và /?url=… (detail)
+  async function getHeadInfo(url){
+    let image = '', price = '';
+    if (AFF.ORIGIN){
+      const img = await fetch(affApi(`/img?url=${encodeURIComponent(url)}`)).then(r=>r.ok?r.blob():null).catch(()=>null);
+      if (img){ image = URL.createObjectURL(img); }
+      const det = await fetchJSON(affApi(`/?url=${encodeURIComponent(url)}`));
+      if (det){
+        // cố gắng bắt các field phổ biến
+        price = det.price || det.price_min || det.data?.price || '';
+        if (!image){
+          const og = det.og_image || det.image || det.images?.[0];
+          if (og) image = og;
+        }
+      }
+    }
+    return {image, price};
+  }
+
+  function qrUrl(u, size=120){ return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(u)}`; }
+
+  // ===== Single mode =====
   async function refreshSingle(){
     const src = els.origin.value.trim();
-    if (!src){ els.aff.value = ''; return; }
-    const {url:aff, via} = await makeAffiliate(src, {sub1:'single', sub2:'importer'});
+    if (!src){ els.aff.value=''; return; }
+    const {url:aff, via} = await makeAffiliate(src, {sub1:'single',sub2:'importer'});
     els.aff.value = aff || '';
     els.aff.dataset.via = via;
+  }
+
+  // ===== Bulk mode =====
+  const CONCURRENCY = 5;
+  async function runQueue(items, worker){
+    let i=0, active=0, done=0;
+    return new Promise(resolve=>{
+      const next=()=>{
+        while(active<CONCURRENCY && i<items.length){
+          const idx=i++, item=items[idx]; active++;
+          worker(item, idx).finally(()=>{ active--; done++; els.progress.textContent = `Đã xử lý ${done}/${items.length}`; next(); if(done===items.length) resolve(); });
+        }
+      };
+      next();
+    });
+  }
+
+  function rowTpl(idx){
+    return `
+      <div class="row" data-idx="${idx}">
+        <div class="thumb" data-thumb><span>—</span></div>
+        <div>
+          <div style="font-size:12px;color:#64748b">Gốc</div>
+          <code data-origin>Loading…</code>
+        </div>
+        <div>
+          <div style="font-size:12px;color:#64748b">Affiliate</div>
+          <code data-aff>Loading…</code>
+          <div style="font-size:12px;color:#64748b;margin-top:4px">Giá: <span data-price>—</span></div>
+        </div>
+        <div>
+          <span data-tag class="tag">…</span>
+        </div>
+        <div>
+          <button data-copy>Copy</button>
+          <button data-open>Mở</button>
+          <button data-qr>QR</button>
+          <div class="qr" data-qrbox></div>
+        </div>
+      </div>`;
   }
 
   async function renderBulk(){
     const links = extractLinks(els.bulk.value);
     if (!links.length){
-      els.results.innerHTML = `<div class="row"><span class="tag warn">NO-LINK</span><div>Không thấy link product hợp lệ.</div></div>`;
+      els.results.innerHTML = `<div class="row"><div></div><div><span class="tag warn">NO-LINK</span> Không thấy link product hợp lệ.</div></div>`;
+      els.progress.textContent = '';
       return;
     }
-    els.results.innerHTML = '<div class="row"><span class="tag">Đang xử lý…</span><div>Vui lòng đợi</div></div>';
+    els.results.innerHTML = links.map((_,i)=>rowTpl(i)).join('');
+    els.progress.textContent = `Đang xử lý 0/${links.length}`;
 
-    const rows = [];
-    for (const u of links){
-      const {url:aff, merchant, via} = await makeAffiliate(u, {sub1:'bulk', sub2:'importer'});
-      const label = via==='none' ? `<span class="tag warn">NO-AFF</span>` : `<span class="tag">${merchant||'link'}</span>`;
-      rows.push(`
-        <div class="row">
-          <div>${label}</div>
-          <div><div style="font-size:12px;color:#64748b">Gốc</div><code>${u}</code></div>
-          <div><div style="font-size:12px;color:#64748b">Affiliate (${via})</div><code>${aff}</code></div>
-          <div>
-            <button data-copy="${aff}">Copy</button>
-            <button data-open="${aff}">Mở</button>
-          </div>
-        </div>
-      `);
-    }
-    els.results.innerHTML = rows.join('');
+    await runQueue(links, async (src, idx)=>{
+      const row = els.results.querySelector(`.row[data-idx="${idx}"]`);
+      const elOrigin = row.querySelector('[data-origin]');
+      const elAff = row.querySelector('[data-aff]');
+      const elTag = row.querySelector('[data-tag]');
+      const elPrice = row.querySelector('[data-price]');
+      const thumb = row.querySelector('[data-thumb]');
 
-    els.results.querySelectorAll('button[data-copy]').forEach(b=>{
-      b.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent='Đã copy'; setTimeout(()=>b.textContent='Copy',1000);}catch(e){} });
+      elOrigin.textContent = src;
+
+      // Affiliate
+      const {url:aff, via, merchant} = await makeAffiliate(src, {sub1:'bulk',sub2:'importer'});
+      elAff.textContent = aff;
+      elTag.textContent = via==='none' ? 'NO-AFF' : (merchant||'link');
+      elTag.className = 'tag' + (via==='none' ? ' warn' : '');
+
+      // Ảnh + giá (best-effort)
+      const {image, price} = await getHeadInfo(src);
+      if (image){
+        thumb.innerHTML = `<img src="${image}" alt="thumb">`;
+      } else {
+        thumb.innerHTML = `<span>IMG</span>`;
+      }
+      elPrice.textContent = price ? (Number(price)||price).toLocaleString('vi-VN') : '—';
+
+      // Wire row buttons
+      const btnCopy = row.querySelector('[data-copy]');
+      const btnOpen = row.querySelector('[data-open]');
+      const btnQR = row.querySelector('[data-qr]');
+      const qrBox = row.querySelector('[data-qrbox]');
+      btnCopy.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(aff); btnCopy.textContent='Đã copy'; setTimeout(()=>btnCopy.textContent='Copy',900);}catch(e){} });
+      btnOpen.addEventListener('click', ()=>{ if(aff) window.open(aff,'_blank'); });
+      btnQR.addEventListener('click', ()=>{
+        if (!qrBox.innerHTML){ qrBox.innerHTML = `<img src="${qrUrl(aff||src)}" alt="QR">`; }
+        qrBox.style.display = qrBox.style.display==='block' ? 'none' : 'block';
+      });
     });
-    els.results.querySelectorAll('button[data-open]').forEach(b=>{
-      b.addEventListener('click', ()=>{ const href=b.dataset.open; if(href) window.open(href, '_blank'); });
+
+    els.progress.textContent += ' — xong.';
+  }
+
+  // ===== Export bulk JSON (origin/aff/merchant/price/image) =====
+  function exportBulk(){
+    const rows = [...els.results.querySelectorAll('.row')];
+    if (!rows.length){ alert('Chưa có dữ liệu.'); return; }
+    const out = rows.map(r=>{
+      const origin = r.querySelector('[data-origin]').textContent||'';
+      const aff = r.querySelector('[data-aff]').textContent||'';
+      const price = r.querySelector('[data-price]').textContent||'';
+      const imgEl = r.querySelector('[data-thumb] img');
+      const image = imgEl ? imgEl.src : '';
+      const tag = r.querySelector('[data-tag]').textContent||'';
+      return { origin, affiliate: aff, merchant: getMerchant(origin)||tag, price, image, updated_at: new Date().toISOString() };
     });
+    const blob = new Blob([JSON.stringify(out,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'links_affiliates_bulk.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
 
   // Wire events
   els.origin.addEventListener('input', refreshSingle);
-  els.copy.addEventListener('click', async ()=>{ if(els.aff.value) { try{ await navigator.clipboard.writeText(els.aff.value); els.copy.textContent='Đã copy'; setTimeout(()=>els.copy.textContent='Copy',1000);}catch(e){} }});
-  els.open.addEventListener('click', ()=>{ if(els.aff.value) window.open(els.aff.value, '_blank'); });
+  els.copy.addEventListener('click', async ()=>{ if(els.aff.value){ try{ await navigator.clipboard.writeText(els.aff.value); els.copy.textContent='Đã copy'; setTimeout(()=>els.copy.textContent='Copy',900);}catch(e){} }});
+  els.open.addEventListener('click', ()=>{ if(els.aff.value) window.open(els.aff.value,'_blank'); });
+  els.qr.addEventListener('click', ()=>{ const v=els.aff.value||els.origin.value; if(v) window.open(qrUrl(v,240),'_blank'); });
+
   els.extract.addEventListener('click', renderBulk);
-  els.clear.addEventListener('click', ()=>{ els.bulk.value=''; els.results.innerHTML=''; });
+  els.export.addEventListener('click', exportBulk);
+  els.clear.addEventListener('click', ()=>{ els.bulk.value=''; els.results.innerHTML=''; els.progress.textContent=''; });
 })();
 </script>
+
 
 </body>
 </html>
