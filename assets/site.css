@@ -82,3 +82,9 @@
   #product-list.grid, #featured-grid.grid{gap:14px}
   #product-list .body, #featured-grid .body{padding:12px}
 }
+/* MXD badges (share across store & g.html) */
+.mxd-badges{position:absolute; top:10px; left:10px; display:flex; gap:6px; flex-wrap:wrap; z-index:2}
+.mxd-badge{font-size:11px; font-weight:700; padding:6px 8px; border-radius:999px; color:#fff}
+.mxd-badge.new{background:#10b981}
+.mxd-badge.hot{background:#ef4444}
+.mxd-badge.sale{background:#f59e0b}
