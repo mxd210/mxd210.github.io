@@ -61,6 +61,7 @@
     .dropzone.drag { background:#f8fafc; border-color:#94a3b8; color:#0f172a; }
   </style>
 </head>
+  
 <body>
   <header>
     <div class="toolbar">
@@ -1175,6 +1176,198 @@
     a.click();
     URL.revokeObjectURL(a.href);
   });
+})();
+</script>
+<!-- MXD Importer — Link Assistant (Get links + Affiliate preview + Guide) -->
+<style>
+  #link-assistant{border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:16px 0;background:#fff;box-shadow:0 6px 18px #0000000d}
+  #link-assistant h3{margin:0 0 10px;font-size:18px}
+  #link-assistant details{margin-bottom:12px}
+  #link-assistant .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  #link-assistant label{font-size:13px;color:#374151}
+  #link-assistant input[type="text"], #link-assistant textarea{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fafafa}
+  #link-assistant .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  #link-assistant button{padding:10px 14px;border-radius:10px;border:1px solid #d1d5db;background:#fff;cursor:pointer}
+  #link-assistant button.primary{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+  #link-results{margin-top:12px}
+  #link-results .row{display:grid;grid-template-columns:120px 1fr 1fr 110px;gap:8px;align-items:center;border:1px solid #eef2f7;border-radius:10px;padding:10px;margin-bottom:8px}
+  #link-results code{display:inline-block;max-width:100%;overflow:auto;white-space:nowrap}
+  #link-results .tag{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#1e3a8a}
+  #link-results .tag.warn{background:#fff7ed;color:#9a3412}
+  @media (max-width: 840px){
+    #link-assistant .grid{grid-template-columns:1fr}
+    #link-results .row{grid-template-columns:1fr}
+  }
+</style>
+
+<section id="link-assistant">
+  <h3>🔗 Get links + Affiliate preview</h3>
+  <details open>
+    <summary><strong>Hướng dẫn nhanh</strong></summary>
+    <ol style="margin:6px 0 0 18px;padding:0">
+      <li>Dán <em>1 link</em> vào “Link gốc (1 sản phẩm)” → affiliate hiện <em>bên cạnh</em>, có nút Copy/Mở.</li>
+      <li>Dán <em>nhiều link</em> (mỗi dòng một link, hoặc lẫn text) vào ô “Danh sách”, bấm <b>Lấy link</b>.</li>
+      <li>Nếu chưa cấu hình affiliate, tool vẫn nhận link gốc và gắn nhãn <code>NO-AFF</code> để cậu biết mà cấu hình.</li>
+    </ol>
+  </details>
+
+  <div class="grid">
+    <div>
+      <label>Link gốc (1 sản phẩm)</label>
+      <input id="la-origin" type="text" placeholder="Dán link Shopee/Lazada/TikTok...">
+    </div>
+    <div>
+      <label>Link affiliate (auto)</label>
+      <input id="la-aff" type="text" readonly placeholder="— sẽ hiện sau khi dán link gốc —">
+      <div class="actions">
+        <button id="la-copy" type="button">Copy</button>
+        <button id="la-open" type="button">Mở</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px">
+    <label>Danh sách (nhiều link — mỗi dòng 1 link, hoặc dán text lẫn link)</label>
+    <textarea id="la-bulk" rows="5" placeholder="Ví dụ: https://shopee.vn/...\nhttps://www.lazada.vn/products/..."></textarea>
+    <div class="actions">
+      <button id="la-extract" class="primary" type="button">Lấy link (Get links)</button>
+      <button id="la-clear" type="button">Xóa</button>
+    </div>
+  </div>
+
+  <div id="link-results"></div>
+</section>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const els = {
+    origin: $('#la-origin'),
+    aff:    $('#la-aff'),
+    copy:   $('#la-copy'),
+    open:   $('#la-open'),
+    bulk:   $('#la-bulk'),
+    extract:$('#la-extract'),
+    clear:  $('#la-clear'),
+    results:$('#link-results'),
+  };
+
+  function dedupe(arr){ return [...new Set(arr.filter(Boolean))]; }
+
+  function getMerchant(u){
+    try{
+      const h = new URL(u).hostname;
+      if (h.includes('shopee')) return 'shopee';
+      if (h.includes('lazada')) return 'lazada';
+      if (h.includes('tiki'))   return 'tiki';
+      if (h.includes('tiktok')) return 'tiktok';
+    }catch(e){}
+    return '';
+  }
+
+  // Deep-link builder: ưu tiên template; fallback gọi /aff; cuối cùng trả link gốc + cảnh báo
+  async function makeAffiliate(url, opts={}){
+    const merchant = getMerchant(url);
+    const AFF_ID = window.AFF_ID || localStorage.getItem('AFF_ID') || '';
+    const TPL = {
+      shopee: window.AFF_SHOPEE_TEMPLATE || '',
+      lazada: window.AFF_LAZADA_TEMPLATE || '',
+      tiktok: window.AFF_TIKTOK_TEMPLATE || ''
+    };
+
+    const sub = {
+      sub1: opts.sub1 || 'importer',
+      sub2: opts.sub2 || 'tool',
+      sub3: opts.sub3 || 'mxda',
+      sub4: opts.sub4 || ''
+    };
+
+    // 1) Template nội bộ (nhanh nhất)
+    if (merchant && TPL[merchant] && AFF_ID){
+      let out = TPL[merchant]
+        .replace('{url}', encodeURIComponent(url))
+        .replace('{aff_id}', encodeURIComponent(AFF_ID))
+        .replace('{merchant}', merchant)
+        .replace('{sub1}', encodeURIComponent(sub.sub1))
+        .replace('{sub2}', encodeURIComponent(sub.sub2))
+        .replace('{sub3}', encodeURIComponent(sub.sub3))
+        .replace('{sub4}', encodeURIComponent(sub.sub4));
+      return {url: out, merchant, via:'template'};
+    }
+
+    // 2) Worker /aff nếu có
+    try{
+      const affApi = `/aff?url=${encodeURIComponent(url)}&merchant=${merchant}&sub1=${encodeURIComponent(sub.sub1)}&sub2=${encodeURIComponent(sub.sub2)}&sub3=${encodeURIComponent(sub.sub3)}&sub4=${encodeURIComponent(sub.sub4)}`;
+      const r = await fetch(affApi, {mode:'cors'});
+      if (r.ok){
+        const data = await r.json().catch(()=> ({}));
+        if (data && data.url) return {url: data.url, merchant, via:'worker'};
+      }
+    }catch(e){ /* ignore network error */ }
+
+    // 3) Không có cấu hình → trả link gốc + cờ NO-AFF
+    return {url, merchant, via:'none'};
+  }
+
+  function extractLinks(text){
+    // Tìm mọi http/https; chấp cả link search (shopee search vẫn deep được)
+    const re = /\bhttps?:\/\/[^\s<>"']+/gi;
+    const raw = (text||'').match(re) || [];
+    const filtered = raw.filter(u=>{
+      const m = getMerchant(u);
+      return !!m; // chỉ giữ shopee/lazada/tiki/tiktok
+    });
+    return dedupe(filtered);
+  }
+
+  async function refreshSingle(){
+    const src = els.origin.value.trim();
+    if (!src){ els.aff.value = ''; return; }
+    const {url:aff, via} = await makeAffiliate(src, {sub1:'single', sub2:'importer'});
+    els.aff.value = aff || '';
+    els.aff.dataset.via = via;
+  }
+
+  async function renderBulk(){
+    const links = extractLinks(els.bulk.value);
+    if (!links.length){
+      els.results.innerHTML = `<div class="row"><span class="tag warn">NO-LINK</span><div>Không thấy link product hợp lệ.</div></div>`;
+      return;
+    }
+    els.results.innerHTML = '<div class="row"><span class="tag">Đang xử lý…</span><div>Vui lòng đợi</div></div>';
+
+    const rows = [];
+    for (const u of links){
+      const {url:aff, merchant, via} = await makeAffiliate(u, {sub1:'bulk', sub2:'importer'});
+      const label = via==='none' ? `<span class="tag warn">NO-AFF</span>` : `<span class="tag">${merchant||'link'}</span>`;
+      rows.push(`
+        <div class="row">
+          <div>${label}</div>
+          <div><div style="font-size:12px;color:#64748b">Gốc</div><code>${u}</code></div>
+          <div><div style="font-size:12px;color:#64748b">Affiliate (${via})</div><code>${aff}</code></div>
+          <div>
+            <button data-copy="${aff}">Copy</button>
+            <button data-open="${aff}">Mở</button>
+          </div>
+        </div>
+      `);
+    }
+    els.results.innerHTML = rows.join('');
+
+    els.results.querySelectorAll('button[data-copy]').forEach(b=>{
+      b.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent='Đã copy'; setTimeout(()=>b.textContent='Copy',1000);}catch(e){} });
+    });
+    els.results.querySelectorAll('button[data-open]').forEach(b=>{
+      b.addEventListener('click', ()=>{ const href=b.dataset.open; if(href) window.open(href, '_blank'); });
+    });
+  }
+
+  // Wire events
+  els.origin.addEventListener('input', refreshSingle);
+  els.copy.addEventListener('click', async ()=>{ if(els.aff.value) { try{ await navigator.clipboard.writeText(els.aff.value); els.copy.textContent='Đã copy'; setTimeout(()=>els.copy.textContent='Copy',1000);}catch(e){} }});
+  els.open.addEventListener('click', ()=>{ if(els.aff.value) window.open(els.aff.value, '_blank'); });
+  els.extract.addEventListener('click', renderBulk);
+  els.clear.addEventListener('click', ()=>{ els.bulk.value=''; els.results.innerHTML=''; });
 })();
 </script>
 
