@@ -1,1576 +1,928 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-  <meta name="format-detection" content="telephone=no"/>
-  <title>MXD Importer v4.4.3 — Pro+ (EN/VN)</title>
-  <meta name="description" content="Importer chuẩn MXD: Shopee/Lazada/Tiki → affiliates.json + snippets + ảnh .webp + health-check + SKU validator + commit generator."/>
-  <link rel="canonical" href="https://mxd210.github.io/tools/shopee-importer.html"/>
-  <meta name="robots" content="noindex,follow"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="format-detection" content="telephone=no"/>
+<title>MXD Importer v4.5.0 — Pro+ (EN/VN)</title>
+<meta name="description" content="Importer chuẩn MXD: Shopee/Lazada/Tiki → affiliates.json + snippets + ảnh .webp + health-check + SKU validator + commit generator."/>
+<link rel="canonical" href="https://mxd210.github.io/tools/shopee-importer.html"/>
+<meta name="robots" content="noindex,follow"/>
 
-  <!-- OG -->
-  <meta property="og:type" content="website"/>
-  <meta property="og:title" content="MXD Importer — Pro+"/>
-  <meta property="og:description" content="JSON + snippets + ảnh + health-check + SKU tools. English (Vietnamese) labels."/>
-  <meta property="og:url" content="https://mxd210.github.io/tools/shopee-importer.html"/>
-  <meta property="og:image" content="/assets/img/products/placeholder.webp"/>
+<!-- OG -->
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="MXD Importer v4.5.0 — Pro+"/>
+<meta property="og:description" content="JSON + snippets + ảnh + health-check + SKU tools. English (Vietnamese) labels."/>
+<meta property="og:url" content="https://mxd210.github.io/tools/shopee-importer.html"/>
+<meta property="og:image" content="/assets/img/products/placeholder.webp"/>
 
-  <!-- Convention MXD: GA4 trước Affiliate -->
-  <script defer src="/assets/analytics.js">
-console.log("MXD Importer build:", document.getElementById("build-badge")?.textContent || "no-stamp");
-</script>
-  <script defer src="/assets/mxd-affiliate.js"></script>
+<!-- Convention MXD: GA4 trước Affiliate -->
+<script defer src="/assets/analytics.js"></script>
+<script defer src="/assets/mxd-affiliate.js"></script>
 
-  <!-- Site CSS -->
-  <link rel="stylesheet" href="/assets/site.css"/>
+<link rel="stylesheet" href="/assets/site.css"/>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
 
-  <!-- JSZip cho gói ảnh -->
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
-
-  <style>
-    :root { --gap:12px; --br:14px; }
-    body { max-width: 1220px; margin: 0 auto; padding: 12px; line-height: 1.55; }
-    header { position: sticky; top:0; background: var(--bg, #fff); z-index: 50; padding: 8px 0; }
-    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .tabs { display:flex; gap:6px; flex-wrap:wrap; margin: 8px 0 12px; }
-    .tab { padding:8px 12px; border:1px solid #d1d5db; border-radius:999px; background:#fff; cursor:pointer; }
-    .tab.active { background:#111827; border-color:#111827; color:#fff; }
-    .card { border:1px solid #e5e7eb; border-radius:var(--br); padding:12px; background:#fff; }
-    h1 { font-size:1.5rem; margin:6px 0 6px; }
-    h2 { font-size:1.15rem; margin:10px 0 8px; }
-    textarea { width:100%; min-height:150px; font-family: ui-monospace, Menlo, Consolas, monospace; resize: vertical; }
-    input[type=text], input[type=url], input[type=number] { width:100%; padding:8px; border:1px solid #e5e7eb; border-radius:10px; }
-    .btn { padding:8px 12px; border-radius:10px; border:1px solid #d1d5db; background:#fff; cursor:pointer; display:inline-flex; gap:8px; align-items:center }
-    .btn.primary { background:#111827; color:#fff; border-color:#111827; }
-    .btn[disabled]{opacity:.6;cursor:not-allowed}
-    .btn[aria-busy="true"]{opacity:.8;pointer-events:none}
-    .spinner{width:14px;height:14px;border:2px solid #e5e7eb;border-top-color:#0ea5e9;border-radius:50%;display:inline-block;animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .btn.ghost { background:transparent; }
-    .muted { color:#6b7280; } .small { font-size:.9em; }
-    table { width:100%; border-collapse: collapse; font-size:.95rem; }
-    th, td { border-bottom:1px solid #eee; padding:8px; vertical-align: top; }
-    th { text-align:left; background:#fafafa; position:sticky; top:0; }
-    td, th { overflow-wrap:anywhere; }
-    td[contenteditable="true"] { background:#fffbeb; outline:2px dashed #fde68a; }
-    .ok { color:#065f46; } .err { color:#b91c1c; } .warn { color:#92400e; }
-    .hidden { display:none; }
-    .grid { display:grid; gap: var(--gap); }
-    .g2 { grid-template-columns: 1fr 1fr; }
-    .g3 { grid-template-columns: 1fr 1fr 1fr; }
-    @media (max-width: 960px){ .g2,.g3 { grid-template-columns: 1fr; } }
-    .toolbar { display:flex; gap:8px; align-items:center; justify-content:space-between; }
-    .spacer { flex:1; }
-    .switch { display:inline-flex; gap:6px; align-items:center; }
-    .dropzone { border:2px dashed #d1d5db; border-radius:12px; padding:10px; text-align:center; color:#6b7280; }
-    .dropzone.drag { background:#f8fafc; border-color:#94a3b8; color:#0f172a; }
-
-    /* Link Assistant visual bits (reused) */
-    #link-results .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#1e3a8a}
-    .dot{width:8px;height:8px;border-radius:999px;display:inline-block}
-    .dot.wait{background:#cbd5e1}
-    .dot.run{background:#0ea5e9;box-shadow:0 0 0 2px #bae6fd66}
-    .dot.ok{background:#10b981}
-    .dot.err{background:#ef4444}
-  </style>
+<style>
+  :root { --gap:12px; --br:14px; }
+  body { max-width:1220px; margin:0 auto; padding:12px; line-height:1.55; }
+  header { position:sticky; top:0; background:var(--bg,#fff); z-index:50; padding:8px 0; }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .tabs { display:flex; gap:6px; flex-wrap:wrap; margin:8px 0 12px; }
+  .tab { padding:8px 12px; border:1px solid #d1d5db; border-radius:999px; background:#fff; cursor:pointer; }
+  .tab.active { background:#111827; border-color:#111827; color:#fff; }
+  .card { border:1px solid #e5e7eb; border-radius:var(--br); padding:12px; background:#fff; }
+  h1{font-size:1.5rem;margin:6px 0 6px;} h2{font-size:1.15rem;margin:10px 0 8px;}
+  textarea, input[type=text], input[type=url], input[type=number]{ width:100%; padding:8px; border:1px solid #e5e7eb; border-radius:10px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+  textarea{ min-height:120px; resize:vertical; }
+  .btn{ padding:8px 12px; border-radius:10px; border:1px solid #d1d5db; background:#fff; cursor:pointer; display:inline-flex; gap:8px; align-items:center }
+  .btn.primary{ background:#111827; color:#fff; border-color:#111827; }
+  .btn.ghost{ background:transparent; }
+  .btn[disabled]{ opacity:.6; cursor:not-allowed; }
+  .btn.busy{ position:relative; }
+  .btn.busy::after{ content:""; width:14px; height:14px; border:2px solid #fff; border-right-color:transparent; border-radius:50%; position:absolute; right:8px; animation:spin .8s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg) } }
+  .muted{ color:#6b7280; } .small{ font-size:.9em; }
+  .hidden{ display:none; }
+  .grid{ display:grid; gap:var(--gap); } .g2{ grid-template-columns:1fr 1fr; } .g3{ grid-template-columns:1fr 1fr 1fr; }
+  @media (max-width:960px){ .g2,.g3{ grid-template-columns:1fr; } }
+  .toolbar{ display:flex; gap:8px; align-items:center; justify-content:space-between; }
+  .spacer{ flex:1 }
+  .section-sep{ margin-top:14px; }
+  .nowrap{ white-space:nowrap; }
+  /* Affiliate block spacing */
+  #aff-block{ display:grid; grid-template-columns:1fr; gap:10px; }
+  #aff-origin{ min-height:44px; }
+  #aff-output{ min-height:96px; }
+  /* Quick outputs */
+  #quick-outputs textarea{ min-height:86px }
+  /* tables */
+  table { width:100%; border-collapse: collapse; font-size:.95rem; }
+  th,td{ border-bottom:1px solid #eee; padding:8px; vertical-align:top; } th{ background:#fafafa; position:sticky; top:0; }
+  td[contenteditable="true"]{ background:#fffbeb; outline:2px dashed #fde68a; }
+  .ok{ color:#065f46 } .err{ color:#b91c1c } .warn{ color:#92400e }
+</style>
 </head>
-  
 <body>
-  <header>
-    <div class="toolbar"><span id="build-badge" class="small muted" style="margin-left:8px;">build 2025-09-24 04:51 UTC</span>
-      <div class="row">
-        <a class="btn ghost" href="/">Home (Trang chủ)</a>
-        <a class="btn ghost" href="/store.html">Store (Cửa hàng)</a>
-        <a class="btn ghost" href="/blog/index.html">Blog (Tin tức)</a>
-        <a class="btn ghost" href="/contact.html">Contact (Liên hệ)</a>
-      </div>
-      <div class="row">
-        <label class="switch"><input id="compact" type="checkbox"> <span class="small muted">Compact mode (Chế độ gọn)</span></label>
-      </div>
+<header>
+  <div class="toolbar">
+    <div class="row">
+      <a class="btn ghost" href="/">Home (Trang chủ)</a>
+      <a class="btn ghost" href="/store.html">Store (Cửa hàng)</a>
+      <a class="btn ghost" href="/blog/index.html">Blog (Tin tức)</a>
+      <a class="btn ghost" href="/contact.html">Contact (Liên hệ)</a>
     </div>
-    <h1>MXD Importer v4.4.3 — Pro+ <span class="small muted">English (Tiếng Việt)</span></h1>
-    <div class="tabs">
-      <button class="tab active" data-tab="import">Import (Nhập)</button>
-      <button class="tab" data-tab="output">Output (Kết quả)</button>
-      <button class="tab" data-tab="snippets">Snippets (Đoạn chèn)</button>
-      <button class="tab" data-tab="images">Images (Ảnh)</button>
-      <button class="tab" data-tab="health">Health (Kiểm tra link)</button>
-      <button class="tab" data-tab="log">Log (Nhật ký)</button>
-      <button class="tab" data-tab="settings">Settings (Cài đặt)</button>
+    <div class="row">
+      <span id="build-badge" class="small muted">build 2025-09-24 05:35 UTC</span>
+      <label class="switch"><input id="compact" type="checkbox"> <span class="small muted">Compact mode (Chế độ gọn)</span></label>
     </div>
-  </header>
+  </div>
+  <h1>MXD Importer v4.5.0 — Pro+ <span class="small muted">English (Tiếng Việt)</span></h1>
+  <div class="tabs">
+    <button class="tab active" data-tab="import">Import (Nhập)</button>
+    <button class="tab" data-tab="output">Output (Kết quả)</button>
+    <button class="tab" data-tab="snippets">Snippets (Đoạn chèn)</button>
+    <button class="tab" data-tab="images">Images (Ảnh)</button>
+    <button class="tab" data-tab="health">Health (Kiểm tra link)</button>
+    <button class="tab" data-tab="log">Log (Nhật ký)</button>
+    <button class="tab" data-tab="settings">Settings (Cài đặt)</button>
+  </div>
+</header>
 
-  <!-- Import -->
-  <section id="tab-import" class="card">
-    <div class="grid g2">
-      <div>
-        <h2>1) Input (Nhập dữ liệu)</h2>
+<section id="guide" class="card">
+  <h2>📘 Hướng dẫn (luồng thao tác nhanh)</h2>
+  <ol class="small">
+    <li>Dán <b>Link gốc</b> (1 hoặc nhiều). Hộp bên dưới sinh ngay <b>Link affiliate (auto)</b>.</li>
+    <li>Bấm <b>Parse → Fetch + Build</b>. Tool tự sinh SKU, deeplink, ảnh, v.v.</li>
+    <li>Xem <b>Quick Outputs</b> ngay tại tab Import: JSON, HTML snippet, danh sách ảnh.</li>
+    <li>Mở các tab <b>Output/Images/Health</b> để tinh chỉnh & export.</li>
+  </ol>
+</section>
 
-        <!-- Hướng dẫn chi tiết -->
-        <details id="guide" class="card" style="margin:8px 0" open>
-          <summary><strong>Hướng dẫn chi tiết sử dụng tool</strong></summary>
-          <ol class="small" style="margin:6px 0 0 18px">
-            <li><b>Dán 1 link</b> vào “Link gốc (1 sản phẩm)” → ô <i>Link affiliate (auto)</i> hiển thị ngay (Copy/Open/QR).</li>
-            <li><b>Dán nhiều link</b> vào “Textarea Input” → chọn định dạng → bấm <b>Parse</b> hoặc <b>Fetch + Build</b>.</li>
-            <li>Vào <b>Settings</b> điền <code>Worker Base</code>, <code>AFF_ID</code>, <code>Campaign ID</code> (isclix) → deep-link dạng
-              <code>https://go.isclix.com/deep_link/&lt;AFF_ID&gt;/&lt;CAMP_ID&gt;?url=…&amp;sub1=…</code>.</li>
-            <li><b>Output</b> → chỉnh Name/Price/SKU nếu cần → <b>Copy JSON</b> hoặc <b>Download affiliates.json</b>.</li>
-            <li>Tab <b>Images</b> → lấy og:image qua Worker, xuất ZIP chuẩn kích thước card.</li>
-            <li>Tab <b>Health</b> → scan/ghi báo cáo, tải <code>affiliates.prune.json</code>.</li>
-          </ol>
-        </details>
+<!-- Import -->
+<section id="tab-import" class="card">
+  <div class="grid g2">
+    <div>
+      <h2>1) Input (Nhập dữ liệu)</h2>
 
-        <div class="card" style="margin-top:6px">
-          <h2>Auto-Search Shopee</h2>
+      <div class="card section-sep">
+        <h3>Auto-Search Shopee</h3>
+        <div class="row">
+          <input id="auto-q" type="text" placeholder="Từ khóa, ví dụ: máy cắt gạch" style="max-width:360px">
+          <input id="auto-pages" type="number" min="1" max="5" value="1" style="max-width:120px">
+          <button class="btn" id="btn-auto-search">Get links (Lấy link)</button>
+          <span class="small muted" id="auto-status"></span>
+        </div>
+        <p class="small muted">Có thể dán link search Shopee vào ô “Input” rồi bấm Get links (tool tự nhận dạng).</p>
+      </div>
+
+      <div class="card section-sep" id="aff-block">
+        <div>
+          <label class="small muted">Link gốc (1 sản phẩm) — hoặc tự lấy link đầu tiên trong ô Input</label>
+          <textarea id="aff-origin" placeholder="https://shopee.vn/product/.../..."></textarea>
+        </div>
+        <div>
           <div class="row">
-            <input id="auto-q" type="text" placeholder="Từ khóa, ví dụ: máy cắt gạch" style="max-width:360px">
-            <input id="auto-pages" type="number" min="1" max="5" value="1" style="max-width:120px" title="Số trang (mỗi trang ~ vài chục link)">
-            <button class="btn" id="btn-auto-search">Get links (Lấy link)</button>
-            <span class="small muted" id="auto-status"></span>
-          </div>
-          <p class="small muted">Hoặc dán link search Shopee vào ô “Input” rồi bấm Get links (tool sẽ tự nhận dạng).</p>
-        </div>
-
-        <!-- Single Affiliate preview (NGAY CẠNH khu nhập) -->
-        <div class="row" id="single-aff-row" style="margin:10px 0">
-          <div style="flex:1;min-width:260px">
-            <label class="small muted">Link gốc (1 sản phẩm)</label>
-            <input id="single-origin" type="url" placeholder="Dán link sản phẩm Shopee/Lazada/Tiki/TikTok">
-          </div>
-          <div style="flex:1;min-width:260px">
             <label class="small muted">Link affiliate (auto)</label>
-            <input id="single-aff" type="text" readonly placeholder="— sẽ hiện ở đây —">
-            <div class="row">
-              <button class="btn" id="single-copy" type="button">Copy</button>
-              <button class="btn" id="single-open" type="button">Open</button>
-              <button class="btn" id="single-qr"   type="button">QR</button>
-              <span class="small muted" id="single-status"></span>
-            </div>
+            <button class="btn" id="aff-copy">Copy</button>
+            <button class="btn" id="aff-open">Open</button>
+            <button class="btn" id="aff-qr">QR</button>
+            <button class="btn" id="aff-build-all">Build all from Input</button>
+            <button class="btn" id="aff-copy-all">Copy all</button>
           </div>
+          <textarea id="aff-output" placeholder="— deeplink sẽ hiển thị tại đây —"></textarea>
+          <p class="small muted">Template: isclix path <code>https://go.isclix.com/deep_link/{AFF_ID}/{CAMP_ID}?url={URL_ENC}&sub1={SKU}</code> hoặc dùng template tùy chỉnh (Settings).</p>
         </div>
+      </div>
 
+      <div class="section-sep">
         <div class="dropzone" id="drop">Drag & drop CSV/TXT here – hoặc dán từ Excel: <b>Tên|Giá|Link</b></div>
         <textarea id="txt-input" placeholder="https://shopee.vn/product/.../...\nMáy cắt KYNKO | 1390000 | https://..." ></textarea>
-
-        <div class="row">
-          <div class="row">
-            <label class="small muted">Format/Định dạng:</label>
-            <label><input type="radio" name="fmt" value="link" checked> Links per line (Mỗi dòng 1 link)</label>
-            <label><input type="radio" name="fmt" value="pipe"> Name|Price|Link (Tên|Giá|Link)</label>
-          </div>
-          <div class="row">
-            <label class="small muted">Merchant/Nhà bán:</label>
-            <label><input type="radio" name="mrc" value="auto" checked> Auto (Tự động)</label>
-            <label><input type="radio" name="mrc" value="shopee"> Shopee</label>
-            <label><input type="radio" name="mrc" value="lazada"> Lazada</label>
-            <label><input type="radio" name="mrc" value="tiki"> Tiki</label>
-          </div>
-          <input id="default-sub1" type="text" placeholder="sub1 (optional / tùy chọn)" style="max-width:220px">
-          <label class="row"><input id="bulk-sub1" type="checkbox"> Bulk sub1={sku} (Gán loạt sub1={sku})</label>
-          <span class="spacer"></span>
-          <button class="btn" id="btn-parse">Parse (Phân tích)</button>
-          <button class="btn primary" id="btn-fetch">Fetch + Build (Lấy & Build)</button>
-        </div>
-        <label class="row"><input id="auto-pipeline" type="checkbox"> Auto image pipeline after Fetch (Chạy pipeline ảnh sau Fetch)</label>
-        <p class="small muted">Tool tự sinh <b>SKU</b>, <code>/assets/img/products/&lt;sku&gt;.webp</code>, và deeplink (nếu set AFF_ID + template).</p>
       </div>
 
-      <div>
-        <!-- JSON link preview -->
-        <div class="card">
-          <h2>JSON link (Liên kết JSON)</h2>
-          <div class="row">
-            <input id="json-link" type="text" value="/assets/data/affiliates.json" readonly style="max-width:100%">
-            <button class="btn" id="btn-copy-json-link">Copy link (Sao chép)</button>
-            <button class="btn" id="btn-open-json-link">Open (Mở tab)</button>
-          </div>
-          <p class="small muted">Đường dẫn tĩnh commit lên GitHub Pages. Không phải blob:URL. Dùng để dán vào site nhanh.</p>
-        </div>
-
-        <h2 style="margin-top:10px">2) JSON (Tệp dữ liệu)</h2>
+      <div class="row section-sep">
         <div class="row">
-          <button class="btn" id="btn-load-existing">Load affiliates.json (Tải)</button>
-          <button class="btn" id="btn-merge">Merge & dedupe (Gộp & loại trùng)</button>
-          <button class="btn" id="btn-copy-json">Copy JSON (Sao chép)</button>
-          <button class="btn primary" id="btn-download-json">Download affiliates.json (Tải xuống)</button>
+          <label class="small muted">Định dạng:</label>
+          <label><input type="radio" name="fmt" value="link" checked> Links per line</label>
+          <label><input type="radio" name="fmt" value="pipe"> Name|Price|Link</label>
+        </div>
+        <div class="row">
+          <label class="small muted">Merchant:</label>
+          <label><input type="radio" name="mrc" value="auto" checked> Auto</label>
+          <label><input type="radio" name="mrc" value="shopee"> Shopee</label>
+          <label><input type="radio" name="mrc" value="lazada"> Lazada</label>
+          <label><input type="radio" name="mrc" value="tiki"> Tiki</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <input id="default-sub1" type="text" placeholder="sub1 (optional / tùy chọn)" style="max-width:220px">
+        <label class="row"><input id="bulk-sub1" type="checkbox"> Bulk sub1={sku}</label>
+        <span class="spacer"></span>
+        <button class="btn" id="btn-parse">Parse</button>
+        <button class="btn primary" id="btn-fetch">Fetch + Build</button>
+      </div>
+
+      <label class="row"><input id="auto-pipeline" type="checkbox"> Auto image pipeline after Fetch</label>
+      <p class="small muted">Tool tự sinh <b>SKU</b>, <code>/assets/img/products/&lt;sku&gt;.webp</code>, và deeplink (nếu set AFF_ID + CAMP_ID hoặc template).</p>
+
+      <div id="quick-outputs" class="card section-sep">
+        <h3>⚡ Quick Outputs (Xem nhanh & copy)</h3>
+        <div class="row">
+          <button class="btn" id="qo-refresh">Refresh từ Output</button>
+          <span class="small muted" id="qo-status"></span>
+        </div>
+        <div class="grid g3 section-sep">
+          <div>
+            <h4 class="small">A) JSON (preview)</h4>
+            <textarea id="qo-json" placeholder="{}"></textarea>
+            <div class="row"><button class="btn" id="qo-copy-json">Copy</button></div>
+          </div>
+          <div>
+            <h4 class="small">B) HTML snippet (Store)</h4>
+            <label class="small"><input id="qo-use-deep" type="checkbox" checked> dùng deep-link cho nút Mua</label>
+            <textarea id="qo-html" placeholder="&lt;a class='product-meta' ...&gt;"></textarea>
+            <div class="row"><button class="btn" id="qo-copy-html">Copy</button></div>
+          </div>
+          <div>
+            <h4 class="small">C) Danh sách ảnh</h4>
+            <textarea id="qo-images" placeholder="/assets/img/products/sku.webp"></textarea>
+            <div class="row"><button class="btn" id="qo-copy-images">Copy</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>JSON link (Liên kết JSON)</h2>
+        <div class="row">
+          <input id="json-link" type="text" value="/assets/data/affiliates.json" readonly>
+          <button class="btn" id="btn-copy-json-link">Copy link</button>
+          <button class="btn" id="btn-open-json-link">Open</button>
+        </div>
+        <p class="small muted">Đường dẫn tĩnh commit lên GitHub Pages. Không phải blob:URL.</p>
+      </div>
+
+      <div class="card section-sep">
+        <h2>2) JSON (Tệp dữ liệu)</h2>
+        <div class="row">
+          <button class="btn" id="btn-load-existing">Load affiliates.json</button>
+          <button class="btn" id="btn-merge">Merge & dedupe</button>
+          <button class="btn" id="btn-copy-json">Copy JSON</button>
+          <button class="btn primary" id="btn-download-json">Download affiliates.json</button>
         </div>
         <p id="out-msg" class="small muted"></p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Output -->
-  <section id="tab-output" class="card hidden">
-    <div class="toolbar">
-      <h2>Output table (Bảng kết quả)</h2>
+<!-- Output tab -->
+<section id="tab-output" class="card hidden">
+  <div class="toolbar">
+    <h2>Output table (Bảng kết quả)</h2>
+    <div class="row">
+      <button class="btn" id="btn-validate-sku">Validate SKUs</button>
+      <button class="btn" id="btn-normalize-sku">Normalize SKUs</button>
+      <button class="btn" id="btn-commit">Commit message</button>
+      <button class="btn" id="btn-copy-commit">Copy commit</button>
+      <button class="btn" id="btn-goto-import">← Back to Import</button>
+    </div>
+  </div>
+  <div style="max-height:60vh; overflow:auto; border:1px solid #eee; border-radius:10px;">
+    <table id="out-table"><thead><tr>
+      <th>Name [edit]</th><th class="nowrap">Price</th><th class="nowrap">Merchant</th>
+      <th>Origin</th><th class="nowrap">SKU [edit]</th><th>Image</th><th>Deep link</th>
+      <th class="nowrap">Featured</th><th></th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+  <textarea id="commit-msg" class="small" placeholder="Commit message…" style="margin-top:8px; min-height:80px"></textarea>
+  <textarea id="sku-report" class="small" placeholder="SKU report…" style="margin-top:8px; min-height:80px"></textarea>
+</section>
+
+<!-- Snippets -->
+<section id="tab-snippets" class="card hidden">
+  <div class="row">
+    <label class="row"><input id="snip-deep" type="checkbox"> Use deep-link for buy</label>
+    <button class="btn" id="btn-build-snippets">Build snippets</button>
+    <button class="btn" id="btn-copy-snippets">Copy</button>
+  </div>
+  <textarea id="snippets" placeholder="Snippets chuẩn MXD…" style="margin-top:8px; min-height:140px"></textarea>
+</section>
+
+<!-- Images -->
+<section id="tab-images" class="card hidden">
+  <h2>Image tools (Công cụ ảnh)</h2>
+  <div class="grid g3">
+    <div>
+      <h3 class="small">A) Extract images</h3>
+      <p class="small muted">Lấy og:image qua Worker /head.</p>
       <div class="row">
-        <button class="btn" id="btn-validate-sku">Validate SKUs (Kiểm tra SKU)</button>
-        <button class="btn" id="btn-normalize-sku">Normalize SKUs (Chuẩn hóa SKU)</button>
-        <button class="btn" id="btn-commit">Commit message (Sinh commit)</button>
-        <button class="btn" id="btn-copy-commit">Copy commit (Sao chép)</button>
+        <button class="btn" id="btn-img-from-head">Extract via /head</button>
+        <button class="btn" id="btn-img-from-out">Use fetched images</button>
       </div>
     </div>
-    <div style="max-height:60vh; overflow:auto; border:1px solid #eee; border-radius:10px;">
-      <table id="out-table">
-        <thead><tr>
-          <th>Name [edit]</th><th class="nowrap">Price</th><th class="nowrap">Merchant</th>
-          <th>Origin</th><th class="nowrap">SKU [edit]</th><th>Image</th><th>Deep link</th>
-          <th class="nowrap">Featured</th><th></th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
+    <div>
+      <h3 class="small">B) Presets</h3>
+      <select id="img-preset">
+        <option value="store">Store card 800×800 → /assets/img/products/&lt;sku&gt;.webp</option>
+        <option value="home">Homepage 1200×800 → /assets/img/hero/&lt;sku&gt;-hero.webp</option>
+        <option value="banner">Banner 1600×500 → /assets/img/banners/&lt;sku&gt;-banner.webp</option>
+        <option value="blog">Blog/OG 1200×630 → /assets/img/tin-tuc/&lt;sku&gt;-og.webp</option>
+        <option value="thumb">Thumb 400×400 → /assets/img/products/&lt;sku&gt;-thumb.webp</option>
+      </select>
+      <label class="small"><input id="img-fit" type="checkbox" checked> Cover (crop giữa) / bỏ chọn = Contain</label>
+      <label>Quality</label>
+      <input id="img-q" type="number" min="0.6" max="0.95" step="0.01" value="0.86"/>
     </div>
-    <textarea id="commit-msg" class="small" placeholder="Commit message…" style="margin-top:8px; min-height:80px"></textarea>
-    <textarea id="sku-report" class="small" placeholder="SKU report…" style="margin-top:8px; min-height:80px"></textarea>
-  </section>
-
-  <!-- Snippets -->
-  <section id="tab-snippets" class="card hidden">
-    <div class="row">
-      <label class="row"><input id="snip-deep" type="checkbox"> Use deep-link for buy (Dùng deep-link cho buy)</label>
-      <button class="btn" id="btn-build-snippets">Build snippets (Tạo đoạn chèn)</button>
-      <button class="btn" id="btn-copy-snippets">Copy (Sao chép)</button>
+    <div>
+      <h3 class="small">C) Export</h3>
+      <div class="row"><button class="btn primary" id="btn-make-images">Generate & ZIP</button></div>
+      <p id="img-msg" class="small muted"></p>
     </div>
-    <textarea id="snippets" placeholder="Snippets chuẩn MXD…" style="margin-top:8px; min-height:140px"></textarea>
-  </section>
+  </div>
+  <textarea id="images-list" placeholder="/assets/img/products/<sku>.webp" style="margin-top:8px; min-height:120px"></textarea>
+</section>
 
-  <!-- Images -->
-  <section id="tab-images" class="card hidden">
-    <h2>Image tools (Công cụ ảnh)</h2>
-    <div class="grid g3">
-      <div>
-        <h3 class="small">A) Extract images (Lấy ảnh)</h3>
-        <p class="small muted">Lấy og:image từ link sản phẩm (qua Worker /head).</p>
-        <div class="row">
-          <button class="btn" id="btn-img-from-head">Extract via /head (Lấy qua /head)</button>
-          <button class="btn" id="btn-img-from-out">Use fetched images (Dùng ảnh đã lấy)</button>
-        </div>
+<!-- Health -->
+<section id="tab-health" class="card hidden">
+  <h2>Health-check (Kiểm tra)</h2>
+  <div class="row">
+    <label>Throttle (ms)</label><input id="hc-throttle" type="number" min="50" step="10" value="120" style="max-width:120px">
+    <button class="btn" id="btn-hc-scan">Scan affiliates.json</button>
+    <button class="btn" id="btn-hc-copy">Copy report</button>
+    <button class="btn primary" id="btn-hc-download">Download affiliates.prune.json</button>
+  </div>
+  <textarea id="hc-report" class="small" placeholder="Health report…" style="margin-top:8px; min-height:200px"></textarea>
+</section>
+
+<!-- Log -->
+<section id="tab-log" class="card hidden">
+  <h2>Fetch Log (Nhật ký)</h2>
+  <div style="max-height:60vh; overflow:auto; border:1px solid #eee; border-radius:10px;">
+    <table id="log-table"><thead><tr>
+      <th class="nowrap">Time</th><th>URL</th><th class="nowrap">Merchant</th>
+      <th class="nowrap">Status</th><th class="nowrap">Parser</th><th>Msg</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button class="btn" id="btn-clear-log">Clear log</button>
+  </div>
+</section>
+
+<!-- Settings -->
+<section id="tab-settings" class="card hidden">
+  <div class="grid g2">
+    <div>
+      <h2>Settings</h2>
+      <label>Worker Base</label><input id="set-worker" type="url" placeholder="https://mxd210.mxd6686.workers.dev">
+      <div class="card section-sep">
+        <h3>isclix path-format (đơn giản)</h3>
+        <label>AFF_ID</label><input id="set-affid" type="text" placeholder="ATxxxxxxx">
+        <label>CAMP_ID</label><input id="set-campid" type="text" placeholder="VD: SHOPEE (hoặc ID chiến dịch)">
+        <label class="row"><input id="use-isclix-path" type="checkbox" checked> Bật isclix path-format: <code>/deep_link/{AFF_ID}/{CAMP_ID}?url=…&sub1=…</code></label>
       </div>
-      <div>
-        <h3 class="small">B) Presets</h3>
-        <label>Context (Ngữ cảnh)</label>
-        <select id="img-preset">
-          <option value="store">Store card 800×800 → /assets/img/products/&lt;sku&gt;.webp</option>
-          <option value="home">Homepage 1200×800 → /assets/img/hero/&lt;sku&gt;-hero.webp</option>
-          <option value="banner">Banner 1600×500 → /assets/img/banners/&lt;sku&gt;-banner.webp</option>
-          <option value="blog">Blog/OG 1200×630 → /assets/img/tin-tuc/&lt;sku&gt;-og.webp</option>
-          <option value="thumb">Thumb 400×400 → /assets/img/products/&lt;sku&gt;-thumb.webp</option>
-        </select>
-        <label class="small"><input id="img-fit" type="checkbox" checked> Cover (crop giữa) / bỏ chọn = Contain</label>
-        <label>Quality (Chất lượng)</label>
-        <input id="img-q" type="number" min="0.6" max="0.95" step="0.01" value="0.86"/>
-      </div>
-      <div>
-        <h3 class="small">C) Export</h3>
-        <div class="row">
-          <button class="btn primary" id="btn-make-images">Generate & ZIP (Xuất ZIP)</button>
-        </div>
-        <p id="img-msg" class="small muted"></p>
-      </div>
-    </div>
-    <textarea id="images-list" placeholder="/assets/img/products/<sku>.webp" style="margin-top:8px; min-height:120px"></textarea>
-  </section>
-
-  <!-- Health -->
-  <section id="tab-health" class="card hidden">
-    <h2>Health-check (Kiểm tra)</h2>
-    <div class="row">
-      <label>Throttle (ms)</label>
-      <input id="hc-throttle" type="number" min="50" step="10" value="120" style="max-width:120px">
-      <button class="btn" id="btn-hc-scan">Scan affiliates.json (Quét)</button>
-      <button class="btn" id="btn-hc-copy">Copy report (Sao chép)</button>
-      <button class="btn primary" id="btn-hc-download">Download affiliates.prune.json (Tải xuống)</button>
-    </div>
-    <textarea id="hc-report" class="small" placeholder="Health report…" style="margin-top:8px; min-height:200px"></textarea>
-  </section>
-
-  <!-- Log -->
-  <section id="tab-log" class="card hidden">
-    <h2>Fetch Log (Nhật ký)</h2>
-    <div style="max-height:60vh; overflow:auto; border:1px solid #eee; border-radius:10px;">
-      <table id="log-table">
-        <thead><tr>
-          <th class="nowrap">Time</th><th>URL</th>
-          <th class="nowrap">Merchant</th>
-          <th class="nowrap">Status</th><th class="nowrap">Parser</th><th>Msg</th>
-        </tr></thead><tbody></tbody>
-      </table>
-    </div>
-    <div class="row" style="margin-top:8px">
-      <button class="btn" id="btn-clear-log">Clear log (Xóa nhật ký)</button>
-    </div>
-  </section>
-
-  <!-- Settings -->
-  <section id="tab-settings" class="card hidden">
-    <div class="grid g2">
-      <div>
-        <h2>Settings (Cài đặt)</h2>
-        <label>Worker Base</label>
-        <input id="set-worker" type="url" placeholder="https://mxd210.mxd6686.workers.dev">
-
-        <label>AFF_ID (isclix / AccessTrade)</label>
-        <input id="set-affid" type="text" placeholder="VD: 6803097511817356947">
-
-        <!-- Campaign IDs (isclix) -->
-        <label>Campaign ID Shopee (isclix)</label>
-        <input id="set-camp-shopee" type="text" placeholder="VD: 4751584435713464237">
-        <label>Campaign ID Lazada (isclix)</label>
-        <input id="set-camp-lazada" type="text" placeholder="">
-        <label>Campaign ID Tiki (isclix)</label>
-        <input id="set-camp-tiki" type="text" placeholder="">
-
-        <!-- Templates (mặc định isclix; vẫn cho phép AT cũ) -->
+      <div class="card section-sep">
+        <h3>Hoặc dùng template tuỳ chỉnh (nâng cao)</h3>
         <label>Template Shopee</label>
-        <input id="tpl-shopee" type="text" placeholder="https://go.isclix.com/deep_link/{aff_id}/{camp_shopee}?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}">
+        <input id="tpl-shopee" type="text" placeholder="https://go.isclix.com/deep_link?url={url}&aff_id={aff_id}&merchant=shopee&sub1={sub1}">
         <label>Template Lazada</label>
-        <input id="tpl-lazada" type="text" placeholder="https://go.isclix.com/deep_link/{aff_id}/{camp_lazada}?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}">
+        <input id="tpl-lazada" type="text" placeholder="https://go.isclix.com/deep_link?url={url}&aff_id={aff_id}&merchant=lazada&sub1={sub1}">
         <label>Template Tiki</label>
-        <input id="tpl-tiki" type="text" placeholder="https://go.isclix.com/deep_link/{aff_id}/{camp_tiki}?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}">
-
-        <label class="row"><input id="override-deeplink" type="checkbox"> Deep-link override for buy (Ghi đè buy dùng deep-link)</label>
-        <div class="row">
-          <button class="btn" id="btn-save-settings">Save (Lưu)</button>
-          <button class="btn" id="btn-test-head">Test /head (Thử /head)</button>
-          <span id="settings-msg" class="small muted"></span>
-        </div>
+        <input id="tpl-tiki" type="text" placeholder="https://go.isclix.com/deep_link?url={url}&aff_id={aff_id}&merchant=tiki&sub1={sub1}">
+        <label class="row"><input id="override-deeplink" type="checkbox"> Deep-link override for buy</label>
       </div>
-      <div>
-        <h2>Shortcuts (Phím tắt)</h2>
-        <ul class="small">
-          <li><b>Ctrl+Enter</b> → Fetch</li>
-          <li><b>Ctrl+S</b> → Save settings</li>
-          <li><b>Alt+1..6</b> → Tabs</li>
-          <li><b>Alt+V</b> → Validate SKU</li>
-          <li><b>Alt+C</b> → Generate commit</li>
-        </ul>
+      <div class="row section-sep">
+        <button class="btn" id="btn-save-settings">Save</button>
+        <button class="btn" id="btn-test-head">Test /head</button>
+        <span id="settings-msg" class="small muted"></span>
       </div>
     </div>
-  </section>
+    <div>
+      <h2>Shortcuts</h2>
+      <ul class="small">
+        <li><b>Ctrl+Enter</b> → Fetch</li>
+        <li><b>Ctrl+S</b> → Save settings</li>
+        <li><b>Alt+1..6</b> → Tabs</li>
+        <li><b>Alt+V</b> → Validate SKU</li>
+        <li><b>Alt+C</b> → Generate commit</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-  <!-- ===== Core Script (Importer) ===== -->
-  <script>
-    // ===== State =====
-    let SETTINGS = loadSettings();
-    let LOGS = [];
-    let OUT = [];
-    let EXISTING = [];
+<script>
+// ===== State =====
+let SETTINGS = loadSettings();
+let LOGS = [];
+let OUT = [];
+let EXISTING = [];
+let HC_LAST = { kept: [], removed: [], report: '' };
 
-    // ===== Utils =====
-    const q = s => document.querySelector(s);
-    const qa = s => Array.from(document.querySelectorAll(s));
-    const nowStr = () => new Date().toLocaleString();
-    const escapeHTML = s => String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
-    const sleep = ms => new Promise(r=>setTimeout(r, ms));
+// ===== Utils =====
+const q = s => document.querySelector(s);
+const qa = s => Array.from(document.querySelectorAll(s));
+const nowStr = () => new Date().toLocaleString();
+const escapeHTML = s => String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',\"'\":'&#39;' }[m]));
+const sleep = ms => new Promise(r=>setTimeout(r, ms));
+const go = id => document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'});
+function withBusy(btn, fn){
+  const el = (typeof btn==='string')? q(btn) : btn;
+  if (!el) return fn();
+  el.classList.add('busy'); el.setAttribute('disabled',''); const txt=el.textContent; el.textContent = (txt||'')+'…';
+  return Promise.resolve(fn()).finally(()=>{ el.classList.remove('busy'); el.removeAttribute('disabled'); el.textContent = txt; });
+}
 
-    function slugifyVN(s){
-      s = String(s||'').toLowerCase().trim();
-      s = s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      s = s.replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-      return s || ('mxd-'+Date.now().toString(36));
+function slugifyVN(s){
+  s = String(s||'').toLowerCase().trim();
+  s = s.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'');
+  s = s.replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  return s || ('mxd-'+Date.now().toString(36));
+}
+function guessMerchant(u){
+  u = String(u||'').toLowerCase();
+  if (u.includes('shopee.')) return 'shopee';
+  if (u.includes('lazada.')) return 'lazada';
+  if (u.includes('tiki.vn')) return 'tiki';
+  return '';
+}
+function parseShopeeIDs(u){ const m = String(u||'').match(/product\\/(\\d+)\\/(\\d+)/i); return m ? {shop:m[1], item:m[2]} : null; }
+function isLazadaProduct(u){ try{ const p=new URL(u).pathname; return /-i\\d+\\.html$/i.test(p) || /\\/products\\//i.test(p);}catch{ return false; } }
+function isTikiProduct(u){ try{ const p=new URL(u).pathname; return /-p\\d+\\.html$/i.test(p) || /\\/p\\//i.test(p);}catch{ return false; } }
+const isProductUrl = (u)=>{ try{ const host=new URL(u).hostname; return (
+  (/shopee\\./.test(host) && /\\/product\\/\\d+\\/\\d+$/i.test(new URL(u).pathname)) ||
+  (/lazada\\./.test(host) && isLazadaProduct(u)) || (/tiki\\.vn$/.test(host) && isTikiProduct(u))
+);}catch{ return false; } };
+const toNumber = (x)=>{ if (x==null) return null; const n = String(x).replace(/[^\\d]/g,''); return n? Number(n): null; };
+
+function logPush({url, merchant, status, parser, message}){
+  LOGS.unshift({ts: nowStr(), url, merchant, status, parser, message});
+  const tb = q('#log-table tbody');
+  tb.innerHTML = LOGS.map(l=>`
+    <tr>
+      <td class="nowrap">${l.ts}</td>
+      <td>${escapeHTML(l.url||'')}</td>
+      <td class="nowrap">${l.merchant||''}</td>
+      <td class="nowrap ${Number(l.status)>=200&&Number(l.status)<400?'ok':(Number(l.status)>=300&&Number(l.status)<400?'warn':'err')}">${l.status||''}</td>
+      <td class="nowrap">${l.parser||''}</td>
+      <td class="small">${escapeHTML(l.message||'')}</td>
+    </tr>
+  `).join('');
+}
+
+// ===== Settings =====
+function loadSettings(){
+  const raw = localStorage.getItem('mxd_settings_v45_pro');
+  if (raw) return JSON.parse(raw);
+  return {
+    worker:'', aff_id:'', camp_id:'',
+    use_isclix_path:true,
+    tpl_shopee:'https://go.isclix.com/deep_link?url={url}&aff_id={aff_id}&merchant=shopee&sub1={sub1}',
+    tpl_lazada:'https://go.isclix.com/deep_link?url={url}&aff_id={aff_id}&merchant=lazada&sub1={sub1}',
+    tpl_tiki:'https://go.isclix.com/deep_link?url={url}&aff_id={aff_id}&merchant=tiki&sub1={sub1}',
+    override:false
+  };
+}
+function mountSettings(){
+  q('#set-worker').value = SETTINGS.worker || '';
+  q('#set-affid').value = SETTINGS.aff_id || '';
+  q('#set-campid').value = SETTINGS.camp_id || '';
+  q('#use-isclix-path').checked = !!SETTINGS.use_isclix_path;
+  q('#tpl-shopee').value = SETTINGS.tpl_shopee || '';
+  q('#tpl-lazada').value = SETTINGS.tpl_lazada || '';
+  q('#tpl-tiki').value = SETTINGS.tpl_tiki || '';
+  q('#override-deeplink').checked = !!SETTINGS.override;
+}
+function saveSettings(){
+  SETTINGS.worker = q('#set-worker').value.trim();
+  SETTINGS.aff_id = q('#set-affid').value.trim();
+  SETTINGS.camp_id = q('#set-campid').value.trim();
+  SETTINGS.use_isclix_path = q('#use-isclix-path').checked;
+  SETTINGS.tpl_shopee = q('#tpl-shopee').value.trim();
+  SETTINGS.tpl_lazada = q('#tpl-lazada').value.trim();
+  SETTINGS.tpl_tiki = q('#tpl-tiki').value.trim();
+  SETTINGS.override = q('#override-deeplink').checked;
+  localStorage.setItem('mxd_settings_v45_pro', JSON.stringify(SETTINGS));
+  q('#settings-msg').textContent = 'Saved (Đã lưu).'; setTimeout(()=> q('#settings-msg').textContent='', 1600);
+  updateAffiliatePreview();
+}
+
+// Tabs
+function showTab(id){
+  qa('section[id^="tab-"]').forEach(el=>el.classList.add('hidden'));
+  q('#tab-'+id).classList.remove('hidden');
+  qa('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  localStorage.setItem('tab', id);
+  go('tab-'+id);
+}
+qa('.tab').forEach(b=> b.onclick = ()=> showTab(b.dataset.tab));
+showTab(localStorage.getItem('tab') || 'import');
+
+q('#compact').onchange = (e)=>{
+  document.body.style.setProperty('--gap', e.target.checked ? '8px' : '12px');
+  document.body.querySelectorAll('.btn').forEach(b=>b.style.padding = e.target.checked?'6px 10px':'8px 12px');
+};
+document.addEventListener('keydown', (ev)=>{
+  if (ev.ctrlKey && ev.code==='Enter'){ q('#btn-fetch').click(); ev.preventDefault(); }
+  if (ev.ctrlKey && ev.key.toLowerCase()==='s'){ q('#btn-save-settings').click(); ev.preventDefault(); }
+  if (ev.altKey){
+    const map = {'Digit1':'import','Digit2':'output','Digit3':'snippets','Digit4':'images','Digit5':'health','Digit6':'settings'};
+    if (map[ev.code]){ showTab(map[ev.code]); ev.preventDefault(); }
+    if (ev.key.toLowerCase()==='v'){ q('#btn-validate-sku').click(); ev.preventDefault(); }
+    if (ev.key.toLowerCase()==='c'){ q('#btn-commit').click(); ev.preventDefault(); }
+  }
+});
+
+// ===== Affiliate builders =====
+function deeplinkTemplate(merchant, origin, sub1){
+  const aff = SETTINGS.aff_id || '';
+  if (SETTINGS.use_isclix_path && aff && SETTINGS.camp_id){
+    return `https://go.isclix.com/deep_link/${encodeURIComponent(aff)}/${encodeURIComponent(SETTINGS.camp_id)}?url=${encodeURIComponent(origin)}&sub1=${encodeURIComponent(sub1||'')}`;
+  }
+  const map = { shopee: SETTINGS.tpl_shopee, lazada: SETTINGS.tpl_lazada, tiki: SETTINGS.tpl_tiki };
+  const tpl = map[merchant] || '';
+  if (!tpl || !aff) return origin;
+  return tpl.replace('{url}', encodeURIComponent(origin))
+    .replace('{aff_id}', encodeURIComponent(aff))
+    .replace('{sub1}', encodeURIComponent(sub1||''));
+}
+async function buildAffiliatePreview(origin, sub1=''){
+  const merchant = guessMerchant(origin);
+  const tplDeep = deeplinkTemplate(merchant, origin, sub1);
+  if (tplDeep && tplDeep !== origin) return { url: tplDeep, via:'template', merchant };
+  const base = (SETTINGS.worker||'').replace(/\\/+$/,'');
+  if (base){
+    try{
+      const r = await fetch(`${base}/aff?url=${encodeURIComponent(origin)}&merchant=${merchant}&sub1=${encodeURIComponent(sub1||'')}`, {mode:'cors'});
+      const j = await r.json(); if (j && j.url) return { url:j.url, via:'worker', merchant };
+    }catch(_){}
+  }
+  return { url: origin, via:'none', merchant };
+}
+function firstLinkInText(txt){ const m = String(txt||'').match(/\\bhttps?:\\/\\/[^\\s<>"']+/i); return m ? m[0] : ''; }
+function qrUrl(u, size=260){ return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(u)}`; }
+
+// ===== Parse input (drag & drop) =====
+function parseInput(raw, fmt, forceMerchant){
+  if (/\\t/.test(raw) || /,https?:\\/\\//.test(raw)){
+    const rows = raw.split(/\\r?\\n/).map(s=>s.trim()).filter(Boolean);
+    raw = rows.map(line=>{
+      const parts = line.split(/\\t|,(?=https?:\\/\\/)/);
+      const [name, price, link] = [parts[0]||'', parts[1]||'', parts[2]||parts[1]||''];
+      return `${name} | ${price} | ${link}`;
+    }).join('\\n');
+    fmt = 'pipe';
+  }
+  const lines = raw.split(/\\r?\\n/).map(s=>s.trim()).filter(Boolean);
+  const out = [];
+  for (const line of lines){
+    if (fmt==='pipe'){
+      const [name, priceStr, link] = line.split('|').map(s=>s.trim());
+      if (!link || !isProductUrl(link)) continue;
+      const origin = link.split('?')[0];
+      const merchant = forceMerchant==='auto' ? guessMerchant(origin) : forceMerchant;
+      const priceNum = toNumber(priceStr);
+      if (priceNum==null) continue;
+      out.push({name, price: priceNum, origin, merchant});
+    } else {
+      if (!isProductUrl(line)) continue;
+      const origin = line.split('?')[0];
+      const merchant = forceMerchant==='auto' ? guessMerchant(origin) : forceMerchant;
+      out.push({name:'', price:0, origin, merchant});
     }
-    function guessMerchant(u){
-      u = String(u||'').toLowerCase();
-      if (u.includes('shopee.')) return 'shopee';
-      if (u.includes('lazada.')) return 'lazada';
-      if (u.includes('tiki.vn')) return 'tiki';
-      if (u.includes('tiktok.')) return 'tiktok';
-      return '';
+  }
+  return out;
+}
+// Drag & drop
+const drop = q('#drop');
+['dragenter','dragover'].forEach(e=> drop.addEventListener(e, ev=>{ ev.preventDefault(); drop.classList.add('drag'); }));
+['dragleave','drop'].forEach(e=> drop.addEventListener(e, ev=>{ ev.preventDefault(); drop.classList.remove('drag'); }));
+drop.addEventListener('drop', ev=>{
+  const f = ev.dataTransfer.files[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{ q('#txt-input').value = (q('#txt-input').value+'\\n'+reader.result).trim(); updateAffiliatePreview(); };
+  reader.readAsText(f);
+});
+
+// ===== Worker helpers =====
+async function fetchHead(url){
+  const base = (SETTINGS.worker||'').replace(/\\/+$/,'');
+  if (!base) return {status:0, parser:'fallback', title:'', image:'', price:null, brand:''};
+  const res = await fetch(base + '/head?url=' + encodeURIComponent(url), {mode:'cors'});
+  let data = {}; try { data = await res.json(); } catch(_){}
+  return {
+    status: res.status || 0, parser: 'worker-head',
+    title: data.title || data.ogTitle || '',
+    image: data.image || data.ogImage || '',
+    price: (data.price!=null && isFinite(Number(data.price))) ? Number(data.price) : null,
+    brand: data.brand || ''
+  };
+}
+function fallbackFromURL(u){
+  try { const url = new URL(u); const last = url.pathname.split('/').filter(Boolean).pop() || url.hostname; const name = last.replace(/[-_]+/g,' ').slice(0,80); return {title: name, image:'', price:null, brand:''}; }
+  catch { return {title:'', image:'', price:null, brand:''}; }
+}
+function isShopeeSearchURL(s){ try { const u = new URL(s); return u.hostname.includes('shopee') && u.pathname.replace(/\\/+$/,'')==='/search'; } catch { return false; } }
+async function searchShopeeLinks(qOrUrl, pages){
+  const base = (SETTINGS.worker||'').replace(/\\/+$/,'');
+  if (!base) throw new Error('Worker chưa cấu hình (Settings → Worker Base).');
+  const results = new Set();
+  if (isShopeeSearchURL(qOrUrl)) {
+    const r = await fetch(`${base}/search?url=${encodeURIComponent(qOrUrl)}`, {mode:'cors'});
+    const j = await r.json(); (j.links||[]).forEach(h=>results.add(h));
+  } else {
+    for (let p=1; p<=pages; p++){
+      const u = `https://shopee.vn/search?keyword=${encodeURIComponent(qOrUrl)}&page=${p-1}`;
+      const r = await fetch(`${base}/search?url=${encodeURIComponent(u)}`, {mode:'cors'});
+      const j = await r.json(); (j.links||[]).forEach(h=>results.add(h));
+      await sleep(200);
     }
-    function parseShopeeIDs(u){
-      const m = String(u||'').match(/product\/(\d+)\/(\d+)/i);
-      return m ? {shop:m[1], item:m[2]} : null;
-    }
-    const isProductUrl = (u)=>{ try{ return /\/product\/\d+\/\d+$/i.test(new URL(u).pathname); }catch{ return false; } };
-    const toNumber = (x)=>{ if (x==null) return null; const n = String(x).replace(/[^\d]/g,''); return n? Number(n): null; };
+  }
+  return Array.from(results);
+}
 
-    function logPush({url, merchant, status, parser, message}){
-      LOGS.unshift({ts: nowStr(), url, merchant, status, parser, message});
-      const tb = q('#log-table tbody');
-      tb.innerHTML = LOGS.map(l=>`
-        <tr>
-          <td class="nowrap">${l.ts}</td>
-          <td>${escapeHTML(l.url||'')}</td>
-          <td class="nowrap">${l.merchant||''}</td>
-          <td class="nowrap ${Number(l.status)>=200&&Number(l.status)<400?'ok':(Number(l.status)>=300&&Number(l.status)<400?'warn':'err')}">${l.status||''}</td>
-          <td class="nowrap">${l.parser||''}</td>
-          <td class="small">${escapeHTML(l.message||'')}</td>
-        </tr>
-      `).join('');
-    }
+// ===== OUT rendering =====
+function renderOUT(){
+  const tb = q('#out-table tbody');
+  tb.innerHTML = OUT.map((it,idx)=>`
+    <tr>
+      <td contenteditable="true" oninput="editField(${idx},'name',this.textContent)">${escapeHTML(it.name||'')}</td>
+      <td class="nowrap"><input type="number" min="0" step="1" value="${isFinite(it.price)?it.price:''}" oninput="editPrice(${idx},this.value)" style="width:110px"></td>
+      <td class="nowrap">${it.merchant||''}</td>
+      <td>${escapeHTML(it.origin||'')}</td>
+      <td contenteditable="true" oninput="editField(${idx},'sku',this.textContent)">${escapeHTML(it.sku||'')}</td>
+      <td class="small">${escapeHTML(it.image||'')}</td>
+      <td class="small">${escapeHTML(it.deeplink||'')}</td>
+      <td class="nowrap"><input type="checkbox" ${it.featured?'checked':''} onchange="toggleFeat(${idx},this.checked)"></td>
+      <td class="nowrap"><button class="btn" onclick="removeRow(${idx})">X</button></td>
+    </tr>
+  `).join('');
+}
+window.editField = (i,k,v)=>{ OUT[i][k]=String(v||'').trim(); syncDerived(i); };
+window.editPrice = (i,v)=>{ OUT[i].price = Number(v)||0; syncDerived(i); };
+window.toggleFeat = (i,checked)=>{ OUT[i].featured = !!checked; };
+window.removeRow = (i)=>{ OUT.splice(i,1); renderOUT(); };
 
-    // ===== Settings (isclix-first; vẫn chấp AT cũ) =====
-    function loadSettings(){
-      const raw = localStorage.getItem('mxd_settings_v42_pro');
-      if (raw) return JSON.parse(raw);
-      return {
-        worker:'',
-        aff_id:'',
-        tpl_shopee:'https://go.isclix.com/deep_link/{aff_id}/{camp_shopee}?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}',
-        tpl_lazada:'https://go.isclix.com/deep_link/{aff_id}/{camp_lazada}?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}',
-        tpl_tiki:'https://go.isclix.com/deep_link/{aff_id}/{camp_tiki}?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}',
-        camp_shopee:'', camp_lazada:'', camp_tiki:'',
-        override:false
-      };
-    }
-    function mountSettings(){
-      q('#set-worker').value = SETTINGS.worker || '';
-      q('#set-affid').value = SETTINGS.aff_id || '';
-      q('#tpl-shopee').value = SETTINGS.tpl_shopee || '';
-      q('#tpl-lazada').value = SETTINGS.tpl_lazada || '';
-      q('#tpl-tiki').value = SETTINGS.tpl_tiki || '';
-      q('#set-camp-shopee').value = SETTINGS.camp_shopee || '';
-      q('#set-camp-lazada').value = SETTINGS.camp_lazada || '';
-      q('#set-camp-tiki').value = SETTINGS.camp_tiki || '';
-      q('#override-deeplink').checked = !!SETTINGS.override;
-      // Bridge sang Link Assistant (AFF_* keys)
-      localStorage.setItem('AFF_ID', SETTINGS.aff_id||'');
-      localStorage.setItem('AFF_ORIGIN', SETTINGS.worker||'');
-      localStorage.setItem('AFF_SHOPEE_TEMPLATE', SETTINGS.tpl_shopee||'');
-      localStorage.setItem('AFF_LAZADA_TEMPLATE', SETTINGS.tpl_lazada||'');
-      localStorage.setItem('AFF_TIKI_TEMPLATE', SETTINGS.tpl_tiki||'');
-      localStorage.setItem('AFF_CAMP_SHOPEE', SETTINGS.camp_shopee||'');
-      localStorage.setItem('AFF_CAMP_LAZADA', SETTINGS.camp_lazada||'');
-      localStorage.setItem('AFF_CAMP_TIKI', SETTINGS.camp_tiki||'');
-    }
-    function saveSettings(){
-      SETTINGS.worker = q('#set-worker').value.trim();
-      SETTINGS.aff_id = q('#set-affid').value.trim();
-      SETTINGS.tpl_shopee = q('#tpl-shopee').value.trim();
-      SETTINGS.tpl_lazada = q('#tpl-lazada').value.trim();
-      SETTINGS.tpl_tiki  = q('#tpl-tiki').value.trim();
-      SETTINGS.camp_shopee = q('#set-camp-shopee').value.trim();
-      SETTINGS.camp_lazada = q('#set-camp-lazada').value.trim();
-      SETTINGS.camp_tiki   = q('#set-camp-tiki').value.trim();
-      SETTINGS.override = q('#override-deeplink').checked;
-      localStorage.setItem('mxd_settings_v42_pro', JSON.stringify(SETTINGS));
-      mountSettings();
-      q('#settings-msg').textContent = 'Saved (Đã lưu).'; setTimeout(()=> q('#settings-msg').textContent='', 1400);
-      if (document.contains(q('#single-origin'))) computeSingleAff();
-    }
+function syncDerived(i){
+  const it = OUT[i];
+  if (!it.sku) it.sku = slugifyVN(it.name || it.origin);
+  it.image = `/assets/img/products/${it.sku}.webp`;
+  if (q('#bulk-sub1').checked) it.sub1 = it.sku;
+  it.deeplink = deeplinkTemplate(it.merchant||'', it.origin||'', it.sub1||'');
+}
 
-    // ===== Tabs / Compact / Shortcuts =====
-    function showTab(id){
-      qa('section[id^="tab-"]').forEach(el=>el.classList.add('hidden'));
-      q('#tab-'+id).classList.remove('hidden');
-      qa('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
-      localStorage.setItem('tab', id);
-    }
-    qa('.tab').forEach(b=> b.onclick = ()=> showTab(b.dataset.tab));
-    showTab(localStorage.getItem('tab') || 'import');
+// Helpers
+function dedupe(items){ const map = new Map(); for (const it of items){ const key=(it.origin||'')+'#'+(it.sku||''); if(!map.has(key)) map.set(key,it);} return Array.from(map.values()); }
+const isRenderable = (it)=> it && isProductUrl(it.origin) && isFinite(it.price) && Number(it.price)>0;
+function toAffJSON(items){
+  return items.filter(isRenderable).map(it=>({
+    name:String(it.name||'').trim(), price:Number(it.price)||0,
+    origin:String(it.origin||'').trim(), merchant:String(it.merchant||'').trim(),
+    sku:String(it.sku||'').trim(), image: it.image || (`/assets/img/products/${String(it.sku||'').trim()}.webp`),
+    category:String(it.category||'').trim(), brand:String(it.brand||'').trim(),
+    featured:!!it.featured, sub1:String(it.sub1||'').trim(),
+    deeplink:String(it.deeplink||it.origin||'').trim(), srcImage: it.srcImage || ''
+  }));
+}
+function download(filename, text){
+  const blob = new Blob([text], {type:'application/json;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+}
 
-    q('#compact').onchange = (e)=>{
-      document.body.style.setProperty('--gap', e.target.checked ? '8px' : '12px');
-      document.body.querySelectorAll('.btn').forEach(b=>b.style.padding = e.target.checked?'6px 10px':'8px 12px');
-    };
+// ===== Affiliate UI actions =====
+async function updateAffiliatePreview(){
+  const first = (q('#aff-origin').value.trim() || firstLinkInText(q('#txt-input').value) || '').split(/\\r?\\n/).map(s=>s.trim()).filter(Boolean)[0];
+  if (!first){ q('#aff-output').value = ''; return; }
+  const sub1 = (q('#default-sub1').value || '').trim();
+  const info = await buildAffiliatePreview(first, sub1);
+  q('#aff-output').value = info.url || first;
+}
+async function buildAllDeeplinksFromInput(){
+  const txt = q('#txt-input').value || '';
+  const lines = txt.split(/\\r?\\n/).map(s=>s.trim()).filter(Boolean);
+  const forceM = (qa('input[name="mrc"]').find(x=>x.checked)||{}).value || 'auto';
+  const sub1 = q('#default-sub1').value.trim();
+  const out = [];
+  for (const line of lines){
+    const origin = line.split('|').pop().trim();
+    const link = isProductUrl(origin) ? origin : (isProductUrl(line)? line : '');
+    if (!link) continue;
+    const m = (forceM==='auto')? guessMerchant(link) : forceM;
+    const sku = slugifyVN(link);
+    const deep = deeplinkTemplate(m, link, q('#bulk-sub1').checked?sku:(sub1||''));
+    out.push(deep);
+  }
+  q('#aff-output').value = out.join('\\n');
+  return out.length;
+}
+q('#aff-copy').onclick = ()=> navigator.clipboard.writeText(q('#aff-output').value||'');
+q('#aff-open').onclick = ()=>{ const u=(q('#aff-output').value||'').split(/\\r?\\n/)[0]; if (u) window.open(u,'_blank'); };
+q('#aff-qr').onclick = ()=>{ const u=(q('#aff-output').value||'').split(/\\r?\\n/)[0]; if (!u) return; const w=window.open('about:blank','_blank'); if (w) w.document.write(`<img alt="QR" src="${qrUrl(u,280)}"/>`); };
+q('#aff-build-all').onclick = ()=> withBusy('#aff-build-all', async()=>{ const n = await buildAllDeeplinksFromInput(); q('#auto-status').textContent = `Built ${n} deeplinks.`; go('quick-outputs'); });
+q('#aff-copy-all').onclick = ()=> navigator.clipboard.writeText(q('#aff-output').value||'');
 
-    document.addEventListener('keydown', (ev)=>{
-      if (ev.ctrlKey && ev.code==='Enter'){ q('#btn-fetch').click(); ev.preventDefault(); }
-      if (ev.ctrlKey && ev.key.toLowerCase()==='s'){ q('#btn-save-settings').click(); ev.preventDefault(); }
-      if (ev.altKey){
-        const map = {'Digit1':'import','Digit2':'output','Digit3':'snippets','Digit4':'images','Digit5':'health','Digit6':'settings'};
-        if (map[ev.code]){ showTab(map[ev.code]); ev.preventDefault(); }
-        if (ev.key.toLowerCase()==='v'){ q('#btn-validate-sku').click(); ev.preventDefault(); }
-        if (ev.key.toLowerCase()==='c'){ q('#btn-commit').click(); ev.preventDefault(); }
-      }
-    });
+// ===== Actions: Import =====
+q('#btn-parse').onclick = ()=> withBusy('#btn-parse', ()=>{
+  const fmt = (qa('input[name="fmt"]').find(x=>x.checked)||{}).value || 'link';
+  const forceM = (qa('input[name="mrc"]').find(x=>x.checked)||{}).value || 'auto';
+  const sub1 = q('#default-sub1').value.trim();
+  const rows = parseInput(q('#txt-input').value, fmt, forceM);
+  OUT = rows.map(r=>{
+    const m = r.merchant || guessMerchant(r.origin);
+    const ids = (m==='shopee') ? parseShopeeIDs(r.origin) : null;
+    let sku = slugifyVN(r.name || r.origin);
+    if ((!r.name || r.name.length<2) && ids) sku = `sp${ids.shop}-${ids.item}`;
+    const it = { name: r.name || r.origin, price:r.price||0, origin:r.origin, merchant:m,
+      sku, image:`/assets/img/products/${sku}.webp`, brand:'', category:'', featured:false, sub1, srcImage:'' };
+    if (q('#bulk-sub1').checked) it.sub1 = it.sku;
+    it.deeplink = deeplinkTemplate(it.merchant, it.origin, it.sub1);
+    return it;
+  });
+  OUT = dedupe(OUT); renderOUT(); showTab('output');
+  q('#out-msg').textContent = `Parsed ${OUT.length} rows.`; setTimeout(()=> q('#out-msg').textContent='', 1600);
+  updateAffiliatePreview();
+});
 
-    // ===== Affiliate =====
-    function deeplinkOf(merchant, origin, sub1){
-      const aff = SETTINGS.aff_id || '';
-      const map = { shopee: SETTINGS.tpl_shopee, lazada: SETTINGS.tpl_lazada, tiki: SETTINGS.tpl_tiki };
-      const tpl = map[merchant] || '';
-      if (!tpl || !aff) return origin;
+q('#btn-auto-search').onclick = async ()=> withBusy('#btn-auto-search', async()=>{
+  const kw = (q('#auto-q').value || '').trim();
+  const pages = Number(q('#auto-pages').value)||1;
+  const raw = (q('#txt-input').value || '').trim();
+  const maybeUrl = raw.split(/\\r?\\n/).map(s=>s.trim()).find(isShopeeSearchURL) || '';
+  q('#auto-status').textContent = 'Đang lấy link…';
+  try {
+    const links = await searchShopeeLinks(maybeUrl || kw, Math.max(1, Math.min(pages,5)));
+    if (!links.length){ q('#auto-status').textContent = 'Không thấy link product.'; return; }
+    const current = q('#txt-input').value.trim();
+    q('#txt-input').value = (current ? (current+'\\n') : '') + links.join('\\n');
+    (qa('input[name="fmt"]').find(x=>x.value==='link')||{}).checked = true;
+    q('#auto-status').textContent = `Đã lấy ${links.length} link.`;
+    updateAffiliatePreview(); go('txt-input');
+  } catch(e){ q('#auto-status').textContent = 'Lỗi: ' + e.message; }
+});
 
-      const camp = merchant==='shopee' ? SETTINGS.camp_shopee
-                : merchant==='lazada' ? SETTINGS.camp_lazada
-                : merchant==='tiki'   ? SETTINGS.camp_tiki : '';
-
-      // A) isclix: https://go.isclix.com/deep_link/{aff_id}/{camp_*}?url={url}&sub1=...
-      // B) accesstrade: https://go.accesstrade.vn/deep_link?url={url}&aff_id={aff_id}&merchant=...
-      return tpl
-        .replace('{url}', encodeURIComponent(origin))
-        .replace('{aff_id}', encodeURIComponent(aff))
-        .replace('{merchant}', merchant)
-        .replace('{camp}', camp)
-        .replace('{camp_shopee}', SETTINGS.camp_shopee||'')
-        .replace('{camp_lazada}', SETTINGS.camp_lazada||'')
-        .replace('{camp_tiki}', SETTINGS.camp_tiki||'')
-        .replace('{sub1}', encodeURIComponent(sub1||''))
-        .replace('{sub2}','').replace('{sub3}','').replace('{sub4}','');
-    }
-
-    // ===== Parse input =====
-    function parseInput(raw, fmt, forceMerchant){
-      if (/\t/.test(raw) || /,https?:\/\//.test(raw)){
-        const rows = raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-        raw = rows.map(line=>{
-          const parts = line.split(/\t|,(?=https?:\/\/)/);
-          const [name, price, link] = [parts[0]||'', parts[1]||'', parts[2]||parts[1]||''];
-          return `${name} | ${price} | ${link}`;
-        }).join('\n');
-        fmt = 'pipe';
-      }
-
-      const lines = raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-      const out = [];
-      for (const line of lines){
-        if (fmt==='pipe'){
-          const [name, priceStr, link] = line.split('|').map(s=>s.trim());
-          if (!link || !isProductUrl(link)) continue;
-          const origin = link.split('?')[0];
-          const merchant = forceMerchant==='auto' ? guessMerchant(origin) : forceMerchant;
-          const priceNum = toNumber(priceStr);
-          if (priceNum==null) continue;
-          out.push({name, price: priceNum, origin, merchant});
-        } else {
-          if (!isProductUrl(line)) continue;
-          const origin = line.split('?')[0];
-          const merchant = forceMerchant==='auto' ? guessMerchant(origin) : forceMerchant;
-          out.push({name:'', price:0, origin, merchant});
-        }
-      }
-      return out;
-    }
-
-    // Drag & drop
-    const drop = q('#drop');
-    ['dragenter','dragover'].forEach(e=> drop.addEventListener(e, ev=>{ ev.preventDefault(); drop.classList.add('drag'); }));
-    ['dragleave','drop'].forEach(e=> drop.addEventListener(e, ev=>{ ev.preventDefault(); drop.classList.remove('drag'); }));
-    drop.addEventListener('drop', ev=>{
-      const f = ev.dataTransfer.files[0]; if (!f) return;
-      const reader = new FileReader();
-      reader.onload = ()=>{ q('#txt-input').value = (q('#txt-input').value+'\n'+reader.result).trim(); };
-      reader.readAsText(f);
-    });
-
-    // ===== OUT rendering =====
-    function renderOUT(){
-      const tb = q('#out-table tbody');
-      tb.innerHTML = OUT.map((it,idx)=>`
-        <tr>
-          <td contenteditable="true" oninput="editField(${idx},'name',this.textContent)">${escapeHTML(it.name||'')}</td>
-          <td class="nowrap"><input type="number" min="0" step="1" value="${isFinite(it.price)?it.price:''}" oninput="editPrice(${idx},this.value)" style="width:110px"></td>
-          <td class="nowrap">${it.merchant||''}</td>
-          <td>${escapeHTML(it.origin||'')}</td>
-          <td contenteditable="true" oninput="editField(${idx},'sku',this.textContent)">${escapeHTML(it.sku||'')}</td>
-          <td class="small">${escapeHTML(it.image||'')}</td>
-          <td class="small">${escapeHTML(it.deeplink||'')}</td>
-          <td class="nowrap"><input type="checkbox" ${it.featured?'checked':''} onchange="toggleFeat(${idx},this.checked)"></td>
-          <td class="nowrap"><button class="btn" onclick="removeRow(${idx})">X</button></td>
-        </tr>
-      `).join('');
-    }
-    window.editField = (i,k,v)=>{ OUT[i][k]=String(v||'').trim(); syncDerived(i); };
-    window.editPrice = (i,v)=>{ OUT[i].price = Number(v)||0; syncDerived(i); };
-    window.toggleFeat = (i,checked)=>{ OUT[i].featured = !!checked; };
-    window.removeRow = (i)=>{ OUT.splice(i,1); renderOUT(); };
-
-    function syncDerived(i){
-      const it = OUT[i];
-      if (!it.sku) it.sku = slugifyVN(it.name || it.origin);
-      it.image = `/assets/img/products/${it.sku}.webp`;
-      if (q('#bulk-sub1').checked) it.sub1 = it.sku;
-      it.deeplink = deeplinkOf(it.merchant||'', it.origin||'', it.sub1||'');
-    }
-    function dedupe(items){
-      const map = new Map();
-      for (const it of items){
-        const key = (it.origin||'') + '#' + (it.sku||'');
-        if (!map.has(key)) map.set(key, it);
-      }
-      return Array.from(map.values());
-    }
-
-    const isRenderable = (it)=> it && isProductUrl(it.origin) && isFinite(it.price) && Number(it.price)>0;
-
-    function toAffJSON(items){
-      return items
-        .filter(isRenderable)
-        .map(it=>({
-          name: String(it.name||'').trim(),
-          price: Number(it.price)||0,
-          origin: String(it.origin||'').trim(),
-          merchant: String(it.merchant||'').trim(),
-          sku: String(it.sku||'').trim(),
-          image: it.image || (`/assets/img/products/${String(it.sku||'').trim()}.webp`),
-          category: String(it.category||'').trim(),
-          brand: String(it.brand||'').trim(),
-          featured: !!it.featured,
-          sub1: String(it.sub1||'').trim(),
-          deeplink: String(it.deeplink||it.origin||'').trim(),
-          srcImage: it.srcImage || ''
-        }));
-    }
-
-    function download(filename, text){
-      const blob = new Blob([text], {type:'application/json;charset=utf-8'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
-
-    // ===== Worker helpers (/head, /img, /search) =====
-    async function fetchHead(url){
-      const base = (SETTINGS.worker||'').replace(/\/+$/,'');
-      if (!base) return {status:0, parser:'fallback', title:'', image:'', price:null, brand:''};
-      const res = await fetch(base + '/head?url=' + encodeURIComponent(url), {mode:'cors'});
-      let data = {};
-      try { data = await res.json(); } catch(_){}
-      return {
-        status: res.status || 0,
-        parser: 'worker-head',
-        title: data.title || data.ogTitle || '',
-        image: data.image || data.ogImage || '',
-        price: (data.price!=null && isFinite(Number(data.price))) ? Number(data.price) : null,
-        brand: data.brand || ''
-      };
-    }
-    function fallbackFromURL(u){
-      try {
-        const url = new URL(u);
-        const last = url.pathname.split('/').filter(Boolean).pop() || url.hostname;
-        const name = last.replace(/[-_]+/g,' ').slice(0,80);
-        return {title: name, image:'', price:null, brand:''};
-      } catch { return {title:'', image:'', price:null, brand:''}; }
-    }
-    function isShopeeSearchURL(s){
-      try { const u = new URL(s); return u.hostname.includes('shopee') && u.pathname.replace(/\/+$/,'')==='/search'; }
-      catch { return false; }
-    }
-    async function searchShopeeLinks(qOrUrl, pages){
-      const base = (SETTINGS.worker||'').replace(/\/+$/,'');
-      if (!base) throw new Error('Worker chưa cấu hình (Settings → Worker Base).');
-      const results = new Set();
-      if (isShopeeSearchURL(qOrUrl)) {
-        const r = await fetch(`${base}/search?url=${encodeURIComponent(qOrUrl)}`, {mode:'cors'});
-        const j = await r.json(); (j.links||[]).forEach(h=>results.add(h));
-      } else {
-        for (let p=1; p<=pages; p++){
-          const u = `https://shopee.vn/search?keyword=${encodeURIComponent(qOrUrl)}&page=${p-1}`;
-          const r = await fetch(`${base}/search?url=${encodeURIComponent(u)}`, {mode:'cors'});
-          const j = await r.json(); (j.links||[]).forEach(h=>results.add(h));
-          await sleep(200);
-        }
-      }
-      return Array.from(results);
-    }
-
-    // ===== Actions: Import =====
-    q('#btn-parse').onclick = ()=>{
-      const fmt = (qa('input[name="fmt"]').find(x=>x.checked)||{}).value || 'link';
-      const forceM = (qa('input[name="mrc"]').find(x=>x.checked)||{}).value || 'auto';
-      const sub1 = q('#default-sub1').value.trim();
-      const rows = parseInput(q('#txt-input').value, fmt, forceM);
-
-      OUT = rows.map(r=>{
-        const m = r.merchant || guessMerchant(r.origin);
-        const ids = (m==='shopee') ? parseShopeeIDs(r.origin) : null;
-        let sku = slugifyVN(r.name || r.origin);
-        if ((!r.name || r.name.length<2) && ids) sku = `sp${ids.shop}-${ids.item}`;
-        const it = {
-          name: r.name || r.origin, price:r.price||0, origin:r.origin, merchant:m,
-          sku, image:`/assets/img/products/${sku}.webp`, brand:'', category:'', featured:false, sub1, srcImage:''
-        };
-        if (q('#bulk-sub1').checked) it.sub1 = it.sku;
-        it.deeplink = deeplinkOf(it.merchant, it.origin, it.sub1);
-        return it;
+q('#btn-fetch').onclick = async ()=> withBusy('#btn-fetch', async()=>{
+  const fmt = (qa('input[name="fmt"]').find(x=>x.checked)||{}).value || 'link';
+  const forceM = (qa('input[name="mrc"]').find(x=>x.checked)||{}).value || 'auto';
+  const sub1 = q('#default-sub1').value.trim();
+  const rows = parseInput(q('#txt-input').value, fmt, forceM);
+  OUT = [];
+  for (const r of rows){
+    const m = r.merchant || guessMerchant(r.origin);
+    if (!isProductUrl(r.origin)) continue;
+    try {
+      const head = await fetchHead(r.origin);
+      const fb = fallbackFromURL(r.origin);
+      let name = r.name || head.title || fb.title;
+      let price = isFinite(r.price)&&r.price>0 ? r.price : (toNumber(head.price)!=null? Number(head.price):0);
+      const ids = (m==='shopee') ? parseShopeeIDs(r.origin) : null;
+      let sku = slugifyVN(name || r.origin);
+      if ((!name || name.length<2) && ids) sku = `sp${ids.shop}-${ids.item}`;
+      OUT.push({
+        name, price, origin:r.origin, merchant:m, brand: head.brand||'',
+        category:'', sku, image:`/assets/img/products/${sku}.webp`,
+        featured:false, sub1, deeplink: deeplinkTemplate(m, r.origin, q('#bulk-sub1').checked?sku:(sub1||'')),
+        srcImage: head.image || ''
       });
-      OUT = dedupe(OUT);
-      renderOUT(); showTab('output');
-      q('#out-msg').textContent = `Parsed ${OUT.length} rows (valid only).`; setTimeout(()=> q('#out-msg').textContent='', 1600);
-    };
-
-    q('#btn-auto-search').onclick = async ()=>{
-      const kw = (q('#auto-q').value || '').trim();
-      const pages = Number(q('#auto-pages').value)||1;
-      const raw = (q('#txt-input').value || '').trim();
-      const maybeUrl = raw.split(/\r?\n/).map(s=>s.trim()).find(isShopeeSearchURL) || '';
-      q('#auto-status').textContent = 'Đang lấy link…';
-      try {
-        const links = await searchShopeeLinks(maybeUrl || kw, Math.max(1, Math.min(pages,5)));
-        if (!links.length){ q('#auto-status').textContent = 'Không thấy link product.'; return; }
-        const current = q('#txt-input').value.trim();
-        q('#txt-input').value = (current ? (current+'\n') : '') + links.join('\n');
-        (qa('input[name="fmt"]').find(x=>x.value==='link')||{}).checked = true;
-        q('#btn-parse').click();
-        q('#btn-fetch').click();
-        q('#auto-status').textContent = `Đã lấy ${links.length} link.`;
-      } catch(e){
-        q('#auto-status').textContent = 'Lỗi: ' + e.message;
-      }
-    };
-
-    q('#btn-fetch').onclick = async ()=>{
-      const fmt = (qa('input[name="fmt"]').find(x=>x.checked)||{}).value || 'link';
-      const forceM = (qa('input[name="mrc"]').find(x=>x.checked)||{}).value || 'auto';
-      const sub1 = q('#default-sub1').value.trim();
-      const rows = parseInput(q('#txt-input').value, fmt, forceM);
-      OUT = [];
-      for (const r of rows){
-        const m = r.merchant || guessMerchant(r.origin);
-        if (!isProductUrl(r.origin)) continue;
-        try {
-          const head = await fetchHead(r.origin);
-          const fb = fallbackFromURL(r.origin);
-          let name = r.name || head.title || fb.title;
-          let price = isFinite(r.price)&&r.price>0 ? r.price : (toNumber(head.price)!=null? Number(head.price):0);
-          const ids = (m==='shopee') ? parseShopeeIDs(r.origin) : null;
-          let sku = slugifyVN(name || r.origin);
-          if ((!name || name.length<2) && ids) sku = `sp${ids.shop}-${ids.item}`;
-          OUT.push({
-            name, price, origin:r.origin, merchant:m, brand: head.brand||'',
-            category:'', sku, image:`/assets/img/products/${sku}.webp`,
-            featured:false, sub1, deeplink: deeplinkOf(m, r.origin, q('#bulk-sub1').checked?sku:(sub1||'')),
-            srcImage: head.image || ''
-          });
-          logPush({url:r.origin, merchant:m, status: head.status, parser: head.parser, message: name? 'Parsed':'Name empty'});
-        } catch(e){
-          const fb = fallbackFromURL(r.origin);
-          const ids = (m==='shopee') ? parseShopeeIDs(r.origin) : null;
-          let sku = slugifyVN(fb.title || r.origin);
-          if ((!fb.title || fb.title.length<2) && ids) sku = `sp${ids.shop}-${ids.item}`;
-          OUT.push({
-            name: r.name || fb.title, price: isFinite(r.price)?r.price:0, origin:r.origin, merchant:m,
-            brand:'', category:'', sku, image:`/assets/img/products/${sku}.webp`,
-            featured:false, sub1, deeplink: deeplinkOf(m, r.origin, q('#bulk-sub1').checked?sku:(sub1||'')), srcImage:''
-          });
-          logPush({url:r.origin, merchant:m, status:0, parser:'fallback', message:String(e)});
-        }
-      }
-      OUT = dedupe(OUT);
-      renderOUT(); showTab('output');
-      q('#out-msg').textContent = `Done: ${OUT.length} items (may filter more when exporting).`; setTimeout(()=> q('#out-msg').textContent='', 1800);
-
-      if (q('#auto-pipeline').checked){
-        showTab('images');
-        await extractImagesViaHead();
-        await generateZipPreset('store'); // 800x800
-      }
-    };
-
-    // ===== Load/Merge/Export JSON =====
-    q('#btn-load-existing').onclick = async ()=>{
-      try {
-        const res = await fetch('/assets/data/affiliates.json', {cache:'no-store'});
-        const arr = await res.json();
-        EXISTING = Array.isArray(arr) ? arr : [];
-        q('#out-msg').textContent = `Loaded ${EXISTING.length} items.`; setTimeout(()=> q('#out-msg').textContent='', 1600);
-      } catch(e){
-        q('#out-msg').textContent = 'Cannot load /assets/data/affiliates.json.'; setTimeout(()=> q('#out-msg').textContent='', 2000);
-      }
-    };
-    q('#btn-merge').onclick = ()=>{
-      const merged = dedupe([...EXISTING, ...OUT]);
-      OUT = merged.map(x=>{
-        const m = x.merchant || guessMerchant(x.origin);
-        const ids = (m==='shopee') ? parseShopeeIDs(x.origin) : null;
-        let sku = x.sku || slugifyVN(x.name||x.origin);
-        if ((!x.name || x.name.length<2) && ids) sku = `sp${ids.shop}-${ids.item}`;
-        return {
-          name:x.name||'', price:isFinite(x.price)?Number(x.price):0, origin:x.origin||'', merchant:m,
-          sku, image:x.image || `/assets/img/products/${sku}.webp`,
-          brand:x.brand||'', category:x.category||'', featured:!!x.featured, sub1:x.sub1||'',
-          deeplink:x.deeplink||x.origin, srcImage: x.srcImage||''
-        };
+      logPush({url:r.origin, merchant:m, status: head.status, parser: head.parser, message: name? 'Parsed':'Name empty'});
+    } catch(e){
+      const fb = fallbackFromURL(r.origin);
+      const ids = (m==='shopee') ? parseShopeeIDs(r.origin) : null;
+      let sku = slugifyVN(fb.title || r.origin);
+      if ((!fb.title || fb.title.length<2) && ids) sku = `sp${ids.shop}-${ids.item}`;
+      OUT.push({
+        name: r.name || fb.title, price: isFinite(r.price)?r.price:0, origin:r.origin, merchant:m,
+        brand:'', category:'', sku, image:`/assets/img/products/${sku}.webp`,
+        featured:false, sub1, deeplink: deeplinkTemplate(m, r.origin, q('#bulk-sub1').checked?sku:(sub1||'')), srcImage:''
       });
-      renderOUT(); showTab('output');
-      q('#out-msg').textContent = `Merged & deduped: ${OUT.length} items.`; setTimeout(()=> q('#out-msg').textContent='', 1600);
-    };
-    q('#btn-copy-json').onclick = ()=>{
-      const txt = JSON.stringify(toAffJSON(OUT), null, 2);
-      navigator.clipboard.writeText(txt).then(()=>{ q('#out-msg').textContent = 'Copied JSON.'; setTimeout(()=> q('#out-msg').textContent='', 1200); });
-    };
-    q('#btn-download-json').onclick = ()=>{
-      const txt = JSON.stringify(toAffJSON(OUT), null, 2);
-      download('affiliates.json', txt);
-    };
-
-    // ===== Snippets =====
-    function buildSnippetFor(it, useDeep){
-      const buyHref = useDeep ? (it.deeplink||it.origin) : it.origin;
-      const label = it.merchant==='shopee'?'Shopee':it.merchant==='lazada'?'Lazada':it.merchant==='tiki'?'Tiki':'Buy';
-      return [
-        `<a class="product-meta" href="${it.origin}" data-merchant="${it.merchant}" data-sku="${it.sku}" data-img="/assets/img/products/${it.sku}.webp" data-price="${isFinite(it.price)?it.price:0}">${it.name}</a>`,
-        `<a class="buy" href="${buyHref}" data-merchant="${it.merchant}">Mua ${label}</a>`
-      ].join('\n');
+      logPush({url:r.origin, merchant:m, status:0, parser:'fallback', message:String(e)});
     }
-    q('#btn-build-snippets').onclick = ()=>{
-      const useDeep = q('#snip-deep').checked || SETTINGS.override;
-      q('#snippets').value = OUT.filter(isRenderable).map(it=> buildSnippetFor(it, useDeep)).join('\n\n');
-    };
-    q('#btn-copy-snippets').onclick = ()=> navigator.clipboard.writeText(q('#snippets').value||'');
+  }
+  OUT = dedupe(OUT); renderOUT(); showTab('output');
+  // Quick outputs
+  refreshQuickOutputs(); showTab('import'); go('quick-outputs');
+  q('#out-msg').textContent = `Done: ${OUT.length} items.`; setTimeout(()=> q('#out-msg').textContent='', 1800);
+  if (q('#auto-pipeline').checked){ showTab('images'); await extractImagesViaHead(); await generateZipPreset('store'); }
+  updateAffiliatePreview();
+});
 
-    // ===== Images =====
-    function presetInfo(key){
-      if (key==='store')  return {w:800,  h:800,  path:(sku)=>`assets/img/products/${sku}.webp`};
-      if (key==='home')   return {w:1200, h:800,  path:(sku)=>`assets/img/hero/${sku}-hero.webp`};
-      if (key==='banner') return {w:1600, h:500,  path:(sku)=>`assets/img/banners/${sku}-banner.webp`};
-      if (key==='blog')   return {w:1200, h:630,  path:(sku)=>`assets/img/tin-tuc/${sku}-og.webp`};
-      if (key==='thumb')  return {w:400,  h:400,  path:(sku)=>`assets/img/products/${sku}-thumb.webp`};
-      return {w:800, h:800, path:(sku)=>`assets/img/products/${sku}.webp`};
-    }
-    async function fetchImageBlobBypass(url){
-      const base = (SETTINGS.worker||'').replace(/\/+$/,'');
-      const src = base ? `${base}/img?url=${encodeURIComponent(url)}` : url;
-      const res = await fetch(src, {mode: base ? 'cors' : 'no-cors'});
-      return await res.blob();
-    }
-    async function resizeToWebp(blob, w, h, fit='cover', quality=0.86){
-      const imgBitmap = await createImageBitmap(blob);
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h);
-      const iw = imgBitmap.width, ih = imgBitmap.height;
-      const r = Math[fit==='cover'?'max':'min'](w/iw, h/ih);
-      const nw = iw*r, nh = ih*r;
-      const dx = (w - nw)/2, dy = (h - nh)/2;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(imgBitmap, dx, dy, nw, nh);
-      return await new Promise(res=> canvas.toBlob(res, 'image/webp', Math.min(Math.max(quality,0.6),0.95)));
-    }
-    async function extractImagesViaHead(){
-      let ok=0;
-      for (const it of OUT){
-        try {
-          const head = await fetchHead(it.origin);
-          if (head.image){ it.srcImage = head.image; ok++; }
-        } catch(_){}
-      }
-      q('#images-list').value = OUT.map(it=> `${it.sku} ← ${it.srcImage||'(no image)'}`).join('\n');
-      q('#img-msg').textContent = `Got images for ${ok}/${OUT.length}.`;
-    }
-    q('#btn-img-from-head').onclick = extractImagesViaHead;
-    q('#btn-img-from-out').onclick = ()=>{
-      q('#images-list').value = OUT.map(it=> `${it.sku} ← ${it.srcImage||'(no image)'}`).join('\n');
-      q('#img-msg').textContent = `Listed current srcImage.`;
-    };
-    async function generateZipPreset(presetKey){
-      const preset = presetInfo(presetKey || q('#img-preset').value);
-      const fit = q('#img-fit').checked ? 'cover' : 'contain';
-      const quality = Number(q('#img-q').value)||0.86;
-      const zip = new JSZip();
-      let cnt = 0;
-      for (const it of OUT.filter(isRenderable)){
-        if (!it.srcImage) continue;
-        try {
-          const blob = await fetchImageBlobBypass(it.srcImage);
-          const webp = await resizeToWebp(blob, preset.w, preset.h, fit, quality);
-          const path = preset.path(it.sku);
-          zip.file(path, webp);
-          cnt++;
-        } catch(_){}
-      }
-      if (cnt===0){ q('#img-msg').textContent = 'No srcImage yet. Extract first.'; return; }
-      const content = await zip.generateAsync({type:'blob'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(content);
-      a.download = `mxd-images-${presetKey||q('#img-preset').value}-${Date.now()}.zip`;
-      a.click(); URL.revokeObjectURL(a.href);
-      q('#img-msg').textContent = `ZIP ready (${cnt} images).`;
-    }
-    q('#btn-make-images').onclick = ()=> generateZipPreset();
+// ===== Load/Merge/Export JSON =====
+q('#btn-load-existing').onclick = async ()=> withBusy('#btn-load-existing', async()=>{
+  try { const res = await fetch('/assets/data/affiliates.json', {cache:'no-store'}); const arr = await res.json(); EXISTING = Array.isArray(arr) ? arr : []; q('#out-msg').textContent = `Loaded ${EXISTING.length} items.`; }
+  catch(e){ q('#out-msg').textContent = 'Cannot load /assets/data/affiliates.json.'; }
+});
+q('#btn-merge').onclick = ()=>{
+  const merged = dedupe([...EXISTING, ...OUT]);
+  OUT = merged.map(x=>{
+    const m = x.merchant || guessMerchant(x.origin);
+    const ids = (m==='shopee') ? parseShopeeIDs(x.origin) : null;
+    let sku = x.sku || slugifyVN(x.name||x.origin);
+    if ((!x.name || x.name.length<2) && ids) sku = `sp${ids.shop}-${ids.item}`;
+    return { name:x.name||'', price:isFinite(x.price)?Number(x.price):0, origin:x.origin||'', merchant:m,
+      sku, image:x.image || `/assets/img/products/${sku}.webp`, brand:x.brand||'', category:x.category||'',
+      featured:!!x.featured, sub1:x.sub1||'', deeplink:x.deeplink||x.origin, srcImage: x.srcImage||'' };
+  });
+  renderOUT(); showTab('output'); q('#out-msg').textContent = `Merged & deduped: ${OUT.length} items.`;
+};
+q('#btn-copy-json').onclick = ()=>{ const txt = JSON.stringify(toAffJSON(OUT), null, 2); navigator.clipboard.writeText(txt).then(()=>{ q('#out-msg').textContent = 'Copied JSON.'; setTimeout(()=> q('#out-msg').textContent='', 1200); }); };
+q('#btn-download-json').onclick = ()=>{ const txt = JSON.stringify(toAffJSON(OUT), null, 2); download('affiliates.json', txt); };
+q('#btn-copy-json-link').onclick = ()=> navigator.clipboard.writeText(q('#json-link').value||'');
+q('#btn-open-json-link').onclick = ()=> window.open(q('#json-link').value||'/assets/data/affiliates.json','_blank');
 
-    // ===== SKU Validator =====
-    function validateSKUList(items){
-      const issues = [];
-      const seen = new Set();
-      for (const it of items){
-        const raw = (it.sku||'').trim();
-        const norm = slugifyVN(raw);
-        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(raw)) issues.push(`Invalid chars: ${raw} → suggest ${norm}`);
-        if (seen.has(raw)) issues.push(`Duplicate SKU: ${raw}`);
-        seen.add(raw);
-      }
-      return issues;
-    }
-    q('#btn-validate-sku').onclick = ()=>{
-      const issues = validateSKUList(OUT.filter(isRenderable));
-      q('#sku-report').value = issues.length? issues.join('\n') : 'All SKUs look good.';
-    };
-    q('#btn-normalize-sku').onclick = ()=>{
-      OUT.forEach(it=> it.sku = slugifyVN(it.sku || it.name || it.origin));
-      OUT = dedupe(OUT); renderOUT();
-      q('#sku-report').value = 'Normalized SKUs to lowercase-kebab-case.';
-    };
+// ===== Snippets =====
+function buildSnippetFor(it, useDeep){
+  const buyHref = useDeep ? (it.deeplink||it.origin) : it.origin;
+  const label = it.merchant==='shopee'?'Shopee':it.merchant==='lazada'?'Lazada':it.merchant==='tiki'?'Tiki':'Buy';
+  return [
+    `<a class="product-meta" href="${it.origin}" data-merchant="${it.merchant}" data-sku="${it.sku}" data-img="/assets/img/products/${it.sku}.webp" data-price="${isFinite(it.price)?it.price:0}">${it.name}</a>`,
+    `<a class="buy" href="${buyHref}" data-merchant="${it.merchant}">Mua ${label}</a>`
+  ].join('\\n');
+}
+q('#btn-build-snippets').onclick = ()=>{ const useDeep = q('#snip-deep').checked || SETTINGS.override; q('#snippets').value = OUT.filter(isRenderable).map(it=> buildSnippetFor(it, useDeep)).join('\\n\\n'); };
+q('#btn-copy-snippets').onclick = ()=> navigator.clipboard.writeText(q('#snippets').value||'');
 
-    // ===== Commit message generator =====
-    q('#btn-commit').onclick = ()=>{
-      const mapOld = new Map((EXISTING||[]).map(x=> [ (x.origin||'')+'#'+(x.sku||''), x ]));
-      const mapNew = new Map(OUT.filter(isRenderable).map(x=> [ (x.origin||'')+'#'+(x.sku||''), x ]));
-      const added = []; const updated = [];
-      for (const [k,v] of mapNew){
-        if (!mapOld.has(k)) added.push(v);
-        else {
-          const o = mapOld.get(k);
-          if ((o.name||'')!== (v.name||'') || Number(o.price||0)!==Number(v.price||0)) updated.push(v);
-        }
-      }
-      const headAdd = added.slice(0,5).map(x=>x.sku).join(', ');
-      const headUpd = updated.slice(0,5).map(x=>x.sku).join(', ');
-      const parts = [];
-      if (added.length) parts.push(`feat(data): add ${added.length} products [${headAdd}]`);
-      if (updated.length) parts.push(`fix(data): update ${updated.length} products [${headUpd}]`);
-      const msg = parts.length? parts.join('\n') : 'chore(data): minor touch (no valid changes detected)';
-      q('#commit-msg').value = msg;
-    };
-    q('#btn-copy-commit').onclick = ()=> navigator.clipboard.writeText(q('#commit-msg').value||'');
+// ===== Images =====
+function presetInfo(key){
+  if (key==='store')  return {w:800,  h:800,  path:(sku)=>`assets/img/products/${sku}.webp`};
+  if (key==='home')   return {w:1200, h:800,  path:(sku)=>`assets/img/hero/${sku}-hero.webp`};
+  if (key==='banner') return {w:1600, h:500,  path:(sku)=>`assets/img/banners/${sku}-banner.webp`};
+  if (key==='blog')   return {w:1200, h:630,  path:(sku)=>`assets/img/tin-tuc/${sku}-og.webp`};
+  if (key==='thumb')  return {w:400,  h:400,  path:(sku)=>`assets/img/products/${sku}-thumb.webp`};
+  return {w:800, h:800, path:(sku)=>`assets/img/products/${sku}.webp`};
+}
+async function fetchImageBlobBypass(url){
+  const base = (SETTINGS.worker||'').replace(/\\/+$/,'');
+  const src = base ? `${base}/img?url=${encodeURIComponent(url)}` : url;
+  const res = await fetch(src, {mode: base ? 'cors' : 'no-cors'});
+  return await res.blob();
+}
+async function resizeToWebp(blob, w, h, fit='cover', quality=0.86){
+  const imgBitmap = await createImageBitmap(blob);
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h);
+  const iw = imgBitmap.width, ih = imgBitmap.height;
+  const r = Math[fit==='cover'?'max':'min'](w/iw, h/ih);
+  const nw = iw*r, nh = ih*r;
+  const dx = (w - nw)/2, dy = (h - nh)/2;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(imgBitmap, dx, dy, nw, nh);
+  return await new Promise(res=> canvas.toBlob(res, 'image/webp', Math.min(Math.max(quality,0.6),0.95)));
+}
+async function extractImagesViaHead(){
+  let ok=0;
+  for (const it of OUT){ try { const head = await fetchHead(it.origin); if (head.image){ it.srcImage = head.image; ok++; } } catch(_){} }
+  q('#images-list').value = OUT.map(it=> `${it.sku} ← ${it.srcImage||'(no image)'}`).join('\\n');
+  q('#img-msg').textContent = `Got images for ${ok}/${OUT.length}.`;
+}
+q('#btn-img-from-head').onclick = ()=> withBusy('#btn-img-from-head', extractImagesViaHead);
+q('#btn-img-from-out').onclick = ()=>{ q('#images-list').value = OUT.map(it=> `${it.sku} ← ${it.srcImage||'(no image)'}`).join('\\n'); q('#img-msg').textContent = `Listed current srcImage.`; };
+async function generateZipPreset(presetKey){
+  const preset = presetInfo(presetKey || q('#img-preset').value);
+  const fit = q('#img-fit').checked ? 'cover' : 'contain';
+  const quality = Number(q('#img-q').value)||0.86;
+  const zip = new JSZip(); let cnt = 0;
+  for (const it of OUT.filter(isRenderable)){
+    if (!it.srcImage) continue;
+    try { const blob = await fetchImageBlobBypass(it.srcImage); const webp = await resizeToWebp(blob, preset.w, preset.h, fit, quality); const path = preset.path(it.sku); zip.file(path, webp); cnt++; }
+    catch(_){}
+  }
+  if (cnt===0){ q('#img-msg').textContent = 'No srcImage yet. Extract first.'; return; }
+  const content = await zip.generateAsync({type:'blob'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(content);
+  a.download = `mxd-images-${presetKey||q('#img-preset').value}-${Date.now()}.zip`; a.click(); URL.revokeObjectURL(a.href);
+  q('#img-msg').textContent = `ZIP ready (${cnt} images).`;
+}
+q('#btn-make-images').onclick = ()=> withBusy('#btn-make-images', ()=>generateZipPreset());
 
-    // ===== Health-check (scan affiliates.json) =====
-    async function hcHead(url){
-      const base = (SETTINGS.worker||'').replace(/\/+$/,'');
-      if (!base) return {status:0, location:''};
-      const res = await fetch(base + '/head?url=' + encodeURIComponent(url), {mode:'cors'});
-      let data={};
-      try{ data = await res.json(); }catch(_){}
-      return {status: res.status||0, location: data.location||''};
-    }
-    q('#btn-hc-scan').onclick = async ()=>{
-      showTab('health');
-      const throttle = Number(q('#hc-throttle').value)||120;
-      let list = [];
-      try {
-        const r = await fetch('/assets/data/affiliates.json', {cache:'no-store'});
-        list = await r.json();
-      } catch(e){
-        q('#hc-report').value = 'Cannot load affiliates.json.'; return;
-      }
-      list = list.filter(x=> isProductUrl(x.origin));
-      const report = [];
-      const prune = [];
-      let ok=0, redir=0, nf=0, err=0;
-      for (const it of list){
-        const {status, location} = await hcHead(it.origin);
-        if (status>=200 && status<300){ ok++; }
-        else if (status>=300 && status<400){ redir++; report.push(`REDIRECT ${status} ${it.sku} → ${location||'?'}`); }
-        else if (status===404){ nf++; report.push(`NOT FOUND 404 ${it.sku} ${it.origin}`); prune.push({origin:it.origin, sku:it.sku}); }
-        else { err++; report.push(`ERROR ${status} ${it.sku} ${it.origin}`); }
-        await sleep(throttle);
-      }
-      report.unshift(`SUMMARY: OK=${ok} Redirect=${redir} NotFound=${nf} Error=${err}`);
-      q('#hc-report').value = report.join('\n');
-      q('#btn-hc-download').onclick = ()=> download('affiliates.prune.json', JSON.stringify(prune, null, 2));
-    };
-    q('#btn-hc-copy').onclick = ()=> navigator.clipboard.writeText(q('#hc-report').value||'');
+// ===== SKU tools / Commit =====
+function validateSKUList(items){
+  const issues = []; const seen = new Set();
+  for (const it of items){
+    const raw = (it.sku||'').trim(); const norm = slugifyVN(raw);
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(raw)) issues.push(`Invalid chars: ${raw} → suggest ${norm}`);
+    if (seen.has(raw)) issues.push(`Duplicate SKU: ${raw}`); seen.add(raw);
+  } return issues;
+}
+q('#btn-validate-sku').onclick = ()=>{ const issues = validateSKUList(OUT.filter(isRenderable)); q('#sku-report').value = issues.length? issues.join('\\n') : 'All SKUs look good.'; };
+q('#btn-normalize-sku').onclick = ()=>{ OUT.forEach(it=> it.sku = slugifyVN(it.sku || it.name || it.origin)); OUT = dedupe(OUT); renderOUT(); q('#sku-report').value = 'Normalized SKUs.'; };
+q('#btn-commit').onclick = ()=>{
+  const mapOld = new Map((EXISTING||[]).map(x=> [ (x.origin||'')+'#'+(x.sku||''), x ]));
+  const mapNew = new Map(OUT.filter(isRenderable).map(x=> [ (x.origin||'')+'#'+(x.sku||''), x ]));
+  const added = []; const updated = [];
+  for (const [k,v] of mapNew){ if (!mapOld.has(k)) added.push(v); else { const o = mapOld.get(k); if ((o.name||'')!== (v.name||'') || Number(o.price||0)!==Number(v.price||0)) updated.push(v); } }
+  const headAdd = added.slice(0,5).map(x=>x.sku).join(', ');
+  const headUpd = updated.slice(0,5).map(x=>x.sku).join(', ');
+  const parts = []; if (added.length) parts.push(`feat(data): add ${added.length} products [${headAdd}]`); if (updated.length) parts.push(`fix(data): update ${updated.length} products [${headUpd}]`);
+  const msg = parts.length? parts.join('\\n') : 'chore(data): minor touch (no valid changes detected)';
+  q('#commit-msg').value = msg;
+};
+q('#btn-copy-commit').onclick = ()=> navigator.clipboard.writeText(q('#commit-msg').value||'');
+q('#btn-goto-import').onclick = ()=> showTab('import');
 
-    // ===== Log / Settings buttons / JSON link preview =====
-    q('#btn-clear-log').onclick = ()=>{ LOGS=[]; q('#log-table tbody').innerHTML=''; };
-    q('#btn-save-settings').onclick = saveSettings;
-    q('#btn-test-head').onclick = async ()=>{
-      const demo = 'https://shopee.vn/product/166287331/22741831588';
-      const r = await fetchHead(demo);
-      q('#settings-msg').textContent = `HEAD ${r.status} — parser: ${r.parser}`; setTimeout(()=> q('#settings-msg').textContent='', 1500);
-    };
+// ===== Health-check =====
+async function hcCheckItem(it){
+  const base = (SETTINGS.worker||'').replace(/\\/+$/,'');
+  let h1 = {status:0}; let h2 = {status:0};
+  try { h1 = await fetchHead(it.origin); } catch(_){ }
+  const deep = (it.deeplink && it.deeplink!==it.origin) ? it.deeplink : '';
+  if (base && deep){ try { const r2 = await fetch(`${base}/head?url=${encodeURIComponent(deep)}`, {mode:'cors'}); h2.status = r2.status||0; } catch(_){ } }
+  const ok = (h1.status>=200 && h1.status<400); return { ok, originStatus:h1.status||0, deepStatus:h2.status||0 };
+}
+async function runHealthScan(items, throttleMs){
+  const kept = []; const removed = []; const lines = []; let i=0;
+  for (const it of items){ i++; const r = await hcCheckItem(it);
+    const tag = r.ok? 'OK ' : 'ERR'; lines.push(`[${tag}] #${i} ${it.sku} • origin=${r.originStatus} • deep=${r.deepStatus} — ${it.origin}`);
+    if (r.ok) kept.push(it); else removed.push(it); await sleep(throttleMs);
+  } return { kept, removed, report: lines.join('\\n') };
+}
+q('#btn-hc-scan').onclick = async ()=> withBusy('#btn-hc-scan', async()=>{
+  const throttle = Math.max(50, Number(q('#hc-throttle').value)||120);
+  let items = []; if (OUT && OUT.length) items = toAffJSON(OUT); else { try { const r = await fetch('/assets/data/affiliates.json', {cache:'no-store'}); items = await r.json(); } catch{ items = []; } }
+  if (!Array.isArray(items) || !items.length){ q('#hc-report').value = 'Không tìm thấy dữ liệu để quét.'; return; }
+  q('#hc-report').value = `Đang quét ${items.length} items…`; HC_LAST = await runHealthScan(items, throttle);
+  const summary = `Kept: ${HC_LAST.kept.length} • Removed: ${HC_LAST.removed.length}`; q('#hc-report').value = summary + '\\n' + HC_LAST.report; go('tab-health');
+});
+q('#btn-hc-copy').onclick = ()=> navigator.clipboard.writeText(q('#hc-report').value||'');
+q('#btn-hc-download').onclick = ()=>{ const txt = JSON.stringify(HC_LAST.kept||[], null, 2); download('affiliates.prune.json', txt); };
 
-    // JSON link: copy/open
-    q('#btn-copy-json-link').onclick = ()=> navigator.clipboard.writeText(q('#json-link').value||'');
-    q('#btn-open-json-link').onclick  = ()=> window.open(q('#json-link').value||'/assets/data/affiliates.json','_blank');
+// ===== Log helpers =====
+q('#btn-clear-log').onclick = ()=>{ LOGS = []; q('#log-table tbody').innerHTML = ''; };
 
-    // ===== Single Affiliate preview wiring =====
-    function computeSingleAff(){
-      const u = q('#single-origin').value.trim();
-      if (!u){ q('#single-aff').value=''; q('#single-status').textContent=''; return; }
-      const mForce = (qa('input[name="mrc"]').find(x=>x.checked)||{}).value || 'auto';
-      const m = mForce==='auto' ? guessMerchant(u) : mForce;
-      const sub1 = q('#bulk-sub1').checked ? slugifyVN(u) : (q('#default-sub1').value.trim() || '');
-      const deep = deeplinkOf(m, u, sub1);
-      q('#single-aff').value = deep;
-      q('#single-status').textContent = m ? `merchant=${m}` : '';
-    }
-    q('#single-origin').addEventListener('input', computeSingleAff);
-    q('#single-copy').onclick = ()=> navigator.clipboard.writeText(q('#single-aff').value||'');
-    q('#single-open').onclick = ()=> { const v=q('#single-aff').value||''; if(v) window.open(v,'_blank'); };
-    q('#single-qr').onclick   = ()=> { const v=q('#single-aff').value||q('#single-origin').value||''; if(v) window.open(`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(v)}`,'_blank'); };
+// ===== Settings actions =====
+q('#btn-save-settings').onclick = ()=> withBusy('#btn-save-settings', saveSettings);
+q('#btn-test-head').onclick = async ()=> withBusy('#btn-test-head', async()=>{
+  const sample = q('#aff-origin').value.trim() || firstLinkInText(q('#txt-input').value) || 'https://shopee.vn/product/1/1';
+  const r = await fetchHead(sample);
+  q('#settings-msg').textContent = `/head → status ${r.status} • title="${(r.title||'').slice(0,40)}"`; setTimeout(()=> q('#settings-msg').textContent='', 2400);
+});
 
-    // ===== Init =====
-    mountSettings();
-  </script>
+// ===== Quick Outputs =====
+function refreshQuickOutputs(){
+  const items = toAffJSON(OUT);
+  q('#qo-json').value = JSON.stringify(items.slice(0,10), null, 2) + (items.length>10?`\\n/* …and ${items.length-10} more */`:'');
+  const useDeep = q('#qo-use-deep').checked;
+  q('#qo-html').value = items.map(it=> {
+    const buy = useDeep ? (it.deeplink||it.origin) : it.origin;
+    return `<div class="card product"><img src="${it.image}" alt="${it.name}"><h3>${it.name}</h3><p class="price">${it.price.toLocaleString('vi-VN')}</p><p><a class="buy" href="${buy}" data-merchant="${it.merchant}">Mua</a></p></div>`;
+  }).join('\\n');
+  q('#qo-images').value = items.map(it=> it.image).join('\\n');
+  q('#qo-status').textContent = `Items: ${items.length}`;
+}
+q('#qo-refresh').onclick = ()=> withBusy('#qo-refresh', ()=>{ refreshQuickOutputs(); go('quick-outputs'); });
+q('#qo-copy-json').onclick = ()=> navigator.clipboard.writeText(q('#qo-json').value||'');
+q('#qo-copy-html').onclick = ()=> navigator.clipboard.writeText(q('#qo-html').value||'');
+q('#qo-copy-images').onclick = ()=> navigator.clipboard.writeText(q('#qo-images').value||'');
+q('#qo-use-deep').onchange = refreshQuickOutputs;
 
-  <!-- ===== MXD Importer — PRO Add-on (Layout + Badges + SEO) ===== -->
-  <style>
-    :root { --mxd-accent:#0ea5e9; --mxd-font: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
-    #pro-panel{font-family:var(--mxd-font);border:1px solid #2223; border-radius:14px; padding:16px; margin:24px 0; background:#fff; box-shadow:0 6px 18px #00000012}
-    #pro-panel h3{margin:0 0 12px; font-size:18px}
-    #pro-grid{display:grid; gap:12px; grid-template-columns:repeat(2,minmax(0,1fr))}
-    #pro-grid label{font-size:13px; color:#333}
-    #pro-grid input[type="text"], #pro-grid input[type="color"], #pro-grid select, #pro-grid textarea{
-      width:100%; padding:10px 12px; border:1px solid #d0d3d6; border-radius:10px; font-family:inherit; font-size:14px; background:#fafafa
-    }
-    #pro-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
-    #pro-actions button{padding:10px 14px; border-radius:10px; border:1px solid #d0d3d6; background:#fff; cursor:pointer}
-    #pro-actions button.primary{background:var(--mxd-accent); color:#fff; border-color:transparent}
-    #pro-preview{margin-top:16px}
-    .card{position:relative; border:1px solid #e5e7eb; border-radius:16px; overflow:hidden; display:flex; flex-direction:column}
-    .card .img{aspect-ratio:1/1; background:#f3f4f6; display:flex; align-items:center; justify-content:center; font-size:12px; color:#777}
-    .card .img img{width:100%; height:100%; object-fit:cover}
-    .card .body{padding:12px}
-    .price{font-weight:700; margin-top:6px}
-    .buy{display:inline-flex; align-items:center; gap:6px; text-decoration:none; border:1px solid var(--mxd-accent); color:var(--mxd-accent); padding:8px 10px; border-radius:10px; font-size:13px}
-    .buy.primary{background:var(--mxd-accent); color:#fff; border-color:transparent}
-    .layout-classic .body{display:flex; flex-direction:column; gap:8px}
-    .layout-media .card{flex-direction:row}
-    .layout-media .img{width:42%; min-width:42%}
-    .layout-banner .img{aspect-ratio:16/9}
-    .layout-minimal .card{border-radius:12px}
-    .layout-minimal .body{padding:10px}
-    .badges{position:absolute; top:10px; left:10px; display:flex; gap:6px; flex-wrap:wrap}
-    .badge{font-size:11px; font-weight:700; padding:6px 8px; border-radius:999px; color:#fff}
-    .badge.new{background:#10b981}
-    .badge.hot{background:#ef4444}
-    .badge.sale{background:#f59e0b}
-    .muted{color:#6b7280; font-size:13px}
-  </style>
+// ===== Affiliate field reactions =====
+q('#aff-origin').addEventListener('input', ()=> updateAffiliatePreview());
+q('#default-sub1').addEventListener('input', ()=> updateAffiliatePreview());
 
-  <section id="pro-panel">
-    <h3>⚙️ MXD PRO Add-on — Layout · Badges · SEO</h3>
-    <div id="pro-grid">
-      <div>
-        <label>Layout sản phẩm</label>
-        <select id="pro-layout">
-          <option value="layout-classic">Card Classic</option>
-          <option value="layout-media">Media Left</option>
-          <option value="layout-banner">Banner Horizontal</option>
-          <option value="layout-minimal">Minimal</option>
-        </select>
-      </div>
-      <div>
-        <label>Màu chủ đạo</label>
-        <input id="pro-accent" type="color" value="#0ea5e9">
-      </div>
-      <div>
-        <label>Font</label>
-        <select id="pro-font">
-          <option value='Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial'>Inter / System</option>
-          <option value='"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'>Segoe UI</option>
-          <option value='Roboto, "Helvetica Neue", Arial, sans-serif'>Roboto</option>
-          <option value='system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial'>System UI</option>
-        </select>
-      </div>
-      <div>
-        <label>Badges</label>
-        <div style="display:flex; gap:10px; align-items:center">
-          <label><input type="checkbox" id="badge-new"> Mới</label>
-          <label><input type="checkbox" id="badge-hot"> Hot</label>
-          <label><input type="checkbox" id="badge-sale"> Sale</label>
-          <button id="badge-auto" type="button">Auto</button>
-        </div>
-      </div>
-      <div style="grid-column:1/-1">
-        <label>Mô tả SEO (tự sinh / chỉnh tay)</label>
-        <textarea id="pro-desc" rows="3" placeholder="Ví dụ: Máy mài Bosch 900W điều tốc, phù hợp cắt mài gạch/kim loại, bảo hành 12 tháng..."></textarea>
-        <div id="pro-actions">
-          <button class="primary" id="btn-desc-generate" type="button">Sinh mô tả (Rule-based)</button>
-          <button id="btn-desc-ai" type="button" title="Tuỳ chọn: nếu có endpoint nội bộ">Sinh bằng AI (nếu có)</button>
-          <button id="btn-apply" class="primary" type="button">Áp vào sản phẩm đang chọn</button>
-          <button id="btn-export-extend" type="button">Export JSON (kèm layout/badges/seo)</button>
-        </div>
-        <div class="muted">Export sẽ thêm <code>layout</code>, <code>style</code>, <code>badges</code>, <code>seo</code> vào object sản phẩm.</div>
-      </div>
-    </div>
-    <div id="pro-preview"></div>
-  </section>
-
-  <script>
-  (function(){
-    const $ = (s, p=document)=>p.querySelector(s);
-    const EL = {
-      layout: $('#pro-layout'),
-      accent: $('#pro-accent'),
-      font:   $('#pro-font'),
-      bNew:   $('#badge-new'),
-      bHot:   $('#badge-hot'),
-      bSale:  $('#badge-sale'),
-      bAuto:  $('#badge-auto'),
-      desc:   $('#pro-desc'),
-      gen:    $('#btn-desc-generate'),
-      genAI:  $('#btn-desc-ai'),
-      apply:  $('#btn-apply'),
-      export: $('#btn-export-extend'),
-      preview: $('#pro-preview'),
-    };
-    function getSelectedProduct(){
-      if (window.MXD && MXD.currentProduct) return MXD.currentProduct;
-      if (window.currentProduct) return window.currentProduct;
-      return {
-        name:'Máy mài góc 125mm điều tốc Bosch GWS 900-125 S', price:1790000,
-        origin:'https://shopee.vn/search?keyword=Bosch%20GWS%20900-125%20S', merchant:'shopee',
-        sku:'bosch-gws-900-125s', image:'/assets/img/products/bosch-gws-900-125s.webp',
-        category:'may-mai', brand:'Bosch', updated_at:new Date().toISOString(),
-        sub1:'bosch-gws-900-125s', notes:'điều tốc, 900W'
-      };
-    }
-    function priceFmt(v){ return (typeof v==='number') ? (v.toLocaleString('vi-VN')+'đ') : (v||''); }
-    function autoBadges(p){
-      const badges = new Set();
-      try{
-        const now = new Date(); const up = p.updated_at ? new Date(p.updated_at) : now;
-        const days = Math.round((now - up)/86400000);
-        if (days<=7) badges.add('new');
-        if (p.price_compare && Number(p.price_compare) > Number(p.price)) badges.add('sale');
-        const txt = (p.notes||p.name||'').toLowerCase();
-        if (/\bgiảm|\bsale|\b%-|%/.test(txt)) badges.add('sale');
-        if (/(bosch|makita|dekton|kynko|stanley)/i.test(p.brand||'')) badges.add('hot');
-      }catch(e){}
-      return [...badges];
-    }
-    function genSEO(p){
-      const brand = p.brand || '';
-      const cat = (p.category||'').replace(/-/g,' ');
-      const watts = (p.notes||'').match(/\b(\d{3,4})w\b/i)?.[1];
-      const features = [
-        brand? `Thương hiệu: ${brand}`:null,
-        p.category? `Nhóm: ${cat}`:null,
-        p.price? `Giá tham khảo: ${priceFmt(p.price)}`:null,
-        p.notes? `Ghi chú: ${p.notes}`:null
-      ].filter(Boolean).join(' · ');
-      const line1 = `${p.name} – lựa chọn phù hợp cho thợ và xưởng.`;
-      const line2 = features ? features : '';
-      const line3 = `Mua nhanh qua link chính hãng, nhận ưu đãi theo chương trình.`;
-      return `${line1} ${line2} ${line3}`.trim();
-    }
-    async function genSEO_AI(p){ return genSEO(p); }
-    function applyTheme(){ document.documentElement.style.setProperty('--mxd-accent', EL.accent.value); document.documentElement.style.setProperty('--mxd-font', EL.font.value); }
-    function badgeNodes(arr){ return `<div class="badges">${(arr||[]).map(b=>`<span class="badge ${b}">${b.toUpperCase()}</span>`).join('')}</div>`; }
-    function preview(p){
-      applyTheme();
-      const layout = EL.layout.value;
-      const badges = [EL.bNew.checked?'new':null, EL.bHot.checked?'hot':null, EL.bSale.checked?'sale':null].filter(Boolean);
-      const img = p.image || '/assets/img/products/placeholder.webp';
-      const name = p.name || p.sku || 'Sản phẩm';
-      const price = p.price? priceFmt(p.price) : '';
-      EL.preview.innerHTML = `
-        <div class="${layout}">
-          <div class="card">
-            ${badgeNodes(badges)}
-            <div class="img"><img src="${img}" alt="${name}" onerror="this.replaceWith(document.createTextNode('No image'))"></div>
-            <div class="body">
-              <div class="title"><strong>${name}</strong></div>
-              ${price? `<div class="price">${price}</div>`:``}
-              <div style="display:flex; gap:8px; margin-top:8px">
-                <a class="buy primary" href="${p.origin||'#'}" target="_blank" rel="noopener">Mua nhanh</a>
-                <a class="buy" href="#" onclick="return false">Sao chép link</a>
-              </div>
-            </div>
-          </div>
-        </div>`;
-    }
-    function extendProduct(p){
-      const badges = []; if (EL.bNew.checked) badges.push('new'); if (EL.bHot.checked) badges.push('hot'); if (EL.bSale.checked) badges.push('sale');
-      const seoDesc = (EL.desc.value||'').trim() || genSEO(p);
-      return Object.assign({}, p, {
-        layout: EL.layout.value.replace(/^layout-/, ''),
-        style: { accent: EL.accent.value, font: EL.font.value },
-        badges,
-        seo: { description: seoDesc, title: p.name, keywords: [p.sku, p.brand, p.category].filter(Boolean) }
-      });
-    }
-    function syncUIFrom(p){
-      const auto = autoBadges(p);
-      EL.bNew.checked = auto.includes('new');
-      EL.bHot.checked = auto.includes('hot');
-      EL.bSale.checked = auto.includes('sale');
-      EL.desc.value = genSEO(p);
-      preview(p);
-    }
-    const initProduct = getSelectedProduct(); syncUIFrom(initProduct);
-    EL.bAuto.addEventListener('click', ()=>{ const a = autoBadges(getSelectedProduct()); EL.bNew.checked=a.includes('new'); EL.bHot.checked=a.includes('hot'); EL.bSale.checked=a.includes('sale'); preview(getSelectedProduct()); });
-    [EL.layout, EL.accent, EL.font, EL.bNew, EL.bHot, EL.bSale].forEach(x=>x.addEventListener('input', ()=>preview(getSelectedProduct())));
-    EL.gen.addEventListener('click', ()=>{ EL.desc.value = genSEO(getSelectedProduct()); });
-    EL.genAI.addEventListener('click', async ()=>{ EL.desc.value = 'Đang sinh mô tả...'; EL.desc.value = await genSEO_AI(getSelectedProduct()); });
-    EL.apply.addEventListener('click', ()=>{ const out=extendProduct(getSelectedProduct()); if (window.MXD?.updateCurrentProduct) MXD.updateCurrentProduct(out); window.currentProduct=out; preview(out); alert('Đã áp layout/badges/SEO cho sản phẩm hiện tại.'); });
-    EL.export.addEventListener('click', ()=>{ const out=extendProduct(getSelectedProduct()); const blob=new Blob([JSON.stringify([out],null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`affiliates_extended_${(out.sku||'product')}.json`; a.click(); URL.revokeObjectURL(a.href); });
-  })();
-  </script>
-
-  <!-- ===== MXD Importer — Link Assistant PRO v4.4 (buttons + spinner + bulk + health + sku + commit) ===== -->
-  <style>
-    #link-assistant,#health-panel,#sku-panel,#commit-panel{border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:16px 0;background:#fff;box-shadow:0 6px 18px #0000000d}
-    #link-assistant h3,#health-panel h3,#sku-panel h3,#commit-panel h3{margin:0 0 10px;font-size:18px}
-    #link-assistant .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    #link-assistant label{font-size:13px;color:#374151}
-    #link-assistant input[type="text"], #link-assistant textarea{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fafafa}
-    #link-assistant .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-    .btn{padding:10px 14px;border-radius:10px;border:1px solid #d1d5db;background:#fff;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
-    .btn.primary{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
-    .btn[disabled]{opacity:.6;cursor:not-allowed}
-    .btn[aria-busy="true"]{opacity:.8;pointer-events:none}
-    .spinner{width:14px;height:14px;border:2px solid #e5e7eb;border-top-color:#0ea5e9;border-radius:50%;display:inline-block;animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    #la-progress{font-size:12px;color:#64748b;margin-top:6px}
-    #la-bar{height:8px;background:#f1f5f9;border-radius:999px;overflow:hidden;margin-top:6px}
-    #la-bar > div{height:100%;width:0;background:#0ea5e9;transition:width .2s ease}
-    #link-results{margin-top:12px}
-    #link-results .row{display:grid;grid-template-columns:44px 1fr 1fr 160px 140px;gap:8px;align-items:center;border:1px solid #eef2f7;border-radius:10px;padding:10px;margin-bottom:8px}
-    #link-results .thumb{width:44px;height:44px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;overflow:hidden}
-    #link-results .thumb img{width:100%;height:100%;object-fit:cover}
-    #link-results code{display:inline-block;max-width:100%;overflow:auto;white-space:nowrap}
-    #link-results .qr{display:none}
-    #link-results .qr img{width:120px;height:120px;border-radius:8px;border:1px solid #e5e7eb}
-    @media (max-width:980px){
-      #link-assistant .grid{grid-template-columns:1fr}
-      #link-results .row{grid-template-columns:44px 1fr}
-    }
-    #sku-panel .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    #sku-panel input[type="text"]{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fafafa}
-  </style>
-
-  <section id="link-assistant">
-    <h3>🔗 Get links + Affiliate preview + Ảnh/giá + QR</h3>
-    <details open>
-      <summary><strong>Hướng dẫn nhanh</strong></summary>
-      <ol style="margin:6px 0 0 18px;padding:0">
-        <li>Dán <em>1 link</em> vào “Link gốc (1 sản phẩm)” → affiliate hiện ngay (nút đổi sang “Đã nhận” khi click).</li>
-        <li>Dán <em>50–200 link</em> vào ô “Danh sách”, bấm <b>Lấy link</b> → thấy spinner, tiến độ, thanh chạy, trạng thái từng dòng.</li>
-        <li>Muốn chính xác deep-link: cấu hình <code>AFF_ID</code>, <code>AFF_*_TEMPLATE</code>, <code>AFF_ORIGIN</code> (Worker).</li>
-      </ol>
-    </details>
-
-    <div class="grid">
-      <div>
-        <label>Link gốc (1 sản phẩm)</label>
-        <input id="la-origin" type="text" placeholder="Dán link Shopee/Lazada/TikTok...">
-      </div>
-      <div>
-        <label>Link affiliate (auto)</label>
-        <input id="la-aff" type="text" readonly placeholder="— sẽ hiện sau khi dán link gốc —">
-        <div class="actions">
-          <button id="la-copy" class="btn" type="button"><span class="ic">📋</span><span>Copy</span></button>
-          <button id="la-open" class="btn" type="button"><span class="ic">↗</span><span>Mở</span></button>
-          <button id="la-qr" class="btn" type="button"><span class="ic">▦</span><span>QR</span></button>
-        </div>
-      </div>
-    </div>
-
-    <div style="margin-top:12px">
-      <label>Danh sách (nhiều link — tối đa 200, mỗi dòng 1 link)</label>
-      <textarea id="la-bulk" rows="6" placeholder="https://shopee.vn/...\nhttps://www.lazada.vn/...\nhttps://www.tiktok.com/..."></textarea>
-      <div class="actions">
-        <button id="la-extract" class="btn primary" type="button"><span class="spinner" style="display:none"></span><span>Lấy link (Get links)</span></button>
-        <button id="la-export" class="btn" type="button"><span>⬇</span><span>Export JSON</span></button>
-        <button id="la-clear" class="btn" type="button"><span>✕</span><span>Xóa</span></button>
-      </div>
-      <div id="la-progress" class="muted">Chưa chạy.</div>
-      <div id="la-bar"><div></div></div>
-    </div>
-
-    <div id="link-results"></div>
-  </section>
-
-  <section id="health-panel">
-    <h3>🛡️ Health-check (HTTP status + redirect + latency)</h3>
-    <p class="muted">Kiểm tra nhanh các link trong bảng dưới. Ưu tiên dùng Worker <code>AFF_ORIGIN</code> → <code>/head?url=...</code>; nếu không có, fallback best-effort.</p>
-    <div class="actions">
-      <button id="hc-run" class="btn"><span class="spinner" style="display:none"></span><span>Chạy Health-check</span></button>
-      <button id="hc-clear" class="btn"><span>✕</span><span>Xóa kết quả HC</span></button>
-    </div>
-  </section>
-
-  <section id="sku-panel">
-    <h3>🆔 SKU Validator + g.html Tester</h3>
-    <div class="grid">
-      <div><label>Tên sản phẩm</label><input id="sku-name" type="text" placeholder="Ví dụ: Bosch GWS 900-125 S điều tốc"></div>
-      <div><label>Brand (tuỳ chọn)</label><input id="sku-brand" type="text" placeholder="Bosch"></div>
-    </div>
-    <div class="actions" style="margin-top:8px">
-      <button id="sku-gen" class="btn"><span>⚙</span><span>Tạo SKU</span></button>
-      <button id="sku-open" class="btn"><span>↗</span><span>Mở g.html</span></button>
-      <button id="sku-img" class="btn"><span>🖼</span><span>Check ảnh /assets/img/products/&lt;sku&gt;.webp</span></button>
-    </div>
-    <div id="sku-out" class="muted" style="margin-top:6px"></div>
-  </section>
-
-  <section id="commit-panel">
-    <h3>🧾 Commit Generator</h3>
-    <div class="actions">
-      <button id="cm-gen" class="btn"><span>🪪</span><span>Tạo commit theo kết quả</span></button>
-      <button id="cm-copy" class="btn"><span>📋</span><span>Copy</span></button>
-    </div>
-    <pre id="cm-out" style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-top:8px"></pre>
-  </section>
-
-  <script>
-  (function(){
-    const $ = s => document.querySelector(s);
-    const els = {
-      origin: $('#la-origin'), aff: $('#la-aff'),
-      copy: $('#la-copy'), open: $('#la-open'), qr: $('#la-qr'),
-      bulk: $('#la-bulk'), extract: $('#la-extract'), export: $('#la-export'), clear: $('#la-clear'),
-      results: $('#link-results'), progress: $('#la-progress'), bar: $('#la-bar > div'),
-      hcRun: $('#hc-run'), hcClear: $('#hc-clear'),
-      skuName: $('#sku-name'), skuBrand: $('#sku-brand'), skuGen: $('#sku-gen'), skuOpen: $('#sku-open'), skuImg: $('#sku-img'), skuOut: $('#sku-out'),
-      cmGen: $('#cm-gen'), cmCopy: $('#cm-copy'), cmOut: $('#cm-out')
-    };
-
-    // ===== Config (đọc localStorage từ Settings đã bridge) =====
-    const AFF = {
-      ID: window.AFF_ID || localStorage.getItem('AFF_ID') || '',
-      TPL: {
-        shopee: window.AFF_SHOPEE_TEMPLATE || localStorage.getItem('AFF_SHOPEE_TEMPLATE') || '',
-        lazada: window.AFF_LAZADA_TEMPLATE || localStorage.getItem('AFF_LAZADA_TEMPLATE') || '',
-        tiki:   window.AFF_TIKI_TEMPLATE   || localStorage.getItem('AFF_TIKI_TEMPLATE') || '',
-        tiktok: window.AFF_TIKTOK_TEMPLATE || localStorage.getItem('AFF_TIKTOK_TEMPLATE') || ''
-      },
-      CAMP: {
-        shopee: window.AFF_CAMP_SHOPEE || localStorage.getItem('AFF_CAMP_SHOPEE') || '',
-        lazada: window.AFF_CAMP_LAZADA || localStorage.getItem('AFF_CAMP_LAZADA') || '',
-        tiki:   window.AFF_CAMP_TIKI   || localStorage.getItem('AFF_CAMP_TIKI') || '',
-        tiktok: window.AFF_CAMP_TIKTOK || localStorage.getItem('AFF_CAMP_TIKTOK') || ''
-      },
-      ORIGIN: window.AFF_ORIGIN || localStorage.getItem('AFF_ORIGIN') || '' // ví dụ: https://mxd210.mxd6686.workers.dev
-    };
-
-    // ===== Utils =====
-    function setBusy(btn, busy, textRun, textIdle){
-      const sp = btn.querySelector('.spinner');
-      if (busy){ btn.setAttribute('aria-busy','true'); btn.disabled = true; if (sp) sp.style.display='inline-block'; if (textRun) btn.lastElementChild.textContent=textRun; }
-      else { btn.removeAttribute('aria-busy'); btn.disabled=false; if (sp) sp.style.display='none'; if (textIdle) btn.lastElementChild.textContent=textIdle; }
-    }
-    function flash(btn, okText='Đã nhận ✓', backText='Copy'){
-      const old = btn.lastElementChild.textContent;
-      btn.lastElementChild.textContent = okText;
-      setTimeout(()=>{ btn.lastElementChild.textContent = backText || old; }, 900);
-    }
-    function dedupe(arr){ return [...new Set(arr.filter(Boolean))]; }
-    function getMerchant(u){
-      try{
-        const h = new URL(u).hostname;
-        if (h.includes('shopee')) return 'shopee';
-        if (h.includes('lazada')) return 'lazada';
-        if (h.includes('tiki'))   return 'tiki';
-        if (h.includes('tiktok')) return 'tiktok';
-      }catch(e){}
-      return '';
-    }
-    function extractLinks(text){
-      const re = /\bhttps?:\/\/[^\s<>"']+/gi;
-      const raw = (text||'').match(re) || [];
-      const filtered = raw.filter(u => !!getMerchant(u));
-      return dedupe(filtered).slice(0,200);
-    }
-    function affApi(path){ return (AFF.ORIGIN || '') + path; }
-    async function fetchJSON(url){ try{ const r=await fetch(url,{mode:'cors'}); if(r.ok) return await r.json(); }catch(e){} return null; }
-
-    async function makeAffiliate(url, sub){
-      const merchant = getMerchant(url);
-      const s = Object.assign({sub1:'importer',sub2:'tool',sub3:'mxda',sub4:''}, sub||{});
-      if (merchant && AFF.TPL[merchant] && AFF.ID){
-        let out = AFF.TPL[merchant]
-          .replace('{url}', encodeURIComponent(url))
-          .replace('{aff_id}', encodeURIComponent(AFF.ID))
-          .replace('{merchant}', merchant)
-          .replace('{camp}', AFF.CAMP[merchant]||'')
-          .replace('{camp_shopee}', AFF.CAMP.shopee||'')
-          .replace('{camp_lazada}', AFF.CAMP.lazada||'')
-          .replace('{camp_tiki}', AFF.CAMP.tiki||'')
-          .replace('{sub1}', encodeURIComponent(s.sub1))
-          .replace('{sub2}', encodeURIComponent(s.sub2))
-          .replace('{sub3}', encodeURIComponent(s.sub3))
-          .replace('{sub4}', encodeURIComponent(s.sub4));
-        return {url: out, via:'template', merchant};
-      }
-      if (AFF.ORIGIN){
-        const u = affApi(`/aff?url=${encodeURIComponent(url)}&merchant=${merchant}&sub1=${encodeURIComponent(s.sub1)}&sub2=${encodeURIComponent(s.sub2)}&sub3=${encodeURIComponent(s.sub3)}&sub4=${encodeURIComponent(s.sub4)}`);
-        const data = await fetchJSON(u);
-        if (data && data.url) return {url: data.url, via:'worker', merchant};
-      }
-      return {url, via:'none', merchant};
-    }
-    async function getHeadInfo(url){
-      let image = '', price = '';
-      if (AFF.ORIGIN){
-        const det = await fetchJSON(affApi(`/head?url=${encodeURIComponent(url)}`));
-        if (det){
-          price = det.price || det.price_min || det.data?.price || '';
-          const og = det.og_image || det.image || det.images?.[0];
-          if (og) image = og;
-        }
-      }
-      return {image, price};
-    }
-    function qrUrl(u, size=120){ return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(u)}`; }
-    const CONCURRENCY = 5;
-
-    // ===== Single mode =====
-    async function refreshSingle(){
-      const src = els.origin.value.trim();
-      if (!src){ els.aff.value=''; return; }
-      setBusy(els.open, true, 'Đang mở…', 'Mở');
-      const {url:aff} = await makeAffiliate(src, {sub1:'single',sub2:'importer'});
-      els.aff.value = aff || '';
-      setBusy(els.open, false, '', 'Mở');
-    }
-    els.origin.addEventListener('input', refreshSingle);
-    els.copy.addEventListener('click', async ()=>{ if(!els.aff.value) return; try{ await navigator.clipboard.writeText(els.aff.value); flash(els.copy,'Đã copy ✓','Copy'); }catch(e){} });
-    els.open.addEventListener('click', ()=>{ if(els.aff.value) { window.open(els.aff.value,'_blank'); flash(els.open,'Đã mở ✓','Mở'); }});
-    els.qr.addEventListener('click', ()=>{ const v=els.aff.value||els.origin.value; if(v){ window.open(qrUrl(v,240),'_blank'); flash(els.qr,'Đã tạo ✓','QR'); }});
-
-    // ===== Bulk mode =====
-    function rowTpl(idx){
-      return `
-        <div class="row" data-idx="${idx}">
-          <div class="thumb" data-thumb><span>—</span></div>
-          <div>
-            <div style="font-size:12px;color:#64748b">Gốc</div>
-            <code data-origin>Loading…</code>
-          </div>
-          <div>
-            <div style="font-size:12px;color:#64748b">Affiliate</div>
-            <code data-aff>Loading…</code>
-            <div style="font-size:12px;color:#64748b;margin-top:4px">Giá: <span data-price>—</span></div>
-          </div>
-          <div>
-            <span data-tag class="tag"><span class="dot wait"></span> Đợi</span>
-            <div class="muted" style="font-size:12px" data-hc>HC: —</div>
-          </div>
-          <div>
-            <button class="btn" data-copy><span>📋</span><span>Copy</span></button>
-            <button class="btn" data-open><span>↗</span><span>Mở</span></button>
-            <button class="btn" data-qr><span>▦</span><span>QR</span></button>
-            <div class="qr" data-qrbox></div>
-          </div>
-        </div>`;
-    }
-    function setTag(elTag, status, label){
-      const dot = elTag.querySelector('.dot');
-      dot.className = 'dot ' + status; // wait|run|ok|err
-      elTag.className = 'tag' + (status==='err' ? ' warn' : '');
-      elTag.lastChild.textContent = ' ' + (label || elTag.lastChild.textContent.trim());
-    }
-    async function runQueue(items, worker, onProgress){
-      let i=0, active=0, done=0;
-      return new Promise(resolve=>{
-        const next=()=>{
-          while(active<CONCURRENCY && i<items.length){
-            const idx=i++, item=items[idx]; active++;
-            worker(item, idx).finally(()=>{ active--; done++; onProgress(done, items.length); next(); if(done===items.length) resolve(); });
-          }
-        }; next();
-      });
-    }
-    async function renderBulk(){
-      const links = extractLinks(els.bulk.value);
-      if (!links.length){
-        els.results.innerHTML = `<div class="row"><div></div><div><span class="tag warn"><span class="dot err"></span> NO-LINK</span> Không thấy link hợp lệ.</div></div>`;
-        els.progress.textContent = 'Không có link.'; els.bar.style.width = '0%'; return;
-      }
-      els.results.innerHTML = links.map((_,i)=>rowTpl(i)).join('');
-      els.progress.textContent = `0/${links.length}`; els.bar.style.width = '0%';
-      setBusy(els.extract, true, 'Đang chạy…', 'Lấy link');
-
-      await runQueue(links, async (src, idx)=>{
-        const row = els.results.querySelector(`.row[data-idx="${idx}"]`);
-        const elOrigin = row.querySelector('[data-origin]');
-        const elAff = row.querySelector('[data-aff]');
-        const elTag = row.querySelector('[data-tag]');
-        const elPrice = row.querySelector('[data-price]');
-        const thumb = row.querySelector('[data-thumb]');
-
-        elOrigin.textContent = src;
-        setTag(elTag,'run','Đang xử lý');
-
-        const {url:aff, via, merchant} = await makeAffiliate(src, {sub1:'bulk',sub2:'importer'});
-        elAff.textContent = aff;
-        const label = via==='none' ? 'NO-AFF' : (merchant||'link');
-        setTag(elTag, via==='none' ? 'err':'ok', label);
-
-        const {image, price} = await getHeadInfo(src);
-        if (image){ thumb.innerHTML = `<img src="${image}" alt="thumb">`; } else { thumb.innerHTML = `<span>IMG</span>`; }
-        elPrice.textContent = price ? (Number(price)||price).toLocaleString('vi-VN') : '—';
-
-        const btnCopy = row.querySelector('[data-copy]');
-        const btnOpen = row.querySelector('[data-open]');
-        const btnQR = row.querySelector('[data-qr]');
-        const qrBox = row.querySelector('[data-qrbox]');
-        btnCopy.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(aff); flash(btnCopy,'Đã copy ✓','Copy'); }catch(e){} });
-        btnOpen.addEventListener('click', ()=>{ if(aff){ window.open(aff,'_blank'); flash(btnOpen,'Đã mở ✓','Mở'); }});
-        btnQR.addEventListener('click', ()=>{ const href = aff || src; if (!qrBox.innerHTML){ qrBox.innerHTML = `<img src="${qrUrl(href)}" alt="QR">`; } qrBox.style.display = qrBox.style.display==='block' ? 'none' : 'block'; flash(btnQR,'Đã tạo ✓','QR'); });
-      }, (done,total)=>{
-        els.progress.textContent = `${done}/${total}`;
-        els.bar.style.width = `${Math.round(done/total*100)}%`;
-      });
-
-      setBusy(els.extract, false, '', 'Lấy link (Get links)');
-      els.progress.textContent += ' — xong.';
-    }
-    function exportBulk(){
-      const rows = [...els.results.querySelectorAll('.row')];
-      if (!rows.length){ alert('Chưa có dữ liệu.'); return; }
-      const out = rows.map(r=>{
-        const origin = r.querySelector('[data-origin]').textContent||'';
-        const aff = r.querySelector('[data-aff]').textContent||'';
-        const price = r.querySelector('[data-price]').textContent||'';
-        const imgEl = r.querySelector('[data-thumb] img');
-        const image = imgEl ? imgEl.src : '';
-        const tag = r.querySelector('[data-tag]').textContent.trim();
-        return { origin, affiliate: aff, merchant: getMerchant(origin)||tag, price, image, updated_at: new Date().toISOString() };
-      });
-      const blob = new Blob([JSON.stringify(out,null,2)], {type:'application/json'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-      a.download = 'links_affiliates_bulk.json'; a.click(); URL.revokeObjectURL(a.href);
-    }
-    els.extract.addEventListener('click', renderBulk);
-    els.export.addEventListener('click', exportBulk);
-    els.clear.addEventListener('click', ()=>{ els.bulk.value=''; els.results.innerHTML=''; els.progress.textContent='Đã xoá.'; els.bar.style.width='0%'; });
-
-    // ===== Health-check panel =====
-    async function headCheck(url){
-      if (AFF.ORIGIN){
-        const data = await fetchJSON(affApi(`/head?url=${encodeURIComponent(url)}`));
-        if (data) return data; // {ok,status,latency,redirects}
-      }
-      const t0 = performance.now();
-      try{ const r = await fetch(url, {mode:'no-cors'}); const t=Math.round(performance.now()-t0); return { ok:true, status:'?', latency:t, redirects:[] }; }
-      catch(e){ const t=Math.round(performance.now()-t0); return { ok:false, status:'ERR', latency:t, redirects:[] }; }
-    }
-    async function runHealth(){
-      const rows = [...els.results.querySelectorAll('.row')];
-      if (!rows.length){ alert('Chưa có bảng kết quả.'); return; }
-      setBusy(els.hcRun, true, 'Đang kiểm…', 'Chạy Health-check');
-      for (const r of rows){
-        const aff = r.querySelector('[data-aff]').textContent || r.querySelector('[data-origin]').textContent;
-        const hcEl = r.querySelector('[data-hc]');
-        const tagEl = r.querySelector('[data-tag]');
-        setTag(tagEl,'run','Kiểm tra');
-        const hc = await headCheck(aff);
-        const msg = hc.ok ? `HC: ${hc.status||200} • ${hc.latency||'?'}ms${(hc.redirects&&hc.redirects.length)?' • '+hc.redirects.length+' redir':''}` : `HC: lỗi • ${hc.latency||'?'}ms`;
-        hcEl.textContent = msg;
-        setTag(tagEl, hc.ok ? 'ok':'err', (tagEl.textContent.trim()||'HC'));
-      }
-      setBusy(els.hcRun, false, '', 'Chạy Health-check');
-    }
-    els.hcRun.addEventListener('click', runHealth);
-    els.hcClear.addEventListener('click', ()=>{ [...els.results.querySelectorAll('[data-hc]')].forEach(x=>x.textContent='HC: —'); [...els.results.querySelectorAll('[data-tag]')].forEach(x=>setTag(x,'wait','Đợi')); });
-
-    // ===== SKU Validator + g.html Tester =====
-    const slugify = s => (s||'').toString().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase();
-    els.skuGen.addEventListener('click', ()=>{ const base = `${(els.skuBrand.value||'').trim()} ${els.skuName.value||''}`.trim(); const sku = slugify(base).replace(/-+/g,'-'); els.skuOut.textContent = sku ? `SKU: ${sku}` : 'SKU: (trống)'; els.skuOut.dataset.sku = sku || ''; });
-    els.skuOpen.addEventListener('click', ()=>{ const sku = els.skuOut.dataset.sku || slugify(els.skuName.value||''); if (!sku){ alert('Chưa có SKU.'); return; } window.open(`/g.html?sku=${encodeURIComponent(sku)}`,'_blank'); });
-    els.skuImg.addEventListener('click', ()=>{ const sku = els.skuOut.dataset.sku || slugify(els.skuName.value||''); if (!sku){ alert('Chưa có SKU.'); return; } const img = new Image(); const url = `/assets/img/products/${sku}.webp`; const t0 = performance.now(); img.onload = ()=>{ const t=Math.round(performance.now()-t0); els.skuOut.textContent = `Ảnh OK (${t}ms): ${url}`; }; img.onerror = ()=>{ els.skuOut.textContent = `Thiếu ảnh: ${url}`; }; img.src = url + '?v=' + Date.now(); });
-
-    // ===== Commit Generator =====
-    els.cmGen.addEventListener('click', ()=>{
-      const rows = [...els.results.querySelectorAll('.row')];
-      const merchants = {};
-      rows.forEach(r=>{ const origin = r.querySelector('[data-origin]').textContent||''; const m = getMerchant(origin)||'other'; merchants[m] = (merchants[m]||0)+1; });
-      const total = rows.length;
-      let parts = Object.keys(merchants).map(k=>`${k}:${merchants[k]}`).join(', ');
-      const msg = `feat(importer): process ${total} links (${parts})\n\n`+
-                  `• Buttons state + spinner + progress bar\n`+
-                  `• Health-check panel (/head via Worker)\n`+
-                  `• SKU validator + g.html tester + image check\n`+
-                  `• Export JSON (bulk) origin/affiliate/merchant/price/image`;
-      els.cmOut.textContent = `git add tools/shopee-importer.html\n`+
-                               `git commit -m ${JSON.stringify(msg)}`;
-    });
-    els.cmCopy.addEventListener('click', async ()=>{ if (!els.cmOut.textContent.trim()) return; try{ await navigator.clipboard.writeText(els.cmOut.textContent); flash(els.cmCopy,'Đã copy ✓','Copy'); }catch(e){} });
-
-    // Wire health buttons
-    els.hcRun = $('#hc-run'); els.hcClear = $('#hc-clear');
-  })();
-  </script>
-</body>
-</html>
+// ===== Init =====
+function init(){ mountSettings(); showTab(localStorage.getItem('tab') || 'import'); updateAffiliatePreview(); console.log('MXD Importer build:', q('#build-badge')?.textContent||'no-stamp'); }
+init();
+</script>
+</body></html>
