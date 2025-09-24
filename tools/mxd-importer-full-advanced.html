@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MXD Importer Full Advanced</title>
+  <style>
+    :root {
+      --gap: 12px;
+      --br: 14px;
+      --accent: #0ea5e9;
+      --font: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+    body {
+      margin: 0; padding: var(--gap);
+      font-family: var(--font);
+      background: #f9fafb; color: #111827;
+      max-width: 1280px; margin-inline: auto;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; }
+    header.toolbar {
+      background: #fff; padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky; top: 0; z-index: 100;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    nav { display: flex; gap: 8px; }
+    .tab {
+      padding: 8px 12px; border: 1px solid #d1d5db;
+      background: #fff; border-radius: 999px; cursor: pointer;
+    }
+    .tab.active {
+      background: var(--accent); color: #fff;
+      border-color: var(--accent);
+    }
+    main { margin-top: var(--gap); display: flex; flex-direction: column; gap: var(--gap); }
+    .panel {
+      display: none; background: #fff; padding: 16px;
+      border-radius: var(--br);
+      box-shadow: 0 0 4px rgba(0,0,0,0.06);
+    }
+    .panel.active { display: block; }
+    table.output-table {
+      width: 100%; border-collapse: collapse;
+    }
+    table.output-table th, table.output-table td {
+      border: 1px solid #e5e7eb; padding: 8px;
+    }
+    .product-grid {
+      display: grid; gap: var(--gap);
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    .product-card {
+      border: 1px solid #e5e7eb; border-radius: var(--br);
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+    .product-card .img img {
+      width: 100%; object-fit: cover;
+    }
+    .product-card .body {
+      padding: 12px; flex-grow: 1;
+    }
+    .price { font-weight: bold; margin-top: 6px; }
+    .buy {
+      display: inline-block; margin-top: 8px;
+      text-decoration: none; border: 1px solid var(--accent);
+      color: var(--accent); padding: 8px 10px; border-radius: 10px;
+    }
+    footer.footer {
+      margin-top: 48px; text-align: center;
+      color: #6b7280;
+    }
+    .muted { color: #6b7280; }
+    .small { font-size: 0.875em; }
+    textarea { width: 100%; resize: vertical; font-family: monospace; }
+    input[type=number], input[type=text] {
+      padding: 6px; border: 1px solid #ccc; border-radius: 6px;
+      width: 100%;
+    }
+    button { padding: 6px 10px; border-radius: 6px; background: var(--accent); color: #fff; border: none; cursor: pointer; }
+    button.secondary { background: #fff; color: #111827; border: 1px solid #d1d5db; }
+  </style>
+</head>
+<body>
+  <header class="toolbar">
+    <h1>MXD Importer Full Advanced</h1>
+    <nav>
+      <button class="tab active" data-tab="import">Import</button>
+      <button class="tab" data-tab="products">Products</button>
+      <button class="tab" data-tab="snippets">Snippets</button>
+      <button class="tab" data-tab="export">Export</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </nav>
+  </header>
+  <main>
+    <section id="panel-import" class="panel active"></section>
+    <section id="panel-products" class="panel"></section>
+    <section id="panel-snippets" class="panel"></section>
+    <section id="panel-export" class "panel"></section>
+    <section id="panel-settings" class="panel"></section>
+  </main>
+  <footer class="footer small muted">MXD Importer Full Advanced</footer>
+
+  <script type="module">
+    // ===== utils =====
+    function slugifyVN(text) {
+      return String(text || '').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+        || 'sp' + Date.now().toString(36);
+    }
+    function toNumber(x) {
+      if (x == null) return 0;
+      const s = String(x).replace(/[^0-9]/g, '');
+      return s ? Number(s) : 0;
+    }
+    function copyToClipboard(txt) {
+      navigator.clipboard.writeText(txt).catch(e => console.error(e));
+    }
+
+    // ===== state & data management =====
+    const state = {
+      products: [],
+      settings: {
+        aff_id: '',
+        tpl_shopee: '',
+        tpl_lazada: '',
+        tpl_tiki: '',
+        worker: ''
+      }
+    };
+
+    function addProduct(raw) {
+      const sku = slugifyVN(raw.sku || raw.name || raw.origin);
+      const p = {
+        name: raw.name || '',
+        origin: raw.origin || '',
+        merchant: raw.merchant || '',
+        price: Number(raw.price || 0),
+        sku,
+        image: raw.image || `/assets/img/products/${sku}.webp`,
+        featured: raw.featured || false,
+        sub1: raw.sub1 || sku,
+        updated_at: raw.updated_at || new Date().toISOString(),
+        notes: raw.notes || ''
+      };
+      state.products.push(p);
+    }
+    function clearAll() {
+      state.products = [];
+    }
+    function exportJSON() {
+      return JSON.stringify(state.products, null, 2);
+    }
+    function importJSON(str) {
+      try {
+        const arr = JSON.parse(str);
+        if (!Array.isArray(arr)) throw new Error('Invalid data');
+        state.products = arr.map(o => ({
+          name: o.name || '',
+          origin: o.origin || '',
+          merchant: o.merchant || '',
+          price: Number(o.price || 0),
+          sku: o.sku || slugifyVN(o.origin),
+          image: o.image || `/assets/img/products/${o.sku || ''}.webp`,
+          featured: !!o.featured,
+          sub1: o.sub1 || '',
+          updated_at: o.updated_at || '',
+          notes: o.notes || ''
+        }));
+      } catch (e) {
+        console.error('Import JSON failed:', e);
+      }
+    }
+
+    // ===== deeplink builder & snippet =====
+    function buildDeeplink(p) {
+      const aff = state.settings.aff_id || '';
+      let tpl = '';
+      if (p.merchant === 'shopee') tpl = state.settings.tpl_shopee;
+      else if (p.merchant === 'lazada') tpl = state.settings.tpl_lazada;
+      else if (p.merchant === 'tiki') tpl = state.settings.tpl_tiki;
+      if (!tpl || !aff) return p.origin;
+      return tpl
+        .replace('{url}', encodeURIComponent(p.origin))
+        .replace('{aff_id}', encodeURIComponent(aff))
+        .replace('{sub1}', encodeURIComponent(p.sub1 || ''))
+        .replace('{sub2}', '').replace('{sub3}', '').replace('{sub4}', '');
+    }
+    function generateSnippets(useDeep = false) {
+      return state.products.map(p => {
+        const buy = useDeep ? buildDeeplink(p) : p.origin;
+        const label = p.merchant === 'shopee' ? 'Shopee'
+          : p.merchant === 'lazada' ? 'Lazada'
+          : p.merchant === 'tiki' ? 'Tiki' : 'Buy';
+        return `<a class="product-meta" href="${p.origin}" data-merchant="${p.merchant}" data-sku="${p.sku}" data-img="${p.image}" data-price="${p.price}">
+  ${p.name}
+</a>
+<a class="buy" href="${buy}" data-merchant="${p.merchant}">Mua ${label}</a>`;
+      }).join('\n\n');
+    }
+
+    // ===== render UI =====
+    function renderOutputTable(container) {
+      container.innerHTML = '';
+      const tbl = document.createElement('table');
+      tbl.className = 'output-table';
+      tbl.innerHTML = `
+        <thead><tr>
+          <th>Name</th><th>Price</th><th>Merchant</th>
+          <th>Origin</th><th>SKU</th><th>Image</th><th>Featured</th><th>Del</th>
+        </tr></thead><tbody></tbody>
+      `;
+      const tbody = tbl.querySelector('tbody');
+      state.products.forEach((p,i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td contenteditable="true" data-key="name">${p.name}</td>
+          <td><input type="number" data-key="price" value="${p.price}"></td>
+          <td>${p.merchant}</td>
+          <td>${p.origin}</td>
+          <td contenteditable="true" data-key="sku">${p.sku}</td>
+          <td>${p.image}</td>
+          <td><input type="checkbox" data-key="featured" ${p.featured?'checked':''}></td>
+          <td><button data-idx="${i}">X</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+      container.appendChild(tbl);
+
+      tbody.querySelectorAll('[contenteditable], input').forEach(el => {
+        el.addEventListener('input', e => {
+          const tr = e.target.closest('tr');
+          const idx = Array.from(tbody.children).indexOf(tr);
+          const key = el.dataset.key;
+          let val;
+          if (el.type === 'checkbox') val = el.checked;
+          else if (el.tagName === 'TD') val = el.textContent.trim();
+          else val = toNumber(el.value);
+          state.products[idx][key] = val;
+        });
+      });
+      tbody.querySelectorAll('button').forEach(b => {
+        b.addEventListener('click', () => {
+          const i = Number(b.dataset.idx);
+          state.products.splice(i, 1);
+          renderOutputTable(container);
+        });
+      });
+    }
+
+    function renderProductGrid(container) {
+      container.innerHTML = '';
+      const grid = document.createElement('div');
+      grid.className = 'product-grid';
+      state.products.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <div class="img"><img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/200'"></div>
+          <div class="body">
+            <h3>${p.name}</h3>
+            <div class="price">${p.price.toLocaleString('vi-VN')}₫</div>
+            <a class="buy" href="${buildDeeplink(p)}" target="_blank">Mua ${p.merchant || ''}</a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      container.appendChild(grid);
+    }
+
+    // ===== fetch from Worker =====
+    async function autoImportFromWorker(workerUrl) {
+      try {
+        const res = await fetch(workerUrl);
+        if (!res.ok) throw new Error(`Worker ${res.status}`);
+        const arr = await res.json();
+        if (!Array.isArray(arr)) throw new Error('Not array');
+        state.products = arr;
+        renderOutputTable(document.querySelector('#panel-products'));
+      } catch (e) {
+        console.error('Worker fetch failed:', e);
+      }
+    }
+
+    // ===== bind UI, init =====
+    document.addEventListener('DOMContentLoaded', () => {
+      bindTabs();
+      bindImportPanel();
+      bindSnippetsPanel();
+      bindExportPanel();
+      bindSettingsPanel();
+      autoImportFromWorker('https://mxd210.mxd6686.workers.dev');
+    });
+
+    function bindTabs() {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const id = tab.dataset.tab;
+          document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+          document.querySelector(`#panel-${id}`).classList.add('active');
+        });
+      });
+    }
+
+    function bindImportPanel() {
+      const p = document.querySelector('#panel-import');
+      p.innerHTML = `
+        <textarea id="txt-in" rows="4" placeholder="Nhập JSON hoặc links..."></textarea><br>
+        <button id="btn-load-json" class="secondary">Load JSON</button>
+        <button id="btn-apply-links">Add links</button>
+      `;
+      p.querySelector('#btn-load-json').addEventListener('click', () => {
+        const txt = p.querySelector('#txt-in').value.trim();
+        importJSON(txt);
+        renderOutputTable(document.querySelector('#panel-products'));
+      });
+      p.querySelector('#btn-apply-links').addEventListener('click', () => {
+        const lines = p.querySelector('#txt-in').value.trim().split(/\r?\n/);
+        lines.forEach(l => addProduct({ origin: l.trim() }));
+        renderOutputTable(document.querySelector('#panel-products'));
+      });
+    }
+
+    function bindSnippetsPanel() {
+      const p = document.querySelector('#panel-snippets');
+      p.innerHTML = `
+        <button id="btn-gen">Generate Snippets</button>
+        <textarea id="ta-snippets" rows="10"></textarea>
+      `;
+      p.querySelector('#btn-gen').addEventListener('click', () => {
+        const sn = generateSnippets(true);
+        p.querySelector('#ta-snippets').value = sn;
+        copyToClipboard(sn);
+      });
+    }
+
+    function bindExportPanel() {
+      const p = document.querySelector('#panel-export');
+      p.innerHTML = `
+        <button id="btn-cp-json">Copy JSON</button>
+        <textarea id="ta-export" rows="10"></textarea>
+      `;
+      p.querySelector('#btn-cp-json').addEventListener('click', () => {
+        const j = exportJSON();
+        p.querySelector('#ta-export').value = j;
+        copyToClipboard(j);
+      });
+    }
+
+    function bindSettingsPanel() {
+      const p = document.querySelector('#panel-settings');
+      p.innerHTML = `
+        <label>AFF ID</label><input type="text" id="inp-aff" value="${state.settings.aff_id}"><br>
+        <label>Template Shopee</label><input type="text" id="inp-shp" value="${state.settings.tpl_shopee}"><br>
+        <label>Template Lazada</label><input type="text" id="inp-lzd" value="${state.settings.tpl_lazada}"><br>
+        <label>Template Tiki</label><input type="text" id="inp-tki" value="${state.settings.tpl_tiki}"><br>
+        <button id="btn-save-set">Save Settings</button>
+      `;
+      p.querySelector('#btn-save-set').addEventListener('click', () => {
+        state.settings.aff_id = p.querySelector('#inp-aff').value.trim();
+        state.settings.tpl_shopee = p.querySelector('#inp-shp').value.trim();
+        state.settings.tpl_lazada = p.querySelector('#inp-lzd').value.trim();
+        state.settings.tpl_tiki = p.querySelector('#inp-tki').value.trim();
+        alert('Settings saved');
+      });
+    }
+
+  </script>
+</body>
+</html>
