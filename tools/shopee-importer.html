@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
   <meta name="format-detection" content="telephone=no"/>
-  <title>MXD Importer v4.4.2 — Pro+ (EN/VN)</title>
+  <title>MXD Importer v4.4.3 — Pro+ (EN/VN)</title>
   <meta name="description" content="Importer chuẩn MXD: Shopee/Lazada/Tiki → affiliates.json + snippets + ảnh .webp + health-check + SKU validator + commit generator."/>
   <link rel="canonical" href="https://mxd210.github.io/tools/shopee-importer.html"/>
   <meta name="robots" content="noindex,follow"/>
@@ -17,7 +17,9 @@
   <meta property="og:image" content="/assets/img/products/placeholder.webp"/>
 
   <!-- Convention MXD: GA4 trước Affiliate -->
-  <script defer src="/assets/analytics.js"></script>
+  <script defer src="/assets/analytics.js">
+console.log("MXD Importer build:", document.getElementById("build-badge")?.textContent || "no-stamp");
+</script>
   <script defer src="/assets/mxd-affiliate.js"></script>
 
   <!-- Site CSS -->
@@ -76,7 +78,7 @@
   
 <body>
   <header>
-    <div class="toolbar">
+    <div class="toolbar"><span id="build-badge" class="small muted" style="margin-left:8px;">build 2025-09-24 04:51 UTC</span>
       <div class="row">
         <a class="btn ghost" href="/">Home (Trang chủ)</a>
         <a class="btn ghost" href="/store.html">Store (Cửa hàng)</a>
@@ -87,7 +89,7 @@
         <label class="switch"><input id="compact" type="checkbox"> <span class="small muted">Compact mode (Chế độ gọn)</span></label>
       </div>
     </div>
-    <h1>MXD Importer v4.4.2 — Pro+ <span class="small muted">English (Tiếng Việt)</span></h1>
+    <h1>MXD Importer v4.4.3 — Pro+ <span class="small muted">English (Tiếng Việt)</span></h1>
     <div class="tabs">
       <button class="tab active" data-tab="import">Import (Nhập)</button>
       <button class="tab" data-tab="output">Output (Kết quả)</button>
