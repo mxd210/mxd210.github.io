@@ -155,6 +155,11 @@ th.sel,td.sel{width:36px}.w90{width:90px}.w120{width:120px}.w160{width:160px}.w3
         <button class="btn primary" id="btnPublishStore">Publish ngay → Store</button>
         <button class="btn primary" id="btnPublishFeatured">Publish ngay → Nổi bật</button>
       </div>
+      <div class="row">
+        <label class="small" style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="autoPub" checked> Tự động Publish sau khi Đẩy
+        </label>
+      </div>
       <div class="out" id="outPublish"></div>
       <div class="small">/queue nhận {channel,items}. /publish phát hành thẳng (POST JSON; nếu 404/405 sẽ fallback GET ?channel=...).</div>
     </div>
@@ -316,15 +321,23 @@ th.sel,td.sel{width:36px}.w90{width:90px}.w120{width:120px}.w160{width:160px}.w3
   async function queue(channel, items){
     if(items.length===0){ $("#outPublish").textContent="Không có item để đẩy."; return; }
     try{
-      const r=await fetch(base()+"/queue",{method:"POST",headers:hdr(),body:JSON.stringify({channel,items})});
+      const r=await fetch(base()+"/queue?channel="+encodeURIComponent(channel),{
+        method:"POST",headers:hdr(),body:JSON.stringify({channel,items})
+      });
       const t=await r.text();
       $("#outPublish").textContent="QUEUE "+channel.toUpperCase()+" "+r.status+" — "+t; remember();
+
+      // Auto-Publish nếu bật
+      if(r.ok && $("#autoPub").checked){
+        let rr=await fetch(base()+"/publish?channel="+encodeURIComponent(channel),{headers:hdr()});
+        const tt=await rr.text();
+        $("#outPublish").textContent += "\nPUBLISH "+channel.toUpperCase()+" "+rr.status+" — "+tt;
+      }
     }catch(e){ $("#outPublish").textContent="Queue lỗi: "+e; }
   }
   async function publish(channel){
     try{
-      let r=await fetch(base()+"/publish",{method:"POST",headers:hdr(),body:JSON.stringify({channel})});
-      if(r.status===404||r.status===405){ r=await fetch(base()+"/publish?channel="+encodeURIComponent(channel),{headers:hdr()}); }
+      let r=await fetch(base()+"/publish?channel="+encodeURIComponent(channel),{headers:hdr()});
       const t=await r.text();
       $("#outPublish").textContent="PUBLISH "+channel.toUpperCase()+" "+r.status+" — "+t; remember();
     }catch(e){ $("#outPublish").textContent="Publish lỗi: "+e; }
