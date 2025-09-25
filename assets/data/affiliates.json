@@ -1,22 +1,21 @@
-[
+  [
   {
     "name": "Máy Khoan Bê Tông Pin Mulinsen",
     "price": 499000,
-    "origin": "https://shopee.vn/Ma%CC%81y-Khoan-B%C3%AA-T%C3%B4ng-Pin-Mulinsen-3-Ch%E1%BB%A9c-N%C4%83ng-%C4%90%C3%B4%CC%A3ng-C%C6%A1-Kh%C3%B4ng-Ch%C3%B4%CC%89i-Than-B%E1%BA%A3o-H%C3%A0nh-6-Th%C3%A1ng-i.131704252.40105822049?sp_atk=da81a36d-6b61-4eee-b4f0-1872cdcbd5b4&xptdk=da81a36d-6b61-4eee-b4f0-1872cdcbd5b4",
+    "origin": "https://shopee.vn/Ma%CC%81y-Khoan-B%C3%AA-T%C3%B4ng-Pin-Mulinsen-3-Ch%E1%BB%A9c-N%C4%83ng-%C4%90%C3%B4%CC%A3ng-C%C6%A1-Kh%C3%B4ng-Ch%C3%B4%CC%89i-Than-B%E1%BA%A3o-H%C3%A0nh-6-Th%C3%A1ng-i.131704252.40105822049?sp_atk=da81a36d-6b61-4eee-b4f0-1872cdcbd5b4&xptdk=da81a36d-6b61-4eee-b4f0-1872cdcbd5b4%22,",
     "merchant": "shopee",
     "sku": "may-khoan-be-tong-pin-mulinsen",
     "image": "/assets/img/products/may-khoan-be-tong-pin-mulinsen.webp",
     "category": "",
     "brand": "",
     "featured": false,
-    "status": "active",
-    "updated_at": "2025-09-25T07:28:40.322+07:00",
-    "sub1": "may-khoan-be-tong-pin-mulinsen",
-    "notes": ""
+    "status": true,
+    "updated_at": "2025-09-25T14:35:31.989Z"
   },
+
   {
     "name": "Máy Khoan Đục Sanpuline RH - 3100",
-    "price": 700000,
+    "price": 550000,
     "origin": "https://shopee.vn/M%C3%A1y-Khoan-%C4%90%E1%BB%A5c-B%C3%AA-T%C3%B4ng-%C4%90i%E1%BB%87n-2-Ch%E1%BB%A9c-N%C4%83ng-Sanpuline-RH-3100-C%C3%B4ng-Su%E1%BA%A5t-1050W-Chu%E1%BA%A9n-D%C3%A2y-%C4%90%E1%BB%93ng-T%E1%BA%B7ng-2-M%C5%A9i-%C4%90%E1%BB%A5c-3-M%C5%A9i-Khoan-i.131704252.3910078759?sp_atk=7df00376-7976-458d-84ca-df72db0d2b93&xptdk=7df00376-7976-458d-84ca-df72db0d2b93",
     "merchant": "shopee",
     "sku": "may-khoan-nuc-sanpuline-rh-3100",
@@ -25,6 +24,6 @@
     "brand": "",
     "featured": false,
     "status": true,
-    "updated_at": "2025-09-25T13:50:02.296Z"
+    "updated_at": "2025-09-25T14:25:51.589Z"
   }
 ]
