@@ -1,1 +1,47 @@
+\
+# MXD-Auto-Publish.ps1
+# Orchestrator: import -> check -> prune -> sitemaps -> (optional) copy -> commit
+param(
+  [string]$SiteRepo = "../mxd210.github.io",
+  [switch]$WriteAff = $true,
+  [switch]$DoCommit = $false
+)
+
+Write-Host "== MXD Auto Publish ==" -ForegroundColor Cyan
+
+# 1) Import
+npm run import
+if($LASTEXITCODE -ne 0){ Write-Error "Import failed"; exit 1 }
+
+# 2) Check links
+npm run check:links
+if($LASTEXITCODE -ne 0){ Write-Error "Check links failed"; exit 1 }
+
+# 3) Prune (write back by default)
+if($WriteAff){ npm run prune -- --write } else { npm run prune }
+if($LASTEXITCODE -ne 0){ Write-Error "Prune failed"; exit 1 }
+
+# 4) Sitemaps
+npm run sitemaps
+if($LASTEXITCODE -ne 0){ Write-Error "Sitemaps failed"; exit 1 }
+
+# 5) Copy sitemaps to site repo (if exists)
+if(Test-Path $SiteRepo){
+  New-Item -ItemType Directory -Force -Path "$SiteRepo" | Out-Null
+  Copy-Item -Force out/sitemaps/*.xml "$SiteRepo/"
+  Write-Host "Copied sitemaps to $SiteRepo" -ForegroundColor Green
+
+  if($DoCommit){
+    Push-Location $SiteRepo
+    git add sitemap*.xml
+    git commit -m "chore(seo): update sitemaps (auto)" | Out-Null
+    git push
+    Pop-Location
+    Write-Host "Committed and pushed sitemaps." -ForegroundColor Green
+  }
+} else {
+  Write-Warning "Site repo not found: $SiteRepo (skip copy/commit)"
+}
+
+Write-Host "Done."
 
