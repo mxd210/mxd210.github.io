@@ -155,13 +155,18 @@ th.sel,td.sel{width:36px}.w90{width:90px}.w120{width:120px}.w160{width:160px}.w3
         <button class="btn primary" id="btnPublishStore">Publish ngay → Store</button>
         <button class="btn primary" id="btnPublishFeatured">Publish ngay → Nổi bật</button>
       </div>
+
+      <!-- Commit message + Auto-pub -->
       <div class="row">
-        <label class="small" style="display:flex;align-items:center;gap:8px">
-          <input type="checkbox" id="autoPub" checked> Tự động Publish sau khi Đẩy
-        </label>
+        <textarea id="commitMsg" rows="2" placeholder="commit message (vd: publish(store): 3 items — sku-a, sku-b, sku-c)"></textarea>
+        <button class="btn" id="btnGenMsg">Tạo message</button>
       </div>
+      <label class="small" style="display:flex;align-items:center;gap:8px;margin-top:6px">
+        <input type="checkbox" id="autoPub" checked> Tự động Publish sau khi Đẩy
+      </label>
+
       <div class="out" id="outPublish"></div>
-      <div class="small">/queue nhận {channel,items}. /publish phát hành thẳng (POST JSON; nếu 404/405 sẽ fallback GET ?channel=...).</div>
+      <div class="small">/queue nhận {channel,items}. /publish phát hành thẳng (POST JSON; nếu 404/405 fallback GET ?channel=...).</div>
     </div>
   </section>
 </main>
@@ -232,7 +237,6 @@ th.sel,td.sel{width:36px}.w90{width:90px}.w120{width:120px}.w160{width:160px}.w3
 
     data.forEach((r,i)=>{
       const tr=el("tr");
-      // chọn dòng
       const tdSel=el("td",{class:"sel"}); const ck=el("input",{type:"checkbox"}); ck.checked=!!r.selected; ck.onchange=()=>{r.selected=ck.checked; $("#selCount").textContent = window._data.filter(x=>x.selected).length;}; tdSel.appendChild(ck); tr.appendChild(tdSel);
       tr.appendChild(el("td",{text:String(i+1)}));
 
@@ -318,6 +322,17 @@ th.sel,td.sel{width:36px}.w90{width:90px}.w120{width:120px}.w160{width:160px}.w3
   const selected=()=> (window._data||[]).filter(x=>x.selected).map(x=>({name:x.name,price:Number(x.price||0),origin:x.origin,merchant:x.merchant,sku:x.sku,image:x.image,featured:!!x.featured,status:true,updated_at:new Date().toISOString()}));
   const allItems=()=> (window._data||[]).map(x=>({name:x.name,price:Number(x.price||0),origin:x.origin,merchant:x.merchant,sku:x.sku,image:x.image,featured:!!x.featured,status:true,updated_at:new Date().toISOString()}));
 
+  function buildMsg(channel, items){
+    const ts = new Date().toLocaleString('vi-VN');
+    const slugs = items.map(x=>x.sku).filter(Boolean).slice(0,8).join(', ');
+    return `publish(${channel}): ${items.length} item(s) — ${slugs}${items.length>8?'…':''} @ ${ts}`;
+  }
+  $("#btnGenMsg").onclick = ()=>{
+    const sel = (window._data||[]).filter(x=>x.selected);
+    const ch  = sel.some(x=>x.featured) ? 'featured' : 'store';
+    $("#commitMsg").value = buildMsg(ch, sel.length ? sel : (window._data||[]));
+  };
+
   async function queue(channel, items){
     if(items.length===0){ $("#outPublish").textContent="Không có item để đẩy."; return; }
     try{
@@ -327,9 +342,10 @@ th.sel,td.sel{width:36px}.w90{width:90px}.w120{width:120px}.w160{width:160px}.w3
       const t=await r.text();
       $("#outPublish").textContent="QUEUE "+channel.toUpperCase()+" "+r.status+" — "+t; remember();
 
-      // Auto-Publish nếu bật
-      if(r.ok && $("#autoPub").checked){
-        let rr=await fetch(base()+"/publish?channel="+encodeURIComponent(channel),{headers:hdr()});
+      // Auto-Publish nếu bật, kèm commit message
+      if(r.ok && $("#autoPub")?.checked){
+        const msg = ($("#commitMsg").value||'').trim() || buildMsg(channel, items);
+        let rr=await fetch(base()+"/publish?channel="+encodeURIComponent(channel)+"&msg="+encodeURIComponent(msg),{headers:hdr()});
         const tt=await rr.text();
         $("#outPublish").textContent += "\nPUBLISH "+channel.toUpperCase()+" "+rr.status+" — "+tt;
       }
@@ -337,14 +353,28 @@ th.sel,td.sel{width:36px}.w90{width:90px}.w120{width:120px}.w160{width:160px}.w3
   }
   async function publish(channel){
     try{
-      let r=await fetch(base()+"/publish?channel="+encodeURIComponent(channel),{headers:hdr()});
+      const chosen = (window._data||[]).filter(x=>x.selected);
+      const items  = chosen.length ? chosen : (window._data||[]);
+      const msg = ($("#commitMsg").value||'').trim() || buildMsg(channel, items);
+      let r=await fetch(base()+"/publish?channel="+encodeURIComponent(channel)+"&msg="+encodeURIComponent(msg),{headers:hdr()});
       const t=await r.text();
       $("#outPublish").textContent="PUBLISH "+channel.toUpperCase()+" "+r.status+" — "+t; remember();
     }catch(e){ $("#outPublish").textContent="Publish lỗi: "+e; }
   }
 
   $("#btnHealthW").onclick=async()=>{ try{const r=await fetch(base()+"/health"); const t=await r.text(); $("#outPublish").textContent="HEALTH "+r.status+" — "+t; }catch(e){ $("#outPublish").textContent="Lỗi: "+e; } };
-  $("#btnDiag").onclick=async()=>{ try{const [rs,rf]=await Promise.all([fetch(base()+"/export/store"),fetch(base()+"/export/featured")]); const ts=await rs.text(), tf=await rf.text(); $("#outPublish").textContent=`STORE ${rs.status} — ${ts.slice(0,200)}...\nFEATURED ${rf.status} — ${tf.slice(0,200)}...`; }catch(e){ $("#outPublish").textContent="Diag lỗi: "+e; } };
+  $("#btnDiag").onclick=async()=>{
+    try{
+      const [rs, rf] = await Promise.all([
+        fetch(base()+"/queue?channel=store"),
+        fetch(base()+"/queue?channel=featured")
+      ]);
+      const ts = await rs.text(), tf = await rf.text();
+      $("#outPublish").textContent =
+        `QUEUE store ${rs.status} — ${ts.slice(0,240)}...\n` +
+        `QUEUE featured ${rf.status} — ${tf.slice(0,240)}...`;
+    }catch(e){ $("#outPublish").textContent="Diag lỗi: "+e; }
+  };
   $("#btnStatus").onclick=async()=>{ try{let r=await fetch(base()+"/status",{headers:hdr()}); if(r.status===404) r=await fetch(base()+"/status"); const t=await r.text(); $("#outPublish").textContent="STATUS "+r.status+" — "+t; }catch(e){ $("#outPublish").textContent="Status lỗi: "+e; } };
 
   $("#btnPushStoreSel").onclick=()=>queue("store", selected());
