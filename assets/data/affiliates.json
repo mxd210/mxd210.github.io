@@ -8,7 +8,7 @@
     "image": "/assets/img/products/may-khoan-be-tong-pin-mulinsen.webp",
     "category": "",
     "brand": "",
-    "featured": false,
+    "featured": true,
     "status": true,
     "updated_at": "2025-09-25T14:35:31.989Z"
   },
@@ -22,8 +22,24 @@
     "image": "/assets/img/products/may-khoan-nuc-sanpuline-rh-3100.webp",
     "category": "",
     "brand": "",
-    "featured": false,
+    "featured": true,
     "status": true,
     "updated_at": "2025-09-25T14:25:51.589Z"
+  },
+    
+  {
+    "name": "Máy khoan bê tông 3in1 3.6J",
+    "price": 699000,
+    "origin": "https://shopee.vn/%E3%80%90TANZU%E3%80%91M%C3%A1y-khoan-b%C3%AA-t%C3%B4ng-3in1-3.6J-D%C3%B9ng-pin-21V-Kh%C3%B4ng-ch%E1%BB%95i-than-Khoan-B%C3%BAa-V%E1%BA%B7n-v%C3%ADt-i.1572163407.44357541356?sp_atk=d4c728e7-c59d-4e18-a857-ce65b2d08ac9&xptdk=d4c728e7-c59d-4e18-a857-ce65b2d08ac9",
+    "merchant": "shopee",
+    "sku": "may-khoan-be-tong-3in1-36j",
+    "image": "/assets/img/products/may-khoan-be-tong-3in1-36j.webp",
+    "category": "",
+    "brand": "",
+    "featured": true,
+    "status": true,
+    "updated_at": "2025-09-25T23:14:09.515Z"
   }
 ]
+
+
