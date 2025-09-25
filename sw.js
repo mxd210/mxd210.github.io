@@ -6,7 +6,7 @@ const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 // ---- Precache (nhẹ) ----
 const ASSETS = [
   '/', '/index.html', '/store.html', '/g.html',
-  '/tools/shopee-importer.html',
+  '/tools/mxd-importer_v4.3.6_pro.html',
   '/assets/site.css',
   '/assets/js/render-products.js',
   '/assets/mxd-affiliate.js',
