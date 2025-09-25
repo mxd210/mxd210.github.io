@@ -1,62 +1,398 @@
-
-{
-  "name": "MXD Importer — Patch Pack v4.0.1 Clean",
-  "target": "tools/shopee-importer.html (layout 4.0)",
-  "purpose": "Giữ layout 4.0, vá font tiếng Việt, chuẩn hóa SKU, Worker Default/Custom/None, thêm giảm giá -3% + bulk sub1={sku}. Kèm snippet EN/VN.",
-  "how_to_apply": 
-[
-    "1) Mở file tools/shopee-importer.html hiện tại (bản 4.0).",
-    "2) Thêm/ghi đè CSS ở cuối <style>.",
-    "3) Thêm các helper JS (decode/slug/humanName/currentWorker/adjPrice) cạnh nhóm Utils.",
-    "4) Sửa 2 handler Parse & Fetch theo hướng dẫn find/replace.",
-    "5) Thay block HTML Worker (Settings) bằng snippet worker_mode.html.",
-    "6) Thêm block HTML chỉnh giá (Settings) bằng snippet price_adjust.html.",
-    "7) Thêm checkbox bulk sub1 vào khu Import bằng snippet import_bulk_sub1.html.",
-    "8) Lưu. Kiểm tra: tên hiển thị tiếng Việt sạch, SKU kebab-case, Worker chọn được, giá mặc định -3%."
-  ],
-  "files": [
-    {
-      "path": "patches/css/401_clean.css",
-      "content": "/* --- 4.0.1: font & layout polish --- */\nbody{font-family:ui-sans-serif,system-ui,-apple-system,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",\"Liberation Sans\",sans-serif}\ntable{table-layout:fixed}\nth,td{word-break:break-word;overflow-wrap:anywhere}\n.card{padding:12px}\n.btn{padding:7px 10px}\ntextarea{resize:vertical}\n"
-    },
-    {
-      "path": "patches/js/helpers_401.js",
-      "content": "// --- 4.0.1 Helpers ---\nfunction decodeURIComponentSafe(s){ try{ return decodeURIComponent(s) }catch{ return s } }\nfunction humanNameFromURL(u){\n  try{\n    const url=new URL(u);\n    const last=url.pathname.split('/').filter(Boolean).pop()||url.hostname;\n    const dec=decodeURIComponentSafe(last).replace(/[-_]+/g,' ').trim();\n    return /^\\d+$/.test(dec) ? url.hostname : dec;\n  }catch{ return u }\n}\nfunction slugifyVN(s){\n  s=String(s||'').trim();\n  if(/%[0-9A-Fa-f]{2}/.test(s)) s=decodeURIComponentSafe(s);\n  s=s.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase();\n  s=s.replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');\n  if(s.length>80) s=s.slice(0,80).replace(/-+$/,'');\n  return s || ('mxd-'+Date.now().toString(36));\n}\n// Worker mode helper (uses SETTINGS.worker_mode + SETTINGS.worker)\nfunction currentWorker(){\n  const mode = (SETTINGS.worker_mode||'default');\n  if(mode==='default') return 'https://mxd210.mxd6686.workers.dev';\n  if(mode==='custom')  return (SETTINGS.worker||'').trim();\n  return ''; // none\n}\n// Price adjust helper\nfunction adjPrice(p){\n  let v = Number(p)||0;\n  v = v * (1 + (Number(SETTINGS.price_adj)||0)/100);\n  if (SETTINGS.price_round) v = Math.round(v/1000)*1000;\n  return Math.max(0, Math.floor(v));\n}\n"
-    },
-    {
-      "path": "patches/js/fetchHead_override.js",
-      "content": "// --- 4.0.1: fetchHead using currentWorker ---\nasync function fetchHead(url){\n  const base = (currentWorker()||'').replace(/\\/+$/,'');\n  if(!base) return {status:0, parser:'fallback', title:'', image:'', price:null, brand:''};\n  const res = await fetch(base + '/head?url=' + encodeURIComponent(url), {mode:'cors'});\n  let data={}; try{ data = await res.json() }catch(_){}\n  return {\n    status: res.status||0, parser:'worker-head',\n    title: data.title||data.ogTitle||'', image: data.image||data.ogImage||'',\n    price: (data.price!=null && isFinite(Number(data.price))) ? Number(data.price) : null,\n    brand: data.brand||''\n  };\n}\n"
-    },
-    {
-      "path": "snippets/html/worker_mode.html",
-      "content": "<!-- Worker (mặc định / tùy chỉnh / tắt) -->\n<label>Worker (mặc định / tùy chỉnh / tắt)</label>\n<div class=\"row\">\n  <select id=\"worker-mode\" style=\"max-width:200px\">\n    <option value=\"default\">Default (mxd210)</option>\n    <option value=\"custom\">Custom…</option>\n    <option value=\"none\">None</option>\n  </select>\n  <input id=\"set-worker\" type=\"url\" placeholder=\"https://your-worker.workers.dev\" style=\"flex:1\">\n</div>\n"
-    },
-    {
-      "path": "snippets/html/price_adjust.html",
-      "content": "<!-- Price adjust -->\n<div class=\"grid\" style=\"gap:8px;margin-top:8px\">\n  <label>Price adjust (%) — Điều chỉnh giá (%):</label>\n  <div class=\"row\">\n    <input id=\"set-price-adj\" type=\"number\" step=\"0.1\" value=\"-3\" style=\"max-width:120px\">\n    <label class=\"row\"><input id=\"set-price-apply-out\" type=\"checkbox\" checked> Áp dụng lên bảng Output</label>\n    <label class=\"row\"><input id=\"set-price-round\" type=\"checkbox\"> Làm tròn 1.000đ</label>\n  </div>\n</div>\n"
-    },
-    {
-      "path": "snippets/html/import_bulk_sub1.html",
-      "content": "<!-- Bulk sub1 toggle -->\n<label class=\"row\"><input id=\"bulk-sub1\" type=\"checkbox\"> sub1 = {sku}</label>\n"
-    },
-    {
-      "path": "patches/js/settings_mount_save.txt",
-      "content": "// --- loadSettings(): add defaults ---\n// price_adj: -3, price_apply_out: true, price_round: false, worker_mode: 'default', worker: ''\n\n// --- mountSettings(): add ---\nq('#worker-mode').value = SETTINGS.worker_mode || 'default';\nq('#set-worker').value  = SETTINGS.worker || '';\nq('#set-price-adj').value = SETTINGS.price_adj ?? -3;\nq('#set-price-apply-out').checked = !!SETTINGS.price_apply_out;\nq('#set-price-round').checked = !!SETTINGS.price_round;\n\n// --- saveSettings(): add ---\nSETTINGS.worker_mode = q('#worker-mode').value;\nSETTINGS.worker      = q('#set-worker').value.trim();\nSETTINGS.price_adj   = Number(q('#set-price-adj').value)||0;\nSETTINGS.price_apply_out = q('#set-price-apply-out').checked;\nSETTINGS.price_round = q('#set-price-round').checked;\n"
-    },
-    {
-      "path": "patches/js/parse_fetch_changes.txt",
-      "content": "// --- In Parse handler ---\nconst fbName = humanNameFromURL(r.origin);\nconst name = r.name || fbName;\nconst m = r.merchant || guessMerchant(r.origin);\nlet price = Number(r.price)||0;\nif (SETTINGS.price_apply_out) price = adjPrice(price);\nlet sku = slugifyVN(name || fbName || r.origin);\nif ((!name || name.length<2) && m==='shopee'){ const ids=parseShopeeIDs(r.origin); if (ids) sku=`sp${ids.shop}-${ids.item}`; }\n\n// --- In Fetch handler ---\nconst fbName = humanNameFromURL(r.origin);\nlet name = r.name || head.title || fbName;\nlet price = (isFinite(r.price)&&r.price>0) ? r.price : (isFinite(head.price)?head.price:0);\nif (SETTINGS.price_apply_out) price = adjPrice(price);\nlet sku = slugifyVN(name || fbName || r.origin);\nif ((!name || name.length<2) && m==='shopee'){ const ids=parseShopeeIDs(r.origin); if (ids) sku=`sp${ids.shop}-${ids.item}`; }\n\n// --- In syncDerived or where building deeplink ---\nif (document.querySelector('#bulk-sub1')?.checked) it.sub1 = it.sku;\n"
-    },
-    {
-      "path": "patches/js/toAffJSON_snippet.txt",
-      "content": "// price field inside toAffJSON():\nprice: isFinite(it.price) ? (SETTINGS.price_apply_out ? Number(it.price) : adjPrice(it.price)) : 0,\n"
-    },
-    {
-      "path": "patches/js/snippet_price_data_attr.txt",
-      "content": "// when building product-meta snippet, ensure data-price uses adjusted value:\ndata-price=\"${isFinite(it.price)? (SETTINGS.price_apply_out?it.price:adjPrice(it.price)) : 0}\"\n"
-    },
-    {
-      "path": "instructions.txt",
-      "content": " === MXD Importer Patch Pack v4.0.1 Clean — Steps ===\n 1) Append CSS from patches/css/401_clean.css to the <style> block.\n 2) Add JS helpers from patches/js/helpers_401.js near your Utils.\n 3) Replace your fetchHead function with patches/js/fetchHead_override.js.\n 4) In Settings (HTML), replace Worker block with snippets/html/worker_mode.html.\n 5) In Settings (HTML), add snippets/html/price_adjust.html (below Worker is fine).\n 6) In Import area (HTML), add snippets/html/import_bulk_sub1.html near sub1 input.\n 7) In JS: apply patches from patches/js/settings_mount_save.txt to load/mount/save settings.\n 8) Update Parse & Fetch handlers using patches/js/parse_fetch_changes.txt.\n 9) Update toAffJSON() price line as in patches/js/toAffJSON_snippet.txt.\n10) If you output data-price in snippets, use patches/js/snippet_price_data_attr.txt.\n 11) Save and reload. Verify: VN text renders fine, SKU kebab-case, Worker mode works, default price adjust -3%.\n"
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>MXD Importer v4.3.7 — PRO (Publish + Deeplink BIG + Upload Ảnh)</title>
+  <meta name="robots" content="noindex,follow"/>
+  <style>
+    :root{
+      --bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--b:#1a2433;--accent:#7cc4ff;
+      --ok:#34d399;--warn:#f59e0b;--err:#ef4444;
     }
-  ]
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto}
+    h1,h2{margin:16px 0 8px}
+    h1{font-size:20px}
+    h2{font-size:16px;color:#cfe5ff}
+    a{color:var(--accent)}
+    .wrap{max-width:1000px;margin:0 auto;padding:16px}
+    .grid{display:grid;gap:12px}
+    .g2{grid-template-columns:1fr 1fr}
+    .card{background:var(--b);border:1px solid #203049;border-radius:12px;padding:14px}
+    label{display:block;font-weight:600;margin:8px 0 6px;color:#cfe5ff}
+    input,select,textarea,button{width:100%;padding:10px;border-radius:10px;border:1px solid #2b3b52;background:#0f1622;color:var(--fg)}
+    textarea{min-height:70px;resize:vertical}
+    .row{display:flex;gap:8px;align-items:center}
+    .row>*{flex:1}
+    .small{font-size:12px;color:var(--muted)}
+    .btn{cursor:pointer;border:1px solid #2b3b52;background:#102235}
+    .btn:hover{background:#132a43}
+    .btn.primary{background:#0b3a5e;border-color:#0b3a5e}
+    .btn.primary:hover{background:#0d4570}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #2a3b55;color:#a9c6ff}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
+    .deeplink-box{border:2px dashed #2f4666;border-radius:12px;padding:10px;background:#0c1623}
+    .deeplink-text{font-size:13px;font-weight:600}
+    .sticky-actions{position:sticky;bottom:0;background:linear-gradient(0deg,#0b0f14 60%,#0b0f1400);padding:12px;border-top:1px solid #1b2a3f}
+    .drop{border:2px dashed #3a5270;border-radius:12px;padding:16px;text-align:center;background:#0c1623}
+    .drop.dragover{border-color:#8ab9ff;background:#0f1e32}
+    .preview{display:flex;gap:12px;align-items:center}
+    .preview img{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid #27405e}
+    .toast{position:fixed;right:12px;bottom:12px;display:none;max-width:420px;background:#122232;border:1px solid #2b425e;border-radius:12px;padding:12px;box-shadow:0 10px 30px #0008}
+    .toast.show{display:block}
+    code.inline{background:#0e1622;border:1px solid #223449;border-radius:6px;padding:2px 6px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>MXD Importer v4.3.7 <span class="pill">PRO</span></h1>
+  <div class="small">Mục tiêu: 1 click đưa sản phẩm lên trang, đi đúng affiliate, ảnh đúng chuẩn <code class="inline">/assets/img/products/&lt;sku&gt;.webp</code>. Worker-first (nếu có), fallback tải file thủ công.</div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h2>1) Cài đặt (1 lần)</h2>
+      <label>Worker Base URL <span class="small">(để 1-click upload & publish; để trống = dùng chế độ tải file)</span></label>
+      <input id="workerUrl" placeholder="https://mxd210.mxd6686.workers.dev"/>
+      <div class="row">
+        <div>
+          <label>Shopee template</label>
+          <input id="tplShopee" placeholder="https://go.isclix.com/deep_link/XXXX/XXXX?url={url}&sub1=MXD&sub2={sku}&sub3=shopee&sub4=web"/>
+        </div>
+        <div>
+          <label>Lazada template</label>
+          <input id="tplLazada" placeholder="https://go.isclix.com/deep_link/YYYY/YYYY?url={url}&sub1=MXD&sub2={sku}&sub3=lazada&sub4=web"/>
+        </div>
+      </div>
+      <button class="btn" id="btnCheckWorker">Kiểm tra Worker</button>
+      <div id="workerStatus" class="small" style="margin-top:6px;color:#a7ffc7"></div>
+    </div>
+
+    <div class="card">
+      <h2>2) Ảnh sản phẩm</h2>
+      <div id="drop" class="drop">Kéo ảnh vào đây hoặc chọn…</div>
+      <input type="file" id="file" accept="image/*" style="display:none"/>
+      <div id="imgPreview" class="preview" style="margin-top:10px;display:none">
+        <img id="thumb" alt="preview"/>
+        <div class="small">
+          <div><b>Tên file đề xuất:</b> <code class="inline" id="imgName">-</code></div>
+          <div><b>Kích thước:</b> <span id="imgInfo">-</span></div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btnSelectImg">Chọn ảnh</button>
+        <button class="btn" id="btnConvert">Nén về .webp</button>
+        <button class="btn" id="btnSaveImg">Tải ảnh (.webp)</button>
+        <button class="btn primary" id="btnUploadImg">Upload ảnh → /assets/img/products/&lt;sku&gt;.webp</button>
+      </div>
+      <div class="small">Chuẩn: .webp, cạnh dài ~1200px, chất lượng 0.82.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>3) Thông tin sản phẩm</h2>
+    <div class="grid g2">
+      <div>
+        <label>Tên sản phẩm</label>
+        <input id="name" placeholder="Ví dụ: Dekton DK-AG950S"/>
+      </div>
+      <div>
+        <label>Giá (VND, không dấu chấm)</label>
+        <input id="price" type="number" placeholder="399000"/>
+      </div>
+      <div>
+        <label>Link gốc (origin)</label>
+        <input id="origin" placeholder="https://shopee.vn/…"/>
+      </div>
+      <div>
+        <label>Merchant</label>
+        <select id="merchant">
+          <option value="shopee">shopee</option>
+          <option value="lazada">lazada</option>
+        </select>
+      </div>
+      <div>
+        <label>SKU (auto từ tên; có thể sửa)</label>
+        <input id="sku" placeholder="dekton-dk-ag950s"/>
+      </div>
+      <div>
+        <label>Ảnh (đường dẫn)</label>
+        <input id="image" placeholder="/assets/img/products/dekton-dk-ag950s.webp"/>
+      </div>
+      <div>
+        <label>Danh mục (category)</label>
+        <input id="category" placeholder="may-mai, may-khoan, phu-kien…"/>
+      </div>
+      <div>
+        <label>Thương hiệu (brand)</label>
+        <input id="brand" placeholder="dekton, bosch, makuta…"/>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <label style="display:flex;align-items:center;gap:8px;flex:unset">
+        <input type="checkbox" id="featured" style="width:auto"/> Nổi bật (featured)
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;flex:unset">
+        <input type="checkbox" id="status" checked style="width:auto"/> Hiển thị (status)
+      </label>
+      <button class="btn" id="btnAuto">Điền auto từ tên + origin</button>
+    </div>
+  </div>
+
+  <div class="card deeplink-box">
+    <h2>4) Deep-link (to, rõ ràng, copy dễ)</h2>
+    <div class="grid g2">
+      <div>
+        <label>Origin (đã nhập)</label>
+        <textarea id="originOut" class="deeplink-text" readonly></textarea>
+        <div class="row" style="margin-top:6px">
+          <button class="btn" id="copyOrigin">Copy Origin</button>
+          <button class="btn" id="openOrigin">Mở Origin</button>
+        </div>
+      </div>
+      <div>
+        <label>Affiliate deep-link</label>
+        <textarea id="deeplink" class="deeplink-text" placeholder="Tự sinh từ template hoặc dán sẵn tại đây"></textarea>
+        <div class="row" style="margin-top:6px">
+          <button class="btn" id="btnMakeDeeplink">Tạo từ template</button>
+          <button class="btn" id="copyDeeplink">Copy Deep-link</button>
+          <button class="btn" id="openDeeplink">Mở Deep-link</button>
+        </div>
+        <div id="dlCheck" class="small" style="margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>5) JSON xuất bản</h2>
+    <textarea id="jsonOut" rows="8" spellcheck="false"></textarea>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btnToJson">Tạo JSON</button>
+      <button class="btn" id="btnCopyJson">Copy JSON</button>
+      <button class="btn" id="btnDownloadJson">Tải file affiliates.append.json</button>
+    </div>
+  </div>
+
+  <div class="sticky-actions row">
+    <button class="btn primary" id="btnPublish">Publish → Store</button>
+    <button class="btn" id="btnPublishFeatured">Publish → Nổi bật</button>
+    <button class="btn" id="btnGenCommit">Gen commit message</button>
+    <input id="commitMsg" readonly/>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $ = (s)=>document.querySelector(s);
+const slugify = s => s
+  .toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/đ/g,'d').replace(/Đ/g,'D')
+  .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+
+const state = {
+  workerOk:false,
+  imgBlob:null,
+  imgName:null,
+  imgW:0, imgH:0,
+};
+
+function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4000); }
+
+// Worker check
+$("#btnCheckWorker").onclick = async ()=>{
+  const base = $("#workerUrl").value.trim();
+  if(!base){ $("#workerStatus").textContent = "Không cấu hình Worker — dùng chế độ tải file."; return; }
+  try{
+    const r = await fetch(base.replace(/\/$/,'') + "/health", {mode:"cors"});
+    if(r.ok){ state.workerOk = true; $("#workerStatus").textContent = "Worker OK (health 200)."; toast("Worker sẵn sàng.","ok"); }
+    else { state.workerOk = false; $("#workerStatus").textContent = "Worker phản hồi nhưng không OK ("+r.status+")."; toast("Worker không OK","warn"); }
+  }catch(e){ state.workerOk = false; $("#workerStatus").textContent = "Không kết nối được Worker."; toast("Không kết nối Worker","err"); }
+};
+
+// Auto fill from name/origin
+$("#btnAuto").onclick = ()=>{
+  const name=$("#name").value.trim();
+  const origin=$("#origin").value.trim();
+  if(name && !$("#sku").value) $("#sku").value = slugify(name);
+  if($("#sku").value && !$("#image").value) $("#image").value = `/assets/img/products/${$("#sku").value}.webp`;
+  $("#originOut").value = origin;
+};
+
+// Deep-link make & validate
+function makeDeeplink(){
+  const origin = $("#origin").value.trim();
+  const sku = $("#sku").value.trim();
+  const merchant = $("#merchant").value;
+  const tpl = merchant==='shopee' ? $("#tplShopee").value.trim() : $("#tplLazada").value.trim();
+  if(!origin || !tpl){ toast("Thiếu Origin hoặc template.","warn"); return; }
+  const urlEnc = encodeURIComponent(origin);
+  const link = tpl.replace("{url}", urlEnc).replace("{sku}", sku||"sku");
+  $("#deeplink").value = link;
+  validateDeeplink();
+}
+$("#btnMakeDeeplink").onclick = makeDeeplink;
+
+function validateDeeplink(){
+  const dl = $("#deeplink").value.trim();
+  if(!dl){ $("#dlCheck").innerHTML = '<span class="warn">Chưa có deeplink.</span>'; return; }
+  const goodHost = /isclix\.com/i.test(dl);
+  const hasSubs = /sub1=/.test(dl);
+  if(goodHost && hasSubs){ $("#dlCheck").innerHTML = '<span class="ok">✔ Có vẻ đã đi qua affiliate (isclix + sub*).</span>'; }
+  else if(goodHost){ $("#dlCheck").innerHTML = '<span class="warn">Có isclix nhưng thiếu sub* theo chuẩn.</span>'; }
+  else { $("#dlCheck").innerHTML = '<span class="err">Không thấy isclix — có thể KHÔNG đi qua affiliate.</span>'; }
+}
+$("#deeplink").addEventListener('input', validateDeeplink);
+$("#origin").addEventListener('input', ()=>$("#originOut").value=$("#origin").value);
+
+// Copy/Open
+function copyText(el){ el.select(); document.execCommand('copy'); toast("Đã copy."); }
+$("#copyOrigin").onclick = ()=>copyText($("#originOut"));
+$("#copyDeeplink").onclick = ()=>copyText($("#deeplink"));
+$("#openOrigin").onclick = ()=>{ const u=$("#originOut").value.trim(); if(u) window.open(u,'_blank'); };
+$("#openDeeplink").onclick = ()=>{ const u=$("#deeplink").value.trim(); if(u) window.open(u,'_blank'); };
+
+// JSON build
+function buildJson(){
+  const now = new Date().toISOString();
+  const obj = {
+    name: $("#name").value.trim(),
+    price: Number($("#price").value||0),
+    origin: $("#origin").value.trim(),
+    merchant: $("#merchant").value,
+    sku: $("#sku").value.trim(),
+    image: $("#image").value.trim(),
+    category: $("#category").value.trim(),
+    brand: $("#brand").value.trim(),
+    featured: $("#featured").checked,
+    status: $("#status").checked,
+    updated_at: now
+  };
+  const dl = $("#deeplink").value.trim();
+  if(dl) obj.deeplink = dl; // optional, giúp kiểm soát "đi qua affiliate"
+  $("#jsonOut").value = JSON.stringify([obj], null, 2);
+  return obj;
+}
+$("#btnToJson").onclick = buildJson;
+$("#btnCopyJson").onclick = ()=>copyText($("#jsonOut"));
+$("#btnDownloadJson").onclick = ()=>{
+  if(!$("#jsonOut").value) buildJson();
+  const blob = new Blob([$("#jsonOut").value], {type:"application/json"});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'affiliates.append.json';
+  a.click();
+};
+
+// Commit message
+$("#btnGenCommit").onclick = ()=>{
+  const sku = $("#sku").value.trim()||'sku';
+  const msg = `feat(data): add/update ${sku} (+image?) via importer 4.3.7`;
+  $("#commitMsg").value = msg;
+};
+
+// Image handling
+const drop = $("#drop"), file=$("#file"), thumb=$("#thumb"), imgName=$("#imgName"), imgInfo=$("#imgInfo");
+drop.addEventListener('click', ()=>file.click());
+$("#btnSelectImg").onclick = ()=>file.click();
+drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.classList.add('dragover'); });
+drop.addEventListener('dragleave', ()=>drop.classList.remove('dragover'));
+drop.addEventListener('drop', e=>{ e.preventDefault(); drop.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
+file.onchange = e=>handleFile(e.target.files[0]);
+
+function handleFile(f){
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const sku = $("#sku").value.trim() || slugify($("#name").value.trim()||'mxd');
+      const maxSide = 1200;
+      const scale = Math.min(1, maxSide/Math.max(img.width, img.height));
+      const w = Math.round(img.width*scale), h = Math.round(img.height*scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      canvas.toBlob(blob=>{
+        state.imgBlob = blob;
+        state.imgW = w; state.imgH = h;
+        state.imgName = `${sku}.webp`;
+        $("#image").value = `/assets/img/products/${sku}.webp`;
+        $("#imgPreview").style.display='flex';
+        thumb.src = URL.createObjectURL(blob);
+        imgName.textContent = state.imgName;
+        imgInfo.textContent = `${w}×${h}, ${(blob.size/1024).toFixed(1)} KB`;
+      }, 'image/webp', 0.82);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+$("#btnConvert").onclick = ()=>{ if(!state.imgBlob){ toast("Chưa chọn ảnh.","warn"); return; } toast("Đã nén .webp sẵn."); };
+$("#btnSaveImg").onclick = ()=>{
+  if(!state.imgBlob){ toast("Chưa có ảnh.","warn"); return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(state.imgBlob);
+  a.download = state.imgName || 'product.webp';
+  a.click();
+};
+$("#btnUploadImg").onclick = async ()=>{
+  if(!state.imgBlob){ toast("Chưa có ảnh.","warn"); return; }
+  if(!state.workerOk){ toast("Chưa cấu hình Worker — dùng nút 'Tải ảnh' để lưu file và commit thủ công.", "warn"); return; }
+  const base = $("#workerUrl").value.trim().replace(/\/$/,'');
+  const sku = $("#sku").value.trim();
+  const path = `/assets/img/products/${sku}.webp`;
+  const b64 = await blobToBase64(state.imgBlob);
+  try{
+    const r = await fetch(base + "/upload-image", {
+      method:"POST", mode:"cors",
+      headers:{"content-type":"application/json"},
+      body: JSON.stringify({ sku, path, file: b64 })
+    });
+    if(!r.ok) throw new Error(String(r.status));
+    toast("Đã upload ảnh lên repo.","ok");
+  }catch(e){ toast("Upload ảnh lỗi: "+e.message, "err"); }
+};
+function blobToBase64(blob){
+  return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(blob); });
+}
+
+// Publish
+$("#btnPublish").onclick = ()=>doPublish(false);
+$("#btnPublishFeatured").onclick = ()=>doPublish(true);
+
+async function doPublish(forceFeatured){
+  const obj = buildJson();
+  if(forceFeatured) { obj.featured = true; $("#featured").checked = true; $("#jsonOut").value = JSON.stringify([obj], null, 2); }
+  // Validate affiliate
+  if(!obj.origin){ toast("Thiếu origin.","warn"); return; }
+  const dl = $("#deeplink").value.trim();
+  if(!/isclix\.com/i.test(dl)){ toast("Cảnh báo: Deep-link chưa rõ qua affiliate (không thấy isclix). Vẫn tiếp tục?", "warn"); }
+  // Worker-first
+  if(state.workerOk){
+    const base = $("#workerUrl").value.trim().replace(/\/$/,'');
+    try{
+      const r = await fetch(base + "/publish", {
+        method:"POST", mode:"cors",
+        headers:{"content-type":"application/json"},
+        body: JSON.stringify(obj)
+      });
+      if(!r.ok){ throw new Error('HTTP '+r.status); }
+      toast("Publish OK → store (và nổi bật nếu bật).","ok");
+      window.scrollTo({top:0,behavior:'smooth'});
+      return;
+    }catch(e){ toast("Publish lỗi (sẽ cho tải JSON để commit tay): "+e.message,"err"); }
+  }
+  // Fallback: tải JSON để commit tay
+  const blob = new Blob([JSON.stringify([obj],null,2)], {type:"application/json"});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'affiliates.append.json'; a.click();
+}
+
+// Init
+["name","origin"].forEach(id=>$( "#"+id ).addEventListener('input', ()=>{
+  if(id==="name"){ if(!$("#sku").value) $("#sku").value = slugify($("#name").value.trim()); }
+  if($("#sku").value && !$("#image").value) $("#image").value = `/assets/img/products/${$("#sku").value}.webp`;
+}));
+</script>
+</body>
+</html>
