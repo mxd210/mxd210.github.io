@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MXD Importer v4.3.7 — PRO (Publish + Deeplink BIG + Upload Ảnh)</title>
+  <title>MXD Importer v4.3.8 — PRO (Settings + X-Key + Publish 1‑click)</title>
   <meta name="robots" content="noindex,follow"/>
   <style>
     :root{
-      --bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--b:#1a2433;--accent:#7cc4ff;
+      --bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--b:#152132;--accent:#7cc4ff;
       --ok:#34d399;--warn:#f59e0b;--err:#ef4444;
     }
     *{box-sizing:border-box}
@@ -16,14 +16,14 @@
     h1{font-size:20px}
     h2{font-size:16px;color:#cfe5ff}
     a{color:var(--accent)}
-    .wrap{max-width:1000px;margin:0 auto;padding:16px}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
     .grid{display:grid;gap:12px}
     .g2{grid-template-columns:1fr 1fr}
-    .card{background:var(--b);border:1px solid #203049;border-radius:12px;padding:14px}
-    label{display:block;font-weight:600;margin:8px 0 6px;color:#cfe5ff}
+    .card{background:var(--b);border:1px solid #223348;border-radius:12px;padding:14px}
+    label{display:block;font-weight:700;margin:8px 0 6px;color:#cfe5ff}
     input,select,textarea,button{width:100%;padding:10px;border-radius:10px;border:1px solid #2b3b52;background:#0f1622;color:var(--fg)}
     textarea{min-height:70px;resize:vertical}
-    .row{display:flex;gap:8px;align-items:center}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .row>*{flex:1}
     .small{font-size:12px;color:var(--muted)}
     .btn{cursor:pointer;border:1px solid #2b3b52;background:#102235}
@@ -34,40 +34,57 @@
     .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
     .deeplink-box{border:2px dashed #2f4666;border-radius:12px;padding:10px;background:#0c1623}
     .deeplink-text{font-size:13px;font-weight:600}
-    .sticky-actions{position:sticky;bottom:0;background:linear-gradient(0deg,#0b0f14 60%,#0b0f1400);padding:12px;border-top:1px solid #1b2a3f}
+    .sticky-actions{position:sticky;bottom:0;background:linear-gradient(0deg,#0b0f14 60%,#0b0f1400);padding:12px;border-top:1px solid #1b2a3f;z-index:9}
     .drop{border:2px dashed #3a5270;border-radius:12px;padding:16px;text-align:center;background:#0c1623}
     .drop.dragover{border-color:#8ab9ff;background:#0f1e32}
     .preview{display:flex;gap:12px;align-items:center}
     .preview img{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid #27405e}
-    .toast{position:fixed;right:12px;bottom:12px;display:none;max-width:420px;background:#122232;border:1px solid #2b425e;border-radius:12px;padding:12px;box-shadow:0 10px 30px #0008}
+    .toast{position:fixed;right:12px;bottom:12px;display:none;max-width:520px;background:#122232;border:1px solid #2b425e;border-radius:12px;padding:12px;box-shadow:0 10px 30px #0008}
     .toast.show{display:block}
     code.inline{background:#0e1622;border:1px solid #223449;border-radius:6px;padding:2px 6px}
+    .badge{display:inline-block;border:1px solid #2b3b52;border-radius:999px;padding:2px 8px;font-size:11px;color:#a4bee8}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>MXD Importer v4.3.7 <span class="pill">PRO</span></h1>
-  <div class="small">Mục tiêu: 1 click đưa sản phẩm lên trang, đi đúng affiliate, ảnh đúng chuẩn <code class="inline">/assets/img/products/&lt;sku&gt;.webp</code>. Worker-first (nếu có), fallback tải file thủ công.</div>
+  <h1>MXD Importer v4.3.8 <span class="pill">PRO</span></h1>
+  <div class="small">“Một click lên web” nhưng không đánh rơi chuẩn MXD210: ảnh đúng đường dẫn, JSON đúng schema, link đi qua affiliate. Phiên bản này khôi phục/chuẩn hóa tất cả tính năng bản cũ + thêm <b>Lưu cài đặt</b> và <b>X-Key</b>.</div>
+
+  <div class="card">
+    <h2>1) Cài đặt (lưu vào trình duyệt)</h2>
+    <div class="grid g2">
+      <div>
+        <label>Worker Base URL</label>
+        <input id="workerUrl" placeholder="https://mxd210.mxd6686.workers.dev"/>
+      </div>
+      <div>
+        <label>X-Key (header bảo vệ Worker)</label>
+        <input id="xKey" placeholder="Ví dụ: mxd210-secret-key"/>
+      </div>
+      <div>
+        <label>Shopee template</label>
+        <input id="tplShopee" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1=MXD&sub2={sku}&sub3=shopee&sub4=web"/>
+      </div>
+      <div>
+        <label>Lazada template</label>
+        <input id="tplLazada" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1=MXD&sub2={sku}&sub3=lazada&sub4=web"/>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btnSaveSettings">💾 Lưu cài đặt</button>
+      <button class="btn" id="btnLoadSettings">↻ Tải lại</button>
+      <button class="btn" id="btnClearSettings">🗑 Xóa cài đặt</button>
+      <span class="small" id="settingsStatus"></span>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btnCheckWorker">Kiểm tra Worker</button>
+      <button class="btn" id="btnCheckAuth">Kiểm tra X-Key</button>
+      <button class="btn" id="btnCheckWrite">Kiểm tra quyền commit</button>
+      <span class="small" id="workerStatus"></span>
+    </div>
+  </div>
 
   <div class="grid g2">
-    <div class="card">
-      <h2>1) Cài đặt (1 lần)</h2>
-      <label>Worker Base URL <span class="small">(để 1-click upload & publish; để trống = dùng chế độ tải file)</span></label>
-      <input id="workerUrl" placeholder="https://mxd210.mxd6686.workers.dev"/>
-      <div class="row">
-        <div>
-          <label>Shopee template</label>
-          <input id="tplShopee" placeholder="https://go.isclix.com/deep_link/XXXX/XXXX?url={url}&sub1=MXD&sub2={sku}&sub3=shopee&sub4=web"/>
-        </div>
-        <div>
-          <label>Lazada template</label>
-          <input id="tplLazada" placeholder="https://go.isclix.com/deep_link/YYYY/YYYY?url={url}&sub1=MXD&sub2={sku}&sub3=lazada&sub4=web"/>
-        </div>
-      </div>
-      <button class="btn" id="btnCheckWorker">Kiểm tra Worker</button>
-      <div id="workerStatus" class="small" style="margin-top:6px;color:#a7ffc7"></div>
-    </div>
-
     <div class="card">
       <h2>2) Ảnh sản phẩm</h2>
       <div id="drop" class="drop">Kéo ảnh vào đây hoặc chọn…</div>
@@ -81,66 +98,70 @@
       </div>
       <div class="row" style="margin-top:10px">
         <button class="btn" id="btnSelectImg">Chọn ảnh</button>
-        <button class="btn" id="btnConvert">Nén về .webp</button>
+        <button class="btn" id="btnConvert">Nén .webp</button>
         <button class="btn" id="btnSaveImg">Tải ảnh (.webp)</button>
         <button class="btn primary" id="btnUploadImg">Upload ảnh → /assets/img/products/&lt;sku&gt;.webp</button>
       </div>
       <div class="small">Chuẩn: .webp, cạnh dài ~1200px, chất lượng 0.82.</div>
     </div>
-  </div>
 
-  <div class="card">
-    <h2>3) Thông tin sản phẩm</h2>
-    <div class="grid g2">
-      <div>
-        <label>Tên sản phẩm</label>
-        <input id="name" placeholder="Ví dụ: Dekton DK-AG950S"/>
+    <div class="card">
+      <h2>3) Thông tin sản phẩm</h2>
+      <div class="grid">
+        <div class="row">
+          <div>
+            <label>Tên sản phẩm</label>
+            <input id="name" placeholder="Ví dụ: Dekton DK-AG950S"/>
+          </div>
+          <div>
+            <label>SKU (bắt buộc, có thể sửa)</label>
+            <input id="sku" placeholder="dekton-dk-ag950s"/>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Giá (VND, không chấm)</label>
+            <input id="price" type="number" placeholder="399000"/>
+          </div>
+          <div>
+            <label>Merchant</label>
+            <select id="merchant"><option value="shopee">shopee</option><option value="lazada">lazada</option></select>
+          </div>
+        </div>
+        <div>
+          <label>Link gốc (origin)</label>
+          <input id="origin" placeholder="https://shopee.vn/…"/>
+        </div>
+        <div class="row">
+          <div>
+            <label>Ảnh (đường dẫn)</label>
+            <input id="image" placeholder="/assets/img/products/dekton-dk-ag950s.webp"/>
+          </div>
+          <div>
+            <label>Danh mục (category)</label>
+            <input id="category" placeholder="may-khoan / may-mai / phu-kien"/>
+          </div>
+        </div>
+        <div>
+          <label>Thương hiệu (brand)</label>
+          <input id="brand" placeholder="dekton, bosch, makuta…"/>
+        </div>
+        <div class="row">
+          <label style="display:flex;align-items:center;gap:8px;flex:unset">
+            <input type="checkbox" id="featured" style="width:auto"/> Nổi bật (featured)
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;flex:unset">
+            <input type="checkbox" id="status" checked style="width:auto"/> Hiển thị (status)
+          </label>
+          <button class="btn" id="btnAuto">Điền auto từ tên</button>
+        </div>
+        <div id="diag" class="small"></div>
       </div>
-      <div>
-        <label>Giá (VND, không dấu chấm)</label>
-        <input id="price" type="number" placeholder="399000"/>
-      </div>
-      <div>
-        <label>Link gốc (origin)</label>
-        <input id="origin" placeholder="https://shopee.vn/…"/>
-      </div>
-      <div>
-        <label>Merchant</label>
-        <select id="merchant">
-          <option value="shopee">shopee</option>
-          <option value="lazada">lazada</option>
-        </select>
-      </div>
-      <div>
-        <label>SKU (auto từ tên; có thể sửa)</label>
-        <input id="sku" placeholder="dekton-dk-ag950s"/>
-      </div>
-      <div>
-        <label>Ảnh (đường dẫn)</label>
-        <input id="image" placeholder="/assets/img/products/dekton-dk-ag950s.webp"/>
-      </div>
-      <div>
-        <label>Danh mục (category)</label>
-        <input id="category" placeholder="may-mai, may-khoan, phu-kien…"/>
-      </div>
-      <div>
-        <label>Thương hiệu (brand)</label>
-        <input id="brand" placeholder="dekton, bosch, makuta…"/>
-      </div>
-    </div>
-    <div class="row" style="margin-top:8px">
-      <label style="display:flex;align-items:center;gap:8px;flex:unset">
-        <input type="checkbox" id="featured" style="width:auto"/> Nổi bật (featured)
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;flex:unset">
-        <input type="checkbox" id="status" checked style="width:auto"/> Hiển thị (status)
-      </label>
-      <button class="btn" id="btnAuto">Điền auto từ tên + origin</button>
     </div>
   </div>
 
   <div class="card deeplink-box">
-    <h2>4) Deep-link (to, rõ ràng, copy dễ)</h2>
+    <h2>4) Deep‑link (to, rõ ràng, copy dễ)</h2>
     <div class="grid g2">
       <div>
         <label>Origin (đã nhập)</label>
@@ -151,14 +172,14 @@
         </div>
       </div>
       <div>
-        <label>Affiliate deep-link</label>
+        <label>Affiliate deep‑link</label>
         <textarea id="deeplink" class="deeplink-text" placeholder="Tự sinh từ template hoặc dán sẵn tại đây"></textarea>
         <div class="row" style="margin-top:6px">
           <button class="btn" id="btnMakeDeeplink">Tạo từ template</button>
-          <button class="btn" id="copyDeeplink">Copy Deep-link</button>
-          <button class="btn" id="openDeeplink">Mở Deep-link</button>
+          <button class="btn" id="copyDeeplink">Copy Deep‑link</button>
+          <button class="btn" id="openDeeplink">Mở Deep‑link</button>
+          <span id="dlCheck" class="badge">–</span>
         </div>
-        <div id="dlCheck" class="small" style="margin-top:6px"></div>
       </div>
     </div>
   </div>
@@ -169,7 +190,7 @@
     <div class="row" style="margin-top:8px">
       <button class="btn" id="btnToJson">Tạo JSON</button>
       <button class="btn" id="btnCopyJson">Copy JSON</button>
-      <button class="btn" id="btnDownloadJson">Tải file affiliates.append.json</button>
+      <button class="btn" id="btnDownloadJson">Tải affiliates.append.json</button>
     </div>
   </div>
 
@@ -184,42 +205,94 @@
 </div>
 
 <script>
-const $ = (s)=>document.querySelector(s);
-const slugify = s => s
-  .toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-  .replace(/đ/g,'d').replace(/Đ/g,'D')
-  .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const $ = s => document.querySelector(s);
+const LS_KEY = 'MXD_IMPORTER_SETTINGS_V438';
+const slugify = s => s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+                 .replace(/đ/g,'d').replace(/Đ/g,'D')
+                 .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 
-const state = {
-  workerOk:false,
-  imgBlob:null,
-  imgName:null,
-  imgW:0, imgH:0,
-};
+const state = { workerOk:false, imgBlob:null, imgName:null, imgW:0, imgH:0 };
+function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4500); }
 
-function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4000); }
+// ---------- Settings Save/Load ----------
+function readSettings(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY)||'{}'); }catch(_){ return {}; }
+}
+function writeSettings(s){ localStorage.setItem(LS_KEY, JSON.stringify(s)); }
+function uiToSettings(){
+  return {
+    workerUrl: $("#workerUrl").value.trim(),
+    xKey: $("#xKey").value.trim(),
+    tplShopee: $("#tplShopee").value.trim(),
+    tplLazada: $("#tplLazada").value.trim()
+  };
+}
+function settingsToUi(s){
+  $("#workerUrl").value = s.workerUrl||'';
+  $("#xKey").value = s.xKey||'';
+  $("#tplShopee").value = s.tplShopee||'';
+  $("#tplLazada").value = s.tplLazada||'';
+}
+function saveSettings(){ writeSettings(uiToSettings()); $("#settingsStatus").textContent="Đã lưu."; toast("Đã lưu cài đặt.","ok"); }
+function loadSettings(){ settingsToUi(readSettings()); $("#settingsStatus").textContent="Đã tải cài đặt."; }
+$("#btnSaveSettings").onclick = saveSettings;
+$("#btnLoadSettings").onclick = loadSettings;
+$("#btnClearSettings").onclick = ()=>{ localStorage.removeItem(LS_KEY); settingsToUi({}); $("#settingsStatus").textContent="Đã xóa."; };
 
-// Worker check
+// Load once at start
+loadSettings();
+
+// ---------- Worker checks ----------
+function hdr(){ const s=readSettings(); const h={}; if(s.xKey) h['x-key']=s.xKey; h['content-type']='application/json'; return h; }
+async function check(url){
+  try{ const r = await fetch(url, {mode:"cors", headers: hdr()}); return {ok:r.ok, status:r.status, text: await r.text().catch(()=>'' )}; }catch(e){ return {ok:false, status:-1, text:String(e)}; }
+}
 $("#btnCheckWorker").onclick = async ()=>{
-  const base = $("#workerUrl").value.trim();
-  if(!base){ $("#workerStatus").textContent = "Không cấu hình Worker — dùng chế độ tải file."; return; }
-  try{
-    const r = await fetch(base.replace(/\/$/,'') + "/health", {mode:"cors"});
-    if(r.ok){ state.workerOk = true; $("#workerStatus").textContent = "Worker OK (health 200)."; toast("Worker sẵn sàng.","ok"); }
-    else { state.workerOk = false; $("#workerStatus").textContent = "Worker phản hồi nhưng không OK ("+r.status+")."; toast("Worker không OK","warn"); }
-  }catch(e){ state.workerOk = false; $("#workerStatus").textContent = "Không kết nối được Worker."; toast("Không kết nối Worker","err"); }
+  const s=readSettings(); if(!s.workerUrl){ $("#workerStatus").textContent="Chưa cấu hình Worker."; return; }
+  const u = s.workerUrl.replace(/\/$/,'') + "/health";
+  const r = await check(u);
+  state.workerOk = r.ok;
+  $("#workerStatus").textContent = r.ok ? "Worker OK (health "+r.status+")." : "Worker lỗi ("+r.status+"). " + r.text.slice(0,120);
+  toast(r.ok?"Worker OK":"Worker lỗi "+r.status, r.ok?"ok":"err");
+};
+$("#btnCheckAuth").onclick = async ()=>{
+  const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; }
+  const u = s.workerUrl.replace(/\/$/,'') + "/whoami";
+  const r = await check(u);
+  toast(r.ok?"X-Key hợp lệ.":"X-Key không hợp lệ ("+r.status+")", r.ok?"ok":"err");
+};
+$("#btnCheckWrite").onclick = async ()=>{
+  const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; }
+  const u = s.workerUrl.replace(/\/$/,'') + "/can-write";
+  const r = await check(u);
+  toast(r.ok?"Có quyền commit.":"Không có quyền ("+r.status+")", r.ok?"ok":"err");
 };
 
-// Auto fill from name/origin
+// ---------- Auto fill / diagnostics ----------
 $("#btnAuto").onclick = ()=>{
   const name=$("#name").value.trim();
-  const origin=$("#origin").value.trim();
-  if(name && !$("#sku").value) $("#sku").value = slugify(name);
+  const skuNow=$("#sku").value.trim();
+  if(name && !skuNow) $("#sku").value = slugify(name);
   if($("#sku").value && !$("#image").value) $("#image").value = `/assets/img/products/${$("#sku").value}.webp`;
-  $("#originOut").value = origin;
+  $("#originOut").value = $("#origin").value.trim();
+  runDiag();
 };
+["name","sku","origin","image","merchant"].forEach(id=>$("#"+id).addEventListener('input', runDiag));
 
-// Deep-link make & validate
+function runDiag(){
+  const sku = $("#sku").value.trim();
+  const img = $("#image").value.trim();
+  const origin = $("#origin").value.trim();
+  const merchant = $("#merchant").value;
+  const msgs = [];
+  if(!sku) msgs.push("• Thiếu SKU.");
+  if(img && !img.startsWith(`/assets/img/products/${sku||'...'}`)) msgs.push("• Ảnh nên là /assets/img/products/"+(sku||'&lt;sku&gt;')+".webp");
+  if(origin && !/shopee\.vn|lazada\.vn/i.test(origin)) msgs.push("• Origin không phải Shopee/Lazada.");
+  msgs.push("• Merchant: "+merchant);
+  $("#diag").innerHTML = msgs.length? msgs.map(x=>`<div>${x}</div>`).join("") : '<span class="ok">Tạm ổn.</span>';
+}
+
+// ---------- Deep-link ----------
 function makeDeeplink(){
   const origin = $("#origin").value.trim();
   const sku = $("#sku").value.trim();
@@ -228,31 +301,24 @@ function makeDeeplink(){
   if(!origin || !tpl){ toast("Thiếu Origin hoặc template.","warn"); return; }
   const urlEnc = encodeURIComponent(origin);
   const link = tpl.replace("{url}", urlEnc).replace("{sku}", sku||"sku");
-  $("#deeplink").value = link;
-  validateDeeplink();
+  $("#deeplink").value = link; validateDeeplink();
 }
 $("#btnMakeDeeplink").onclick = makeDeeplink;
-
+$("#origin").addEventListener('input', ()=>$("#originOut").value=$("#origin").value);
 function validateDeeplink(){
   const dl = $("#deeplink").value.trim();
-  if(!dl){ $("#dlCheck").innerHTML = '<span class="warn">Chưa có deeplink.</span>'; return; }
-  const goodHost = /isclix\.com/i.test(dl);
-  const hasSubs = /sub1=/.test(dl);
-  if(goodHost && hasSubs){ $("#dlCheck").innerHTML = '<span class="ok">✔ Có vẻ đã đi qua affiliate (isclix + sub*).</span>'; }
-  else if(goodHost){ $("#dlCheck").innerHTML = '<span class="warn">Có isclix nhưng thiếu sub* theo chuẩn.</span>'; }
-  else { $("#dlCheck").innerHTML = '<span class="err">Không thấy isclix — có thể KHÔNG đi qua affiliate.</span>'; }
+  const okHost = /isclix\.com/i.test(dl);
+  const s1 = /[?&]sub1=/.test(dl), s2=/[?&]sub2=/.test(dl), s3=/[?&]sub3=/.test(dl), s4=/[?&]sub4=/.test(dl);
+  let txt = "–";
+  if(!dl) txt="chưa có deeplink";
+  else if(okHost && s1 && s2 && s3 && s4) txt="OK affiliate";
+  else if(okHost) txt="isclix nhưng thiếu sub*";
+  else txt="KHÔNG qua affiliate";
+  $("#dlCheck").textContent = txt;
 }
 $("#deeplink").addEventListener('input', validateDeeplink);
-$("#origin").addEventListener('input', ()=>$("#originOut").value=$("#origin").value);
 
-// Copy/Open
-function copyText(el){ el.select(); document.execCommand('copy'); toast("Đã copy."); }
-$("#copyOrigin").onclick = ()=>copyText($("#originOut"));
-$("#copyDeeplink").onclick = ()=>copyText($("#deeplink"));
-$("#openOrigin").onclick = ()=>{ const u=$("#originOut").value.trim(); if(u) window.open(u,'_blank'); };
-$("#openDeeplink").onclick = ()=>{ const u=$("#deeplink").value.trim(); if(u) window.open(u,'_blank'); };
-
-// JSON build
+// ---------- JSON ----------
 function buildJson(){
   const now = new Date().toISOString();
   const obj = {
@@ -269,29 +335,26 @@ function buildJson(){
     updated_at: now
   };
   const dl = $("#deeplink").value.trim();
-  if(dl) obj.deeplink = dl; // optional, giúp kiểm soát "đi qua affiliate"
+  if(dl) obj.deeplink = dl;
   $("#jsonOut").value = JSON.stringify([obj], null, 2);
   return obj;
 }
 $("#btnToJson").onclick = buildJson;
-$("#btnCopyJson").onclick = ()=>copyText($("#jsonOut"));
+$("#btnCopyJson").onclick = ()=>{ $("#jsonOut").select(); document.execCommand('copy'); toast("Đã copy JSON."); };
 $("#btnDownloadJson").onclick = ()=>{
   if(!$("#jsonOut").value) buildJson();
   const blob = new Blob([$("#jsonOut").value], {type:"application/json"});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'affiliates.append.json';
-  a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'affiliates.append.json'; a.click();
 };
 
-// Commit message
+// ---------- Commit message ----------
 $("#btnGenCommit").onclick = ()=>{
   const sku = $("#sku").value.trim()||'sku';
-  const msg = `feat(data): add/update ${sku} (+image?) via importer 4.3.7`;
+  const msg = `feat(data): add/update ${sku} (+image?) via importer 4.3.8`;
   $("#commitMsg").value = msg;
 };
 
-// Image handling
+// ---------- Image handling ----------
 const drop = $("#drop"), file=$("#file"), thumb=$("#thumb"), imgName=$("#imgName"), imgInfo=$("#imgInfo");
 drop.addEventListener('click', ()=>file.click());
 $("#btnSelectImg").onclick = ()=>file.click();
@@ -310,18 +373,13 @@ function handleFile(f){
       const maxSide = 1200;
       const scale = Math.min(1, maxSide/Math.max(img.width, img.height));
       const w = Math.round(img.width*scale), h = Math.round(img.height*scale);
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
+      const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
       canvas.toBlob(blob=>{
-        state.imgBlob = blob;
-        state.imgW = w; state.imgH = h;
-        state.imgName = `${sku}.webp`;
+        state.imgBlob = blob; state.imgW = w; state.imgH = h; state.imgName = `${sku}.webp`;
         $("#image").value = `/assets/img/products/${sku}.webp`;
-        $("#imgPreview").style.display='flex';
-        thumb.src = URL.createObjectURL(blob);
-        imgName.textContent = state.imgName;
-        imgInfo.textContent = `${w}×${h}, ${(blob.size/1024).toFixed(1)} KB`;
+        $("#imgPreview").style.display='flex'; thumb.src = URL.createObjectURL(blob);
+        imgName.textContent = state.imgName; imgInfo.textContent = `${w}×${h}, ${(blob.size/1024).toFixed(1)} KB`;
       }, 'image/webp', 0.82);
     };
     img.src = ev.target.result;
@@ -331,68 +389,61 @@ function handleFile(f){
 $("#btnConvert").onclick = ()=>{ if(!state.imgBlob){ toast("Chưa chọn ảnh.","warn"); return; } toast("Đã nén .webp sẵn."); };
 $("#btnSaveImg").onclick = ()=>{
   if(!state.imgBlob){ toast("Chưa có ảnh.","warn"); return; }
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(state.imgBlob);
-  a.download = state.imgName || 'product.webp';
-  a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(state.imgBlob); a.download = state.imgName || 'product.webp'; a.click();
 };
 $("#btnUploadImg").onclick = async ()=>{
   if(!state.imgBlob){ toast("Chưa có ảnh.","warn"); return; }
-  if(!state.workerOk){ toast("Chưa cấu hình Worker — dùng nút 'Tải ảnh' để lưu file và commit thủ công.", "warn"); return; }
-  const base = $("#workerUrl").value.trim().replace(/\/$/,'');
+  const s=readSettings();
+  if(!s.workerUrl){ toast("Chưa cấu hình Worker — dùng 'Tải ảnh' để lưu file và commit tay.", "warn"); return; }
+  const base = s.workerUrl.replace(/\/$/,'');
   const sku = $("#sku").value.trim();
   const path = `/assets/img/products/${sku}.webp`;
   const b64 = await blobToBase64(state.imgBlob);
   try{
     const r = await fetch(base + "/upload-image", {
       method:"POST", mode:"cors",
-      headers:{"content-type":"application/json"},
+      headers: hdr(),
       body: JSON.stringify({ sku, path, file: b64 })
     });
     if(!r.ok) throw new Error(String(r.status));
     toast("Đã upload ảnh lên repo.","ok");
   }catch(e){ toast("Upload ảnh lỗi: "+e.message, "err"); }
 };
-function blobToBase64(blob){
-  return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(blob); });
-}
+function blobToBase64(blob){ return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(blob); }); }
 
-// Publish
+// ---------- Publish ----------
 $("#btnPublish").onclick = ()=>doPublish(false);
 $("#btnPublishFeatured").onclick = ()=>doPublish(true);
 
 async function doPublish(forceFeatured){
   const obj = buildJson();
-  if(forceFeatured) { obj.featured = true; $("#featured").checked = true; $("#jsonOut").value = JSON.stringify([obj], null, 2); }
-  // Validate affiliate
+  if(forceFeatured){ obj.featured = true; $("#featured").checked = true; $("#jsonOut").value = JSON.stringify([obj], null, 2); }
+  if(!obj.sku){ toast("Thiếu SKU.","err"); return; }
   if(!obj.origin){ toast("Thiếu origin.","warn"); return; }
-  const dl = $("#deeplink").value.trim();
-  if(!/isclix\.com/i.test(dl)){ toast("Cảnh báo: Deep-link chưa rõ qua affiliate (không thấy isclix). Vẫn tiếp tục?", "warn"); }
+  validateDeeplink();
+  const s = readSettings();
   // Worker-first
-  if(state.workerOk){
-    const base = $("#workerUrl").value.trim().replace(/\/$/,'');
+  if(s.workerUrl){
     try{
-      const r = await fetch(base + "/publish", {
-        method:"POST", mode:"cors",
-        headers:{"content-type":"application/json"},
-        body: JSON.stringify(obj)
+      const r = await fetch(s.workerUrl.replace(/\/$/,'') + "/publish", {
+        method:"POST", mode:"cors", headers: hdr(), body: JSON.stringify(obj)
       });
-      if(!r.ok){ throw new Error('HTTP '+r.status); }
-      toast("Publish OK → store (và nổi bật nếu bật).","ok");
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      toast("Publish OK → store"+(obj.featured?" + nổi bật":""),"ok");
       window.scrollTo({top:0,behavior:'smooth'});
       return;
-    }catch(e){ toast("Publish lỗi (sẽ cho tải JSON để commit tay): "+e.message,"err"); }
+    }catch(e){ toast("Publish lỗi (sẽ tải JSON để commit tay): "+e.message,"err"); }
   }
-  // Fallback: tải JSON để commit tay
+  // Fallback
   const blob = new Blob([JSON.stringify([obj],null,2)], {type:"application/json"});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'affiliates.append.json'; a.click();
 }
 
-// Init
-["name","origin"].forEach(id=>$( "#"+id ).addEventListener('input', ()=>{
-  if(id==="name"){ if(!$("#sku").value) $("#sku").value = slugify($("#name").value.trim()); }
-  if($("#sku").value && !$("#image").value) $("#image").value = `/assets/img/products/${$("#sku").value}.webp`;
-}));
+// keep origin mirror
+$("#origin").addEventListener('input', ()=>$("#originOut").value=$("#origin").value);
+
+// Init diag once
+runDiag();
 </script>
 </body>
 </html>
