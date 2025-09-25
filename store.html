@@ -47,11 +47,6 @@
     .card .body{padding:12px}
     .name{font-size:16px;line-height:1.35;margin:0 0 6px}
     .price{font-weight:800;margin:4px 0 10px}
-<!-- chèn vào template card -->
-<div class="mxd-badges">
-  ${ (p.badges||[]).map(b=>`<span class="mxd-badge ${b}">${b.toUpperCase()}</span>`).join('') }
-</div>
-
     /* Buy button: tôn trọng merchant (Shopee/Lazada...) */
     .buy{display:inline-block;width:100%;text-align:center;padding:10px 12px;border-radius:12px;font-weight:800;text-decoration:none;color:#fff;border:1px solid transparent}
     .buy:focus-visible{outline:2px solid #0000ff55;outline-offset:2px}
