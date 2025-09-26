@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MXD Importer v4.3.8 — PRO (Settings + X-Key + Publish 1‑click)</title>
+  <title>MXD Importer v4.3.8 — PRO (Settings + X-Key + Publish 1-click)</title>
   <meta name="robots" content="noindex,follow"/>
   <style>
     :root{
@@ -63,11 +63,11 @@
       </div>
       <div>
         <label>Shopee template</label>
-        <input id="tplShopee" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1=MXD&sub2={sku}&sub3=shopee&sub4=web"/>
+        <input id="tplShopee" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}"/>
       </div>
       <div>
         <label>Lazada template</label>
-        <input id="tplLazada" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1=MXD&sub2={sku}&sub3=lazada&sub4=web"/>
+        <input id="tplLazada" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}"/>
       </div>
     </div>
     <div class="row" style="margin-top:8px">
@@ -161,7 +161,7 @@
   </div>
 
   <div class="card deeplink-box">
-    <h2>4) Deep‑link (to, rõ ràng, copy dễ)</h2>
+    <h2>4) Deep-link (to, rõ ràng, copy dễ)</h2>
     <div class="grid g2">
       <div>
         <label>Origin (đã nhập)</label>
@@ -172,12 +172,12 @@
         </div>
       </div>
       <div>
-        <label>Affiliate deep‑link</label>
+        <label>Affiliate deep-link</label>
         <textarea id="deeplink" class="deeplink-text" placeholder="Tự sinh từ template hoặc dán sẵn tại đây"></textarea>
         <div class="row" style="margin-top:6px">
           <button class="btn" id="btnMakeDeeplink">Tạo từ template</button>
-          <button class="btn" id="copyDeeplink">Copy Deep‑link</button>
-          <button class="btn" id="openDeeplink">Mở Deep‑link</button>
+          <button class="btn" id="copyDeeplink">Copy Deep-link</button>
+          <button class="btn" id="openDeeplink">Mở Deep-link</button>
           <span id="dlCheck" class="badge">–</span>
         </div>
       </div>
@@ -211,6 +211,31 @@ const slugify = s => s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,''
                  .replace(/đ/g,'d').replace(/Đ/g,'D')
                  .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 
+// ==== Templates mặc định (AccessTrade) ====
+const DEFAULT_TPL_SHOPEE =
+  'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
+const DEFAULT_TPL_LAZADA =
+  'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
+
+// SUB chuẩn MXD210: s1=SKU, s2=merchant, s3=tool, s4=campaign
+function computeSubs(sku, merchant){
+  const sub1 = sku || 'sku';
+  const sub2 = (merchant||'merchant').toLowerCase();
+  const sub3 = 'tool';
+  const sub4 = 'mxd210';
+  return {sub1, sub2, sub3, sub4};
+}
+function ensureSubsInUrl(u, subs){
+  const has = k => new RegExp(`[?&]${k}=`,`i`).test(u);
+  const qs = [];
+  if(!has('sub1')) qs.push(`sub1=${encodeURIComponent(subs.sub1)}`);
+  if(!has('sub2')) qs.push(`sub2=${encodeURIComponent(subs.sub2)}`);
+  if(!has('sub3')) qs.push(`sub3=${encodeURIComponent(subs.sub3)}`);
+  if(!has('sub4')) qs.push(`sub4=${encodeURIComponent(subs.sub4)}`);
+  return qs.length ? (u + (u.includes('?') ? '&' : '?') + qs.join('&')) : u;
+}
+
+// ====== State / Toast
 const state = { workerOk:false, imgBlob:null, imgName:null, imgW:0, imgH:0 };
 function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4500); }
 
@@ -234,13 +259,18 @@ function settingsToUi(s){
   $("#tplLazada").value = s.tplLazada||'';
 }
 function saveSettings(){ writeSettings(uiToSettings()); $("#settingsStatus").textContent="Đã lưu."; toast("Đã lưu cài đặt.","ok"); }
-function loadSettings(){ settingsToUi(readSettings()); $("#settingsStatus").textContent="Đã tải cài đặt."; }
+function loadSettings(){
+  const s = readSettings();
+  settingsToUi(s);
+  // tự gợi ý template mặc định nếu trống
+  if(!$("#tplShopee").value) $("#tplShopee").value = DEFAULT_TPL_SHOPEE;
+  if(!$("#tplLazada").value) $("#tplLazada").value = DEFAULT_TPL_LAZADA;
+  $("#settingsStatus").textContent="Đã tải cài đặt.";
+}
 $("#btnSaveSettings").onclick = saveSettings;
 $("#btnLoadSettings").onclick = loadSettings;
 $("#btnClearSettings").onclick = ()=>{ localStorage.removeItem(LS_KEY); settingsToUi({}); $("#settingsStatus").textContent="Đã xóa."; };
-
-// Load once at start
-loadSettings();
+loadSettings(); // Load once at start
 
 // ---------- Worker checks ----------
 function hdr(){ const s=readSettings(); const h={}; if(s.xKey) h['x-key']=s.xKey; h['content-type']='application/json'; return h; }
@@ -293,30 +323,67 @@ function runDiag(){
 }
 
 // ---------- Deep-link ----------
+function activeTplFor(merchant){
+  const s = readSettings();
+  const raw = (merchant==='shopee' ? (s.tplShopee||'') : (s.tplLazada||'')).trim();
+  if(raw) return raw;
+  return merchant==='shopee' ? DEFAULT_TPL_SHOPEE : DEFAULT_TPL_LAZADA;
+}
 function makeDeeplink(){
   const origin = $("#origin").value.trim();
   const sku = $("#sku").value.trim();
   const merchant = $("#merchant").value;
-  const tpl = merchant==='shopee' ? $("#tplShopee").value.trim() : $("#tplLazada").value.trim();
-  if(!origin || !tpl){ toast("Thiếu Origin hoặc template.","warn"); return; }
-  const urlEnc = encodeURIComponent(origin);
-  const link = tpl.replace("{url}", urlEnc).replace("{sku}", sku||"sku");
-  $("#deeplink").value = link; validateDeeplink();
+  if(!origin){ toast("Thiếu Origin.","warn"); return; }
+  const tpl = activeTplFor(merchant);
+  const subs = computeSubs(sku, merchant);
+
+  let link = tpl
+    .replace(/\{url\}/g, encodeURIComponent(origin))
+    .replace(/\{sku\}/g, sku||'sku')
+    .replace(/\{sub1\}/g, subs.sub1)
+    .replace(/\{sub2\}/g, subs.sub2)
+    .replace(/\{sub3\}/g, subs.sub3)
+    .replace(/\{sub4\}/g, subs.sub4);
+
+  link = ensureSubsInUrl(link, subs); // bồi thêm nếu template thiếu {sub*}
+
+  $("#deeplink").value = link;
+  validateDeeplink();
 }
 $("#btnMakeDeeplink").onclick = makeDeeplink;
+
+// auto-gen khi điền form
+["origin","sku","merchant","tplShopee","tplLazada"].forEach(id=>{
+  const el = $("#"+id);
+  if(el) el.addEventListener('input', ()=>{
+    if($("#origin").value.trim()) makeDeeplink();
+  });
+});
+
 $("#origin").addEventListener('input', ()=>$("#originOut").value=$("#origin").value);
+
 function validateDeeplink(){
   const dl = $("#deeplink").value.trim();
-  const okHost = /isclix\.com/i.test(dl);
+  const badge = $("#dlCheck");
+  if(!dl){ badge.textContent = "chưa có deeplink"; badge.className='badge'; return; }
+  const okHost = /(^https?:\/\/)?([^/]*\.)?isclix\.com/i.test(dl);
   const s1 = /[?&]sub1=/.test(dl), s2=/[?&]sub2=/.test(dl), s3=/[?&]sub3=/.test(dl), s4=/[?&]sub4=/.test(dl);
-  let txt = "–";
-  if(!dl) txt="chưa có deeplink";
-  else if(okHost && s1 && s2 && s3 && s4) txt="OK affiliate";
-  else if(okHost) txt="isclix nhưng thiếu sub*";
-  else txt="KHÔNG qua affiliate";
-  $("#dlCheck").textContent = txt;
+  if(okHost && s1 && s2 && s3 && s4){ badge.textContent="OK affiliate"; badge.className='badge'; return; }
+  if(okHost){
+    const missing = ['sub1','sub2','sub3','sub4'].filter(k=>!new RegExp(`[?&]${k}=`).test(dl));
+    badge.textContent = "isclix thiếu: "+missing.join(', ');
+    badge.className='badge';
+    return;
+  }
+  badge.textContent="KHÔNG qua affiliate"; badge.className='badge';
 }
 $("#deeplink").addEventListener('input', validateDeeplink);
+
+// Buttons copy/mở
+$("#copyOrigin").onclick = ()=>{ $("#originOut").select(); document.execCommand('copy'); toast("Đã copy Origin."); };
+$("#openOrigin").onclick = ()=>{ const u=$("#origin").value.trim(); if(u) window.open(u,'_blank'); else toast("Chưa có Origin.","warn"); };
+$("#copyDeeplink").onclick = ()=>{ $("#deeplink").select(); document.execCommand('copy'); toast("Đã copy Deep-link."); };
+$("#openDeeplink").onclick = ()=>{ const u=$("#deeplink").value.trim(); if(u) window.open(u,'_blank'); else toast("Chưa có Deep-link.","warn"); };
 
 // ---------- JSON ----------
 function buildJson(){
@@ -335,7 +402,7 @@ function buildJson(){
     updated_at: now
   };
   const dl = $("#deeplink").value.trim();
-  if(dl) obj.deeplink = dl;
+  if(dl) obj.deeplink = dl; // cho nhu cầu chia sẻ nhanh; store sẽ rewrite lại từ origin khi hiển thị
   $("#jsonOut").value = JSON.stringify([obj], null, 2);
   return obj;
 }
@@ -420,7 +487,15 @@ async function doPublish(forceFeatured){
   if(forceFeatured){ obj.featured = true; $("#featured").checked = true; $("#jsonOut").value = JSON.stringify([obj], null, 2); }
   if(!obj.sku){ toast("Thiếu SKU.","err"); return; }
   if(!obj.origin){ toast("Thiếu origin.","warn"); return; }
+
+  // đảm bảo deeplink trước khi publish
+  if(!$("#deeplink").value.trim()){
+    makeDeeplink();
+    const dl = $("#deeplink").value.trim();
+    if(dl) { obj.deeplink = dl; $("#jsonOut").value = JSON.stringify([obj], null, 2); }
+  }
   validateDeeplink();
+
   const s = readSettings();
   // Worker-first
   if(s.workerUrl){
