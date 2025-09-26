@@ -63,16 +63,17 @@
     .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
     @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
   </style>
-<!-- SUB mặc định cho chiến dịch (ghi đè bằng ?sub1=...&sub2=... khi test) -->
-<meta name="at:sub1" content="">          <!-- SKU: renderer sẽ điền tự động vào nút Mua -->
-<meta name="at:sub2" content="">          <!-- merchant: renderer/affiliate sẽ tự suy -->
-<meta name="at:sub3" content="store">     <!-- page: store | g -->
-<meta name="at:sub4" content="mxd210">    <!-- campaign -->
 
-  <!-- Chuẩn MXD: GA4 trước, Affiliate sau -->
-  <script defer src="/assets/analytics.js"></script>
-  <script defer src="/assets/mxd-affiliate.js"></script>
-  <script defer src="/assets/js/render-products.js"></script>
+<!-- SUB mặc định (override bằng ?sub1=&sub2=... khi test) -->
+<meta name="at:sub1" content="">
+<meta name="at:sub2" content="">
+<meta name="at:sub3" content="store">
+<meta name="at:sub4" content="mxd210">
+
+<!-- GA4 trước, Affiliate sau, Renderer cuối -->
+<script defer src="/assets/analytics.js?v=2025-09-26-fb2"></script>
+<script defer src="/assets/mxd-affiliate.js?v=2025-09-26-fb2"></script>
+<script defer src="/assets/js/render-products.js?v=2025-09-26-fb2"></script>
 
 </head>
 <body>
