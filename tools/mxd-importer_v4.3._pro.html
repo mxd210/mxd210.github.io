@@ -48,7 +48,7 @@
 <body>
 <div class="wrap">
   <h1>MXD Importer v4.3.8 <span class="pill">PRO</span></h1>
-  <div class="small">“Một click lên web” nhưng không đánh rơi chuẩn MXD210: ảnh đúng đường dẫn, JSON đúng schema, link đi qua affiliate. Phiên bản này khôi phục/chuẩn hóa tất cả tính năng bản cũ + thêm <b>Lưu cài đặt</b> và <b>X-Key</b>.</div>
+  <div class="small">“Một click lên web” nhưng không đánh rơi chuẩn MXD210: ảnh đúng đường dẫn, JSON đúng schema, link đi qua affiliate. Bản này có <b>Lưu cài đặt</b>, <b>X-Key</b>, auto-deeplink + <b>Kiểm tra trên Store</b>.</div>
 
   <div class="card">
     <h2>1) Cài đặt (lưu vào trình duyệt)</h2>
@@ -197,6 +197,7 @@
   <div class="sticky-actions row">
     <button class="btn primary" id="btnPublish">Publish → Store</button>
     <button class="btn" id="btnPublishFeatured">Publish → Nổi bật</button>
+    <button class="btn" id="btnVerify">✅ Kiểm tra trên Store</button>
     <button class="btn" id="btnGenCommit">Gen commit message</button>
     <input id="commitMsg" readonly/>
   </div>
@@ -235,6 +236,9 @@ function ensureSubsInUrl(u, subs){
   return qs.length ? (u + (u.includes('?') ? '&' : '?') + qs.join('&')) : u;
 }
 
+// Sanitize URL (loại ký tự " ' , thừa ở đầu/cuối)
+function cleanUrl(u){ return (u||'').trim().replace(/^["']+|["',]+$/g,''); }
+
 // ====== State / Toast
 const state = { workerOk:false, imgBlob:null, imgName:null, imgW:0, imgH:0 };
 function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4500); }
@@ -262,7 +266,6 @@ function saveSettings(){ writeSettings(uiToSettings()); $("#settingsStatus").tex
 function loadSettings(){
   const s = readSettings();
   settingsToUi(s);
-  // tự gợi ý template mặc định nếu trống
   if(!$("#tplShopee").value) $("#tplShopee").value = DEFAULT_TPL_SHOPEE;
   if(!$("#tplLazada").value) $("#tplLazada").value = DEFAULT_TPL_LAZADA;
   $("#settingsStatus").textContent="Đã tải cài đặt.";
@@ -304,7 +307,7 @@ $("#btnAuto").onclick = ()=>{
   const skuNow=$("#sku").value.trim();
   if(name && !skuNow) $("#sku").value = slugify(name);
   if($("#sku").value && !$("#image").value) $("#image").value = `/assets/img/products/${$("#sku").value}.webp`;
-  $("#originOut").value = $("#origin").value.trim();
+  $("#originOut").value = cleanUrl($("#origin").value.trim());
   runDiag();
 };
 ["name","sku","origin","image","merchant"].forEach(id=>$("#"+id).addEventListener('input', runDiag));
@@ -312,7 +315,7 @@ $("#btnAuto").onclick = ()=>{
 function runDiag(){
   const sku = $("#sku").value.trim();
   const img = $("#image").value.trim();
-  const origin = $("#origin").value.trim();
+  const origin = cleanUrl($("#origin").value.trim());
   const merchant = $("#merchant").value;
   const msgs = [];
   if(!sku) msgs.push("• Thiếu SKU.");
@@ -320,6 +323,7 @@ function runDiag(){
   if(origin && !/shopee\.vn|lazada\.vn/i.test(origin)) msgs.push("• Origin không phải Shopee/Lazada.");
   msgs.push("• Merchant: "+merchant);
   $("#diag").innerHTML = msgs.length? msgs.map(x=>`<div>${x}</div>`).join("") : '<span class="ok">Tạm ổn.</span>';
+  $("#originOut").value = origin;
 }
 
 // ---------- Deep-link ----------
@@ -330,7 +334,7 @@ function activeTplFor(merchant){
   return merchant==='shopee' ? DEFAULT_TPL_SHOPEE : DEFAULT_TPL_LAZADA;
 }
 function makeDeeplink(){
-  const origin = $("#origin").value.trim();
+  const origin = cleanUrl($("#origin").value.trim());
   const sku = $("#sku").value.trim();
   const merchant = $("#merchant").value;
   if(!origin){ toast("Thiếu Origin.","warn"); return; }
@@ -355,20 +359,21 @@ $("#btnMakeDeeplink").onclick = makeDeeplink;
 // auto-gen khi điền form
 ["origin","sku","merchant","tplShopee","tplLazada"].forEach(id=>{
   const el = $("#"+id);
-  if(el) el.addEventListener('input', ()=>{
-    if($("#origin").value.trim()) makeDeeplink();
-  });
+  if(el) el.addEventListener('input', ()=>{ if($("#origin").value.trim()) makeDeeplink(); });
 });
 
-$("#origin").addEventListener('input', ()=>$("#originOut").value=$("#origin").value);
+$("#origin").addEventListener('input', ()=>$("#originOut").value=cleanUrl($("#origin").value));
 
+// Validator
 function validateDeeplink(){
   const dl = $("#deeplink").value.trim();
   const badge = $("#dlCheck");
   if(!dl){ badge.textContent = "chưa có deeplink"; badge.className='badge'; return; }
   const okHost = /(^https?:\/\/)?([^/]*\.)?isclix\.com/i.test(dl);
+  const hasUrl = /[?&]url=/.test(dl);
   const s1 = /[?&]sub1=/.test(dl), s2=/[?&]sub2=/.test(dl), s3=/[?&]sub3=/.test(dl), s4=/[?&]sub4=/.test(dl);
-  if(okHost && s1 && s2 && s3 && s4){ badge.textContent="OK affiliate"; badge.className='badge'; return; }
+  if(okHost && hasUrl && s1 && s2 && s3 && s4){ badge.textContent="OK affiliate"; badge.className='badge'; return; }
+  if(okHost && !hasUrl){ badge.textContent="isclix thiếu url="; badge.className='badge'; return; }
   if(okHost){
     const missing = ['sub1','sub2','sub3','sub4'].filter(k=>!new RegExp(`[?&]${k}=`).test(dl));
     badge.textContent = "isclix thiếu: "+missing.join(', ');
@@ -381,7 +386,7 @@ $("#deeplink").addEventListener('input', validateDeeplink);
 
 // Buttons copy/mở
 $("#copyOrigin").onclick = ()=>{ $("#originOut").select(); document.execCommand('copy'); toast("Đã copy Origin."); };
-$("#openOrigin").onclick = ()=>{ const u=$("#origin").value.trim(); if(u) window.open(u,'_blank'); else toast("Chưa có Origin.","warn"); };
+$("#openOrigin").onclick = ()=>{ const u=cleanUrl($("#origin").value.trim()); if(u) window.open(u,'_blank'); else toast("Chưa có Origin.","warn"); };
 $("#copyDeeplink").onclick = ()=>{ $("#deeplink").select(); document.execCommand('copy'); toast("Đã copy Deep-link."); };
 $("#openDeeplink").onclick = ()=>{ const u=$("#deeplink").value.trim(); if(u) window.open(u,'_blank'); else toast("Chưa có Deep-link.","warn"); };
 
@@ -391,7 +396,7 @@ function buildJson(){
   const obj = {
     name: $("#name").value.trim(),
     price: Number($("#price").value||0),
-    origin: $("#origin").value.trim(),
+    origin: cleanUrl($("#origin").value.trim()),
     merchant: $("#merchant").value,
     sku: $("#sku").value.trim(),
     image: $("#image").value.trim(),
@@ -402,7 +407,7 @@ function buildJson(){
     updated_at: now
   };
   const dl = $("#deeplink").value.trim();
-  if(dl) obj.deeplink = dl; // cho nhu cầu chia sẻ nhanh; store sẽ rewrite lại từ origin khi hiển thị
+  if(dl) obj.deeplink = dl; // có cũng được; store sẽ rewrite từ origin khi click
   $("#jsonOut").value = JSON.stringify([obj], null, 2);
   return obj;
 }
@@ -514,8 +519,24 @@ async function doPublish(forceFeatured){
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'affiliates.append.json'; a.click();
 }
 
+// ---------- Verify on Store ----------
+$("#btnVerify").onclick = async ()=>{
+  const sku = $("#sku").value.trim();
+  if(!sku){ toast("Chưa có SKU để kiểm tra.","warn"); return; }
+  try{
+    const r = await fetch('/assets/data/affiliates.json?_=' + Date.now(), {cache:'no-cache'});
+    const arr = await r.json();
+    const found = Array.isArray(arr) && arr.some(x => (x.sku||'') === sku);
+    toast(found ? "ĐÃ CÓ trong affiliates.json." : "CHƯA THẤY trong affiliates.json.", found ? "ok":"warn");
+  }catch(e){
+    toast("Không đọc được affiliates.json: "+e.message, "err");
+  }
+  const url = `/store.html?dev=1&sku=${encodeURIComponent(sku)}&v=${Date.now()}`;
+  window.open(url, '_blank');
+};
+
 // keep origin mirror
-$("#origin").addEventListener('input', ()=>$("#originOut").value=$("#origin").value);
+$("#origin").addEventListener('input', ()=>$("#originOut").value=cleanUrl($("#origin").value));
 
 // Init diag once
 runDiag();
