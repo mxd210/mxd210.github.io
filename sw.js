@@ -1,5 +1,8 @@
-// sw.js — MXD PWA v40
-const VERSION = 'v40';
+// sw.js — MXD PWA v41
+const VERSION = 'v41';
+const VERSION = '2025-09-26-fb1';
+self.addEventListener('install', e => self.skipWaiting());
+self.addEventListener('activate', e => self.clients.claim());
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
