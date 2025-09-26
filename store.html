@@ -69,12 +69,13 @@
 <meta name="at:sub2" content="">
 <meta name="at:sub3" content="store">
 <meta name="at:sub4" content="mxd210">
-
-<!-- GA4 trước, Affiliate sau, Renderer cuối -->
+  
 <script defer src="/assets/analytics.js?v=2025-09-26-fb2"></script>
 <script defer src="/assets/mxd-affiliate.js?v=2025-09-26-fb2"></script>
 <script defer src="/assets/js/render-products.js?v=2025-09-26-fb2"></script>
 
+  <!-- Floating contact (giữ nguyên nếu bạn đang dùng file tách riêng) -->
+<script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
 </head>
 <body>
   <header style="position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(6px)">
@@ -103,11 +104,6 @@
     </div>
   </footer>
 
-  <!-- ===== Renderer dùng chung (đừng để script loader inline khác gây xung đột) ===== -->
- <script defer src="/assets/js/render-products.js?v=2025-09-26-1"></script>
-<script defer src="/assets/mxd-affiliate.js?v=2025-09-26-1"></script>
-  <!-- Floating contact (giữ nguyên nếu bạn đang dùng file tách riêng) -->
-<script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
   <script>
     // Hiển thị TẤT CẢ sản phẩm (có thể giới hạn bằng ?limit=12 trên URL)
     window.addEventListener('DOMContentLoaded', () => {
