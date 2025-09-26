@@ -72,6 +72,8 @@
   <!-- Chuẩn MXD: GA4 trước, Affiliate sau -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
+  <script defer src="/assets/js/render-products.js"></script>
+
 </head>
 <body>
   <header style="position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(6px)">
@@ -100,13 +102,11 @@
     </div>
   </footer>
 
-  <!-- Floating contact (giữ nguyên nếu bạn đang dùng file tách riêng) -->
-  <script defer src="/assets/js/floating-contact.js"></script>
-
   <!-- ===== Renderer dùng chung (đừng để script loader inline khác gây xung đột) ===== -->
  <script defer src="/assets/js/render-products.js?v=2025-09-26-1"></script>
 <script defer src="/assets/mxd-affiliate.js?v=2025-09-26-1"></script>
-
+  <!-- Floating contact (giữ nguyên nếu bạn đang dùng file tách riêng) -->
+<script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
   <script>
     // Hiển thị TẤT CẢ sản phẩm (có thể giới hạn bằng ?limit=12 trên URL)
     window.addEventListener('DOMContentLoaded', () => {
