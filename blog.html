@@ -14,7 +14,7 @@
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#111111" />
 
-  <!-- Open Graph / Twitter -->
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Chia sẻ kinh nghiệm thi công & chọn sản phẩm | MXD">
   <meta property="og:description" content="Chống thấm, ốp lát, dụng cụ, keo dán gạch… tổng hợp thực chiến.">
@@ -47,72 +47,16 @@
       <p class="lead">Các bài viết hữu ích dành cho thợ xây dựng, kỹ sư & người làm nhà.</p>
     </section>
 
-    <!-- Blog cards -->
+    <!-- Blog cards (auto from sitemap) -->
     <section aria-label="Bài viết mới">
-      <ul class="cards">
-        <li>
-          <a class="card" href="/blog/may-cat-gach.html">
-            <img src="/assets/img/tin-tuc/may-cat-gach.webp"
-                 alt="Máy cắt gạch: chọn máy & mẹo sử dụng"
-                 width="1280" height="720" loading="lazy" decoding="async">
-            <div class="card-body">
-              <h3>🔧 Cách chọn máy cắt gạch phù hợp</h3>
-              <p>Nên chọn máy bàn đẩy hay cầm tay? Lưỡi cắt, công suất bao nhiêu là đủ?</p>
-              <div class="meta"><span>5 phút đọc</span> <span class="chip">Dụng cụ</span></div>
-            </div>
-          </a>
-        </li>
-
-        <li>
-          <a class="card" href="/blog/chong-tham-wc.html">
-            <img src="/assets/img/tin-tuc/chong-tham-wc.webp"
-                 alt="Kỹ thuật chống thấm sàn vệ sinh"
-                 width="1280" height="720" loading="lazy" decoding="async">
-            <div class="card-body">
-              <h3>🚿 Kỹ thuật chống thấm sàn vệ sinh</h3>
-              <p>Các loại vật liệu, xử lý cổ ống, chân tường, mạch ngừng để không thấm ngược.</p>
-              <div class="meta"><span>4 phút đọc</span> <span class="chip">Chống thấm</span></div>
-            </div>
-          </a>
-        </li>
-
-        <li>
-          <a class="card" href="/blog/keo-dan-gach.html">
-            <img src="/assets/img/tin-tuc/keo-dan-gach.webp"
-                 alt="Keo dán gạch: phân loại & cách trát keo"
-                 width="1280" height="720" loading="lazy" decoding="async">
-            <div class="card-body">
-              <h3>🧪 Nên dùng loại keo dán gạch nào?</h3>
-              <p>Phân biệt C1, C2, C2TE; gợi ý theo kích thước & bề mặt gạch.</p>
-              <div class="meta"><span>6 phút đọc</span> <span class="chip">Vật tư</span></div>
-            </div>
-          </a>
-        </li>
-
-        <li>
-          <a class="card" href="/blog/thi-cong-nha-ve-sinh-50tr.html">
-            <img src="/assets/img/tin-tuc/thi-cong-wc-500tr.webp"
-                 alt="Thi công nhà vệ sinh 50 triệu: checklist & vật tư cốt lõi"
-                 width="1280" height="720" loading="lazy" decoding="async">
-            <div class="card-body">
-              <h3>💰 Thi công nhà vệ sinh 50&nbsp;triệu</h3>
-              <p>Phân bổ ngân sách, vật tư cốt lõi, timeline 7–12 ngày, checklist nghiệm thu.</p>
-              <div class="meta"><span>7 phút đọc</span> <span class="chip">Thi công</span></div>
-            </div>
-          </a>
-        </li>
-
-        <li>
-          <a class="card" href="/blog/gach-op-lat-wc.html">
-            <img src="/assets/img/tin-tuc/gach-op-lat-wc.webp"
-                 alt="Gạch ốp lát WC: kích thước, bề mặt & phối màu"
-                 width="1280" height="720" loading="lazy" decoding="async">
-            <div class="card-body">
-              <h3>🧱 Chọn gạch ốp lát WC: đẹp & bền</h3>
-              <p>Kích thước, chống trượt, phối màu, ron; mẹo thi công bền lâu.</p>
-              <div class="meta"><span>5 phút đọc</span> <span class="chip">Ốp lát</span></div>
-            </div>
-          </a>
+      <ul class="cards" id="postList">
+        <li class="card sk">
+          <div class="sk-thumb"></div>
+          <div class="card-body">
+            <h3 class="sk-line" style="width:70%"></h3>
+            <p class="sk-line" style="width:90%"></p>
+            <div class="meta"><span class="chip">Đang tải…</span></div>
+          </div>
         </li>
       </ul>
     </section>
@@ -121,13 +65,13 @@
 
 <footer class="mxd-footer"><div class="wrap">© MXD</div></footer>
 
-<!-- Scripts -->
+<!-- Scripts (GA4 trước affiliate theo MXD conventions) -->
 <script src="/assets/analytics.js" defer></script>
 <script src="/assets/mxd-affiliate.js" defer></script>
 <script src="/js/floating-contact.js" defer></script>
 
-<!-- JSON-LD: CollectionPage -->
-<script> type="application/ld+json">
+<!-- JSON-LD: CollectionPage (sửa cú pháp type) -->
+<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
@@ -136,26 +80,163 @@
 }
 </script>
 
+<!-- Auto index logic -->
+<script>
+(async () => {
+  // Bump query để vượt cache SW khi cần
+  const VERSION = '2025-09-27-01';
+  const SITEMAP_URL = '/sitemap-blog.xml?v=' + VERSION;
+  const listEl = document.getElementById('postList');
+  const parser = new DOMParser();
+
+  const esc = s => (s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const fmtVN = d => isNaN(d) ? '' : d.toLocaleDateString('vi-VN');
+
+  const pillFromUrl = (u) => {
+    const p = u.split('/').pop() || '';
+    if (p.includes('may-')) return 'Máy móc';
+    if (p.includes('keo') || p.includes('gach') || p.includes('vat-lieu')) return 'Vật liệu';
+    if (p.includes('chong-tham')) return 'Chống thấm';
+    if (p.includes('dung-cu')) return 'Dụng cụ';
+    if (p.includes('thi-cong') || p.includes('checklist')) return 'Thi công';
+    return 'Tư vấn';
+  };
+
+  const pickArticleLD = (blocks) => {
+    for (const b of blocks) {
+      if (!b) continue;
+      if (Array.isArray(b)) {
+        const item = b.find(x => x && (x['@type']==='Article' || (Array.isArray(x['@type']) && x['@type'].includes('Article'))));
+        if (item) return item;
+      } else if (typeof b==='object') {
+        if (b['@type']==='Article' || (Array.isArray(b['@type']) && b['@type'].includes('Article'))) return b;
+        if (b['@graph']) {
+          const g = b['@graph'].find(x => x && (x['@type']==='Article' || (Array.isArray(x['@type']) && x['@type'].includes('Article'))));
+          if (g) return g;
+        }
+      }
+    }
+    return null;
+  };
+
+  const extractMeta = (doc, url) => {
+    const ogTitle = doc.querySelector('meta[property="og:title"]')?.content;
+    const title = ogTitle || doc.querySelector('title')?.textContent || doc.querySelector('h1')?.textContent || url;
+
+    const desc = doc.querySelector('meta[name="description"]')?.content
+              || doc.querySelector('meta[property="og:description"]')?.content || '';
+
+    let img = doc.querySelector('meta[property="og:image"]')?.content
+           || doc.querySelector('header img')?.getAttribute('src')
+           || '/assets/img/blog/placeholder.webp';
+
+    // Chuẩn hóa ảnh về absolute cho an toàn tải
+    if (img.startsWith('/')) img = location.origin + img;
+
+    const blocks = Array.from(doc.querySelectorAll('script[type="application/ld+json"]')).map(s => {
+      try { return JSON.parse(s.textContent.trim()); } catch { return null; }
+    });
+
+    const art = pickArticleLD(blocks);
+    let dateISO = art?.datePublished || art?.dateModified
+               || doc.querySelector('time[datetime]')?.getAttribute('datetime')
+               || doc.querySelector('meta[property="article:published_time"]')?.content || '';
+
+    const date = dateISO ? new Date(dateISO) : new Date(0);
+
+    return {
+      url,
+      title: title.trim(),
+      desc: (desc||'').trim(),
+      img,
+      pill: pillFromUrl(url),
+      dateISO,
+      date
+    };
+  };
+
+  try {
+    // 1) Lấy sitemap & rút URLs
+    const sm = await fetch(SITEMAP_URL, { cache: 'no-store' });
+    const xmlText = await sm.text();
+    const xml = parser.parseFromString(xmlText, 'application/xml');
+    const urls = Array.from(xml.querySelectorAll('url > loc')).map(n => n.textContent.trim())
+      .filter(u => u.includes('/blog/') && u.endsWith('.html'));
+
+    if (!urls.length) {
+      listEl.innerHTML = '<li>Chưa có bài nào trong sitemap-blog.xml</li>';
+      return;
+    }
+
+    // 2) Tải bài song song nhóm nhỏ để nhẹ máy
+    const concurrency = 4;
+    const posts = [];
+    for (let i = 0; i < urls.length; i += concurrency) {
+      const part = urls.slice(i, i+concurrency);
+      const got = await Promise.all(part.map(async (u) => {
+        try {
+          const res = await fetch(u + '?v=' + VERSION, { cache: 'no-store' });
+          const text = await res.text();
+          const doc = parser.parseFromString(text, 'text/html');
+          return extractMeta(doc, u);
+        } catch (e) {
+          console.warn('[blog] fetch fail:', u, e);
+          return null;
+        }
+      }));
+      posts.push(...got.filter(Boolean));
+    }
+
+    // 3) Sắp xếp mới → cũ
+    posts.sort((a,b) => b.date - a.date);
+
+    // 4) Render
+    listEl.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    for (const p of posts) {
+      const li = document.createElement('li');
+      const pathname = new URL(p.url).pathname;
+      li.innerHTML = `
+        <a class="card" href="${esc(pathname)}">
+          <img src="${esc(p.img)}" alt="${esc(p.title)}" width="1280" height="720" loading="lazy" decoding="async">
+          <div class="card-body">
+            <h3>${esc(p.title)}</h3>
+            <p>${esc(p.desc)}</p>
+            <div class="meta">
+              ${p.dateISO ? `<time datetime="${esc(p.dateISO)}">${fmtVN(p.date)}</time>` : ''}
+              <span class="chip">${esc(p.pill)}</span>
+            </div>
+          </div>
+        </a>
+      `.trim();
+      frag.appendChild(li);
+    }
+    listEl.appendChild(frag);
+  } catch (err) {
+    console.error(err);
+    listEl.innerHTML = '<li>Lỗi tải danh sách bài viết. Vui lòng tải lại trang.</li>';
+  }
+})();
+</script>
+
 <!-- CSS tăng cường cho thẻ blog (nhẹ, gắn ngay tại trang nếu chưa muốn sửa site.css) -->
 <style>
-  .cards{
-    list-style:none;margin:0;padding:0;display:grid;gap:20px;
-    grid-template-columns:repeat(3,minmax(0,1fr))
-  }
+  .cards{list-style:none;margin:0;padding:0;display:grid;gap:20px;grid-template-columns:repeat(3,minmax(0,1fr))}
   @media (max-width:960px){.cards{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:640px){.cards{grid-template-columns:1fr}}
-  .card{
-    display:block;background:#fff;color:inherit;text-decoration:none;overflow:hidden;
-    border:1px solid #e9e9e9;border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.04);
-    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease
-  }
+  .card{display:block;background:#fff;color:inherit;text-decoration:none;overflow:hidden;border:1px solid #e9e9e9;border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.04);transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease}
   .card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.08);border-color:#ddd}
   .card>img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;display:block}
   .card-body{padding:14px 16px 16px}
   .card-body h3{margin:4px 0 8px;font-size:1.05rem;line-height:1.35}
   .card-body p{margin:0 0 10px;color:#444}
-  .meta{display:flex;gap:8px;align-items:center;font-size:.9rem;color:#666}
+  .meta{display:flex;gap:8px;align-items:center;font-size:.9rem;color:#666;flex-wrap:wrap}
   .meta .chip{border:1px solid #e3e3e3;border-radius:999px;padding:2px 10px;font-size:.8rem;background:#fafafa}
+  /* skeleton */
+  .sk{border-style:dashed}
+  .sk-thumb{width:100%;aspect-ratio:16/9;background:linear-gradient(90deg,#eee,#f6f6f6,#eee);animation:sk 1.2s infinite}
+  .sk-line{height:14px;background:#eee;border-radius:6px;animation:sk 1.2s infinite}
+  @keyframes sk{0%{background-position:0 0}100%{background-position:200% 0}}
 </style>
 </body>
 </html>
