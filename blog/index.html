@@ -3,158 +3,19 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Tin tức | MXD</title>
-  <meta name="description" content="Tin tức, hướng dẫn và kinh nghiệm thi công từ MXD."/>
-  <link rel="canonical" href="https://mxd210.github.io/blog/"/>
-  <meta name="robots" content="index,follow">
+  <title>Đang chuyển đến Blog | MXD</title>
 
-  <!-- OG -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Tin tức | MXD">
-  <meta property="og:description" content="Tin tức, hướng dẫn và kinh nghiệm thi công từ MXD.">
-  <meta property="og:url" content="https://mxd210.github.io/blog/">
+  <!-- Đặt canonical về URL chính để tránh duplicate -->
+  <link rel="canonical" href="https://mxd210.github.io/blog.html"/>
 
-  <link rel="stylesheet" href="/assets/site.css">
+  <!-- Không index trang alias -->
+  <meta name="robots" content="noindex,follow"/>
+
+  <!-- Chuyển hướng ngay (meta + JS) -->
+  <meta http-equiv="refresh" content="0; url=/blog.html?v=2025-09-27-05">
 </head>
-  
 <body>
-  <nav class="mxd-topbar">
-  <a class="brand" href="/">MXD</a>
-  <div class="links">
-    <a href="/">Trang chủ</a>
-    <a href="/store/">Cửa hàng</a>  <!-- nếu site bạn là /store.html, đổi href thành /store.html -->
-    <a href="/blog/">Tin tức</a>
-    <a href="/tu-van.html">Tư vấn</a>
-    <a href="/lien-he.html">Liên hệ</a>
-  </div>
-</nav>
-
-<style>
-  /* tối thiểu để hiển thị đẹp ngay, không đụng style cũ */
-  .mxd-topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid #eee}
-  .mxd-topbar .brand{font-weight:700;text-decoration:none;color:inherit}
-  .mxd-topbar .links a{margin-left:12px;text-decoration:none;color:inherit}
-  .mxd-topbar .links a.active{font-weight:700;text-decoration:underline}
-</style>
-
-<script>
-  // đánh dấu mục đang xem là active
-  (function(){
-    var p = location.pathname.replace(/\/index\.html$/,'') || '/';
-    document.querySelectorAll('.mxd-topbar .links a').forEach(function(a){
-      var href = a.getAttribute('href');
-      if (href === p || href === p + '/' ) a.classList.add('active');
-    });
-  })();
-</script>
-
-  <header class="container">
-    
-    <h1>Tin tức</h1>
-    <p class="muted">Bài viết mới nhất từ MXD (kỹ thuật thi công, chọn dụng cụ, chống thấm, keo dán…).</p>
-  </header>
-
-  <main class="container blog-list">
-    <ul class="post-list">
-     <!-- Bài 1 -->
-      <a class="post-card" href="/blog/may-cat-gach.html">
-        <img class="post-thumb" loading="lazy"
-             src="/assets/img/blog/may-cat-gach.webp"
-             alt="Máy cắt gạch: chọn máy & lưỡi cắt cho men/porcelain">
-        <div class="post-body">
-          <div class="post-meta">
-            <span class="pill">Máy cắt</span>
-            <time datetime="2025-09-14">14/09/2025</time>
-          </div>
-          <h2 class="post-title">Máy cắt gạch: chọn máy & lưỡi cắt cho men/porcelain</h2>
-          <p class="post-excerpt">Chọn máy cắt bàn hay cắt tay? Lưỡi ướt hay khô? Mẹo cắt gạch cứng (porcelain) không mẻ cạnh và an toàn.</p>
-          <div class="post-actions">
-            <a class="readmore" href="/blog/may-cat-gach.html">Đọc bài ↗</a>
-          </div>
-        </div>
-      </a>
-
-      <!-- Bài 2 -->
-      <a class="post-card" href="/blog/chong-tham-wc.html">
-        <img class="post-thumb" loading="lazy"
-             src="/assets/img/blog/chong-tham-wc.webp"
-             alt="Kỹ thuật chống thấm WC: quy trình & vật liệu">
-        <div class="post-body">
-          <div class="post-meta">
-            <span class="pill">Chống thấm</span>
-            <time datetime="2025-09-10">10/09/2025</time>
-          </div>
-          <h2 class="post-title">Kỹ thuật chống thấm WC: quy trình & vật liệu</h2>
-          <p class="post-excerpt">Các lớp vật liệu, thời gian chờ giữa lớp, kiểm tra nước, lỗi hay gặp và cách sửa khi đã lát xong.</p>
-          <div class="post-actions">
-            <a class="readmore" href="/blog/chong-tham-wc.html">Đọc bài ↗</a>
-          </div>
-        </div>
-      </a>
-
-      <!-- Bài 3 -->
-      <a class="post-card" href="/blog/keo-dan-gach.html">
-        <img class="post-thumb" loading="lazy"
-             src="/assets/img/blog/keo-dan-gach.webp"
-             alt="Keo dán gạch: chọn loại nào cho nền/ốp tường?">
-        <div class="post-body">
-          <div class="post-meta">
-            <span class="pill">Keo dán</span>
-            <time datetime="2025-09-09">09/09/2025</time>
-          </div>
-          <h2 class="post-title">Keo dán gạch: chọn loại nào cho nền/ốp tường?</h2>
-          <p class="post-excerpt">Phân biệt C0/C1/C2, chống trượt, chống thấm, khuyến nghị keo cho gạch kích thước lớn.</p>
-          <div class="post-actions">
-            <a class="readmore" href="/blog/keo-dan-gach.html">Đọc bài ↗</a>
-          </div>
-        </div>
-      </a>
-
-      <!-- Bài 4 -->
-      <a class="post-card" href="/blog/gach-op-lat-wc.html">
-        <img class="post-thumb" loading="lazy"
-             src="/assets/img/blog/gach-op-lat-wc.webp"
-             alt="Gạch ốp lát WC: men hay porcelain?">
-        <div class="post-body">
-          <div class="post-meta">
-            <span class="pill">Vật liệu</span>
-            <time datetime="2025-09-08">08/09/2025</time>
-          </div>
-          <h2 class="post-title">Gạch ốp lát WC: men hay porcelain?</h2>
-          <p class="post-excerpt">So độ hút nước, độ bền, bề mặt; chọn cỡ gạch & ron hợp lý cho phòng nhỏ.</p>
-          <div class="post-actions">
-            <a class="readmore" href="/blog/gach-op-lat-wc.html">Đọc bài ↗</a>
-          </div>
-        </div>
-      </a>
-
-      <!-- Bài 5 -->
-      <a class="post-card" href="/blog/thi-cong-nha-ve-sinh-50tr.html">
-        <img class="post-thumb" loading="lazy"
-             src="/assets/img/blog/thi-cong-50tr.webp"
-             alt="Thi công nhà vệ sinh 50tr: checklist vật tư">
-        <div class="post-body">
-          <div class="post-meta">
-            <span class="pill">Checklist</span>
-            <time datetime="2025-09-05">05/09/2025</time>
-          </div>
-          <h2 class="post-title">Thi công nhà vệ sinh 50tr: checklist vật tư</h2>
-          <p class="post-excerpt">Danh mục vật tư, dụng cụ bắt buộc; mẹo tối ưu chi phí mà vẫn bền.</p>
-          <div class="post-actions">
-            <a class="readmore" href="/blog/thi-cong-nha-ve-sinh-50tr.html">Đọc bài ↗</a>
-          </div>
-        </div>
-      </a>
-  </main>
-  <script src="/assets/analytics.js" defer></script>
-  <script src="/assets/mxd-affiliate.js" defer></script>
-  <script src="/js/floating-contact.js" defer></script>
-  <!-- Nút nổi liên hệ MXD -->
-<div id="floating-contact"
-     data-phone="0338328898"
-     data-zalo="0338328898"
-     data-facebook="https://www.facebook.com/mxd6686">
-</div>
-
+  <p>Đang chuyển đến <a href="/blog.html?v=2025-09-27-05">Blog</a>…</p>
+  <script>location.replace('/blog.html?v=2025-09-27-05');</script>
 </body>
 </html>
