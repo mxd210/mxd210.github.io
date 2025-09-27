@@ -1,9 +1,9 @@
-// sw.js — MXD PWA v43 (2025-09-26)
-const VERSION = 'v43-2025-09-26-fb2';   // <— CHỈ 1 DÒNG NÀY
+// sw.js — MXD PWA  (2025-09-26)
+const VERSION = 'v44-2025-09-26-fb2';   // <— CHỈ 1 DÒNG NÀY
 
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => self.clients.claim());
-
+self.addEventListener('fetch', () => {});
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
