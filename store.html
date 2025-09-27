@@ -113,5 +113,11 @@
       MXD.renderProducts('#product-list', limit);
     });
   </script>
+  <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js?v=2025-09-26-fb2');
+}
+</script>
+
 </body>
 </html>
