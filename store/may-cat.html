@@ -93,12 +93,20 @@
   };
 
   // Ưu tiên field category/categories; fallback regex (tên/SKU có “cắt”)
-  function inCategory(p){
-    if (p && (p.category === CATEGORY_SLUG)) return true;
-    if (p && Array.isArray(p.categories) && p.categories.includes(CATEGORY_SLUG)) return true;
-    const s = ((p.sku||'') + ' ' + (p.name||'')).toLowerCase();
-    return /may[-\s_]*cat|cắt/.test(s);
-  }
+    const vn = s => (s||'').toString()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/đ/g,'d').toLowerCase();
+
+ function inCategory(p){
+  // Ưu tiên so khớp theo field category/categories
+  const cat = vn(p.category);
+  if (cat === 'may-cat') return true;
+  if (Array.isArray(p.categories) && p.categories.map(vn).includes('may-cat')) return true;
+
+  // Fallback theo tên/SKU (đã bỏ dấu)
+  const s = vn(`${p.sku||''} ${p.name||''}`);
+  return /may[-\s_]*cat/.test(s);
+}
 
   function toLinks(p){
     if (Array.isArray(p.links) && p.links.length) return p.links;
