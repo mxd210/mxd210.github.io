@@ -84,6 +84,16 @@
       align-self:flex-start;
     }
 
+    /* ================== QUICK-NAV ================== */
+    .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:8px 0 0}
+    .quick-nav .qnav-item{
+      display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);
+      border-radius:12px;background:var(--card);box-shadow:var(--shadow);color:var(--text);
+      text-decoration:none
+    }
+    .quick-nav .qnav-item:hover{background:rgba(23,70,255,.06)}
+    .quick-nav img{width:28px;height:28px;border-radius:8px}
+
     /* ================== SKELETON ================== */
     .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%)}
     .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
@@ -126,9 +136,14 @@
   </header>
 
   <main class="container">
-    <h2 style="margin:16px 0 0">Sản phẩm</h2>
+    <!-- QUICK-NAV: đọc từ assets/categories.json; fallback Máy cắt -->
+    <section aria-label="Danh mục nhanh" style="margin-top:12px">
+      <ul class="quick-nav" id="quick-nav"></ul>
+    </section>
+
+    <h2 style="margin:8px 0 0">Sản phẩm</h2>
     <div id="product-list" class="grid" aria-live="polite"></div>
-    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/assets/data/affiliates.json</code> hoặc <code>/products.json</code>.</p>
+    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/affiliates.json</code> (nguồn chuẩn) hoặc <code>/products.json</code> (fallback).</p>
     <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
   </main>
 
@@ -156,10 +171,101 @@
     </button>
   </div>
 
+  <!-- Config để renderer lấy đúng nguồn chuẩn -->
+  <script>
+    window.MXD_RENDER = window.MXD_RENDER || {};
+    window.MXD_RENDER.source = '/affiliates.json'; // nguồn chuẩn theo Canonical
+  </script>
+
   <!-- Gọi render khi DOM sẵn sàng -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      MXD.renderProducts('#product-list'); // hiển thị TẤT CẢ
+      // QUICK-NAV động từ assets/categories.json (fallback cứng 'Máy cắt')
+      const qn = document.getElementById('quick-nav');
+      (async () => {
+        try {
+          const res = await fetch('/assets/categories.json', { cache: 'no-store' });
+          const cats = await res.json();
+          const list = Array.isArray(cats) ? cats : [];
+          if (list.length) {
+            qn.innerHTML = list.map(c => `
+              <li>
+                <a href="${c.path}" class="qnav-item">
+                  <img src="${c.icon}" alt="${c.name}" width="28" height="28" loading="lazy" decoding="async"/>
+                  ${c.name}
+                </a>
+              </li>
+            `).join('');
+          } else {
+            throw new Error('empty categories');
+          }
+        } catch {
+          // Fallback cứng
+          qn.innerHTML = `
+            <li>
+              <a href="/store/may-cat.html" class="qnav-item">
+                <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt" width="28" height="28" loading="lazy" decoding="async"/>
+                Máy cắt
+              </a>
+            </li>`;
+        }
+      })();
+
+      // Render tất cả sản phẩm
+      if (window.MXD?.renderProducts) {
+        MXD.renderProducts('#product-list'); // hiển thị TẤT CẢ
+      } else {
+        // Fallback nhẹ: tự render nếu render-products.js chưa sẵn sàng
+        const wrap = document.querySelector('#product-list');
+        const empty = document.getElementById('empty');
+        wrap.innerHTML = Array.from({length:6}).map(()=>`
+          <article class="card">
+            <div class="skeleton" style="height:160px"></div>
+            <div class="body">
+              <div class="skeleton" style="height:18px"></div>
+              <div class="skeleton" style="height:16px;width:40%;margin-top:8px"></div>
+            </div>
+          </article>
+        `).join('');
+
+        fetch('/affiliates.json', { cache: 'no-store' })
+          .then(r=>r.ok?r.json():[])
+          .then(all=>{
+            const arr = Array.isArray(all) ? all : (all.items||[]);
+            if (!arr.length){ empty.style.display='block'; wrap.innerHTML=''; return; }
+            const fmt = n => isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
+            wrap.innerHTML = arr.map(p=>{
+              const sku = (p.sku||'').toLowerCase();
+              const name = p.name || sku || 'Sản phẩm';
+              const origin = p.origin_url || p.origin || p.url || p.link || '#';
+              const merchant = (p.merchant||'').toLowerCase();
+              const price = p.price ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>` : '';
+              return `
+                <article class="card">
+                  <a class="product-meta sr-only"
+                     href="${origin}" data-merchant="${merchant}"
+                     data-sku="${sku}" data-img="/assets/img/products/${sku}.webp"
+                     ${p.price?`data-price="${p.price}"`:''}>${name}</a>
+
+                  <a href="/g.html?sku=${encodeURIComponent(sku)}" aria-label="Xem chi tiết ${name}">
+                    <img loading="lazy" decoding="async"
+                         src="/assets/img/products/${sku}.webp"
+                         alt="${name}"
+                         onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+                  </a>
+                  <div class="body">
+                    <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${name}</a></h3>
+                    ${price}
+                    <div class="actions">
+                      <a class="buy" href="${origin}" data-merchant="${merchant}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+                    </div>
+                  </div>
+                </article>`;
+            }).join('');
+            if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+          })
+          .catch(()=>{ empty.style.display='block'; wrap.innerHTML=''; });
+      }
     });
   </script>
 
