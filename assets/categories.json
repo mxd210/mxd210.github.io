@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "may-cat",
+    "name": "Máy cắt",
+    "path": "/store/may-cat.html",
+    "icon": "/assets/img/categories/may-cat.webp",
+    "keywords": [
+      "máy cắt",
+      "máy cưa",
+      "cưa đĩa",
+      "cưa bàn",
+      "cưa kiếm",
+      "cưa lọng",
+      "cut off",
+      "cut-off",
+      "circular",
+      "circular saw",
+      "jigsaw",
+      "reciprocating",
+      "sabre",
+      "máy cắt gạch",
+      "máy cắt sắt",
+      "máy cắt nhôm",
+      "máy cắt đa năng",
+      "mài góc"
+    ],
+    "priority": 0.8
+  }
+]
