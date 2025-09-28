@@ -247,6 +247,21 @@ function ensureSubsInUrl(u, subs){
 // Sanitize URL (loại ký tự " ' , thừa ở đầu/cuối)
 function cleanUrl(u){ return (u||'').trim().replace(/^["']+|["',]+$/g,''); }
 
+// === NORMALIZE HELPERS (vi → slug) ===
+function vn(s){
+  return (s||'').toString()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // bỏ dấu
+    .replace(/đ/g,'d').replace(/Đ/g,'D')
+    .toLowerCase();
+}
+function normCategory(raw){
+  const base = vn(raw).replace(/\s+/g,'-')
+    .replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
+  // alias hay gặp → gom về may-cat
+  if (/^(may-?cat|maycat|may\s*cat|may-mai|mai-goc|may-cat-sat|may-cat-gach)$/.test(base)) return 'may-cat';
+  return base;
+}
+
 // ===================================================================
 // === CATEGORY MAP (CONFIG) — đặt TRƯỚC buildJson() — MXD Canonical ===
 window.CATEGORY_KEYWORDS = window.CATEGORY_KEYWORDS || {};
@@ -291,7 +306,6 @@ function updateToastOffset(){
 }
 window.addEventListener('load', updateToastOffset);
 window.addEventListener('resize', updateToastOffset);
-// Nếu trình duyệt hỗ trợ, theo dõi thay đổi chiều cao do wrap
 if ('ResizeObserver' in window){
   new ResizeObserver(updateToastOffset).observe(document.querySelector('.sticky-actions'));
 }
@@ -361,6 +375,9 @@ $("#btnAuto").onclick = ()=>{
   if(name && !skuNow) $("#sku").value = slugify(name);
   if($("#sku").value && !$("#image").value) $("#image").value = `/assets/img/products/${$("#sku").value}.webp`;
   $("#originOut").value = cleanUrl($("#origin").value.trim());
+  // gợi ý danh mục nếu để trống
+  const g = autoCategory(`${name} ${$("#brand").value} ${$("#origin").value}`);
+  if (g && !$("#category").value.trim()) $("#category").value = g;
   runDiag();
 };
 ["name","sku","origin","image","merchant"].forEach(id=>$("#"+id).addEventListener('input', runDiag));
@@ -408,13 +425,10 @@ function makeDeeplink(){
   validateDeeplink();
 }
 $("#btnMakeDeeplink").onclick = makeDeeplink;
-
-// auto-gen khi điền form
 ["origin","sku","merchant","tplShopee","tplLazada"].forEach(id=>{
   const el = $("#"+id);
   if(el) el.addEventListener('input', ()=>{ if($("#origin").value.trim()) makeDeeplink(); });
 });
-
 $("#origin").addEventListener('input', ()=>$("#originOut").value=cleanUrl($("#origin").value));
 
 // Validator
@@ -437,20 +451,16 @@ function validateDeeplink(){
 }
 $("#deeplink").addEventListener('input', validateDeeplink);
 
-// Buttons copy/mở
-$("#copyOrigin").onclick = ()=>{ $("#originOut").select(); document.execCommand('copy'); toast("Đã copy Origin."); };
-$("#openOrigin").onclick = ()=>{ const u=cleanUrl($("#origin").value.trim()); if(u) window.open(u,'_blank'); else toast("Chưa có Origin.","warn"); };
-$("#copyDeeplink").onclick = ()=>{ $("#deeplink").select(); document.execCommand('copy'); toast("Đã copy Deep-link."); };
-$("#openDeeplink").onclick = ()=>{ const u=$("#deeplink").value.trim(); if(u) window.open(u,'_blank'); else toast("Chưa có Deep-link.","warn"); };
-
 // ---------- JSON ----------
 function buildJson(){
-  // MXD: auto-fill category từ map nếu chưa gõ tay
+  // Auto-fill category nếu trống → rồi chuẩn hoá về slug
   if (!$("#category").value.trim()){
     const text = `${$("#name").value} ${$("#brand").value} ${$("#origin").value}`;
     const guess = autoCategory(text);
     if (guess) $("#category").value = guess;
   }
+  // luôn normalize để ra slug chuẩn (vd: 'máy cắt' → 'may-cat')
+  $("#category").value = normCategory($("#category").value);
 
   const now = new Date().toISOString();
   const obj = {
