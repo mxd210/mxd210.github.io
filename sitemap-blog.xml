@@ -51,4 +51,11 @@
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+    <url>
+    <loc>https://mxd210.github.io/store/may-cat.html</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
 </urlset>
