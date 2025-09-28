@@ -247,6 +247,38 @@ function ensureSubsInUrl(u, subs){
 // Sanitize URL (loại ký tự " ' , thừa ở đầu/cuối)
 function cleanUrl(u){ return (u||'').trim().replace(/^["']+|["',]+$/g,''); }
 
+// ===================================================================
+// === CATEGORY MAP (CONFIG) — đặt TRƯỚC buildJson() — MXD Canonical ===
+window.CATEGORY_KEYWORDS = window.CATEGORY_KEYWORDS || {};
+window.CATEGORY_KEYWORDS["may-cat"] = {
+  include: [
+    /\b(máy\s*)?cắt\b/i,
+    /\bmáy\s*cưa\b/i,
+    /\bcưa\s*(đĩa|bàn|kiếm|lọng)\b/i,
+    /\bcut[\s-]?off\b/i,
+    /\bcircular(\s*saw)?\b/i,
+    /\bjig\s*saw\b/i, /\bjigsaw\b/i,
+    /\breciprocating\b/i, /\bsabre\b/i,
+    /\bmáy\s*cắt\s*(gạch|sắt|nhôm|đa\s*năng)\b/i,
+    /\bm[ảa]i\s*g[óo]c\b/i,     // mài góc (tạm gom Máy cắt)
+    /\bmay\s*cat\b/i            // không dấu
+  ],
+  exclude: [ /\b(lưỡi|blade|đĩa|disc|đá\s*cắt|phụ\s*kiện|mũi)\b/i ],
+  set: { category: "may-cat" }
+};
+
+// Helper đoán slug danh mục từ text
+function autoCategory(text){
+  const MAP = window.CATEGORY_KEYWORDS || {};
+  for (const [slug, rule] of Object.entries(MAP)){
+    const okInc = (rule.include||[]).some(rx => rx.test(text));
+    const okExc = (rule.exclude||[]).some(rx => rx.test(text));
+    if (okInc && !okExc) return slug;
+  }
+  return '';
+}
+// ===================================================================
+
 // ====== State / Toast
 const state = { workerOk:false, imgBlob:null, imgName:null, imgW:0, imgH:0 };
 function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4500); }
@@ -413,6 +445,13 @@ $("#openDeeplink").onclick = ()=>{ const u=$("#deeplink").value.trim(); if(u) wi
 
 // ---------- JSON ----------
 function buildJson(){
+  // MXD: auto-fill category từ map nếu chưa gõ tay
+  if (!$("#category").value.trim()){
+    const text = `${$("#name").value} ${$("#brand").value} ${$("#origin").value}`;
+    const guess = autoCategory(text);
+    if (guess) $("#category").value = guess;
+  }
+
   const now = new Date().toISOString();
   const obj = {
     name: $("#name").value.trim(),
@@ -545,9 +584,9 @@ $("#btnVerify").onclick = async ()=>{
   const sku = $("#sku").value.trim();
   if(!sku){ toast("Chưa có SKU để kiểm tra.","warn"); return; }
   try{
-    const r = await fetch('/assets/data/affiliates.json?_=' + Date.now(), {cache:'no-cache'});
+    const r = await fetch('/affiliates.json?_=' + Date.now(), {cache:'no-cache'});
     const arr = await r.json();
-    const found = Array.isArray(arr) && arr.some(x => (x.sku||'') === sku);
+    const found = (Array.isArray(arr)?arr:(arr.items||[])).some(x => (String(x.sku||'').toLowerCase()) === sku.toLowerCase());
     toast(found ? "ĐÃ CÓ trong affiliates.json." : "CHƯA THẤY trong affiliates.json.", found ? "ok":"warn");
   }catch(e){
     toast("Không đọc được affiliates.json: "+e.message, "err");
