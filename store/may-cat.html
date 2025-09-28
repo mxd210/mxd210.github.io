@@ -3,18 +3,23 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Máy cắt — Cửa hàng MXD</title>
-  <meta name="description" content="Danh mục Máy cắt: máy cắt cầm tay, phụ kiện liên quan."/>
+  <title>Máy cắt | MXD</title>
+  <meta name="description" content="Danh mục Máy cắt: cưa đĩa, cưa kiếm, cưa lọng, bàn cắt, cut-off, circular, jigsaw, reciprocating… Hàng tin dùng thực tế từ MXD."/>
   <link rel="canonical" href="https://mxd210.github.io/store/may-cat.html"/>
   <meta name="robots" content="index,follow"/>
 
   <!-- OG -->
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Máy cắt — Cửa hàng MXD"/>
-  <meta property="og:description" content="Danh mục Máy cắt tại MXD."/>
+  <meta property="og:title" content="Máy cắt | MXD"/>
+  <meta property="og:description" content="Cưa đĩa, cưa kiếm, cưa lọng, cut-off, circular, jigsaw, reciprocating…"/>
   <meta property="og:url" content="https://mxd210.github.io/store/may-cat.html"/>
-  <meta property="og:image" content="/assets/img/products/placeholder.webp"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/may-cat.webp"/>
 
+  <!-- VERIFY (giữ nguyên nếu đang dùng) -->
+  <meta name="google-site-verification" content="PASTE_GOOGLE_CODE">
+  <meta name="msvalidate.01" content="PASTE_BING_CODE">
+
+  <link rel="preload" as="image" href="/assets/img/categories/may-cat.webp"/>
   <link rel="stylesheet" href="/assets/site.css"/>
 
   <style>
@@ -42,23 +47,21 @@
     .buy:hover{background:var(--text);color:#fff}
     .muted{color:var(--muted)}
     .crumb{margin:0 0 6px}
+    .hero{margin:10px 0 0}
+    .hero img{width:100%;height:auto;border-radius:12px}
   </style>
-  <!-- VERIFY + ROBOTS + CANONICAL (STORE CATEGORY) -->
-<meta name="google-site-verification" content="PASTE_GOOGLE_CODE">
-<meta name="msvalidate.01" content="PASTE_BING_CODE">
-<link rel="canonical" href="https://mxd210.github.io/store/may-cat.html">
-<meta name="robots" content="index,follow">
-
-<script src="/assets/analytics.js" defer></script>
-<script src="/assets/mxd-affiliate.js" defer></script>
-
 </head>
 <body>
   <header>
     <div class="container">
       <p class="crumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Máy cắt</p>
       <h1 style="margin:0">Danh mục: Máy cắt</h1>
-      <p class="muted" style="margin:4px 0 0">Sản phẩm được lọc tự động từ <code>/assets/data/affiliates.json</code>.</p>
+      <p class="muted" style="margin:4px 0 0">
+        Sản phẩm được lọc tự động từ <code>/affiliates.json</code> theo danh mục <code>may-cat</code>.
+      </p>
+      <figure class="hero">
+        <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt — MXD" width="1200" height="500" loading="eager" decoding="async"/>
+      </figure>
     </div>
   </header>
 
@@ -69,17 +72,19 @@
   </main>
 
   <footer>
-    <div class="container">© MXD</div>
+    <div class="container">© MXD • Zalo/Phone 0338328898</div>
   </footer>
 
-  <!-- GA4 trước, Affiliate sau -->
-  <script src="/assets/analytics.js" defer></script>
-  <script src="/assets/mxd-affiliate.js" defer></script>
-  <!-- Nút nổi (đã cấu hình sẵn 0338328898, mxd6686) -->
-  <script src="/assets/js/floating-contact.js" defer></script>
+  <!-- GA4 trước, Affiliate sau (chỉ 1 lần theo chuẩn MXD) -->
+  <script defer src="/assets/analytics.js"></script>
+  <script defer src="/assets/mxd-affiliate.js"></script>
+  <script defer src="/assets/js/floating-contact.js"></script>
 
   <script>
+  // Chuẩn MXD
+  const CATEGORY_SLUG = 'may-cat';
   const PLACEHOLDER = '/assets/img/products/placeholder.webp';
+  const AFF_PATH = '/affiliates.json';
 
   const fmtVND = n => {
     const x = Number(n); if (!isFinite(x)) return '';
@@ -87,36 +92,48 @@
     catch { return (x+'').replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '₫'; }
   };
 
-  // === Filter danh mục "Máy cắt": theo slug hoặc tên có chữ "cắt"
+  // Ưu tiên field category/categories; fallback regex (tên/SKU có “cắt”)
   function inCategory(p){
-    const s = (p.sku||'') + ' ' + (p.name||'');
-    return /may[-\\s_]*cat|cắt/i.test(s);
+    if (p && (p.category === CATEGORY_SLUG)) return true;
+    if (p && Array.isArray(p.categories) && p.categories.includes(CATEGORY_SLUG)) return true;
+    const s = ((p.sku||'') + ' ' + (p.name||'')).toLowerCase();
+    return /may[-\s_]*cat|cắt/.test(s);
+  }
+
+  function toLinks(p){
+    if (Array.isArray(p.links) && p.links.length) return p.links;
+    const origin = p.origin_url || p.origin || p.url || p.link;
+    if (origin) return [{ merchant: (p.merchant||'origin'), href: origin }];
+    return [];
   }
 
   function renderCard(p){
-    const links = Array.isArray(p.links) && p.links.length ? p.links
-                 : (p.origin ? [{merchant:p.merchant||'origin', href:p.origin}] : []);
-    const buyBtns = links.map(l => 
+    const links = toLinks(p);
+    const buyBtns = links.map(l =>
       `<a class="buy" href="${l.href}" data-merchant="${l.merchant||''}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>`
     ).join('');
+    const sku = (p.sku||'').toLowerCase();
+    const name = p.name || sku || 'Sản phẩm';
+
     return `
       <article class="card">
+        <!-- Meta link chuẩn MXD để affiliate.js nhận diện -->
         <a class="product-meta sr-only"
-           href="${p.origin||'#'}"
-           data-merchant="${p.merchant||''}"
-           data-sku="${p.sku}"
-           data-img="/assets/img/products/${p.sku}.webp"
-           data-price="${p.price||''}">${p.name}</a>
+           href="${(p.origin_url || p.origin || p.url || p.link) || '#'}"
+           data-merchant="${(p.merchant||'')}"
+           data-sku="${sku}"
+           data-img="/assets/img/products/${sku}.webp"
+           ${p.price ? `data-price="${p.price}"` : ''}>${name}</a>
 
-        <a href="/g.html?sku=${encodeURIComponent(p.sku)}" aria-label="Xem chi tiết ${p.name}">
+        <a href="/g.html?sku=${encodeURIComponent(sku)}" aria-label="Xem chi tiết ${name}">
           <img loading="lazy" decoding="async" width="640" height="640"
-               src="/assets/img/products/${p.sku}.webp"
-               alt="${p.name}"
+               src="/assets/img/products/${sku}.webp"
+               alt="${name}"
                onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
         </a>
 
         <div class="body">
-          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(p.sku)}">${p.name}</a></h3>
+          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${name}</a></h3>
           ${p.price ? `<div class="price" data-price="${p.price}">${fmtVND(p.price)}</div>` : ''}
           <div class="actions">${buyBtns}</div>
         </div>
@@ -124,7 +141,7 @@
     `;
   }
 
-  // Skeleton nhẹ
+  // Skeleton
   (function showSkeleton(){
     const wrap = document.getElementById('product-list');
     wrap.innerHTML = Array.from({length:6}).map(()=>`
@@ -138,25 +155,28 @@
     `).join('');
   })();
 
-  fetch('/assets/data/affiliates.json')
+  fetch(AFF_PATH, { cache: 'no-store' })
     .then(r=>r.ok?r.json():[])
     .then(all=>{
-      const list = (Array.isArray(all)?all:[]).filter(inCategory);
+      const arr = Array.isArray(all) ? all : (all.items||[]);
+      const list = arr.filter(inCategory);
       const wrap = document.getElementById('product-list');
       const empty = document.getElementById('empty');
+
       if (!list.length){
         empty.style.display='block'; wrap.innerHTML=''; return;
       }
-      // Sắp xếp tăng dần theo giá nếu có
+
+      // Sắp xếp tăng dần theo giá (có giá đứng trước)
       list.sort((a,b)=>(a.price||1e15)-(b.price||1e15));
       wrap.innerHTML = list.map(renderCard).join('');
 
-      // JSON-LD ItemList cho danh mục
+      // JSON-LD ItemList
       const ld = {"@context":"https://schema.org","@type":"ItemList",
-        "itemListElement": list.map((p,i)=>({"@type":"ListItem","position":i+1,"name":p.name,"url":`/g.html?sku=${p.sku}`}))};
+        "itemListElement": list.map((p,i)=>({"@type":"ListItem","position":i+1,"name":p.name||p.sku,"url":`/g.html?sku=${(p.sku||'').toLowerCase()}`}))};
       const s = document.createElement('script'); s.type='application/ld+json'; s.textContent=JSON.stringify(ld); document.head.appendChild(s);
 
-      // Cho affiliate xử lý
+      // Kích hoạt affiliate rewrite
       if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
     })
     .catch(err=>{
@@ -164,7 +184,5 @@
       document.getElementById('empty').style.display='block';
     });
   </script>
-  <script src="/assets/js/floating-contact.js" defer></script>
-
 </body>
 </html>
