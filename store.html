@@ -39,6 +39,16 @@
     .nav-link[aria-current="page"]{ background:#eef4ff; color:#1746ff }
     @media (max-width:480px){ .nav-link{ padding:8px } }
 
+    /* Quick-Nav */
+    .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:12px 0}
+    .qnav-item{
+      display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);
+      border-radius:12px;background:var(--card);box-shadow:var(--shadow);color:var(--text);
+      text-decoration:none
+    }
+    .qnav-item:hover{background:rgba(23,70,255,.06)}
+    .quick-nav img{width:28px;height:28px;border-radius:8px}
+
     /* Grid / Card */
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--gap);margin:16px 0}
     .card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .15s}
@@ -64,18 +74,19 @@
     @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
   </style>
 
-<!-- SUB mặc định (override bằng ?sub1=&sub2=... khi test) -->
-<meta name="at:sub1" content="">
-<meta name="at:sub2" content="">
-<meta name="at:sub3" content="store">
-<meta name="at:sub4" content="mxd210">
-  
-<script defer src="/assets/analytics.js?v=2025-09-26-fb2"></script>
-<script defer src="/assets/mxd-affiliate.js?v=2025-09-26-fb2"></script>
-<script defer src="/assets/js/render-products.js?v=2025-09-26-fb2"></script>
+  <!-- SUB mặc định (override bằng ?sub1=&sub2=... khi test) -->
+  <meta name="at:sub1" content="">
+  <meta name="at:sub2" content="">
+  <meta name="at:sub3" content="store">
+  <meta name="at:sub4" content="mxd210">
+
+  <!-- GA4 trước Affiliate (chuẩn MXD) -->
+  <script defer src="/assets/analytics.js?v=2025-09-26-fb2"></script>
+  <script defer src="/assets/mxd-affiliate.js?v=2025-09-26-fb2"></script>
+  <script defer src="/assets/js/render-products.js?v=2025-09-26-fb2"></script>
 
   <!-- Floating contact (giữ nguyên nếu bạn đang dùng file tách riêng) -->
-<script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
+  <script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
 </head>
 <body>
   <header style="position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(6px)">
@@ -92,32 +103,104 @@
   </header>
 
   <main class="container">
+    <!-- QUICK-NAV (mới thêm) -->
+    <section aria-label="Danh mục nhanh">
+      <ul class="quick-nav" id="quick-nav"></ul>
+    </section>
+
     <div id="product-list" class="grid" aria-live="polite"></div>
     <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/assets/data/affiliates.json</code> hoặc <code>/products.json</code>.</p>
     <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
   </main>
 
-  
   <footer>
     <div class="container">
       © MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a>
     </div>
   </footer>
 
+  <!-- Loader Quick-Nav + Render sản phẩm -->
   <script>
-    // Hiển thị TẤT CẢ sản phẩm (có thể giới hạn bằng ?limit=12 trên URL)
     window.addEventListener('DOMContentLoaded', () => {
+      // QUICK-NAV: đọc nhiều nguồn + có fallback bắt buộc 2 danh mục
+      const qn = document.getElementById('quick-nav');
+
+      (async () => {
+        const sources = ['/assets/categories.json', '/assets/data/categories.json'];
+        let raw = null;
+
+        for (const url of sources) {
+          try {
+            const r = await fetch(url, { cache: 'no-store' });
+            if (r.ok) { raw = await r.json(); break; }
+          } catch(_) {}
+        }
+
+        // Chuẩn hoá list
+        let list = [];
+        if (Array.isArray(raw)) list = raw;
+        else if (raw && Array.isArray(raw.categories)) list = raw.categories;
+        else if (raw && typeof raw === 'object') list = Object.values(raw);
+
+        const norm = (x = {}) => {
+          const slug = (x.slug || '').toLowerCase();
+          return {
+            slug,
+            name: x.name || x.title || 'Danh mục',
+            icon: x.icon || (slug ? `/assets/img/categories/${slug}.webp` : '/assets/img/categories/placeholder.webp'),
+            path: x.path || x.canonical || (slug ? `/store/${slug}.html` : '#')
+          };
+        };
+
+        let items = list.map(norm);
+
+        // Bảo đảm luôn có 2 danh mục cốt lõi
+        const ensure = (slug, name, icon) => {
+          if (!items.some(i => i.slug === slug)) {
+            items.push(norm({ slug, name, icon, path: `/store/${slug}.html` }));
+          }
+        };
+        ensure('may-cat', 'Máy cắt', '/assets/img/categories/may-cat.webp');
+        ensure('may-khoan-duc-vit', 'Khoan · Đục · Vít', '/assets/img/categories/may-khoan-duc-vit.webp');
+
+        // Render
+        if (!items.length) {
+          qn.innerHTML = `
+            <li>
+              <a href="/store/may-cat.html" class="qnav-item">
+                <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt" width="28" height="28" loading="lazy" decoding="async"/>Máy cắt
+              </a>
+            </li>
+            <li>
+              <a href="/store/may-khoan-duc-vit.html" class="qnav-item">
+                <img src="/assets/img/categories/may-khoan-duc-vit.webp" alt="Khoan · Đục · Vít" width="28" height="28" loading="lazy" decoding="async"/>Khoan · Đục · Vít
+              </a>
+            </li>`;
+        } else {
+          qn.innerHTML = items.map(c => `
+            <li>
+              <a href="${c.path}" class="qnav-item">
+                <img src="${c.icon}" alt="${c.name}" width="28" height="28" loading="lazy" decoding="async"/>
+                ${c.name}
+              </a>
+            </li>
+          `).join('');
+        }
+      })();
+
+      // Hiển thị TẤT CẢ sản phẩm (có thể giới hạn bằng ?limit=12)
       const qs = new URLSearchParams(location.search);
       const lim = qs.has('limit') ? Number(qs.get('limit')) : undefined;
       const limit = Number.isFinite(lim) ? lim : undefined;
       MXD.renderProducts('#product-list', limit);
     });
   </script>
-  <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js?v=2025-09-26-fb2');
-}
-</script>
 
+  <!-- SW -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js?v=2025-09-26-fb2');
+    }
+  </script>
 </body>
 </html>
