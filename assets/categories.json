@@ -16,5 +16,14 @@
     "keywords": ["khoan búa","SDS-Plus","SDS-Max","impact driver","impact wrench","siết bu lông"],
     "canonical": "https://mxd210.github.io/store/may-khoan-duc-vit.html",
     "priority": 0.9
+  },
+  {
+    "slug": "may-laze",
+    "name": "Máy laser",
+    "icon": "/assets/img/categories/may-laze.webp",
+    "path": "/store/may-laze.html",
+    "keywords": ["cân mực 4 tia","cân mực 8 tia","cân mực 12 tia","laser xanh","laser đỏ","thước laser"],
+    "canonical": "https://mxd210.github.io/store/may-laze.html",
+    "priority": 0.9
   }
 ]
