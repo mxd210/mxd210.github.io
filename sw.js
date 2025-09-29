@@ -1,5 +1,5 @@
 // sw.js — MXD PWA  (2025-09-26)
-const VERSION = 'v45-2025-09-27-fb2';   // <— CHỈ 1 DÒNG NÀY
+const VERSION = '2025-09-30-mlz1'; // <— CHỈ 1 DÒNG NÀY
 
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => self.clients.claim());
