@@ -136,7 +136,7 @@
   </header>
 
   <main class="container">
-    <!-- QUICK-NAV: đọc từ assets/categories.json; fallback Máy cắt -->
+    <!-- QUICK-NAV -->
     <section aria-label="Danh mục nhanh" style="margin-top:12px">
       <ul class="quick-nav" id="quick-nav"></ul>
     </section>
@@ -177,45 +177,78 @@
     window.MXD_RENDER.source = '/affiliates.json'; // nguồn chuẩn theo Canonical
   </script>
 
-  <!-- Gọi render khi DOM sẵn sàng -->
+  <!-- QUICK-NAV LOADER (đa nguồn + fallback 2 danh mục cốt lõi) & RENDER SẢN PHẨM -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      // QUICK-NAV động từ assets/categories.json (fallback cứng 'Máy cắt')
       const qn = document.getElementById('quick-nav');
+
       (async () => {
-        try {
-          const res = await fetch('/assets/categories.json', { cache: 'no-store' });
-          const cats = await res.json();
-          const list = Array.isArray(cats) ? cats : [];
-          if (list.length) {
-            qn.innerHTML = list.map(c => `
-              <li>
-                <a href="${c.path}" class="qnav-item">
-                  <img src="${c.icon}" alt="${c.name}" width="28" height="28" loading="lazy" decoding="async"/>
-                  ${c.name}
-                </a>
-              </li>
-            `).join('');
-          } else {
-            throw new Error('empty categories');
+        // Thử lần lượt 2 nguồn
+        const sources = ['/assets/categories.json', '/assets/data/categories.json'];
+        let raw = null;
+        for (const url of sources) {
+          try {
+            const r = await fetch(url, { cache: 'no-store' });
+            if (r.ok) { raw = await r.json(); break; }
+          } catch(_) {}
+        }
+
+        // Chuẩn hoá về array items
+        let list = [];
+        if (Array.isArray(raw)) list = raw;
+        else if (raw && Array.isArray(raw.categories)) list = raw.categories;
+        else if (raw && typeof raw === 'object') list = Object.values(raw);
+
+        const norm = (x = {}) => {
+          const slug = (x.slug || '').toLowerCase();
+          return {
+            slug,
+            name: x.name || x.title || 'Danh mục',
+            icon: x.icon || (slug ? `/assets/img/categories/${slug}.webp` : '/assets/img/categories/placeholder.webp'),
+            path: x.path || x.canonical || (slug ? `/store/${slug}.html` : '#')
+          };
+        };
+
+        let items = list.map(norm);
+
+        // Đảm bảo luôn có 2 danh mục này
+        const ensure = (slug, name, icon) => {
+          if (!items.some(i => i.slug === slug)) {
+            items.push(norm({ slug, name, icon, path: `/store/${slug}.html` }));
           }
-        } catch {
-          // Fallback cứng
+        };
+        ensure('may-cat', 'Máy cắt', '/assets/img/categories/may-cat.webp');
+        ensure('may-khoan-duc-vit', 'Khoan · Đục · Vít', '/assets/img/categories/may-khoan-duc-vit.webp');
+
+        // Nếu vẫn trống, render fallback tối thiểu
+        if (!items.length) {
           qn.innerHTML = `
             <li>
               <a href="/store/may-cat.html" class="qnav-item">
-                <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt" width="28" height="28" loading="lazy" decoding="async"/>
-                Máy cắt
+                <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt" width="28" height="28" loading="lazy" decoding="async"/>Máy cắt
+              </a>
+            </li>
+            <li>
+              <a href="/store/may-khoan-duc-vit.html" class="qnav-item">
+                <img src="/assets/img/categories/may-khoan-duc-vit.webp" alt="Khoan · Đục · Vít" width="28" height="28" loading="lazy" decoding="async"/>Khoan · Đục · Vít
               </a>
             </li>`;
+        } else {
+          qn.innerHTML = items.map(c => `
+            <li>
+              <a href="${c.path}" class="qnav-item">
+                <img src="${c.icon}" alt="${c.name}" width="28" height="28" loading="lazy" decoding="async"/>
+                ${c.name}
+              </a>
+            </li>
+          `).join('');
         }
       })();
 
-      // Render tất cả sản phẩm
+      // Render tất cả sản phẩm (giữ nguyên logic cũ của cậu)
       if (window.MXD?.renderProducts) {
         MXD.renderProducts('#product-list'); // hiển thị TẤT CẢ
       } else {
-        // Fallback nhẹ: tự render nếu render-products.js chưa sẵn sàng
         const wrap = document.querySelector('#product-list');
         const empty = document.getElementById('empty');
         wrap.innerHTML = Array.from({length:6}).map(()=>`
