@@ -3,174 +3,101 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Máy cắt — Cửa hàng MXD</title>
-  <meta name="description" content="Danh mục Máy cắt: máy cắt cầm tay, máy cưa đĩa, cưa kiếm, cưa lọng, cut-off…"/>
+  <title>Máy cắt (Gạch/Đá/Đa năng) | MXD</title>
+  <meta name="description" content="Máy cắt gạch bàn, cắt gạch cầm tay, máy cắt đa năng, máy cắt sắt/nhôm và lưỡi cắt — danh mục chuẩn MXD, tối ưu thi công."/>
   <link rel="canonical" href="https://mxd210.github.io/store/may-cat.html"/>
   <meta name="robots" content="index,follow"/>
 
   <!-- OG -->
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Máy cắt — Cửa hàng MXD"/>
-  <meta property="og:description" content="Danh mục Máy cắt tại MXD."/>
+  <meta property="og:title" content="Máy cắt (Gạch/Đá/Đa năng) | MXD"/>
+  <meta property="og:description" content="Máy cắt gạch bàn, cắt gạch cầm tay, máy cắt đa năng, cắt sắt/nhôm & lưỡi cắt — danh mục chuẩn MXD."/>
   <meta property="og:url" content="https://mxd210.github.io/store/may-cat.html"/>
-  <meta property="og:image" content="/assets/img/categories/may-cat.webp"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/may-cat-og.webp"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
 
   <link rel="stylesheet" href="/assets/site.css"/>
+  <script defer src="/assets/analytics.js"></script>
+  <script defer src="/assets/js/render-products.js"></script>
+  <script defer src="/assets/mxd-affiliate.js"></script>
 
   <style>
-    :root{
-      --bg:#ffffff; --text:#111; --muted:#666; --border:#eaeaea; --card:#fff;
-      --brand:#0a84ff; --brand-contrast:#fff; --radius:16px; --gap:16px;
-      --shadow:0 6px 20px rgba(0,0,0,.06);
-    }
-    @media (prefers-color-scheme: dark){
-      :root{ --bg:#0f1215; --text:#e8e8e8; --muted:#a2a2a2; --border:#262b31; --card:#14181d; --shadow:0 10px 28px rgba(0,0,0,.35) }
-    }
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    a{color:var(--brand);text-decoration:none}
-    header,footer{padding:12px 16px;border-bottom:1px solid var(--border)}
-    footer{border-bottom:none;border-top:1px solid var(--border);margin-top:24px}
     .container{max-width:1100px;margin:0 auto;padding:0 16px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--gap);margin:16px 0}
-    .card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
-    .card img{width:100%;height:240px;object-fit:cover;background:#f7f7f7}
-    .card .body{padding:12px}
-    .name{font-size:16px;line-height:1.35;margin:0 0 6px}
-    .price{font-weight:800;margin:4px 0 10px}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
-    .buy{display:inline-block;border:1px solid var(--text);color:var(--text);border-radius:12px;padding:8px 10px}
-    .buy:hover{background:var(--text);color:#fff}
-    .muted{color:var(--muted)}
-    .crumb{margin:0 0 6px}
+    .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:8px 0 0}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border,#eaeaea);border-radius:12px;background:var(--card,#fff);text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.06);color:inherit}
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin:12px 0}
+    .bullets{padding-left:18px}
+    .steps{padding-left:18px}
   </style>
-
-  <script src="/assets/analytics.js" defer></script>
-  <script src="/assets/mxd-affiliate.js" defer></script>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <p class="crumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Máy cắt</p>
-      <h1 style="margin:0">Danh mục: Máy cắt</h1>
-      <p class="muted" style="margin:4px 0 0">Sản phẩm được lọc tự động từ <code>/affiliates.json</code>.</p>
-    </div>
+  <header class="container">
+    <nav class="breadcrumb" style="padding:12px 0;border-bottom:1px solid var(--border,#eaeaea);margin-bottom:8px">
+      <a href="/">MXD</a> › <a href="/store.html">Cửa hàng</a> › <span>Máy cắt</span>
+    </nav>
+    <h1>Máy cắt <small>(Gạch/Đá/Đa năng)</small></h1>
+    <p class="lead">Cắt gạch bàn, cắt gạch cầm tay, oscillating đa năng, cắt sắt/nhôm & lưỡi cắt đúng vật liệu.</p>
   </header>
 
+  <section class="container quick-nav">
+    <a href="#cat-gach-ban" class="chip">Cắt gạch bàn</a>
+    <a href="#cat-gach-cam-tay" class="chip">Cắt gạch cầm tay</a>
+    <a href="#cat-da-nang" class="chip">Máy cắt đa năng</a>
+    <a href="#cat-sat-nhom" class="chip">Cắt sắt/nhôm</a>
+    <a href="#luoi-cat" class="chip">Lưỡi cắt & phụ kiện</a>
+    <a href="#faq" class="chip">FAQ</a>
+  </section>
+
   <main class="container">
-    <div id="product-list" class="grid" aria-live="polite"></div>
-    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm phù hợp danh mục.</p>
-    <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
+    <section id="cat-gach-ban">
+      <h2>Máy cắt gạch bàn</h2>
+      <div class="product-grid" data-category="may-cat" data-sub="cat-gach-ban"></div>
+    </section>
+
+    <section id="cat-gach-cam-tay">
+      <h2>Máy cắt gạch cầm tay</h2>
+      <div class="product-grid" data-category="may-cat" data-sub="cat-gach-cam-tay"></div>
+    </section>
+
+    <section id="cat-da-nang">
+      <h2>Máy cắt đa năng (oscillating)</h2>
+      <div class="product-grid" data-category="may-cat" data-sub="cat-da-nang"></div>
+    </section>
+
+    <section id="cat-sat-nhom">
+      <h2>Máy cắt sắt/nhôm (cut-off)</h2>
+      <div class="product-grid" data-category="may-cat" data-sub="cat-sat-nhom"></div>
+    </section>
+
+    <section id="luoi-cat">
+      <h2>Lưỡi cắt & phụ kiện</h2>
+      <ul class="bullets">
+        <li>Lưỡi kim cương 110/125/180/230 mm — khô/ướt, mỏng/siêu mỏng</li>
+        <li>Đá cắt sắt/inox, đế cữ, thước 45°; lưỡi oscillating cho gỗ/kim loại/gạch mỏng</li>
+      </ul>
+      <div class="product-grid" data-category="may-cat" data-sub="luoi-cat"></div>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ</h2>
+      <details><summary>Lưỡi ướt/khô khác gì?</summary><p>Ướt cho mép cắt mịn, ít bụi; khô tiện thi công nhanh nhưng nhiều bụi/nhiệt.</p></details>
+      <details><summary>Chọn đường kính lưỡi?</summary><p>110–125 mm cho cầm tay; 180–230 mm cho sâu cắt lớn; chiều dài bàn theo gạch 600/800/1200 mm.</p></details>
+    </section>
   </main>
 
-  <footer>
-    <div class="container">© MXD</div>
+  <footer class="container" style="margin-top:16px;border-top:1px solid var(--border,#eaeaea);padding:12px 0">
+    <p>Icon danh mục: <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt" width="64" height="64" loading="lazy"/></p>
   </footer>
 
-  <!-- Nút nổi (đã cấu hình sẵn 0338328898, mxd6686) -->
-  <script src="/assets/js/floating-contact.js" defer></script>
-
   <script>
-  const DATA_URL = '/affiliates.json';
-  const PLACEHOLDER = '/assets/img/products/placeholder.webp';
-
-  const fmtVND = n => {
-    const x = Number(n); if (!isFinite(x)) return '';
-    try { return new Intl.NumberFormat('vi-VN').format(x) + '₫'; }
-    catch { return (x+'').replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '₫'; }
-  };
-
-  // Chuẩn hoá có dấu -> không dấu để so slug
-  function vn(s){ return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase(); }
-
-  // === Filter danh mục "Máy cắt"
-  function inCategory(p){
-    // 1) Ưu tiên field category
-    const cat = (p.category||'').trim();
-    if (cat){
-      const slug = vn(cat).replace(/\s+/g,'-');
-      if (slug === 'may-cat') return true;
-    }
-    // 2) Fallback: SKU/Tên/Brand + loại trừ phụ kiện
-    const s = `${p.sku||''} ${p.name||''} ${p.brand||''}`;
-    const isCut =
-      /may[-\s_]*cat|cắt|cưa|jig\s*saw|jigsaw|reciprocating|cut[\s-]?off|circular/i.test(s);
-    const isAccessory =
-      /\b(lưỡi|blade|đĩa|disc|đá\s*cắt|phụ\s*kiện|mũi)\b/i.test(s);
-    return isCut && !isAccessory;
-  }
-
-  function renderCard(p){
-    const imgSrc = p.image || `/assets/img/products/${p.sku}.webp`;
-    const links = Array.isArray(p.links) && p.links.length ? p.links
-                 : (p.deeplink ? [{merchant:p.merchant||'', href:p.deeplink}]
-                               : (p.origin ? [{merchant:p.merchant||'origin', href:p.origin}] : []));
-    const buyBtns = links.map(l =>
-      `<a class="buy" href="${l.href}" data-merchant="${l.merchant||''}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>`
-    ).join('');
-    return `
-      <article class="card">
-        <a class="product-meta sr-only"
-           href="${p.origin||'#'}"
-           data-merchant="${p.merchant||''}"
-           data-sku="${p.sku}"
-           data-img="${imgSrc}"
-           data-price="${p.price||''}">${p.name}</a>
-
-        <a href="/g.html?sku=${encodeURIComponent(p.sku)}" aria-label="Xem chi tiết ${p.name}">
-          <img loading="lazy" decoding="async" width="640" height="640"
-               src="${imgSrc}"
-               alt="${p.name}"
-               onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
-        </a>
-
-        <div class="body">
-          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(p.sku)}">${p.name}</a></h3>
-          ${p.price ? `<div class="price" data-price="${p.price}">${fmtVND(p.price)}</div>` : ''}
-          <div class="actions">${buyBtns}</div>
-        </div>
-      </article>
-    `;
-  }
-
-  // Skeleton nhẹ
-  (function showSkeleton(){
-    const wrap = document.getElementById('product-list');
-    wrap.innerHTML = Array.from({length:6}).map(()=>`
-      <article class="card">
-        <div style="height:240px;background:linear-gradient(90deg, rgba(0,0,0,.06) 25%, rgba(0,0,0,.12) 37%, rgba(0,0,0,.06) 63%);"></div>
-        <div class="body">
-          <div style="height:18px;background:#eaeaea"></div>
-          <div style="height:16px;width:40%;margin-top:8px;background:#eee"></div>
-        </div>
-      </article>
-    `).join('');
-  })();
-
-  fetch(DATA_URL + '?_=' + Date.now(), { cache: 'no-cache' })
-    .then(r=>r.ok?r.json():[])
-    .then(all=>{
-      const arr = Array.isArray(all) ? all : (all.items||[]);
-      const list = arr.filter(inCategory).filter(x => x.status !== false);
-      const wrap = document.getElementById('product-list');
-      const empty = document.getElementById('empty');
-      if (!list.length){
-        empty.style.display='block'; wrap.innerHTML=''; return;
+    // Ưu tiên API theo danh mục nếu có; fallback hiển thị toàn bộ
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.MXD?.renderCategory) {
+        MXD.renderCategory('may-cat');
+      } else if (window.MXD?.renderProducts) {
+        MXD.renderProducts('.product-grid');
       }
-      // Sắp xếp tăng dần theo giá nếu có
-      list.sort((a,b)=>(a.price??1e15)-(b.price??1e15));
-      wrap.innerHTML = list.map(renderCard).join('');
-
-      // JSON-LD ItemList cho danh mục
-      const ld = {"@context":"https://schema.org","@type":"ItemList",
-        "itemListElement": list.map((p,i)=>({"@type":"ListItem","position":i+1,"name":p.name,"url":`/g.html?sku=${p.sku}`}))};
-      const s = document.createElement('script'); s.type='application/ld+json'; s.textContent=JSON.stringify(ld); document.head.appendChild(s);
-
-      // Cho affiliate xử lý
-      if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
-    })
-    .catch(err=>{
-      console.error('Không thể tải affiliates.json', err);
-      document.getElementById('empty').style.display='block';
     });
   </script>
 </body>
