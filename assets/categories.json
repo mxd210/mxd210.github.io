@@ -9,6 +9,15 @@
     "priority": 0.9
   },
   {
+    "slug": "may-rung-op-lat",
+    "name": "Máy rung ốp lát",
+    "icon": "/assets/img/categories/may-rung-op-lat.webp",
+    "path": "/store/may-rung-op-lat.html",
+    "keywords": ["máy rung ốp lát","tile vibrator","máy rung lát gạch","máy rung gạch men","máy rung hút chân không","vibrator ốp lát","dụng cụ rung gạch","máy rung dán gạch"],
+    "canonical": "https://mxd210.github.io/store/may-rung-op-lat.html",
+    "priority": 0.9
+  },
+  {
     "slug": "may-khoan-duc-vit",
     "name": "Khoan · Đục · Vít",
     "icon": "/assets/img/categories/may-khoan-duc-vit.webp",
