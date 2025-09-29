@@ -25,5 +25,18 @@
       "mài góc"
     ],
     "priority": 0.8
-  }
+  },
 ]
+{
+  "slug": "may-khoan-duc-vit",
+  "name": "Khoan · Đục · Vít",
+  "icon": "/assets/img/categories/may-khoan-duc-vit.webp",
+  "description": "Khoan búa, đục bê tông SDS-Plus/SDS-Max, bắn vít/siết bu lông brushless & phụ kiện.",
+  "keywords": [
+    "khoan bê tông","khoan búa","SDS-Plus","SDS-Max",
+    "impact driver","impact wrench","siết bu lông",
+    "mũi khoan bê tông","đục nhọn","đục dẹt","bit PH/PZ/TX","khẩu impact"
+  ],
+  "canonical": "https://mxd210.github.io/store/may-khoan-duc-vit.html",
+  "priority": 0.9
+}
