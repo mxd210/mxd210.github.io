@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <title>Máy laser – Cân mực 4/8/12 tia, Laser xanh/đỏ, Thước laser | MXD</title>
+  <meta name="description" content="Chọn máy cân mực 4/8/12 tia, laser xanh/đỏ; thước đo khoảng cách 20–100m. Hàng chọn lọc, phù hợp thi công và hoàn thiện."/>
+  <link rel="canonical" href="https://mxd210.github.io/store/may-laze.html"/>
+  <meta name="robots" content="index,follow"/>
+
+  <!-- OG -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Máy laser – Cân mực 4/8/12 tia, Laser xanh/đỏ, Thước laser | MXD"/>
+  <meta property="og:description" content="Cân mực 4/8/12 tia, laser xanh/đỏ; thước đo khoảng cách 20–100m. Sàng lọc theo số tia, màu tia, tầm đo, thương hiệu."/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/may-laze-og.webp"/>
+  <meta property="og:url" content="https://mxd210.github.io/store/may-laze.html"/>
+
+  <!-- CSS canonical -->
+  <link rel="stylesheet" href="/assets/site.css"/>
+
+  <!-- GA4 trước Affiliate (MXD rule) -->
+  <script src="/assets/analytics.js" defer></script>
+</head>
+<body>
+  <header class="container">
+    <h1>Máy laser (cân mực, thước laser)</h1>
+    <p class="muted">Phục vụ cân cốt, ốp lát, hoàn thiện: cân mực 4/8/12 tia, laser xanh/đỏ; thước laser 20–100m.</p>
+  </header>
+
+  <nav class="container quick-nav" aria-label="Điều hướng nhanh">
+    <a href="#can-muc-4" data-filter="{"key":"tia","val":"4"}">Cân mực 4 tia</a>
+    <a href="#can-muc-8" data-filter="{"key":"tia","val":"8"}">Cân mực 8 tia</a>
+    <a href="#can-muc-12" data-filter="{"key":"tia","val":"12"}">Cân mực 12 tia / 360°</a>
+    <a href="#mau-tia-xanh" data-filter="{"key":"mau","val":"laser-xanh"}">Laser xanh</a>
+    <a href="#mau-tia-do" data-filter="{"key":"mau","val":"laser-do"}">Laser đỏ</a>
+    <a href="#thuoc-laser" data-filter="{"key":"tag","val":"thuoc-laser"}">Thước laser 20–100m</a>
+  </nav>
+
+  <section class="container" id="filters" aria-label="Bộ lọc">
+    <div class="filters-grid">
+      <label>Số tia
+        <select id="f-tia">
+          <option value="">Tất cả</option>
+          <option value="4">4 tia</option>
+          <option value="8">8 tia</option>
+          <option value="12">12 tia / 360°</option>
+        </select>
+      </label>
+      <label>Màu tia
+        <select id="f-mau">
+          <option value="">Tất cả</option>
+          <option value="laser-xanh">Laser xanh</option>
+          <option value="laser-do">Laser đỏ</option>
+        </select>
+      </label>
+      <label>Tầm đo (thước)
+        <select id="f-tam">
+          <option value="">Tất cả</option>
+          <option value="20">20m</option>
+          <option value="40">40m</option>
+          <option value="50">50m</option>
+          <option value="70">70m</option>
+          <option value="100">100m</option>
+        </select>
+      </label>
+      <label>Thương hiệu
+        <input id="f-brand" placeholder="Bosch, Makita, HUKAN…"/>
+      </label>
+      <label>Tìm kiếm
+        <input id="f-q" placeholder="từ khóa (ví dụ: 12 line, 360)…"/>
+      </label>
+    </div>
+  </section>
+
+  <main class="container" id="content">
+    <!-- Nơi thả meta link (ẩn) để tương thích trình dựng card chuẩn MXD -->
+    <div id="meta" hidden></div>
+
+    <!-- Lưới sản phẩm -->
+    <div id="product-grid" class="product-grid" aria-live="polite"></div>
+
+    <p id="empty" class="muted" style="display:none">Không tìm thấy sản phẩm theo bộ lọc hiện tại.</p>
+  </main>
+
+  <!-- Liên hệ nổi (theo quy ước MXD #44) -->
+  <div class="contact-floating">
+    <a class="zalo" href="https://zalo.me/0338328898" aria-label="Chat Zalo">Zalo</a>
+    <a class="fb" href="https://www.facebook.com/mxd6686" aria-label="Facebook">FB</a>
+    <a class="call" href="tel:0338328898" aria-label="Gọi 0338328898">Gọi</a>
+  </div>
+
+  <script>
+  (function(){
+    const $meta = document.getElementById('meta');
+    const $grid = document.getElementById('product-grid');
+    const $empty = document.getElementById('empty');
+    const $tia = document.getElementById('f-tia');
+    const $mau = document.getElementById('f-mau');
+    const $tam = document.getElementById('f-tam');
+    const $brand = document.getElementById('f-brand');
+    const $q = document.getElementById('f-q');
+
+    const STATE = {items:[], view:[]};
+
+    const isLaserItem = (it) => {
+      const t = (it.name||it.title||'').toLowerCase();
+      const cats = (it.category||'').toLowerCase();
+      const tags = (it.tags||[]).map(s=>String(s).toLowerCase());
+      const hitName = /(laser|cân mực|can muc|thước laser|thuoc laser|distance meter|ldm|line laser)/.test(t);
+      const hitCat = /may-laze/.test(cats);
+      const hitTag = tags.some(x=>/laser|cân|thuoc|ldm/.test(x));
+      return hitCat || hitTag || hitName;
+    };
+
+    const parseTags = (it) => {
+      const t = (it.name||it.title||'').toLowerCase();
+      const tags = new Set((it.tags||[]).map(String));
+      // số tia
+      if (/\b4\s*(tia|line)\b/.test(t)) tags.add('4-tia');
+      if (/\b8\s*(tia|line)\b/.test(t)) tags.add('8-tia');
+      if (/\b12\s*(tia|line)\b/.test(t) || /360/.test(t)) tags.add('12-tia');
+      // màu
+      if (/(laser xanh|green)/.test(t)) tags.add('laser-xanh');
+      if (/(laser đỏ|laser do|red)/.test(t)) tags.add('laser-do');
+      // thước khoảng cách
+      if (/\b(20)\s*m\b/.test(t)) tags.add('thuoc-laser-20m');
+      if (/\b(40)\s*m\b/.test(t)) tags.add('thuoc-laser-40m');
+      if (/\b(50)\s*m\b/.test(t)) tags.add('thuoc-laser-50m');
+      if (/\b(70)\s*m\b/.test(t)) tags.add('thuoc-laser-70m');
+      if (/\b(100)\s*m\b/.test(t)) tags.add('thuoc-laser-100m');
+      return Array.from(tags);
+    };
+
+    const formatVND = (n) => {
+      const x = Number(n||0);
+      return x ? x.toLocaleString('vi-VN')+"₫" : '';
+    };
+
+    const buildMetaLink = (it) => {
+      const sku = it.sku || (it.id||'').toString().toLowerCase();
+      const merchant = (it.merchant||it.source||'').toString().toLowerCase() || 'shopee';
+      const img = it.image || `/assets/img/products/${sku}.webp`;
+      const price = it.price || it.data_price || '';
+      const origin = (it.url || (it.links&&it.links[0]&&it.links[0].url) || '#');
+      const name = it.name || it.title || sku;
+      const a = document.createElement('a');
+      a.className = 'product-meta';
+      a.href = origin; // link gốc: sẽ được rewrite bởi mxd-affiliate.js
+      a.textContent = name;
+      a.setAttribute('data-merchant', merchant);
+      a.setAttribute('data-sku', sku);
+      a.setAttribute('data-img', img);
+      if (price) a.setAttribute('data-price', price);
+      $meta.appendChild(a);
+
+      // buy links nếu có
+      if (Array.isArray(it.links)){
+        it.links.forEach(l => {
+          if(!l||!l.url) return;
+          const b = document.createElement('a');
+          b.className = 'buy';
+          b.href = l.url;
+          if (l.merchant) b.setAttribute('data-merchant', (l.merchant||'').toLowerCase());
+          b.textContent = l.label || (l.merchant ? ('Mua '+l.merchant) : 'Mua');
+          $meta.appendChild(b);
+        });
+      }
+    };
+
+    const localCardBuilder = (meta, buys=[]) => {
+      // Tối giản: render card dùng meta link
+      const sku = meta.getAttribute('data-sku');
+      const img = meta.getAttribute('data-img');
+      const price = meta.getAttribute('data-price');
+      const name = meta.textContent;
+      const card = document.createElement('div');
+      card.className = 'card product';
+      const a = document.createElement('a');
+      a.href = `../g.html?sku=${encodeURIComponent(sku)}`;
+      a.className = 'cover';
+      a.setAttribute('aria-label', name);
+      const im = document.createElement('img');
+      im.loading = 'lazy';
+      im.src = img;
+      im.alt = name;
+      a.appendChild(im);
+      const h3 = document.createElement('h3');
+      h3.textContent = name;
+      const p = document.createElement('div');
+      p.className = 'price';
+      p.textContent = price ? formatVND(price) : '';
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      buys.forEach(b=>{
+        const bb = document.createElement('a');
+        bb.className = 'btn buy';
+        bb.href = b.href;
+        if (b.dataset.merchant) bb.setAttribute('data-merchant', b.dataset.merchant);
+        bb.textContent = b.textContent || 'Mua';
+        actions.appendChild(bb);
+      });
+      card.append(a,h3,p,actions);
+      return card;
+    };
+
+    const render = () => {
+      $grid.innerHTML = '';
+      const list = Array.from($meta.querySelectorAll('.product-meta'));
+      if (!list.length){ $empty.style.display = 'block'; return; }
+      $empty.style.display = 'none';
+      list.forEach(meta => {
+        const buys = [];
+        let el = meta.nextElementSibling;
+        while(el && el.classList.contains('buy')){ buys.push(el); el = el.nextElementSibling; }
+        if (window.MXD && typeof window.MXD.buildCardsFromMeta === 'function'){
+          // Nếu site đã có builder chuẩn, uỷ quyền cho nó
+          window.MXD.buildCardsFromMeta($meta, $grid);
+        } else {
+          $grid.appendChild(localCardBuilder(meta, buys));
+        }
+      });
+      injectItemListJSONLD();
+    };
+
+    const applyFilters = () => {
+      const tia = $tia.value;
+      const mau = $mau.value;
+      const tam = $tam.value;
+      const brand = ($brand.value||'').trim().toLowerCase();
+      const q = ($q.value||'').trim().toLowerCase();
+
+      $meta.innerHTML = '';
+      const filtered = STATE.items.filter(it => {
+        const tags = parseTags(it);
+        // Số tia
+        if (tia && !tags.includes(tia+'-tia')) return false; // map: 4 -> 4-tia
+        // Màu
+        if (mau && !tags.includes(mau)) return false;
+        // Tầm đo
+        if (tam && !(tags.includes('thuoc-laser-'+tam+'m'))) return false;
+        // Brand
+        if (brand){
+          const b = (it.brand||'').toLowerCase();
+          const inTitle = (it.name||it.title||'').toLowerCase().includes(brand);
+          if (!b && !inTitle) return false;
+          if (b && !b.includes(brand) && !inTitle) return false;
+        }
+        // Q
+        if (q){
+          const hay = (it.name||it.title||'')+ ' ' + (it.tags||[]).join(' ');
+          if (!hay.toLowerCase().includes(q)) return false;
+        }
+        return true;
+      });
+
+      filtered.forEach(buildMetaLink);
+      render();
+    };
+
+    const parseAndInit = (data) => {
+      const items = Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : []);
+      STATE.items = items.filter(isLaserItem).map(it => ({...it, tags: parseTags(it)}));
+      applyFilters();
+    };
+
+    // Quick-nav: map anchor click -> set filter
+    document.querySelectorAll('.quick-nav a[data-filter]').forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        try{
+          const cfg = JSON.parse(a.getAttribute('data-filter'));
+          if (cfg.key === 'tia') $tia.value = cfg.val;
+          if (cfg.key === 'mau') $mau.value = cfg.val;
+          if (cfg.key === 'tag'){
+            // map thuoc-laser -> chỉ set tầm đo rỗng để hiển thị hết thước
+            $tia.value = '';
+            $mau.value = '';
+          }
+          applyFilters();
+        }catch(err){}
+      });
+    });
+
+    [$tia,$mau,$tam,$brand,$q].forEach(el=> el.addEventListener('input', applyFilters));
+
+    // Load data
+    fetch('/assets/data/affiliates.json',{cache:'no-store'})
+      .then(r=>r.json())
+      .then(parseAndInit)
+      .catch(()=>{$empty.style.display='block';});
+
+    // JSON-LD ItemList sau khi render
+    function injectItemListJSONLD(){
+      const skus = Array.from($meta.querySelectorAll('.product-meta')).map(a=>a.getAttribute('data-sku'));
+      if (!skus.length) return;
+      const items = skus.map((sku, i)=>({
+        '@type':'ListItem',
+        position:i+1,
+        url: `https://mxd210.github.io/g.html?sku=${encodeURIComponent(sku)}`
+      }));
+      const ld = {
+        '@context':'https://schema.org',
+        '@type':'ItemList',
+        itemListElement: items
+      };
+      let tag = document.getElementById('ld-itemlist');
+      if(!tag){ tag = document.createElement('script'); tag.type='application/ld+json'; tag.id='ld-itemlist'; document.body.appendChild(tag); }
+      tag.textContent = JSON.stringify(ld);
+    }
+  })();
+  </script>
+
+  <!-- Affiliate script cuối trang (sau GA4) -->
+  <script src="/assets/mxd-affiliate.js" defer></script>
+</body>
+</html>
+
+<!-- commit: feat(store): add Máy laser category page (may-laze.html) with quick-nav & filters -->
