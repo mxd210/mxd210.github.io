@@ -34,5 +34,17 @@
     "keywords": ["cân mực 4 tia","cân mực 8 tia","cân mực 12 tia","laser xanh","laser đỏ","thước laser"],
     "canonical": "https://mxd210.github.io/store/may-laze.html",
     "priority": 0.9
-  }
+  },
+{
+"slug": "dung-cu-op-lat",
+"name": "Dụng cụ ốp lát",
+"icon": "/assets/img/categories/dung-cu-op-lat.webp",
+"path": "/store/dung-cu-op-lat.html",
+"keywords": [
+"bay răng cưa","nivô","nivo","thước nivo","kê gạch","kê chữ thập","ke chữ T","nêm gạch",
+"búa cao su","thước dẫn","thước nhôm ốp lát","hít gạch","kìm kẹp ke","kìm siết ke",
+"xô trộn vữa","bàn khuấy vữa","phao chà ron","cữ cắt gạch","bàn cắt gạch mini"
+"canonical": "https://mxd210.github.io/store/dung-cu-op-lat.html",
+"priority": 0.9
+}
 ]
