@@ -103,7 +103,7 @@
   </header>
 
   <main class="container">
-    <!-- QUICK-NAV (mới thêm) -->
+    <!-- QUICK-NAV -->
     <section aria-label="Danh mục nhanh">
       <ul class="quick-nav" id="quick-nav"></ul>
     </section>
@@ -122,7 +122,7 @@
   <!-- Loader Quick-Nav + Render sản phẩm -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      // QUICK-NAV: đọc nhiều nguồn + có fallback bắt buộc 2 danh mục
+      // QUICK-NAV: đọc nhiều nguồn + fallback
       const qn = document.getElementById('quick-nav');
 
       (async () => {
@@ -154,7 +154,7 @@
 
         let items = list.map(norm);
 
-        // Bảo đảm luôn có 2 danh mục cốt lõi
+        // Fallback: đảm bảo có các danh mục cốt lõi
         const ensure = (slug, name, icon) => {
           if (!items.some(i => i.slug === slug)) {
             items.push(norm({ slug, name, icon, path: `/store/${slug}.html` }));
@@ -162,9 +162,10 @@
         };
         ensure('may-cat', 'Máy cắt', '/assets/img/categories/may-cat.webp');
         ensure('may-khoan-duc-vit', 'Khoan · Đục · Vít', '/assets/img/categories/may-khoan-duc-vit.webp');
-ensure('may-laze', 'Máy laser', '/assets/img/categories/may-laze.webp');
+        ensure('may-laze', 'Máy laser', '/assets/img/categories/may-laze.webp');
+        ensure('phu-kien-may', 'Phụ kiện máy', '/assets/img/categories/phu-kien-may.webp'); /* NEW */
 
-        // Render
+        // Render quick-nav (CHỈ render items, không chèn thẻ lạ gây lặp)
         if (!items.length) {
           qn.innerHTML = `
             <li>
@@ -185,12 +186,6 @@ ensure('may-laze', 'Máy laser', '/assets/img/categories/may-laze.webp');
                 ${c.name}
               </a>
             </li>
-            <li class="category-card">
-<a href="/store/dung-cu-op-lat.html" class="category-link">
-<img src="/assets/img/categories/dung-cu-op-lat.webp" alt="Dụng cụ ốp lát" width="320" height="320" loading="lazy">
-<span>Dụng cụ ốp lát</span>
-</a>
-</li>
           `).join('');
         }
       })();
@@ -204,12 +199,11 @@ ensure('may-laze', 'Máy laser', '/assets/img/categories/may-laze.webp');
   </script>
 
   <!-- SW -->
-  <!-- trước: /sw.js?v=2025-09-26-fb2 -->
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=2025-09-30-mlz1');
-  }
-</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js?v=2025-09-30-mlz1');
+    }
+  </script>
 
 </body>
 </html>
