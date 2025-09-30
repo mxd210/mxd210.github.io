@@ -8,7 +8,10 @@
     "image": "/assets/img/products/may-can-bang-cot-12-tia-xanh-hukan-hk-t97.webp",
     "category": "may-laze",
     "brand": "HUKAN",
-    "tags": ["12-tia","laser-xanh"],
+    "tags": [
+      "12-tia",
+      "laser-xanh"
+    ],
     "featured": true,
     "status": true,
     "updated_at": "2025-09-29T17:30:53.604Z",
@@ -23,7 +26,10 @@
     "image": "/assets/img/products/may-can-bang-laser-hukan-gen-2-g2-ls300.webp",
     "category": "may-laze",
     "brand": "HUKAN",
-    "tags": ["5-tia","laser-xanh"],
+    "tags": [
+      "5-tia",
+      "laser-xanh"
+    ],
     "featured": true,
     "status": true,
     "updated_at": "2025-09-27T12:01:42.115Z",
@@ -38,7 +44,10 @@
     "image": "/assets/img/products/may-can-bang-laze-hukan-g1-t85.webp",
     "category": "may-laze",
     "brand": "HUKAN",
-    "tags": ["5-tia","laser-xanh"],
+    "tags": [
+      "5-tia",
+      "laser-xanh"
+    ],
     "featured": false,
     "status": true,
     "updated_at": "2025-09-27T11:58:57.393Z",
@@ -58,6 +67,20 @@
     "status": true,
     "updated_at": "2025-09-29T17:32:49.280Z",
     "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2Fproduct%2F727253302%2F22983388549%3Fgads_t_sig%3DVTJGc2RHVmtYMTlxTFVSVVRrdENkUm9yWVZMbGw0Q214S0d1TzNEZmUwNVdFd0kxcnRaWk9Uai9OQWt3bU1XcjYrTHczalhMMUFjWVVXZWcwRDVBTnkvS0lLU2pWTDNrRlRqSnoycHV3emc2bjdaaDVmbzVsd1BMU0h6RDBCb2s%26gad_source%3D1%26gad_campaignid%3D22496085537%26gbraid%3D0AAAAADPpQE5mKwIf15Y-93jKuVbx-BnCT%26gclid%3DCjwKCAjwuePGBhBZEiwAIGCVS-HMzCZpCfSgTkV7zS6Nhwcu8RH57jB8_cV9hpb2MYwr0--YDdci1xoCZj4QAvD_BwE&sub1=may-can-bang-laze-hukan-hk-e63&sub2=shopee&sub3=tool&sub4=mxd210"
+  },
+  {
+    "name": "Máy Cắt Cành Pin HK-PRB 2025S",
+    "price": 780000,
+    "origin": "https://shopee.vn/Hukan-M%C3%A1y-C%E1%BA%AFt-C%C3%A0nh-Pin-HK-PRB-2025S-HM21-G1-PR2025S-%C4%90%E1%BB%99ng-C%C6%A1-Kh%C3%B4ng-Ch%E1%BB%95i-Than-21V-L%C6%B0%E1%BB%A1i-Th%C3%A9p-SK5-Hi%E1%BB%87u-Su%E1%BA%A5t-Cao-B%E1%BA%A3o-H%C3%A0nh-6-T-i.131704252.29302745773?sp_atk=807310ec-99dc-4689-89d8-f051e7e9e45a&xptdk=807310ec-99dc-4689-89d8-f051e7e9e45a",
+    "merchant": "shopee",
+    "sku": "may-cat-canh-pin-hk-prb-2025s",
+    "image": "/assets/img/products/may-cat-canh-pin-hk-prb-2025s.webp",
+    "category": "may-cat",
+    "brand": "",
+    "featured": false,
+    "status": true,
+    "updated_at": "2025-09-30T02:46:05.841Z",
+    "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FHukan-M%25C3%25A1y-C%25E1%25BA%25AFt-C%25C3%25A0nh-Pin-HK-PRB-2025S-HM21-G1-PR2025S-%25C4%2590%25E1%25BB%2599ng-C%25C6%25A1-Kh%25C3%25B4ng-Ch%25E1%25BB%2595i-Than-21V-L%25C6%25B0%25E1%25BB%25A1i-Th%25C3%25A9p-SK5-Hi%25E1%25BB%2587u-Su%25E1%25BA%25A5t-Cao-B%25E1%25BA%25A3o-H%25C3%25A0nh-6-T-i.131704252.29302745773%3Fsp_atk%3D807310ec-99dc-4689-89d8-f051e7e9e45a%26xptdk%3D807310ec-99dc-4689-89d8-f051e7e9e45a&sub1=may-cat-canh-pin-hk-prb-2025s&sub2=shopee&sub3=tool&sub4=mxd210"
   },
   {
     "name": "Máy cắt gạch cầm tay HUKAN HG2",
