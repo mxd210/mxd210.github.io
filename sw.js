@@ -1,5 +1,5 @@
 // sw.js — MXD PWA  (2025-09-26)
-const VERSION = '2025-09-30-mlz1'; // <— CHỈ 1 DÒNG NÀY
+const VERSION = '2025-09-30-mlz2mlz2'; // <— CHỈ 1 DÒNG NÀY
 
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => self.clients.claim());
@@ -10,7 +10,7 @@ const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 // ---- Precache (nhẹ) ----
 const ASSETS = [
   '/', '/index.html', '/store.html', '/g.html',
-  '/tools/mxd-importer_v4.3.6_pro.html',
+  '/tools/mxd-importer_v4.3.8_pro.html',
   '/assets/site.css',
   '/assets/js/render-products.js',
   '/assets/mxd-affiliate.js',
