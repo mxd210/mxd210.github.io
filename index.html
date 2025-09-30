@@ -4,17 +4,17 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 
-  <title>Cửa hàng MXD – Sản phẩm chọn lọc</title>
-  <meta name="description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
-  <link rel="canonical" href="https://mxd210.github.io/store.html">
+  <title>MXD — Trang chủ</title>
+  <meta name="description" content="MXD: Trung tâm mua sắm affiliate ngành xây dựng — danh mục rõ ràng, sản phẩm chuẩn ảnh .webp, link đo lường qua affiliate.">
+  <link rel="canonical" href="https://mxd210.github.io/">
   <meta name="robots" content="index,follow">
 
   <!-- OG -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Cửa hàng MXD – Sản phẩm chọn lọc">
-  <meta property="og:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
-  <meta property="og:url" content="https://mxd210.github.io/store.html">
-  <meta property="og:image" content="/assets/img/products/placeholder.webp">
+  <meta property="og:title" content="MXD — Trang chủ">
+  <meta property="og:description" content="Danh mục rõ ràng, sản phẩm chuẩn ảnh .webp, link đo lường qua affiliate.">
+  <meta property="og:url" content="https://mxd210.github.io/">
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/home.webp">
 
   <!-- VERIFY (điền mã thật khi có) -->
   <meta name="google-site-verification" content="PASTE_GOOGLE_CODE">
@@ -115,10 +115,29 @@
 
   <!-- 1) GA4 -->
   <script defer src="/assets/analytics.js"></script>
-  <!-- 2) Renderer -->
+  <!-- 2) Renderer (tuỳ cậu có muốn show sản phẩm ở Home) -->
   <script defer src="/assets/js/render-products.js"></script>
   <!-- 3) Affiliate -->
   <script defer src="/assets/mxd-affiliate.js"></script>
+
+  <!-- JSON-LD Organization (chuẩn index) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"MXD",
+    "url":"https://mxd210.github.io/",
+    "logo":"https://mxd210.github.io/assets/img/og/home.webp",
+    "sameAs":["https://www.facebook.com/mxd6686"],
+    "contactPoint":[{
+      "@type":"ContactPoint",
+      "telephone":"+84-338-328-898",
+      "contactType":"customer service",
+      "areaServed":"VN",
+      "availableLanguage":["vi","en"]
+    }]
+  }
+  </script>
 </head>
 <body>
   <!-- Header -->
@@ -126,8 +145,8 @@
     <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)">
       <a href="/" class="brand" style="font-weight:900;font-size:18px;color:var(--text);text-decoration:none">MXD</a>
       <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
-        <a href="/"                  class="nav-link">Trang chủ</a>
-        <a href="/store.html"        class="nav-link" aria-current="page">Cửa hàng</a>
+        <a href="/"                  class="nav-link" aria-current="page">Trang chủ</a>
+        <a href="/store.html"        class="nav-link">Cửa hàng</a>
         <a href="/blog/"             class="nav-link">Tin tức</a>
         <a href="/tu-van.html"       class="nav-link">Tư vấn</a>
         <a href="/lien-he.html"      class="nav-link">Liên hệ</a>
@@ -136,12 +155,55 @@
   </header>
 
   <main class="container">
-    <!-- QUICK-NAV -->
-    <section aria-label="Danh mục nhanh" style="margin-top:12px">
-      <ul class="quick-nav" id="quick-nav"></ul>
+    <!-- HERO -->
+    <section aria-label="Hero" style="margin:14px 0 4px">
+      <h1 style="margin:0">MXD — Trung tâm mua sắm ngành xây dựng</h1>
+      <p class="muted" style="margin:6px 0 0">Danh mục gọn gàng · Ảnh .webp tối ưu · Liên kết qua affiliate chuẩn đo lường.</p>
     </section>
 
-    <h2 style="margin:8px 0 0">Sản phẩm</h2>
+    <!-- QUICK-NAV (tĩnh theo quy ước + có 'Máy rung ốp lát') -->
+    <section aria-label="Danh mục nhanh" style="margin-top:12px">
+      <ul class="quick-nav">
+        <li>
+          <a href="/store.html" class="qnav-item">
+            <img src="/assets/img/og/store.webp" alt="Cửa hàng" width="28" height="28" loading="lazy" decoding="async"
+                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
+            Cửa hàng
+          </a>
+        </li>
+        <li>
+          <a href="/store/bay-rang-cua.html" class="qnav-item">
+            <img src="/assets/img/categories/bay-rang-cua.webp" alt="Bàn răng cưa" width="28" height="28" loading="lazy" decoding="async"
+                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
+            Bàn răng cưa
+          </a>
+        </li>
+        <li>
+          <a href="/store/may-rung-op-lat.html" class="qnav-item">
+            <img src="/assets/img/categories/may-rung-op-lat.webp" alt="Máy rung ốp lát" width="28" height="28" loading="lazy" decoding="async"
+                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
+            Máy rung ốp lát
+          </a>
+        </li>
+        <li>
+          <a href="/blog/may-cat-gach.html" class="qnav-item">
+            <img src="/assets/img/og/blog-may-cat-gach.webp" alt="Máy cắt gạch: hướng dẫn chọn" width="28" height="28" loading="lazy" decoding="async"
+                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
+            Máy cắt gạch (blog)
+          </a>
+        </li>
+        <li>
+          <a href="/blog/chong-tham-wc.html" class="qnav-item">
+            <img src="/assets/img/og/blog-chong-tham-wc.webp" alt="Chống thấm WC" width="28" height="28" loading="lazy" decoding="async"
+                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
+            Chống thấm WC (blog)
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <!-- SẢN PHẨM (giữ renderer hiện tại để không phá flow) -->
+    <h2 style="margin:16px 0 0">Sản phẩm mới</h2>
     <div id="product-list" class="grid" aria-live="polite"></div>
     <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/affiliates.json</code> (nguồn chuẩn) hoặc <code>/products.json</code> (fallback).</p>
     <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
@@ -171,141 +233,84 @@
     </button>
   </div>
 
-  <!-- Config để renderer lấy đúng nguồn chuẩn -->
+  <!-- Config renderer: dùng nguồn chuẩn -->
   <script>
     window.MXD_RENDER = window.MXD_RENDER || {};
-    window.MXD_RENDER.source = '/affiliates.json'; // nguồn chuẩn theo Canonical
+    window.MXD_RENDER.source = '/affiliates.json';
   </script>
 
-  <!-- QUICK-NAV LOADER (đa nguồn + fallback 2 danh mục cốt lõi) & RENDER SẢN PHẨM -->
+  <!-- Render sản phẩm (giữ logic cũ) -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      const qn = document.getElementById('quick-nav');
-
-      (async () => {
-        // Thử lần lượt 2 nguồn
-        const sources = ['/assets/categories.json', '/assets/data/categories.json'];
-        let raw = null;
-        for (const url of sources) {
-          try {
-            const r = await fetch(url, { cache: 'no-store' });
-            if (r.ok) { raw = await r.json(); break; }
-          } catch(_) {}
-        }
-
-        // Chuẩn hoá về array items
-        let list = [];
-        if (Array.isArray(raw)) list = raw;
-        else if (raw && Array.isArray(raw.categories)) list = raw.categories;
-        else if (raw && typeof raw === 'object') list = Object.values(raw);
-
-        const norm = (x = {}) => {
-          const slug = (x.slug || '').toLowerCase();
-          return {
-            slug,
-            name: x.name || x.title || 'Danh mục',
-            icon: x.icon || (slug ? `/assets/img/categories/${slug}.webp` : '/assets/img/categories/placeholder.webp'),
-            path: x.path || x.canonical || (slug ? `/store/${slug}.html` : '#')
-          };
-        };
-
-        let items = list.map(norm);
-
-        // Đảm bảo luôn có 2 danh mục này
-        const ensure = (slug, name, icon) => {
-          if (!items.some(i => i.slug === slug)) {
-            items.push(norm({ slug, name, icon, path: `/store/${slug}.html` }));
-          }
-        };
-        ensure('may-cat', 'Máy cắt', '/assets/img/categories/may-cat.webp');
-        ensure('may-khoan-duc-vit', 'Khoan · Đục · Vít', '/assets/img/categories/may-khoan-duc-vit.webp');
-
-        // Nếu vẫn trống, render fallback tối thiểu
-        if (!items.length) {
-          qn.innerHTML = `
-            <li>
-              <a href="/store/may-cat.html" class="qnav-item">
-                <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt" width="28" height="28" loading="lazy" decoding="async"/>Máy cắt
-              </a>
-            </li>
-            <li>
-              <a href="/store/may-khoan-duc-vit.html" class="qnav-item">
-                <img src="/assets/img/categories/may-khoan-duc-vit.webp" alt="Khoan · Đục · Vít" width="28" height="28" loading="lazy" decoding="async"/>Khoan · Đục · Vít
-              </a>
-            </li>`;
-        } else {
-          qn.innerHTML = items.map(c => `
-            <li>
-              <a href="${c.path}" class="qnav-item">
-                <img src="${c.icon}" alt="${c.name}" width="28" height="28" loading="lazy" decoding="async"/>
-                ${c.name}
-              </a>
-            </li>
-          `).join('');
-        }
-      })();
-
-      // Render tất cả sản phẩm (giữ nguyên logic cũ của cậu)
+      // Render danh sách sản phẩm ở trang chủ (reuse logic như store)
       if (window.MXD?.renderProducts) {
-        MXD.renderProducts('#product-list'); // hiển thị TẤT CẢ
-      } else {
-        const wrap = document.querySelector('#product-list');
-        const empty = document.getElementById('empty');
-        wrap.innerHTML = Array.from({length:6}).map(()=>`
-          <article class="card">
-            <div class="skeleton" style="height:160px"></div>
-            <div class="body">
-              <div class="skeleton" style="height:18px"></div>
-              <div class="skeleton" style="height:16px;width:40%;margin-top:8px"></div>
-            </div>
-          </article>
-        `).join('');
-
-        fetch('/affiliates.json', { cache: 'no-store' })
-          .then(r=>r.ok?r.json():[])
-          .then(all=>{
-            const arr = Array.isArray(all) ? all : (all.items||[]);
-            if (!arr.length){ empty.style.display='block'; wrap.innerHTML=''; return; }
-            const fmt = n => isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-            wrap.innerHTML = arr.map(p=>{
-              const sku = (p.sku||'').toLowerCase();
-              const name = p.name || sku || 'Sản phẩm';
-              const origin = p.origin_url || p.origin || p.url || p.link || '#';
-              const merchant = (p.merchant||'').toLowerCase();
-              const price = p.price ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>` : '';
-              return `
-                <article class="card">
-                  <a class="product-meta sr-only"
-                     href="${origin}" data-merchant="${merchant}"
-                     data-sku="${sku}" data-img="/assets/img/products/${sku}.webp"
-                     ${p.price?`data-price="${p.price}"`:''}>${name}</a>
-
-                  <a href="/g.html?sku=${encodeURIComponent(sku)}" aria-label="Xem chi tiết ${name}">
-                    <img loading="lazy" decoding="async"
-                         src="/assets/img/products/${sku}.webp"
-                         alt="${name}"
-                         onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-                  </a>
-                  <div class="body">
-                    <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${name}</a></h3>
-                    ${price}
-                    <div class="actions">
-                      <a class="buy" href="${origin}" data-merchant="${merchant}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
-                    </div>
-                  </div>
-                </article>`;
-            }).join('');
-            if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
-          })
-          .catch(()=>{ empty.style.display='block'; wrap.innerHTML=''; });
+        MXD.renderProducts('#product-list'); // hiển thị TẤT CẢ hoặc theo logic mặc định của renderer
+        return;
       }
+      const wrap = document.querySelector('#product-list');
+      const empty = document.getElementById('empty');
+      wrap.innerHTML = Array.from({length:6}).map(()=>`
+        <article class="card">
+          <div class="skeleton" style="height:160px"></div>
+          <div class="body">
+            <div class="skeleton" style="height:18px"></div>
+            <div class="skeleton" style="height:16px;width:40%;margin-top:8px"></div>
+          </div>
+        </article>
+      `).join('');
+
+      fetch('/affiliates.json', { cache: 'no-store' })
+        .then(r=>r.ok?r.json():[])
+        .then(all=>{
+          const arr = Array.isArray(all) ? all : (all.items||[]);
+          if (!arr.length){ empty.style.display='block'; wrap.innerHTML=''; return; }
+          const fmt = n => isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
+          wrap.innerHTML = arr.map(p=>{
+            const sku = (p.sku||'').toLowerCase();
+            const name = p.name || sku || 'Sản phẩm';
+            const origin = p.origin_url || p.origin || p.url || p.link || '#';
+            const merchant = (p.merchant||'').toLowerCase();
+            const price = p.price ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>` : '';
+            return `
+              <article class="card">
+                <a class="product-meta sr-only"
+                   href="${origin}" data-merchant="${merchant}"
+                   data-sku="${sku}" data-img="/assets/img/products/${sku}.webp"
+                   ${p.price?`data-price="${p.price}"`:''}>${name}</a>
+
+                <a href="/g.html?sku=${encodeURIComponent(sku)}" aria-label="Xem chi tiết ${name}">
+                  <img loading="lazy" decoding="async"
+                       src="/assets/img/products/${sku}.webp"
+                       alt="${name}"
+                       onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+                </a>
+                <div class="body">
+                  <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${name}</a></h3>
+                  ${price}
+                  <div class="actions">
+                    <a class="buy" href="${origin}" data-merchant="${merchant}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+                  </div>
+                </div>
+              </article>`;
+          }).join('');
+          if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+        })
+        .catch(()=>{ empty.style.display='block'; wrap.innerHTML=''; });
     });
+
+    // Nút lên đầu trang
+    addEventListener('scroll', () => {
+      const toTop = document.getElementById('toTop');
+      if (!toTop) return;
+      toTop.style.display = scrollY > 400 ? 'flex' : 'none';
+    }, { passive:true });
+    document.getElementById('toTop')?.addEventListener('click', () => scrollTo({ top:0, behavior:'smooth' }));
   </script>
 
   <!-- Floating contacts script riêng (nếu dùng) -->
   <script defer src="/assets/js/floating-contact.js"></script>
 
-  <!-- Đăng ký SW (giữ nguyên nếu bạn đang dùng) -->
+  <!-- Đăng ký SW (giữ nguyên) -->
   <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
