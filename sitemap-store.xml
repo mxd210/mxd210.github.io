@@ -1,136 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<!-- REPLACE: /store/chong-tham.html -->
+<url>
+  <loc>https://mxd210.github.io/store/chong-tham.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.7</priority>
+</url>
 
-  <url>
-    <loc>https://mxd210.github.io/store/bay-rang-cua.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.70</priority>
-  </url>
+<!-- REPLACE: /store/keo-op-lat.html -->
+<url>
+  <loc>https://mxd210.github.io/store/keo-op-lat.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.7</priority>
+</url>
 
-  <url>
-    <loc>https://mxd210.github.io/store/chong-tham.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.70</priority>
-  </url>
+<!-- REPLACE: /store/may-cat-mai.html -->
+<url>
+  <loc>https://mxd210.github.io/store/may-cat-mai.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.7</priority>
+</url>
 
-  <url>
-    <loc>https://mxd210.github.io/store/keo-op-lat.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.70</priority>
-  </url>
+<!-- REPLACE: /store/may-rung-op-lat.html -->
+<url>
+  <loc>https://mxd210.github.io/store/may-rung-op-lat.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.7</priority>
+</url>
 
-  <url>
-    <loc>https://mxd210.github.io/store/may-cat-mai.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.70</priority>
-  </url>
+<!-- INSERT nếu CHƯA có: /store/thoi-trang.html (hub) -->
+<url>
+  <loc>https://mxd210.github.io/store/thoi-trang.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.9</priority>
+</url>
+<!-- INSERT nếu CHƯA có: /store/thoi-trang-nam.html -->
+<url>
+  <loc>https://mxd210.github.io/store/thoi-trang-nam.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
 
-  <url>
-    <loc>https://mxd210.github.io/store/may-cat.html</loc>
-    <lastmod>2025-09-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.70</priority>
-  </url>
+<!-- INSERT nếu CHƯA có: /store/thoi-trang-nu.html -->
+<url>
+  <loc>https://mxd210.github.io/store/thoi-trang-nu.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
 
-  <url>
-    <loc>https://mxd210.github.io/store/may-khoan-duc-vit.html</loc>
-    <lastmod>2025-09-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.90</priority>
-  </url>
+<!-- INSERT nếu CHƯA có: /store/thoi-trang-tre-em.html -->
+<url>
+  <loc>https://mxd210.github.io/store/thoi-trang-tre-em.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
 
-  <url>
-    <loc>https://mxd210.github.io/store/may-laze.html</loc>
-    <lastmod>2025-09-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
+<!-- INSERT nếu CHƯA có: /store/thoi-trang-thu-dong.html -->
+<url>
+  <loc>https://mxd210.github.io/store/thoi-trang-thu-dong.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
 
-  <!-- Tap 4: Máy rung ốp lát -->
-  <url>
-    <loc>https://mxd210.github.io/store/may-rung-op-lat.html</loc>
-    <lastmod>2025-09-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-
-  <url>
-    <loc>https://mxd210.github.io/store/dung-cu-op-lat.html</loc>
-    <lastmod>2025-09-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Tap 8: Phụ kiện máy -->
-  <url>
-    <loc>https://mxd210.github.io/store/phu-kien-may.html</loc>
-    <lastmod>2025-09-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/thoi-trang.html</loc>
-    <lastmod>2025-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/thoi-trang-nam.html</loc>
-    <lastmod>2025-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/thoi-trang-nu.html</loc>
-    <lastmod>2025-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/thoi-trang-tre-em.html</loc>
-    <lastmod>2025-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/thoi-trang-thu-dong.html</loc>
-    <lastmod>2025-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/thoi-trang-he.html</loc>
-    <lastmod>2025-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/may-cat-mai.html</loc>
-    <lastmod>2025-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/may-rung-op-lat.html</loc>
-    <lastmod>2025-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/keo-op-lat.html</loc>
-    <lastmod>2025-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://mxd210.github.io/store/chong-tham.html</loc>
-    <lastmod>2025-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
+<!-- INSERT nếu CHƯA có: /store/thoi-trang-he.html -->
+<url>
+  <loc>https://mxd210.github.io/store/thoi-trang-he.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
+  
 </urlset>
