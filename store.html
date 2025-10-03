@@ -16,9 +16,11 @@
   <meta property="og:url" content="https://mxd210.github.io/store.html">
   <meta property="og:image" content="/assets/img/products/placeholder.webp">
 
-  <!-- VERIFY (điền mã thật khi có) -->
-  <meta name="google-site-verification" content="PASTE_GOOGLE_CODE">
-  <meta name="msvalidate.01" content="PASTE_BING_CODE">
+  <!-- VERIFY: các thẻ xác minh cho Google/Bing -->
+  <meta name="google-site-verification" content="0uBElpRxXaTs4jd4uLe-2qjKtMVYQSgrNd3blqrMXiU"/>
+  <!-- Nếu có Bing Webmaster, bỏ comment dòng sau và điền mã:
+  <meta name="msvalidate.01" content="YOUR_BING_CODE">
+  -->
 
   <link rel="stylesheet" href="/assets/site.css">
 
@@ -164,6 +166,8 @@
         ensure('may-khoan-duc-vit', 'Khoan · Đục · Vít', '/assets/img/categories/may-khoan-duc-vit.webp');
         ensure('may-laze', 'Máy laser', '/assets/img/categories/may-laze.webp');
         ensure('phu-kien-may', 'Phụ kiện máy', '/assets/img/categories/phu-kien-may.webp'); /* NEW */
+        // Thêm danh mục thời trang (mới) nếu chưa có
+        ensure('thoi-trang', 'Thời trang', '/assets/img/categories/placeholder.webp');
 
         // Render quick-nav (CHỈ render items, không chèn thẻ lạ gây lặp)
         if (!items.length) {
