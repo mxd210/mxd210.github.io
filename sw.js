@@ -1,5 +1,5 @@
-// sw.js — MXD PWA (2025-10-03)
-const VERSION = '2025-10-03-mlz5'; // BUMP mỗi lần sửa
+// sw.js — MXD PWA (2025-10-04)  ← bumped
+const VERSION = '2025-10-04-mlz6'; // BUMP mỗi lần sửa
 
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
@@ -105,6 +105,11 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+
+  // ✅ BỎ QUA sitemap & robots: để trình duyệt tự lấy từ mạng (không "from service worker")
+  if (url.pathname.endsWith('.xml') || url.pathname === '/robots.txt') {
+    return; // không respondWith => SW không can thiệp
+  }
 
   // version endpoint
   if (url.pathname === '/sw-version') {
