@@ -118,7 +118,7 @@
   <!-- 2) Renderer (tuỳ cậu có muốn show sản phẩm ở Home) -->
   <script defer src="/assets/js/render-products.js"></script>
   <!-- 3) Affiliate -->
-  <script defer src="/assets/mxd-affiliate.js"></script>
+  <script defer src="/assets/data/mxd-affiliate.js"></script>
 
   <!-- JSON-LD Organization (chuẩn index) -->
   <script type="application/ld+json">
@@ -205,7 +205,7 @@
     <!-- SẢN PHẨM (giữ renderer hiện tại để không phá flow) -->
     <h2 style="margin:16px 0 0">Sản phẩm mới</h2>
     <div id="product-list" class="grid" aria-live="polite"></div>
-    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/affiliates.json</code> (nguồn chuẩn) hoặc <code>/products.json</code> (fallback).</p>
+    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>data/affiliates.json</code> (nguồn chuẩn) hoặc <code>/products.json</code> (fallback).</p>
     <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
   </main>
 
@@ -236,7 +236,7 @@
   <!-- Config renderer: dùng nguồn chuẩn -->
   <script>
     window.MXD_RENDER = window.MXD_RENDER || {};
-    window.MXD_RENDER.source = '/affiliates.json';
+    window.MXD_RENDER.source = 'datadata/affiliates.json';
   </script>
 
   <!-- Render sản phẩm (giữ logic cũ) -->
@@ -259,7 +259,7 @@
         </article>
       `).join('');
 
-      fetch('/affiliates.json', { cache: 'no-store' })
+      fetch('data/affiliates.json', { cache: 'no-store' })
         .then(r=>r.ok?r.json():[])
         .then(all=>{
           const arr = Array.isArray(all) ? all : (all.items||[]);
