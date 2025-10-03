@@ -1,20 +1,22 @@
-// sw.js — MXD PWA  (2025-09-26)
-const VERSION = '2025-10-03-mlz3'; // <— CHỈ 1 DÒNG NÀY
+// sw.js — MXD PWA (2025-10-03)
+const VERSION = '2025-10-03-mlz5'; // BUMP mỗi lần sửa
 
-self.addEventListener('install', e => self.skipWaiting());
-self.addEventListener('activate', e => self.clients.claim());
-self.addEventListener('fetch', () => {});
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
 // ---- Precache (nhẹ) ----
 const ASSETS = [
   '/', '/index.html', '/store.html', '/g.html',
-  '/tools/mxd-importer_v4.3.8_pro.html',
+  // Tool đúng chuẩn MXD hiện dùng:
+  '/tools/mxd-importerv1.html',
+  // CSS & JS nền tảng:
   '/assets/site.css',
   '/assets/js/render-products.js',
+  // Affiliate & GA4 (đưa cả 2 path để an toàn, 404 sẽ bị bỏ qua):
+  '/assets/mxd-affiliate.js',
   '/assets/data/mxd-affiliate.js',
   '/assets/analytics.js',
+  // Ảnh placeholder
   '/assets/img/products/placeholder.webp'
 ];
 
@@ -41,7 +43,7 @@ const offlinePage = () => new Response(
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const c = await caches.open(CACHE);
-    await Promise.all(ASSETS.map(u => c.add(u).catch(() => {})));
+    await Promise.all(ASSETS.map(u => c.add(u).catch(() => {}))); // bỏ qua asset lỗi
     await self.skipWaiting();
   })());
 });
