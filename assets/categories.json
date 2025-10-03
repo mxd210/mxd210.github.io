@@ -9,6 +9,14 @@
     "priority": 0.9
   },
   {
+  "slug": "thoi-trang",
+  "name": "Thời trang & làm việc",
+  "icon": "/assets/img/categories/thoi-trang.webp",
+  "path": "/store/thoi-trang.html",
+  "canonical": "https://mxd210.github.io/store/thoi-trang.html",
+  "priority": 0.9
+  },
+  {
     "slug": "may-rung-op-lat",
     "name": "Máy rung ốp lát",
     "icon": "/assets/img/categories/may-rung-op-lat.webp",
