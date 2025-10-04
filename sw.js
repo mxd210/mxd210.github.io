@@ -1,5 +1,5 @@
 // sw.js — MXD PWA (2025-10-04)  ← bumped
-const VERSION = '2025-10-04-mlz6'; // BUMP mỗi lần sửa
+const VERSION = '2025-10-04-'; // BUMP mỗi lần sửa
 
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
