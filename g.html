@@ -119,6 +119,17 @@
         <p><a href="/store.html">← Về Cửa hàng</a></p>`;
     }
 
+    // Lấy URL an toàn đầu tiên từ p.links (string hoặc object)
+    function firstValidLinkURL(arr){
+      if (!Array.isArray(arr)) return '';
+      for (const l of arr){
+        if (!l) continue;
+        if (typeof l === 'string' && l.startsWith('http')) return l;
+        if (typeof l === 'object' && l.url && String(l.url).startsWith('http')) return l.url;
+      }
+      return '';
+    }
+
     // main
     if (!skuParam){ renderNotFound(); return; }
     setCanonical();
@@ -140,7 +151,7 @@
 
         const skuReal = p.sku || p.p_sku || p.id;
         const priceNum = typeof p.price === 'number' ? p.price : Number(String(p.price||'').replace(/[^\d]/g,''));
-        const link = p.link || p.url || (Array.isArray(p.links) ? p.links[0] : '');
+        const link = p.link || p.url || firstValidLinkURL(p.links);
         const image = p.image || `/assets/img/products/${skuReal}.webp`;
         const priceText = priceNum ? new Intl.NumberFormat('vi-VN').format(priceNum) + ' đ' : 'Liên hệ';
 
@@ -149,16 +160,28 @@
         setMeta(p.name, seoDesc, `https://mxd210.github.io${image}`);
         injectProductLD({ name:p.name, sku:skuReal, price:priceNum, image:`https://mxd210.github.io${image}`, link:link, desc: seoDesc });
 
-        // buybox
+        // buybox — chỉ hiển thị 1 nút mua hợp lệ (ưu tiên p.links[0] hợp lệ; fallback origin/link)
         let buyBox = '';
         const metaHref = p.origin || link || '';
 
-        if (Array.isArray(p.links) && p.links.length){
-          buyBox = p.links.map((u,i)=>{
-            const m = getMerchant(u);
-            return `<a class="buy" href="${u}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ${i+1} (${m})</a>`;
-          }).join('');
-        } else if (metaHref){
+        function firstValidLink(links){
+          if (!Array.isArray(links)) return null;
+          const flat = links.map(l => {
+            if (!l) return null;
+            if (typeof l === 'string') return { url: l };
+            if (typeof l === 'object') return { url: l.url, label: l.label, merchant: l.merchant };
+            return null;
+          }).filter(x => x && x.url && typeof x.url === 'string' && x.url.startsWith('http'));
+          return flat[0] || null;
+        }
+
+        const primary = firstValidLink(p.links);
+
+        if (primary) {
+          const m = getMerchant(primary.url);
+          const label = primary.label || (m ? `Mua ${m}` : 'Mua ngay');
+          buyBox = `<a class="buy" href="${primary.url}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">${label}</a>`;
+        } else if (metaHref) {
           const m = getMerchant(metaHref);
           buyBox = `<a class="buy" href="${metaHref}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ngay</a>`;
         } else {
