@@ -88,5 +88,40 @@
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
   </url>
+<!-- INSERT -->
+<url>
+  <loc>https://mxd210.github.io/blog/bi-quyet-thoi-trang-cong-so.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
+<!-- INSERT -->
+<url>
+  <loc>https://mxd210.github.io/blog/huong-dan-bao-tri-may-rung.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
+<!-- INSERT -->
+<url>
+  <loc>https://mxd210.github.io/blog/kinh-nghiem-chon-may-khoan-cat.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
+<!-- INSERT -->
+<url>
+  <loc>https://mxd210.github.io/blog/phoi-do-thu-dong.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
+<!-- INSERT -->
+<url>
+  <loc>https://mxd210.github.io/blog/toi-uu-mua-sam-affiliate.html</loc>
+  <lastmod>2025-10-04</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.8</priority>
+</url>
 
 </urlset>
