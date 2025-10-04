@@ -158,6 +158,20 @@
   letter-spacing:.2px;
 }
 
+/* Optional description text under the price.  Some products include a short
+   description or tính năng to aid SEO and provide more context.  We clamp
+   to two lines to keep cards compact. */
+.product-grid .card .desc{
+  margin-top:4px;
+  font-size:13px;
+  line-height:1.4;
+  color:var(--muted,#666);
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  overflow:hidden;
+}
+
 /* Buy button with merchant-colour overrides */
 .product-grid .card .buy{
   display:inline-block;
