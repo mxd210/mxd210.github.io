@@ -37,7 +37,12 @@
     const img   = rec.image || rec.img || (IMG_DIR + sku + ".webp");
     const merchant = (rec.merchant || inferMerchant(baseForMerchant) || "").toLowerCase();
 
-    return { name, sku, price, img, merchant, href, origin, deeplink };
+    // Allow optional description/desc field.  Some records in products.json
+    // include a "description" or "desc" property; we preserve it here so
+    // cardHTML can render it.  If not provided, default to empty string.
+    const desc = rec.description || rec.desc || "";
+
+    return { name, sku, price, img, merchant, href, origin, deeplink, desc };
   }
 
   function priceLabel(v) {
@@ -48,12 +53,17 @@
 
   function cardHTML(x) {
     const mTitle = x.merchant ? x.merchant[0].toUpperCase()+x.merchant.slice(1) : "Shop";
+    // Build description element only when provided.  Short descriptions improve SEO
+    // and user understanding but should not clutter cards; we rely on CSS to
+    // clamp to two lines.
+    const descHTML = x.desc ? `<p class="desc">${x.desc}</p>` : "";
     return `
       <div class="card" data-sku="${x.sku}">
         <img loading="lazy" src="${x.img}" onerror="this.src='${PLACEHOLDER}'" alt="${x.name}">
         <div class="body">
           <h3 class="name">${x.name}</h3>
           <div class="price">${priceLabel(x.price)}</div>
+          ${descHTML}
 
           <!-- Meta link (ẩn) để giữ metadata -->
           <a class="product-meta" href="${x.origin || x.href}"
