@@ -1,0 +1,122 @@
+{
+  "origin": "https://mxd210.github.io",
+
+  "verify": {
+    "gsc": "84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o",
+    "bing": "PASTE_BING_CODE"
+  },
+
+  "meta": {
+    "required": [
+      "canonical_absolute",
+      "robots_index_follow",
+      "ga4_before_affiliate",
+      "og_minimum",
+      "product_jsonld_on_g",
+      "lang_vi_one_h1_title_desc_length"
+    ]
+  },
+
+  "pages": {
+    "include": [
+      "^index\\.html$",
+      "^store\\.html$",
+      "^g\\.html$",
+      "^store\\/.*\\.html$",
+      "^blog\\/.*\\.html$"
+    ],
+    "exclude": [
+      "^tools\\/.*",
+      "^redirects\\/.*"
+    ]
+  },
+
+  "categories": {
+    "map": {
+      "may-cat": [
+        "máy cắt",
+        "cắt gạch",
+        "lưỡi cắt",
+        "cut-off",
+        "oscillating",
+        "máy cắt bàn"
+      ],
+      "may-khoan-duc-vit": [
+        "khoan",
+        "đục",
+        "bắn vít",
+        "impact",
+        "sds",
+        "sds-plus",
+        "búa điện",
+        "vít thạch cao"
+      ],
+      "may-laze": [
+        "laser",
+        "laze",
+        "nivô",
+        "tia",
+        "cân mực",
+        "dekton",
+        "ls1201"
+      ],
+      "may-rung-op-lat": [
+        "rung ốp lát",
+        "vibrator",
+        "hút gạch",
+        "máy rung lát gạch",
+        "máy rung gạch men"
+      ],
+      "dung-cu-op-lat": [
+        "bay răng cưa",
+        "livô",
+        "nivô cơ",
+        "nêm",
+        "ke cân bằng",
+        "con kê",
+        "búa cao su",
+        "thước dẫn",
+        "con đội",
+        "giác hút"
+      ],
+      "thoi-trang-va-lam-viec": [
+        "áo",
+        "quần",
+        "giày bảo hộ",
+        "mũ bảo hộ",
+        "găng tay",
+        "đồ bảo hộ",
+        "đồng phục",
+        "thời trang nam",
+        "thời trang nữ",
+        "trẻ em",
+        "thu đông",
+        "mùa hè"
+      ]
+    },
+    "overrides": {
+      "dk-ls1201": "may-laze"
+    }
+  },
+
+  "fix": {
+    "safe": true,
+    "meta": true,
+    "sitemaps": true,
+    "products": {
+      "normalize": true,
+      "autocategorize": true,
+      "preserve_overrides": true
+    },
+    "images": {
+      "add_placeholder": true
+    }
+  },
+
+  "scores": {
+    "keyword_weight": 1.0,
+    "title_boost": 1.2,
+    "desc_boost": 0.8,
+    "threshold": 0.6
+  }
+}
