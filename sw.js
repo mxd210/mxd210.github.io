@@ -1,5 +1,16 @@
-// sw.js — MXD PWA (2025-10-04)  ← bumped
-const VERSION = '2025-10-04-'; // BUMP mỗi lần sửa
+/* MXD-CHECK v2025-10-06 [sw]
+- VERSION bump mỗi lần sửa (định dạng YYYY-MM-DD-<tag>)
+- HTML: network-first (+ navigationPreload); fallback offlinePage
+- Assets same-origin: stale-while-revalidate; tránh precache 404
+- Bỏ qua sitemap .xml, robots.txt để bot luôn lấy from network
+- BYPASS analytics/affiliate domains; không can thiệp
+- JSON động (/assets/data/*.json, /products.json): network-first (no-store)
+- /sw-version phục vụ kiểm tra phiên bản
+FIND: MXD-CHECK v2025-10-06 [sw]
+*/
+
+// sw.js — MXD PWA (2025-10-06)
+const VERSION = '2025-10-06-mlz6'; // BUMP mỗi lần sửa
 
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
@@ -43,7 +54,7 @@ const offlinePage = () => new Response(
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const c = await caches.open(CACHE);
-    await Promise.all(ASSETS.map(u => c.add(u).catch(() => {}))); // bỏ qua asset lỗi
+    await Promise.all(ASSETS.map(u => c.add(u).catch(() => {}))); // bỏ qua asset lỗi (tránh fail toàn bộ)
     await self.skipWaiting();
   })());
 });
@@ -106,12 +117,12 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // ✅ BỎ QUA sitemap & robots: để trình duyệt tự lấy từ mạng (không "from service worker")
+  // ✅ BỎ QUA sitemap & robots: để trình duyệt/bot lấy trực tiếp từ network
   if (url.pathname.endsWith('.xml') || url.pathname === '/robots.txt') {
     return; // không respondWith => SW không can thiệp
   }
 
-  // version endpoint
+  // Phiên bản nhanh để kiểm tra
   if (url.pathname === '/sw-version') {
     event.respondWith(new Response(VERSION, { headers: {'content-type':'text/plain'} }));
     return;
