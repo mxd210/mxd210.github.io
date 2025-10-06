@@ -1,3 +1,13 @@
+<!-- MXD-CHECK v2025-10-06 [store]
+- Canonical absolute; robots=index,follow; meta verify present
+- GA4 BEFORE /assets/mxd-affiliate.js (only once)
+- .category-grid tiles link to /store/<slug>.html (no sub-items inline)
+- Category icon path: /assets/img/categories/<slug>.webp ; alt="<Tên danh mục> — MXD"
+- Quick-Nav loads from categories.json (fallback ensured)
+- Renderer uses affiliates.json; buy links are origin (rewritten by affiliate script)
+- SW registered; bump sw.js VERSION on asset changes
+FIND: MXD-CHECK v2025-10-06 [store]
+-->
 <!doctype html>
 <html lang="vi">
 <head>
@@ -14,12 +24,11 @@
   <meta property="og:title" content="Cửa hàng MXD – Sản phẩm chọn lọc">
   <meta property="og:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
   <meta property="og:url" content="https://mxd210.github.io/store.html">
-  <meta property="og:image" content="/assets/img/products/placeholder.webp">
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/products/placeholder.webp">
 
-  <!-- VERIFY: các thẻ xác minh cho Google/Bing -->
-<meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o" />  <!-- Nếu có Bing Webmaster, bỏ comment dòng sau và điền mã:
-  <meta name="msvalidate.01" content="YOUR_BING_CODE">
-  -->
+  <!-- VERIFY: Google/Bing -->
+  <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o">
+  <!-- <meta name="msvalidate.01" content="YOUR_BING_CODE"> -->
 
   <link rel="stylesheet" href="/assets/site.css">
 
@@ -69,7 +78,7 @@
     .buy[data-merchant="tiktok"]{ background:#111; border-color:#111 }
     .buy:hover{ filter:brightness(1.05) }
 
-    /* Skeleton (nếu cần thì renderer sẽ thay) */
+    /* Skeleton */
     .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%)}
     .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
     @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
@@ -86,7 +95,7 @@
   <script defer src="/assets/mxd-affiliate.js?v=2025-09-26-fb2"></script>
   <script defer src="/assets/js/render-products.js?v=2025-09-26-fb2"></script>
 
-  <!-- Floating contact (giữ nguyên nếu bạn đang dùng file tách riêng) -->
+  <!-- Floating contact -->
   <script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
 </head>
 <body>
@@ -164,28 +173,27 @@
         ensure('may-cat', 'Máy cắt', '/assets/img/categories/may-cat.webp');
         ensure('may-khoan-duc-vit', 'Khoan · Đục · Vít', '/assets/img/categories/may-khoan-duc-vit.webp');
         ensure('may-laze', 'Máy laser', '/assets/img/categories/may-laze.webp');
-        ensure('phu-kien-may', 'Phụ kiện máy', '/assets/img/categories/phu-kien-may.webp'); /* NEW */
-        // Thêm danh mục thời trang (HUB)
+        ensure('phu-kien-may', 'Phụ kiện máy', '/assets/img/categories/phu-kien-may.webp');
         ensure('thoi-trang', 'Thời trang & làm việc', '/assets/img/categories/thoi-trang.webp');
 
-        // Render quick-nav (CHỈ render items, không chèn thẻ lạ gây lặp)
+        // Render quick-nav
         if (!items.length) {
           qn.innerHTML = `
             <li>
               <a href="/store/may-cat.html" class="qnav-item">
-                <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt" width="28" height="28" loading="lazy" decoding="async"/>Máy cắt
+                <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt — MXD" width="28" height="28" loading="lazy" decoding="async"/>Máy cắt
               </a>
             </li>
             <li>
               <a href="/store/may-khoan-duc-vit.html" class="qnav-item">
-                <img src="/assets/img/categories/may-khoan-duc-vit.webp" alt="Khoan · Đục · Vít" width="28" height="28" loading="lazy" decoding="async"/>Khoan · Đục · Vít
+                <img src="/assets/img/categories/may-khoan-duc-vit.webp" alt="Khoan · Đục · Vít — MXD" width="28" height="28" loading="lazy" decoding="async"/>Khoan · Đục · Vít
               </a>
             </li>`;
         } else {
           qn.innerHTML = items.map(c => `
             <li>
               <a href="${c.path}" class="qnav-item">
-                <img src="${c.icon}" alt="${c.name}" width="28" height="28" loading="lazy" decoding="async"/>
+                <img src="${c.icon}" alt="${c.name} — MXD" width="28" height="28" loading="lazy" decoding="async"/>
                 ${c.name}
               </a>
             </li>
