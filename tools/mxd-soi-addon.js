@@ -1,10 +1,5 @@
-<!-- tools/mxd-soi-addon.js — v2.0 (Unified SOI Add-on: Blocks Auto, Notes, HTML Patch, Audits) -->
+<!-- tools/mxd-soi-addon.js — v2.1 (Unified SOI + SMART auto-target/anchor + Commit message) -->
 <script>
-/* Shadow DOM addon cho mxd-importerv1.html — HỢP NHẤT
-   - Thêm tab BLOCKS (auto place): chèn block theo page-type, có marker, idempotent.
-   - Giữ nguyên NOTES/INJECT & HTML PATCH cũ.
-   - Gọi Worker /admin/command (html.patch, notes.inject, audit.*) như trước.
-*/
 (() => {
   const host = document.createElement('div'); host.id='mxd-soi-addon';
   const shadow = host.attachShadow({mode:'open'});
@@ -14,7 +9,7 @@
   :host{all:initial}
   .btn{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:700}
   .fab{position:fixed;right:16px;bottom:16px;background:#7cc4ff;color:#001528;box-shadow:0 6px 20px rgba(0,0,0,.3)}
-  .panel{position:fixed;right:16px;bottom:76px;width:420px;max-height:80vh;overflow:auto;background:#0e1622;color:#e8f0fb;border:1px solid #1f2a3a;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
+  .panel{position:fixed;right:16px;bottom:76px;width:460px;max-height:80vh;overflow:auto;background:#0e1622;color:#e8f0fb;border:1px solid #1f2a3a;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
   .hd{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #1f2a3a;font-weight:700}
   .wrap{padding:12px}
   label{display:block;margin:8px 0 4px;color:#a7b4c2;font-size:13px}
@@ -33,7 +28,7 @@
   .chip input{width:auto}
   `;
 
-  const templateNote = `<!-- MXD-CHECK v{{date}} [hub:/store/{{slug}}.html]
+  const templateNote = `<!-- MXD-CHECK v{{date}} [type: hub] [file:/store/{{slug}}.html]
 - Canonical tuyệt đối; robots=index,follow; meta verify hiện diện
 - GA4 (/assets/analytics.js) TRƯỚC /assets/mxd-affiliate.js (duy nhất 1 lần)
 - OG: title/desc/url/image (≥1200×630 .webp) tuyệt đối
@@ -45,14 +40,12 @@
 FIND: MXD-CHECK v{{date}} [hub:/store/{{slug}}.html]
 -->`;
 
-  // Block templates (idempotent wrapped)
   const blockTemplates = {
     'mxd-stamp': (date)=>`<!-- MXD-BLOCK:mxd-stamp START -->
 <div data-mxd-block-id="mxd-stamp" style="margin:12px 0;padding:8px 12px;border-radius:10px;border:1px dashed #27425f;background:#0b1420;color:#a7b4c2;font:13px/1.5 system-ui">
   <b>MXD Stamp</b> — build ${date}. Chuẩn MXD: GA4 trước affiliate · Canonical tuyệt đối · Robots index,follow.
 </div>
 <!-- MXD-BLOCK:mxd-stamp END -->`,
-
     'mxd-cta': ()=>`<!-- MXD-BLOCK:mxd-cta START -->
 <div data-mxd-block-id="mxd-cta" style="margin:14px 0;padding:12px 14px;border-radius:12px;background:#112033;border:1px solid #1f2a3a">
   <div style="font-weight:800;margin-bottom:6px">Cần tư vấn nhanh?</div>
@@ -63,7 +56,6 @@ FIND: MXD-CHECK v{{date}} [hub:/store/{{slug}}.html]
   </div>
 </div>
 <!-- MXD-BLOCK:mxd-cta END -->`,
-
     'mxd-contact-floating': ()=>`<!-- MXD-BLOCK:mxd-contact-floating START -->
 <div data-mxd-block-id="mxd-contact-floating" style="position:fixed;right:12px;bottom:12px;z-index:9999;display:flex;flex-direction:column;gap:8px">
   <a href="https://zalo.me/0338328898" style="display:inline-block;padding:10px 12px;border-radius:999px;background:#7cc4ff;color:#001528;text-decoration:none;font-weight:800">Zalo</a>
@@ -71,8 +63,6 @@ FIND: MXD-CHECK v{{date}} [hub:/store/{{slug}}.html]
   <a href="tel:0338328898" style="display:inline-block;padding:10px 12px;border-radius:999px;background:#223146;color:#e8f0fb;text-decoration:none;font-weight:800">Gọi</a>
 </div>
 <!-- MXD-BLOCK:mxd-contact-floating END -->`,
-
-    // Comment-based checklist (use notes.inject for templating slug/date if cần)
     'mxd-check': (date)=>`<!-- MXD-BLOCK:mxd-check START -->
 ${templateNote.replaceAll('{{date}}', date)}
 <!-- MXD-BLOCK:mxd-check END -->`
@@ -95,7 +85,11 @@ ${templateNote.replaceAll('{{date}}', date)}
       </div>
       <div class="row">
         <div><label>Dry-run</label><select id="dry"><option value="true" selected>true</option><option value="false">false</option></select></div>
+        <div><label>Commit message (tùy chọn)</label><input id="commit" placeholder="feat(soi): ..."></div>
+      </div>
+      <div class="row">
         <div><label>&nbsp;</label><button class="btn muted" id="health">Health</button></div>
+        <div><label>&nbsp;</label><button class="btn muted" id="clearCommit">Clear commit</button></div>
       </div>
 
       <div class="pill">META</div>
@@ -114,9 +108,49 @@ ${templateNote.replaceAll('{{date}}', date)}
         <button class="btn muted" data-cmd="fix.products">Fix Products</button>
       </div>
 
-      <!-- NEW: BLOCKS AUTO -->
+      <!-- NEW: SMART (auto) -->
       <details open>
-        <summary><b>BLOCKS (auto place, idempotent)</b></summary>
+        <summary><b>SMART — Auto target & anchor</b></summary>
+        <label>Block (dán meta/script/link/comment hoặc HTML tùy ý)</label>
+        <textarea id="smart_block" spellcheck="false" placeholder="<!-- MXD-CHECK v2025-10-06 [type: store] [file:/store/chong-tham.html] ... -->"></textarea>
+        <div class="row">
+          <div>
+            <label>Ưu tiên chèn vào</label>
+            <select id="smart_pref">
+              <option value="auto" selected>auto</option>
+              <option value="head">head (trước </head>)</option>
+              <option value="content">nội dung trang</option>
+            </select>
+          </div>
+          <div>
+            <label>Marker (tự sinh nếu để trống)</label>
+            <input id="smart_marker" placeholder="MXD-BLOCK:mxd-check">
+          </div>
+        </div>
+        <details>
+          <summary>Override đích (tùy chọn)</summary>
+          <div class="row">
+            <div><label>paths</label><input id="smart_paths" placeholder="store/chong-tham.html"></div>
+            <div><label>glob</label><input id="smart_glob" placeholder="store/*.html"></div>
+          </div>
+          <div><label>regex</label><input id="smart_regex" placeholder="^store/(.+)\\.html$"></div>
+        </details>
+        <div class="btns">
+          <button class="btn ok" id="smart_apply">SMART Apply</button>
+        </div>
+        <div class="tiny">
+          Luật auto: nếu block chứa &lt;meta|script|link&gt; → chèn **before_head_end**. Nếu là comment/HTML:
+          <br>type=hub/store → sau &lt;h1&gt; (fallback: trước .category-grid → sau &lt;main&gt;).
+          <br>type=product → trước .buy đầu tiên (fallback: sau #product).
+          <br>type=index → sau #quick-nav (fallback: sau &lt;main&gt;).
+          <br>type=blog → sau header bài (fallback: sau &lt;h1&gt;).
+          <br>Nếu block có \`[file:/...]\` → ưu tiên đúng file, không cần nhập đích.
+        </div>
+      </details>
+
+      <!-- BLOCKS templates (giữ v2.0) -->
+      <details>
+        <summary><b>BLOCKS (template sẵn, idempotent)</b></summary>
         <div class="row">
           <div>
             <label>Block</label>
@@ -159,19 +193,13 @@ ${templateNote.replaceAll('{{date}}', date)}
         <div class="btns">
           <button class="btn ok" id="blk_apply">Apply</button>
         </div>
-        <div class="tiny">Auto-anchor:
-          HUB → sau &lt;h1&gt; (fallback: trước .category-grid → fallback: đầu &lt;main&gt;);
-          PRODUCT → trước .buy đầu tiên (fallback: sau #product);
-          INDEX → sau #quick-nav (fallback: đầu &lt;main&gt;);
-          BLOG → sau header bài (fallback: sau &lt;h1&gt;).
-        </div>
       </details>
 
       <details>
         <summary><b>NOTES / INJECT</b></summary>
         <label>FIND (marker để replace nguyên block)</label>
         <input id="find" placeholder="MXD-CHECK v{{date}} [hub:/store/{{slug}}.html]">
-        <label>Block (hỗ trợ {{date}} {{slug}} {{hub}})</label>
+        <label>Block</label>
         <textarea id="blockNote" spellcheck="false">${templateNote}</textarea>
         <div class="row">
           <div><label>Đích: paths (phẩy)</label><input id="paths" placeholder="store/may-cat.html,store/may-laze.html"></div>
@@ -219,7 +247,7 @@ ${templateNote.replaceAll('{{date}}', date)}
           <div><label>Marker (tuỳ chọn)</label><input id="p_marker" placeholder="mxd-tag-2025"></div>
           <div><label>nth</label><input id="p_nth" type="number" value="1"></div>
         </div>
-        <label>Block (nội dung chèn/thay; để trống nếu remove)</label>
+        <label>Block</label>
         <textarea id="p_block" spellcheck="false"></textarea>
         <div class="btns"><button class="btn ok" id="btnPatch">Run Patch</button></div>
       </details>
@@ -245,6 +273,7 @@ ${templateNote.replaceAll('{{date}}', date)}
     $('#date').value = store.get('date') || new Date().toISOString().slice(0,10);
     $('#blockNote').value = store.get('blockNote') || $('#blockNote').value;
     $('#find').value = store.get('find') || 'MXD-CHECK v{{date}} [hub:/store/{{slug}}.html]';
+    $('#commit').value = store.get('commit') || '';
 
     // BLOCKS defaults
     $('#blk_id').value = store.get('blk_id') || 'mxd-stamp';
@@ -263,6 +292,7 @@ ${templateNote.replaceAll('{{date}}', date)}
   $('#toggle').onclick = ()=>$('#panel').style.display='block';
   $('#close').onclick  = ()=>$('#panel').style.display='none';
   $('#health').onclick = ()=> call(`${base()}/health`);
+  $('#clearCommit').onclick = ()=>{ $('#commit').value=''; store.set('commit',''); };
 
   for (const btn of shadow.querySelectorAll('[data-cmd]')){
     btn.onclick = async ()=>{
@@ -272,53 +302,83 @@ ${templateNote.replaceAll('{{date}}', date)}
     };
   }
 
-  // BLOCKS apply
-  $('#blk_apply').onclick = async ()=>{
+  // SMART apply (auto)
+  $('#smart_apply').onclick = async ()=>{
     persistCommon();
-    persistBlocksState();
+    const block = $('#smart_block').value || '';
+    const prefer = $('#smart_pref').value; // auto|head|content
+    const marker = ($('#smart_marker').value.trim() || autoMarker(block));
+    const metaLike = /<(meta|script|link)\b/i.test(block);
+    const { file, type } = detectMeta(block);
+    const targets = pickTargets({ file, type, overrides:{
+      paths: $('#smart_paths').value.trim(),
+      glob: $('#smart_glob').value.trim(),
+      regex: $('#smart_regex').value.trim()
+    }});
+
+    const jobs = [];
+
+    // If meta/script/link OR prefer=head → inject before </head>
+    if (prefer==='head' || (prefer==='auto' && metaLike)){
+      jobs.push(applyPatch({
+        ...targets,
+        mode:'before_head_end',
+        marker,
+        nth:1,
+        block
+      }));
+    } else {
+      // content anchors theo type
+      const anchors = chooseAnchorsForType(type);
+      for (const a of anchors){
+        jobs.push(applyPatch({
+          ...targets,
+          mode: a.mode,
+          anchor: a.anchor,
+          marker,
+          nth:1,
+          block
+        }));
+      }
+    }
+
+    const results = await Promise.all(jobs);
+    const mergedDiffs = results.flatMap(r=> (r && r.diffs) ? r.diffs : []);
+    if (mergedDiffs.length) $('#diff').textContent = renderDiffs(mergedDiffs);
+  };
+
+  // BLOCKS apply (template)
+  $('#blk_apply').onclick = async ()=>{
+    persistCommon(); persistBlocksState();
 
     const id = $('#blk_id').value;
     const marker = ($('#blk_marker').value.trim()||(`MXD-BLOCK:${id}`));
     const date = $('#date').value;
-
-    // 1) Remove old by marker (idempotent)
-    await removeByMarkerAcrossTargets(marker);
-
-    // 2) Insert per target with proper anchors
-    const jobs = [];
     const content = makeBlock(id, date);
 
+    // Remove old by marker (idempotent)
+    await removeByMarkerAcrossTargets(marker);
+
+    const jobs = [];
     if ($('#t_hub').checked){
       const glob = ($('#hub_glob').value.trim()||'store/*.html');
-      // Try after first H1
       jobs.push(applyPatch({glob, mode:'after', anchor:'(?is)<h1[^>]*>.*?</h1>', marker, block:content, nth:1}));
-      // Fallback before category-grid (only if previous produced no change — server decides; okay to re-run)
       jobs.push(applyPatch({glob, mode:'before', anchor:'(?is)<(?:div|ul)\\s+[^>]*class="[^"]*\\bcategory-grid\\b[^"]*"[^>]*>', marker, block:content, nth:1}));
-      // Fallback: top of <main>
       jobs.push(applyPatch({glob, mode:'after', anchor:'(?is)<main[^>]*>', marker, block:content, nth:1}));
     }
-
     if ($('#t_product').checked){
       const paths = $('#prod_paths').value.trim();
-      // Before first .buy
       jobs.push(applyPatch({paths: toArr(paths), mode:'before', anchor:'(?is)<a[^>]+class="[^"]*\\bbuy\\b[^"]*"', marker, block:content, nth:1}));
-      // Fallback: after #product container open
       jobs.push(applyPatch({paths: toArr(paths), mode:'after', anchor:'(?is)<(?:article|div)\\s+id="product"[^>]*>', marker, block:content, nth:1}));
     }
-
     if ($('#t_index').checked){
       const paths = $('#idx_paths').value.trim();
-      // After quick-nav
       jobs.push(applyPatch({paths: toArr(paths), mode:'after', anchor:'(?is)<(?:nav|div)[^>]*id="quick-nav"[^>]*>.*?</(?:nav|div)>', marker, block:content, nth:1}));
-      // Fallback: after <main>
       jobs.push(applyPatch({paths: toArr(paths), mode:'after', anchor:'(?is)<main[^>]*>', marker, block:content, nth:1}));
     }
-
     if ($('#t_blog').checked){
       const glob = ($('#blog_glob').value.trim()||'blog/*.html');
-      // After post header
       jobs.push(applyPatch({glob, mode:'after', anchor:'(?is)<(?:header|div)\\s+[^>]*class="[^"]*(?:post-header|post_header)\\b[^"]*"[^>]*>.*?</(?:header|div)>', marker, block:content, nth:1}));
-      // Fallback: after first H1
       jobs.push(applyPatch({glob, mode:'after', anchor:'(?is)<h1[^>]*>.*?</h1>', marker, block:content, nth:1}));
     }
 
@@ -327,7 +387,7 @@ ${templateNote.replaceAll('{{date}}', date)}
     if (mergedDiffs.length) $('#diff').textContent = renderDiffs(mergedDiffs);
   };
 
-  // Notes inject (giữ nguyên)
+  // Notes inject
   $('#injectNote').onclick = async ()=>{
     const args = {
       cmd:'notes.inject',
@@ -349,7 +409,7 @@ ${templateNote.replaceAll('{{date}}', date)}
     if (res && res.diffs) $('#diff').textContent = renderDiffs(res.diffs);
   };
 
-  // HTML patch (giữ nguyên)
+  // HTML patch
   $('#btnPatch').onclick = async ()=>{
     const args = {
       cmd:'html.patch',
@@ -374,6 +434,10 @@ ${templateNote.replaceAll('{{date}}', date)}
 
   // helpers
   function toArr(csv){ return csv.split(',').map(s=>s.trim()).filter(Boolean); }
+  function base(){ const v=$('#base').value.trim().replace(/\/$/,''); store.set('base',v); return v; }
+  function key(){  const v=$('#xkey').value.trim(); store.set('xkey',v); return v; }
+  function branch(){ const v=$('#branch').value.trim()||'main'; store.set('branch',v); return v; }
+  function getCommit(){ const v=$('#commit').value.trim(); store.set('commit',v); return v; }
 
   function persistCommon(){
     store.set('base', base()); store.set('xkey', key()); store.set('branch', branch());
@@ -381,6 +445,7 @@ ${templateNote.replaceAll('{{date}}', date)}
     store.set('date', $('#date').value);
     store.set('blockNote', $('#blockNote').value);
     store.set('find', $('#find').value);
+    store.set('commit', $('#commit').value);
   }
   function persistBlocksState(){
     store.set('blk_id', $('#blk_id').value);
@@ -395,37 +460,90 @@ ${templateNote.replaceAll('{{date}}', date)}
     store.set('blog_glob', $('#blog_glob').value);
   }
 
-  function makeBlock(id, date){
-    const f = blockTemplates[id] || (()=>'');
-    return f(date);
+  function makeBlock(id, date){ const f = blockTemplates[id] || (()=>''); return f(date); }
+
+  function autoMarker(block){
+    if (/MXD-CHECK/i.test(block)) return 'MXD-BLOCK:mxd-check';
+    if (/<meta\b/i.test(block)) return 'MXD-BLOCK:meta';
+    if (/<script\b/i.test(block)) return 'MXD-BLOCK:script';
+    if (/<link\b/i.test(block)) return 'MXD-BLOCK:link';
+    return 'MXD-BLOCK:auto';
   }
 
-  function base(){ const v=$('#base').value.trim().replace(/\/$/,''); store.set('base',v); return v; }
-  function key(){  const v=$('#xkey').value.trim(); store.set('xkey',v); return v; }
-  function branch(){ const v=$('#branch').value.trim()||'main'; store.set('branch',v); return v; }
+  function detectMeta(block){
+    // [file:/store/abc.html]  |  [type: store|hub|product|index|blog]
+    const mFile = block.match(/\[file:\s*\/([^\]\s]+)\s*\]/i);
+    const mType = block.match(/\[type:\s*(hub|store|product|index|blog)\s*\]/i);
+    let file = mFile ? mFile[1] : '';
+    let type = mType ? mType[1].toLowerCase() : '';
+    if (type==='store') type = 'hub';
+    return { file, type };
+  }
+
+  function pickTargets({ file, type, overrides }){
+    const { paths, glob, regex } = overrides || {};
+    if (paths) return { paths: toArr(paths) };
+    if (glob)  return { glob };
+    if (regex) return { regex };
+
+    if (file) return { paths:[file] };
+
+    // default by type
+    switch (type){
+      case 'hub':     return { glob:'store/*.html' };
+      case 'product': return { paths:['g.html'] };
+      case 'index':   return { paths:['index.html'] };
+      case 'blog':    return { glob:'blog/*.html' };
+      default:        return { glob:'store/*.html' }; // an toàn nhất
+    }
+  }
+
+  function chooseAnchorsForType(type){
+    switch(type){
+      case 'product':
+        return [
+          { mode:'before', anchor:'(?is)<a[^>]+class="[^"]*\\bbuy\\b[^"]*"' },
+          { mode:'after',  anchor:'(?is)<(?:article|div)\\s+id="product"[^>]*>' }
+        ];
+      case 'index':
+        return [
+          { mode:'after', anchor:'(?is)<(?:nav|div)[^>]*id="quick-nav"[^>]*>.*?</(?:nav|div)>' },
+          { mode:'after', anchor:'(?is)<main[^>]*>' }
+        ];
+      case 'blog':
+        return [
+          { mode:'after', anchor:'(?is)<(?:header|div)\\s+[^>]*class="[^"]*(?:post-header|post_header)\\b[^"]*"[^>]*>.*?</(?:header|div)>' },
+          { mode:'after', anchor:'(?is)<h1[^>]*>.*?</h1>' }
+        ];
+      case 'hub':
+      default:
+        return [
+          { mode:'after',  anchor:'(?is)<h1[^>]*>.*?</h1>' },
+          { mode:'before', anchor:'(?is)<(?:div|ul)\\s+[^>]*class="[^"]*\\bcategory-grid\\b[^"]*"[^>]*>' },
+          { mode:'after',  anchor:'(?is)<main[^>]*>' }
+        ];
+    }
+  }
 
   async function call(url, method='GET', payload=null, admin=false){
     try{
+      const body = payload ? { branch: branch(), ...(getCommit()?{commit_message:getCommit()}:{}), ...payload } : null;
       const init = { method, headers:{'content-type':'application/json'} };
       if (admin) init.headers['x-key'] = key();
-      if (payload) init.body = JSON.stringify({ branch: branch(), ...payload });
+      if (body) init.body = JSON.stringify(body);
       const r = await fetch(url, init);
       const j = await r.json().catch(()=>({}));
       $('#out').textContent = JSON.stringify(j, null, 2);
       return j;
     }catch(e){ $('#out').textContent = JSON.stringify({ok:false,error:String(e)}, null, 2); }
   }
+
   function renderDiffs(diffs){
     return (diffs||[]).map(d=>`# ${d.path}\n--- BEFORE ---\n${(d.beforeSample||'').slice(0,400)}\n--- AFTER ---\n${(d.afterSample||'').slice(0,400)}`).join('\n\n');
   }
 
-  // Convenience wrappers for patch flows
   async function applyPatch({paths, glob, regex, mode, anchor, marker, nth=1, block}){
-    const args = {
-      cmd: 'html.patch',
-      dry_run: ($('#dry').value==='true'),
-      args: { mode, anchor, marker, nth, block }
-    };
+    const args = { cmd: 'html.patch', dry_run: ($('#dry').value==='true'), args: { mode, anchor, marker, nth, block } };
     if (paths && paths.length) args.args.paths = paths;
     if (glob)  args.args.glob = glob;
     if (regex) args.args.regex = regex;
@@ -434,7 +552,6 @@ ${templateNote.replaceAll('{{date}}', date)}
 
   async function removeByMarkerAcrossTargets(marker){
     const pattern = `(?is)<!--\\s*${escapeRegex(marker)}\\s*START\\s*-->[\\s\\S]*?<!--\\s*${escapeRegex(marker)}\\s*END\\s*-->`;
-    // Try broad scopes; server will ignore if not matched
     const jobs = [];
     jobs.push(applyPatch({glob:'store/*.html', mode:'remove', anchor:pattern, marker, nth:1}));
     jobs.push(applyPatch({paths:['g.html'], mode:'remove', anchor:pattern, marker, nth:1}));
