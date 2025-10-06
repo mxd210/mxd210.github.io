@@ -17,23 +17,23 @@ FIND: MXD-CHECK v2025-10-06 [g]
   <meta id="desc" name="description" content="Trang sản phẩm MXD. Vui lòng bật JavaScript để xem đầy đủ thông tin và liên kết mua.">
 
   <!-- Canonical động theo SKU -->
-  <link id="can" rel="canonical" href="https://mxd210.github.io/g.html">
-  <meta id="robots" name="robots" content="index,follow">
+  <link rel="canonical" href="https://mxd210.github.io/g.html">
+  <meta name="robots" content="index,follow">
 
   <!-- VERIFY -->
   <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o">
-  <!-- <meta name="msvalidate.01" content="YOUR_BING_CODE"> -->
+  <!-- <meta name="msvalidate.01" content="PASTE_BING_CODE"> -->
 
   <!-- OG cơ bản (sẽ được cập nhật bằng JS) -->
   <meta property="og:type" content="product">
   <meta id="og-title" property="og:title" content="Sản phẩm | MXD">
   <meta id="og-desc" property="og:description" content="Trang sản phẩm MXD.">
-  <meta id="og-image" property="og:image" content="https://mxd210.github.io/assets/img/logo.webp">
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/logo.webp">
   <meta id="og-url" property="og:url" content="https://mxd210.github.io/g.html">
 
   <!-- Chuẩn MXD: GA4 trước, Affiliate sau -->
-  <script src="/assets/analytics.js" defer></script>
-  <script src="/assets/mxd-affiliate.js" defer></script>
+  
+  
 
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;color:#111;background:#fff}
@@ -48,6 +48,22 @@ FIND: MXD-CHECK v2025-10-06 [g]
     .lead{font-size:1.06rem;line-height:1.6;margin-top:8px;color:#374151}
     @media (max-width:768px){.card{grid-template-columns:1fr}}
   </style>
+
+<script id="MXD_PRODUCT_META_BOOT">
+(function(){
+  function q(k){return new URLSearchParams(location.search).get(k)||''}
+  var sku=q('sku')||q('SKU')||'';
+  if(!sku){return}
+  var can=document.querySelector('link[rel=canonical]');
+  if(can){ var u=new URL(can.href, location.origin); u.searchParams.set('sku', sku); can.href=u.href; }
+  var title=document.querySelector('#og-title'); if(title) title.setAttribute('content', sku+' | MXD');
+  var desc=document.querySelector('#og-desc'); if(desc) desc.setAttribute('content', 'Sản phẩm '+sku+' tại MXD');
+  var img=document.querySelector('#og-image'); if(img) img.setAttribute('content', 'https://mxd210.github.io/assets/img/products/'+sku+'.webp');
+  var ld=document.createElement('script');
+  ld.type='application/ld+json';
+  ld.textContent=JSON.stringify({"@context":"https://schema.org/","@type":"Product","name":sku+" | MXD","sku":sku,"image":"https://mxd210.github.io/assets/img/products/"+sku+".webp","url":location.href});
+  document.head.appendChild(ld);
+})();</script>
 </head>
 <body>
   <header class="wrap">
@@ -236,5 +252,8 @@ FIND: MXD-CHECK v2025-10-06 [g]
 
   <!-- Nút nổi MXD (Zalo/Facebook/Gọi + Back-to-top) -->
   <script src="/assets/js/floating-contact.js" defer></script>
+<script defer src="/assets/analytics.js"></script>
+<script defer src="/assets/mxd-affiliate.js"></script>
+<script defer src="/assets/data/mxd-affiliate.js"></script>
 </body>
 </html>
