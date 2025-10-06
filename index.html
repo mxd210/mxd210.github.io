@@ -1,3 +1,14 @@
+<!-- MXD-CHECK v2025-10-06 [index]
+- Canonical: https://mxd210.github.io/ ; robots=index,follow
+- Meta verify: Google/Bing present
+- GA4 (/assets/analytics.js) BEFORE /assets/mxd-affiliate.js (only once)
+- JSON-LD: Organization on index
+- OG: title/desc/url/image (≥1200×630 .webp) absolute URL
+- Quick-nav: /store.html + hubs + 2–3 blog pillars
+- Floating contacts: Zalo 0338328898, Facebook /mxd6686
+- SW: HTML network-first; assets stale-while-revalidate; bump sw.js VERSION on asset changes
+FIND: MXD-CHECK v2025-10-06 [index]
+-->
 <!doctype html>
 <html lang="vi">
 <head>
@@ -16,8 +27,10 @@
   <meta property="og:url" content="https://mxd210.github.io/">
   <meta property="og:image" content="https://mxd210.github.io/assets/img/og/home.webp">
 
-<!-- VERIFY: Google Search Console -->
-<meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o" />
+  <!-- VERIFY: Google Search Console + (tuỳ chọn) Bing -->
+  <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o">
+  <!-- <meta name="msvalidate.01" content="YOUR_BING_CODE"> -->
+
   <link rel="stylesheet" href="/assets/site.css">
 
   <style>
@@ -113,10 +126,10 @@
 
   <!-- 1) GA4 -->
   <script defer src="/assets/analytics.js"></script>
-  <!-- 2) Renderer (tuỳ cậu có muốn show sản phẩm ở Home) -->
+  <!-- 2) Renderer (tuỳ chọn hiển thị sản phẩm ở Home) -->
   <script defer src="/assets/js/render-products.js"></script>
-  <!-- 3) Affiliate -->
-  <script defer src="/assets/data/mxd-affiliate.js"></script>
+  <!-- 3) Affiliate (đúng chuẩn path) -->
+  <script defer src="/assets/mxd-affiliate.js"></script>
 
   <!-- JSON-LD Organization (chuẩn index) -->
   <script type="application/ld+json">
@@ -159,7 +172,7 @@
       <p class="muted" style="margin:6px 0 0">Danh mục gọn gàng · Ảnh .webp tối ưu · Liên kết qua affiliate chuẩn đo lường.</p>
     </section>
 
-    <!-- QUICK-NAV (tĩnh theo quy ước + có 'Máy rung ốp lát') -->
+    <!-- QUICK-NAV -->
     <section aria-label="Danh mục nhanh" style="margin-top:12px">
       <ul class="quick-nav">
         <li>
@@ -200,10 +213,10 @@
       </ul>
     </section>
 
-    <!-- SẢN PHẨM (giữ renderer hiện tại để không phá flow) -->
+    <!-- SẢN PHẨM -->
     <h2 style="margin:16px 0 0">Sản phẩm mới</h2>
     <div id="product-list" class="grid" aria-live="polite"></div>
-    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>data/affiliates.json</code> (nguồn chuẩn) hoặc <code>/products.json</code> (fallback).</p>
+    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/assets/data/affiliates.json</code> (nguồn chuẩn) hoặc <code>/products.json</code> (fallback).</p>
     <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
   </main>
 
@@ -234,15 +247,14 @@
   <!-- Config renderer: dùng nguồn chuẩn -->
   <script>
     window.MXD_RENDER = window.MXD_RENDER || {};
-    window.MXD_RENDER.source = 'datadata/affiliates.json';
+    window.MXD_RENDER.source = '/assets/data/affiliates.json';
   </script>
 
-  <!-- Render sản phẩm (giữ logic cũ) -->
+  <!-- Render sản phẩm -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      // Render danh sách sản phẩm ở trang chủ (reuse logic như store)
       if (window.MXD?.renderProducts) {
-        MXD.renderProducts('#product-list'); // hiển thị TẤT CẢ hoặc theo logic mặc định của renderer
+        MXD.renderProducts('#product-list'); 
         return;
       }
       const wrap = document.querySelector('#product-list');
@@ -257,7 +269,7 @@
         </article>
       `).join('');
 
-      fetch('data/affiliates.json', { cache: 'no-store' })
+      fetch('/assets/data/affiliates.json', { cache: 'no-store' })
         .then(r=>r.ok?r.json():[])
         .then(all=>{
           const arr = Array.isArray(all) ? all : (all.items||[]);
@@ -308,7 +320,7 @@
   <!-- Floating contacts script riêng (nếu dùng) -->
   <script defer src="/assets/js/floating-contact.js"></script>
 
-  <!-- Đăng ký SW (giữ nguyên) -->
+  <!-- Đăng ký SW -->
   <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
