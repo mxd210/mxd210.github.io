@@ -1,3 +1,12 @@
+<!-- MXD-CHECK v2025-10-06 [g]
+- Canonical dynamic (?sku=) + robots=index,follow (auto switch to noindex on 404 SKU)
+- Meta verify present; GA4 BEFORE /assets/mxd-affiliate.js (only once)
+- Product JSON-LD: name, sku, image (absolute), description, offers{price, priceCurrency:"VND", availability, url}
+- Product image path: /assets/img/products/<sku>.webp (fallback ok)
+- No manual deep-links; meta link + buy links use origin; affiliate script rewrites
+- OG updated per SKU; og:url reflects canonical with ?sku=
+FIND: MXD-CHECK v2025-10-06 [g]
+-->
 <!doctype html>
 <html lang="vi">
 <head>
@@ -10,7 +19,11 @@
   <!-- Canonical động theo SKU -->
   <link id="can" rel="canonical" href="https://mxd210.github.io/g.html">
   <meta id="robots" name="robots" content="index,follow">
-<meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o" />
+
+  <!-- VERIFY -->
+  <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o">
+  <!-- <meta name="msvalidate.01" content="YOUR_BING_CODE"> -->
+
   <!-- OG cơ bản (sẽ được cập nhật bằng JS) -->
   <meta property="og:type" content="product">
   <meta id="og-title" property="og:title" content="Sản phẩm | MXD">
@@ -155,12 +168,12 @@
         const image = p.image || `/assets/img/products/${skuReal}.webp`;
         const priceText = priceNum ? new Intl.NumberFormat('vi-VN').format(priceNum) + ' đ' : 'Liên hệ';
 
-        // meta + JSON-LD (ưu tiên mô tả từ importer nếu có)
+        // meta + JSON-LD
         const seoDesc = (p.seo && p.seo.description) ? p.seo.description : `Sản phẩm ${p.name} – giá tham khảo ${priceText}.`;
         setMeta(p.name, seoDesc, `https://mxd210.github.io${image}`);
         injectProductLD({ name:p.name, sku:skuReal, price:priceNum, image:`https://mxd210.github.io${image}`, link:link, desc: seoDesc });
 
-        // buybox — chỉ hiển thị 1 nút mua hợp lệ (ưu tiên p.links[0] hợp lệ; fallback origin/link)
+        // buybox
         let buyBox = '';
         const metaHref = p.origin || link || '';
 
@@ -180,7 +193,7 @@
         if (primary) {
           const m = getMerchant(primary.url);
           const label = primary.label || (m ? `Mua ${m}` : 'Mua ngay');
-          buyBox = `<a class="buy" href="${primary.url}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">${label}</a>`;
+          buyBox = `<a class="buy" href="${primary.url}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ngay</a>`;
         } else if (metaHref) {
           const m = getMerchant(metaHref);
           buyBox = `<a class="buy" href="${metaHref}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow noopener">Mua ngay</a>`;
