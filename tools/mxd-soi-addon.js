@@ -1,4 +1,4 @@
-<!-- tools/mxd-soi-addon.js — v2.1 (Unified SOI + SMART auto-target/anchor + Commit message) -->
+<!-- tools/mxd-soi-addon.js — v2.4 -->
 <script>
 (() => {
   const host = document.createElement('div'); host.id='mxd-soi-addon';
@@ -9,7 +9,7 @@
   :host{all:initial}
   .btn{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:700}
   .fab{position:fixed;right:16px;bottom:16px;background:#7cc4ff;color:#001528;box-shadow:0 6px 20px rgba(0,0,0,.3)}
-  .panel{position:fixed;right:16px;bottom:76px;width:460px;max-height:80vh;overflow:auto;background:#0e1622;color:#e8f0fb;border:1px solid #1f2a3a;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
+  .panel{position:fixed;right:16px;bottom:76px;width:480px;max-height:80vh;overflow:auto;background:#0e1622;color:#e8f0fb;border:1px solid #1f2a3a;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
   .hd{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #1f2a3a;font-weight:700}
   .wrap{padding:12px}
   label{display:block;margin:8px 0 4px;color:#a7b4c2;font-size:13px}
@@ -21,7 +21,7 @@
   .ok{background:#7cc4ff;color:#001528}
   .tiny{font-size:12px;color:#a7b4c2;margin-top:6px}
   .pill{display:inline-block;background:#112033;border:1px solid #1f2a3a;padding:3px 8px;border-radius:999px;font-size:12px;margin-right:6px}
-  pre{white-space:pre-wrap;background:#0b0f14;border:1px solid #1f2a3a;border-radius:10px;padding:8px;max-height:240px;overflow:auto;font-size:12px}
+  pre{white-space:pre-wrap;background:#0b0f14;border:1px solid #1f2a3a;border-radius:10px;padding:8px;max-height:260px;overflow:auto;font-size:12px}
   details{border:1px solid #1f2a3a;border-radius:10px;padding:8px;margin-top:8px}
   details>summary{cursor:pointer}
   .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid #1f2a3a;background:#0b1420}
@@ -85,7 +85,7 @@ ${templateNote.replaceAll('{{date}}', date)}
       </div>
       <div class="row">
         <div><label>Dry-run</label><select id="dry"><option value="true" selected>true</option><option value="false">false</option></select></div>
-        <div><label>Commit message (tùy chọn)</label><input id="commit" placeholder="feat(soi): ..."></div>
+        <div><label>Commit message</label><input id="commit" placeholder="feat(soi): smart insert GA4 vào hub"></div>
       </div>
       <div class="row">
         <div><label>&nbsp;</label><button class="btn muted" id="health">Health</button></div>
@@ -108,49 +108,40 @@ ${templateNote.replaceAll('{{date}}', date)}
         <button class="btn muted" data-cmd="fix.products">Fix Products</button>
       </div>
 
-      <!-- NEW: SMART (auto) -->
+      <!-- SMART (server-side html.smart) -->
       <details open>
-        <summary><b>SMART — Auto target & anchor</b></summary>
-        <label>Block (dán meta/script/link/comment hoặc HTML tùy ý)</label>
-        <textarea id="smart_block" spellcheck="false" placeholder="<!-- MXD-CHECK v2025-10-06 [type: store] [file:/store/chong-tham.html] ... -->"></textarea>
+        <summary><b>SMART INSERT (html.smart)</b></summary>
+        <label>Block (dán NOTE/META/SCRIPT/LD+JSON/HTML)</label>
+        <textarea id="s_block" spellcheck="false" placeholder="<!-- MXD-CHECK v2025-10-06 [type: hub] [file:/store/<slug>.html] ... -->"></textarea>
         <div class="row">
-          <div>
-            <label>Ưu tiên chèn vào</label>
-            <select id="smart_pref">
-              <option value="auto" selected>auto</option>
-              <option value="head">head (trước </head>)</option>
-              <option value="content">nội dung trang</option>
-            </select>
-          </div>
-          <div>
-            <label>Marker (tự sinh nếu để trống)</label>
-            <input id="smart_marker" placeholder="MXD-BLOCK:mxd-check">
-          </div>
+          <div><label>Marker (tuỳ chọn)</label><input id="s_marker" placeholder="mxd-check-hub-2025-10-06"></div>
+          <div><label>FIND (tuỳ chọn — replace đúng block)</label><input id="s_find" placeholder="MXD-CHECK v2025-10-06"></div>
         </div>
         <details>
-          <summary>Override đích (tùy chọn)</summary>
+          <summary>Đích (bỏ trống để auto theo [type:] / [file:])</summary>
           <div class="row">
-            <div><label>paths</label><input id="smart_paths" placeholder="store/chong-tham.html"></div>
-            <div><label>glob</label><input id="smart_glob" placeholder="store/*.html"></div>
+            <div><label>paths</label><input id="s_paths" placeholder="store/bay-rang-cua.html"></div>
+            <div><label>glob</label><input id="s_glob" placeholder="store/*.html"></div>
           </div>
-          <div><label>regex</label><input id="smart_regex" placeholder="^store/(.+)\\.html$"></div>
+          <div><label>regex</label><input id="s_regex" placeholder="^store/(bay-.*)\\.html$"></div>
         </details>
         <div class="btns">
-          <button class="btn ok" id="smart_apply">SMART Apply</button>
+          <button class="btn muted" id="s_sim">Simulate (dry-run)</button>
+          <button class="btn ok" id="s_apply">Apply (commit)</button>
         </div>
-        <div class="tiny">
-          Luật auto: nếu block chứa &lt;meta|script|link&gt; → chèn **before_head_end**. Nếu là comment/HTML:
-          <br>type=hub/store → sau &lt;h1&gt; (fallback: trước .category-grid → sau &lt;main&gt;).
-          <br>type=product → trước .buy đầu tiên (fallback: sau #product).
-          <br>type=index → sau #quick-nav (fallback: sau &lt;main&gt;).
-          <br>type=blog → sau header bài (fallback: sau &lt;h1&gt;).
-          <br>Nếu block có \`[file:/...]\` → ưu tiên đúng file, không cần nhập đích.
+
+        <div class="pill" style="margin-top:8px">PRESETS</div>
+        <div class="btns">
+          <button class="btn muted" id="pre_ga4_sim">Simulate — Smart GA4 → store/*.html</button>
+          <button class="btn ok" id="pre_ga4_apply">Apply — Smart GA4 → store/*.html</button>
         </div>
+        <div class="tiny">Preset GA4: xoá trùng <code>/assets/analytics.js</code>, chèn mới nếu thiếu, luôn đặt <b>trước</b> affiliate.</div>
+        <div class="tiny" id="s_warn"></div>
       </details>
 
-      <!-- BLOCKS templates (giữ v2.0) -->
+      <!-- BLOCKS templates -->
       <details>
-        <summary><b>BLOCKS (template sẵn, idempotent)</b></summary>
+        <summary><b>BLOCKS (template sẵn)</b></summary>
         <div class="row">
           <div>
             <label>Block</label>
@@ -195,6 +186,7 @@ ${templateNote.replaceAll('{{date}}', date)}
         </div>
       </details>
 
+      <!-- NOTES / INJECT -->
       <details>
         <summary><b>NOTES / INJECT</b></summary>
         <label>FIND (marker để replace nguyên block)</label>
@@ -222,6 +214,7 @@ ${templateNote.replaceAll('{{date}}', date)}
         </div>
       </details>
 
+      <!-- HTML PATCH -->
       <details>
         <summary><b>HTML PATCH (tự do)</b></summary>
         <label>Đích (chọn một trong ba)</label>
@@ -265,6 +258,7 @@ ${templateNote.replaceAll('{{date}}', date)}
   const $ = (s)=>shadow.querySelector(s);
   const store = { get:k=>localStorage.getItem('mxd_soi_'+k)||'', set:(k,v)=>localStorage.setItem('mxd_soi_'+k,v) };
 
+  // boot persisted
   setTimeout(()=>{
     $('#base').value = store.get('base') || '';
     $('#xkey').value = store.get('xkey') || '';
@@ -275,7 +269,6 @@ ${templateNote.replaceAll('{{date}}', date)}
     $('#find').value = store.get('find') || 'MXD-CHECK v{{date}} [hub:/store/{{slug}}.html]';
     $('#commit').value = store.get('commit') || '';
 
-    // BLOCKS defaults
     $('#blk_id').value = store.get('blk_id') || 'mxd-stamp';
     $('#blk_marker').value = store.get('blk_marker') || 'MXD-BLOCK:mxd-stamp';
     $('#t_hub').checked = (store.get('t_hub')||'1')==='1';
@@ -298,65 +291,62 @@ ${templateNote.replaceAll('{{date}}', date)}
     btn.onclick = async ()=>{
       const cmd = btn.getAttribute('data-cmd');
       const res = await call(`${base()}/admin/command`, 'POST', { cmd, dry_run:($('#dry').value==='true') }, true);
-      if (res && res.diffs) $('#diff').textContent = renderDiffs(res.diffs);
+      showDiff(res);
     };
   }
 
-  // SMART apply (auto)
-  $('#smart_apply').onclick = async ()=>{
+  /* ========== SMART via html.smart ========== */
+  $('#s_sim').onclick = ()=> smartCall(true);
+  $('#s_apply').onclick = ()=> smartCall(false);
+
+  async function smartCall(dry){
     persistCommon();
-    const block = $('#smart_block').value || '';
-    const prefer = $('#smart_pref').value; // auto|head|content
-    const marker = ($('#smart_marker').value.trim() || autoMarker(block));
-    const metaLike = /<(meta|script|link)\b/i.test(block);
-    const { file, type } = detectMeta(block);
-    const targets = pickTargets({ file, type, overrides:{
-      paths: $('#smart_paths').value.trim(),
-      glob: $('#smart_glob').value.trim(),
-      regex: $('#smart_regex').value.trim()
-    }});
-
-    const jobs = [];
-
-    // If meta/script/link OR prefer=head → inject before </head>
-    if (prefer==='head' || (prefer==='auto' && metaLike)){
-      jobs.push(applyPatch({
-        ...targets,
-        mode:'before_head_end',
-        marker,
-        nth:1,
-        block
-      }));
-    } else {
-      // content anchors theo type
-      const anchors = chooseAnchorsForType(type);
-      for (const a of anchors){
-        jobs.push(applyPatch({
-          ...targets,
-          mode: a.mode,
-          anchor: a.anchor,
-          marker,
-          nth:1,
-          block
-        }));
+    const args = {
+      cmd:'html.smart',
+      dry_run: dry,
+      args:{
+        block: $('#s_block').value || '',
+        marker: ($('#s_marker').value.trim() || undefined),
+        dedupe_find: ($('#s_find').value.trim() || undefined)
       }
-    }
+    };
+    const paths=$('#s_paths').value.trim(), glob=$('#s_glob').value.trim(), regex=$('#s_regex').value.trim();
+    if (paths) args.args.paths = toArr(paths);
+    if (glob)  args.args.glob  = glob;
+    if (regex) args.args.regex = regex;
 
-    const results = await Promise.all(jobs);
-    const mergedDiffs = results.flatMap(r=> (r && r.diffs) ? r.diffs : []);
-    if (mergedDiffs.length) $('#diff').textContent = renderDiffs(mergedDiffs);
-  };
+    const res = await call(`${base()}/admin/command`, 'POST', args, true);
+    showDiff(res);
+    showTraces(res);
+    $('#s_warn').textContent = (!res || !res.targets || !res.targets.length) ? '⚠️ Không khớp file nào (paths/glob/regex đang trống hoặc sai)' : '';
+  }
 
-  // BLOCKS apply (template)
+  // PRESET — Smart GA4 toàn bộ store/*.html
+  $('#pre_ga4_sim').onclick   = ()=> presetGA4(true);
+  $('#pre_ga4_apply').onclick = ()=> presetGA4(false);
+  async function presetGA4(dry){
+    persistCommon();
+    const res = await call(`${base()}/admin/command`, 'POST', {
+      cmd:'html.smart',
+      dry_run: dry,
+      args:{
+        glob:'store/*.html',
+        marker:'mxd-ga4',
+        block:'<script defer src="/assets/analytics.js"></script>'
+      }
+    }, true);
+    showDiff(res);
+    showTraces(res);
+  }
+
+  /* ========== BLOCKS apply (idempotent) ========== */
   $('#blk_apply').onclick = async ()=>{
     persistCommon(); persistBlocksState();
-
     const id = $('#blk_id').value;
     const marker = ($('#blk_marker').value.trim()||(`MXD-BLOCK:${id}`));
     const date = $('#date').value;
     const content = makeBlock(id, date);
 
-    // Remove old by marker (idempotent)
     await removeByMarkerAcrossTargets(marker);
 
     const jobs = [];
@@ -383,11 +373,10 @@ ${templateNote.replaceAll('{{date}}', date)}
     }
 
     const results = await Promise.all(jobs);
-    const mergedDiffs = results.flatMap(r=> (r && r.diffs) ? r.diffs : []);
-    if (mergedDiffs.length) $('#diff').textContent = renderDiffs(mergedDiffs);
+    showDiffsFromJobs(results);
   };
 
-  // Notes inject
+  /* ========== NOTES / INJECT ========== */
   $('#injectNote').onclick = async ()=>{
     const args = {
       cmd:'notes.inject',
@@ -406,10 +395,10 @@ ${templateNote.replaceAll('{{date}}', date)}
 
     persistCommon();
     const res = await call(`${base()}/admin/command`, 'POST', args, true);
-    if (res && res.diffs) $('#diff').textContent = renderDiffs(res.diffs);
+    showDiff(res);
   };
 
-  // HTML patch
+  /* ========== HTML PATCH (tự do) ========== */
   $('#btnPatch').onclick = async ()=>{
     const args = {
       cmd:'html.patch',
@@ -429,10 +418,10 @@ ${templateNote.replaceAll('{{date}}', date)}
 
     persistCommon();
     const res = await call(`${base()}/admin/command`, 'POST', args, true);
-    if (res && res.diffs) $('#diff').textContent = renderDiffs(res.diffs);
+    showDiff(res);
   };
 
-  // helpers
+  /* ===== helpers ===== */
   function toArr(csv){ return csv.split(',').map(s=>s.trim()).filter(Boolean); }
   function base(){ const v=$('#base').value.trim().replace(/\/$/,''); store.set('base',v); return v; }
   function key(){  const v=$('#xkey').value.trim(); store.set('xkey',v); return v; }
@@ -447,83 +436,8 @@ ${templateNote.replaceAll('{{date}}', date)}
     store.set('find', $('#find').value);
     store.set('commit', $('#commit').value);
   }
-  function persistBlocksState(){
-    store.set('blk_id', $('#blk_id').value);
-    store.set('blk_marker', $('#blk_marker').value);
-    store.set('t_hub', $('#t_hub').checked?'1':'0');
-    store.set('t_product', $('#t_product').checked?'1':'0');
-    store.set('t_index', $('#t_index').checked?'1':'0');
-    store.set('t_blog', $('#t_blog').checked?'1':'0');
-    store.set('hub_glob', $('#hub_glob').value);
-    store.set('prod_paths', $('#prod_paths').value);
-    store.set('idx_paths', $('#idx_paths').value);
-    store.set('blog_glob', $('#blog_glob').value);
-  }
 
   function makeBlock(id, date){ const f = blockTemplates[id] || (()=>''); return f(date); }
-
-  function autoMarker(block){
-    if (/MXD-CHECK/i.test(block)) return 'MXD-BLOCK:mxd-check';
-    if (/<meta\b/i.test(block)) return 'MXD-BLOCK:meta';
-    if (/<script\b/i.test(block)) return 'MXD-BLOCK:script';
-    if (/<link\b/i.test(block)) return 'MXD-BLOCK:link';
-    return 'MXD-BLOCK:auto';
-  }
-
-  function detectMeta(block){
-    // [file:/store/abc.html]  |  [type: store|hub|product|index|blog]
-    const mFile = block.match(/\[file:\s*\/([^\]\s]+)\s*\]/i);
-    const mType = block.match(/\[type:\s*(hub|store|product|index|blog)\s*\]/i);
-    let file = mFile ? mFile[1] : '';
-    let type = mType ? mType[1].toLowerCase() : '';
-    if (type==='store') type = 'hub';
-    return { file, type };
-  }
-
-  function pickTargets({ file, type, overrides }){
-    const { paths, glob, regex } = overrides || {};
-    if (paths) return { paths: toArr(paths) };
-    if (glob)  return { glob };
-    if (regex) return { regex };
-
-    if (file) return { paths:[file] };
-
-    // default by type
-    switch (type){
-      case 'hub':     return { glob:'store/*.html' };
-      case 'product': return { paths:['g.html'] };
-      case 'index':   return { paths:['index.html'] };
-      case 'blog':    return { glob:'blog/*.html' };
-      default:        return { glob:'store/*.html' }; // an toàn nhất
-    }
-  }
-
-  function chooseAnchorsForType(type){
-    switch(type){
-      case 'product':
-        return [
-          { mode:'before', anchor:'(?is)<a[^>]+class="[^"]*\\bbuy\\b[^"]*"' },
-          { mode:'after',  anchor:'(?is)<(?:article|div)\\s+id="product"[^>]*>' }
-        ];
-      case 'index':
-        return [
-          { mode:'after', anchor:'(?is)<(?:nav|div)[^>]*id="quick-nav"[^>]*>.*?</(?:nav|div)>' },
-          { mode:'after', anchor:'(?is)<main[^>]*>' }
-        ];
-      case 'blog':
-        return [
-          { mode:'after', anchor:'(?is)<(?:header|div)\\s+[^>]*class="[^"]*(?:post-header|post_header)\\b[^"]*"[^>]*>.*?</(?:header|div)>' },
-          { mode:'after', anchor:'(?is)<h1[^>]*>.*?</h1>' }
-        ];
-      case 'hub':
-      default:
-        return [
-          { mode:'after',  anchor:'(?is)<h1[^>]*>.*?</h1>' },
-          { mode:'before', anchor:'(?is)<(?:div|ul)\\s+[^>]*class="[^"]*\\bcategory-grid\\b[^"]*"[^>]*>' },
-          { mode:'after',  anchor:'(?is)<main[^>]*>' }
-        ];
-    }
-  }
 
   async function call(url, method='GET', payload=null, admin=false){
     try{
@@ -538,6 +452,19 @@ ${templateNote.replaceAll('{{date}}', date)}
     }catch(e){ $('#out').textContent = JSON.stringify({ok:false,error:String(e)}, null, 2); }
   }
 
+  function showDiff(res){
+    if (res && res.diffs) $('#diff').textContent = renderDiffs(res.diffs);
+  }
+  function showDiffsFromJobs(results){
+    const merged = (results||[]).flatMap(r=> (r && r.diffs) ? r.diffs : []);
+    if (merged.length) $('#diff').textContent = renderDiffs(merged);
+  }
+  function showTraces(res){
+    if (res && res.traces){
+      const mini = res.traces.map(t=>`${t.path} ▸ ${t.intent} ▸ ${t.mode} @ ${t.anchor_used} (${Math.round((t.confidence||0)*100)}%)`).join('\n');
+      $('#out').textContent = JSON.stringify(res, null, 2) + '\n\nTRACE:\n' + mini;
+    }
+  }
   function renderDiffs(diffs){
     return (diffs||[]).map(d=>`# ${d.path}\n--- BEFORE ---\n${(d.beforeSample||'').slice(0,400)}\n--- AFTER ---\n${(d.afterSample||'').slice(0,400)}`).join('\n\n');
   }
@@ -557,8 +484,7 @@ ${templateNote.replaceAll('{{date}}', date)}
     jobs.push(applyPatch({paths:['g.html'], mode:'remove', anchor:pattern, marker, nth:1}));
     jobs.push(applyPatch({paths:['index.html'], mode:'remove', anchor:pattern, marker, nth:1}));
     jobs.push(applyPatch({glob:'blog/*.html', mode:'remove', anchor:pattern, marker, nth:1}));
-    const res = await Promise.all(jobs);
-    return res;
+    await Promise.all(jobs);
   }
   function escapeRegex(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 })();
