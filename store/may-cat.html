@@ -32,13 +32,19 @@ FIND: MXD-CHECK v2025-10-06 [hub:/store/may-cat.html]
   <meta property="og:image:width" content="1200"/>
   <meta property="og:image:height" content="630"/>
 
-  <link rel="stylesheet" href="/assets/site.css"/>
+ <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- GA4 trước Affiliate (chuẩn MXD) -->
-  <script defer src="/assets/analytics.js"></script>
-  <!-- Giữ lại để tương thích (không gọi nếu không cần) -->
-  <script defer src="/assets/js/render-products.js"></script>
-  <script defer src="/assets/mxd-affiliate.js"></script>
+<!-- GA4 trước Affiliate (chuẩn MXD) -->
+<script defer src="/assets/analytics.js"></script>
+
+<!-- Aliases: phải load TRƯỚC khi render -->
+<script defer src="/assets/js/category-alias.js"></script>
+
+<!-- giữ để tương thích nếu nơi khác gọi -->
+<script defer src="/assets/js/render-products.js"></script>
+
+<!-- Affiliate luôn cuối cùng -->
+<script defer src="/assets/mxd-affiliate.js"></script>
 
   <style>
     .container{max-width:1100px;margin:0 auto;padding:0 16px}
