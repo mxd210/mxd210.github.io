@@ -1,15 +1,30 @@
-<!-- tools/mxd-soi-addon.js — v2.4 -->
-<script>
+// tools/mxd-soi-addon.js — v2.4.3
 (() => {
-  const host = document.createElement('div'); host.id='mxd-soi-addon';
-  const shadow = host.attachShadow({mode:'open'});
-  document.addEventListener('DOMContentLoaded', ()=>document.body.appendChild(host));
+  // ---------- mount cứng ----------
+  const host = document.createElement('div');
+  host.id = 'mxd-soi-addon';
+  const shadow = host.attachShadow({ mode: 'open' });
+
+  function mountNow() {
+    const target = document.body || document.documentElement;
+    if (target && !host.isConnected) target.appendChild(host);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountNow, { once: true });
+    document.addEventListener('readystatechange', () => {
+      if (document.readyState === 'interactive') mountNow();
+    }, { once: true });
+  } else {
+    mountNow();
+  }
+  // Dự phòng thêm: nếu framework render chậm, quan sát DOM để gắn lại
+  new MutationObserver(() => mountNow()).observe(document.documentElement, { childList: true, subtree: true });
 
   const css = `
   :host{all:initial}
   .btn{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:700}
-  .fab{position:fixed;right:16px;bottom:16px;background:#7cc4ff;color:#001528;box-shadow:0 6px 20px rgba(0,0,0,.3)}
-  .panel{position:fixed;right:16px;bottom:76px;width:480px;max-height:80vh;overflow:auto;background:#0e1622;color:#e8f0fb;border:1px solid #1f2a3a;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
+  .fab{position:fixed;right:16px;bottom:16px;background:#7cc4ff;color:#001528;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:2147483647}
+  .panel{position:fixed;right:16px;bottom:76px;width:480px;max-height:80vh;overflow:auto;background:#0e1622;color:#e8f0fb;border:1px solid #1f2a3a;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none;z-index:2147483646}
   .hd{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #1f2a3a;font-weight:700}
   .wrap{padding:12px}
   label{display:block;margin:8px 0 4px;color:#a7b4c2;font-size:13px}
@@ -108,9 +123,9 @@ ${templateNote.replaceAll('{{date}}', date)}
         <button class="btn muted" data-cmd="fix.products">Fix Products</button>
       </div>
 
-      <!-- SMART (server-side html.smart) -->
+      <!-- SMART -->
       <details open>
-        <summary><b>SMART INSERT (html.smart)</b></summary>
+        <summary><b>SMART INSERT</b></summary>
         <label>Block (dán NOTE/META/SCRIPT/LD+JSON/HTML)</label>
         <textarea id="s_block" spellcheck="false" placeholder="<!-- MXD-CHECK v2025-10-06 [type: hub] [file:/store/<slug>.html] ... -->"></textarea>
         <div class="row">
@@ -129,17 +144,10 @@ ${templateNote.replaceAll('{{date}}', date)}
           <button class="btn muted" id="s_sim">Simulate (dry-run)</button>
           <button class="btn ok" id="s_apply">Apply (commit)</button>
         </div>
-
-        <div class="pill" style="margin-top:8px">PRESETS</div>
-        <div class="btns">
-          <button class="btn muted" id="pre_ga4_sim">Simulate — Smart GA4 → store/*.html</button>
-          <button class="btn ok" id="pre_ga4_apply">Apply — Smart GA4 → store/*.html</button>
-        </div>
-        <div class="tiny">Preset GA4: xoá trùng <code>/assets/analytics.js</code>, chèn mới nếu thiếu, luôn đặt <b>trước</b> affiliate.</div>
         <div class="tiny" id="s_warn"></div>
       </details>
 
-      <!-- BLOCKS templates -->
+      <!-- BLOCKS -->
       <details>
         <summary><b>BLOCKS (template sẵn)</b></summary>
         <div class="row">
@@ -186,7 +194,7 @@ ${templateNote.replaceAll('{{date}}', date)}
         </div>
       </details>
 
-      <!-- NOTES / INJECT -->
+      <!-- NOTES -->
       <details>
         <summary><b>NOTES / INJECT</b></summary>
         <label>FIND (marker để replace nguyên block)</label>
@@ -214,7 +222,7 @@ ${templateNote.replaceAll('{{date}}', date)}
         </div>
       </details>
 
-      <!-- HTML PATCH -->
+      <!-- PATCH -->
       <details>
         <summary><b>HTML PATCH (tự do)</b></summary>
         <label>Đích (chọn một trong ba)</label>
@@ -258,6 +266,12 @@ ${templateNote.replaceAll('{{date}}', date)}
   const $ = (s)=>shadow.querySelector(s);
   const store = { get:k=>localStorage.getItem('mxd_soi_'+k)||'', set:(k,v)=>localStorage.setItem('mxd_soi_'+k,v) };
 
+  // Hotkey mở panel
+  window.MXD_SOI_TOGGLE = () => { $('#panel').style.display = 'block'; };
+  document.addEventListener('keydown', e => {
+    if (e.altKey && String(e.key).toLowerCase() === 's') window.MXD_SOI_TOGGLE();
+  });
+
   // boot persisted
   setTimeout(()=>{
     $('#base').value = store.get('base') || '';
@@ -295,13 +309,13 @@ ${templateNote.replaceAll('{{date}}', date)}
     };
   }
 
-  /* ========== SMART via html.smart ========== */
+  // SMART (ưu tiên html.smart, fallback patch)
   $('#s_sim').onclick = ()=> smartCall(true);
   $('#s_apply').onclick = ()=> smartCall(false);
 
   async function smartCall(dry){
     persistCommon();
-    const args = {
+    const payload = {
       cmd:'html.smart',
       dry_run: dry,
       args:{
@@ -311,37 +325,56 @@ ${templateNote.replaceAll('{{date}}', date)}
       }
     };
     const paths=$('#s_paths').value.trim(), glob=$('#s_glob').value.trim(), regex=$('#s_regex').value.trim();
-    if (paths) args.args.paths = toArr(paths);
-    if (glob)  args.args.glob  = glob;
-    if (regex) args.args.regex = regex;
+    if (paths) payload.args.paths = toArr(paths);
+    if (glob)  payload.args.glob  = glob;
+    if (regex) payload.args.regex = regex;
 
-    const res = await call(`${base()}/admin/command`, 'POST', args, true);
+    let res = await call(`${base()}/admin/command`, 'POST', payload, true);
+
+    const needFallback = !res || res.error || res.ok === false;
+    if (needFallback) {
+      // Fallback client-side: đoán đích + anchor và chạy html.patch/notes.inject
+      const block = $('#s_block').value || '';
+      const marker = ($('#s_marker').value.trim() || autoMarker(block));
+      const find   = ($('#s_find').value.trim() || '');
+      const { file, type } = detectMeta(block);
+      const targets = pickTargets({ file, type, overrides:{ paths, glob, regex } });
+
+      // Nếu là meta/script/link → chèn head
+      if (/(<meta|<script|<link)\b/i.test(block)) {
+        res = await applyPatch({ ...targets, mode:'before_head_end', marker, nth:1, block });
+      } else {
+        // Nếu có FIND → notes.inject để replace nguyên block
+        if (find) {
+          const args = {
+            cmd:'notes.inject',
+            dry_run: dry,
+            args: {
+              date: new Date().toISOString().slice(0,10),
+              block, dedupe_find: find, position:'before_head_end',
+              ...targets
+            }
+          };
+          res = await call(`${base()}/admin/command`, 'POST', args, true);
+        } else {
+          // HTML content → thử theo bộ anchor mặc định theo type
+          const anchors = chooseAnchorsForType(type);
+          const jobs = anchors.map(a => applyPatch({ ...targets, mode:a.mode, anchor:a.anchor, marker, nth:1, block }));
+          const results = await Promise.all(jobs);
+          res = { diffs: results.flatMap(r => (r && r.diffs) ? r.diffs : []), targets: (results[0] && results[0].targets) || [] };
+        }
+      }
+    }
     showDiff(res);
-    showTraces(res);
     $('#s_warn').textContent = (!res || !res.targets || !res.targets.length) ? '⚠️ Không khớp file nào (paths/glob/regex đang trống hoặc sai)' : '';
   }
 
-  // PRESET — Smart GA4 toàn bộ store/*.html
-  $('#pre_ga4_sim').onclick   = ()=> presetGA4(true);
-  $('#pre_ga4_apply').onclick = ()=> presetGA4(false);
-  async function presetGA4(dry){
-    persistCommon();
-    const res = await call(`${base()}/admin/command`, 'POST', {
-      cmd:'html.smart',
-      dry_run: dry,
-      args:{
-        glob:'store/*.html',
-        marker:'mxd-ga4',
-        block:'<script defer src="/assets/analytics.js"></script>'
-      }
-    }, true);
-    showDiff(res);
-    showTraces(res);
-  }
+  // PRESETS?
+  // (bạn có thể thêm sau; giữ gọn)
 
-  /* ========== BLOCKS apply (idempotent) ========== */
+  // BLOCKS apply
   $('#blk_apply').onclick = async ()=>{
-    persistCommon(); persistBlocksState();
+    persistCommon();
     const id = $('#blk_id').value;
     const marker = ($('#blk_marker').value.trim()||(`MXD-BLOCK:${id}`));
     const date = $('#date').value;
@@ -373,10 +406,10 @@ ${templateNote.replaceAll('{{date}}', date)}
     }
 
     const results = await Promise.all(jobs);
-    showDiffsFromJobs(results);
+    showDiff({ diffs: results.flatMap(r => (r && r.diffs) ? r.diffs : []) });
   };
 
-  /* ========== NOTES / INJECT ========== */
+  // NOTES / INJECT
   $('#injectNote').onclick = async ()=>{
     const args = {
       cmd:'notes.inject',
@@ -398,7 +431,7 @@ ${templateNote.replaceAll('{{date}}', date)}
     showDiff(res);
   };
 
-  /* ========== HTML PATCH (tự do) ========== */
+  // HTML PATCH (tự do)
   $('#btnPatch').onclick = async ()=>{
     const args = {
       cmd:'html.patch',
@@ -421,13 +454,12 @@ ${templateNote.replaceAll('{{date}}', date)}
     showDiff(res);
   };
 
-  /* ===== helpers ===== */
+  // ===== helpers =====
   function toArr(csv){ return csv.split(',').map(s=>s.trim()).filter(Boolean); }
   function base(){ const v=$('#base').value.trim().replace(/\/$/,''); store.set('base',v); return v; }
   function key(){  const v=$('#xkey').value.trim(); store.set('xkey',v); return v; }
   function branch(){ const v=$('#branch').value.trim()||'main'; store.set('branch',v); return v; }
   function getCommit(){ const v=$('#commit').value.trim(); store.set('commit',v); return v; }
-
   function persistCommon(){
     store.set('base', base()); store.set('xkey', key()); store.set('branch', branch());
     store.set('dry', $('#dry').value);
@@ -438,6 +470,62 @@ ${templateNote.replaceAll('{{date}}', date)}
   }
 
   function makeBlock(id, date){ const f = blockTemplates[id] || (()=>''); return f(date); }
+  function autoMarker(block){
+    if (/MXD-CHECK/i.test(block)) return 'MXD-BLOCK:mxd-check';
+    if (/<meta\b/i.test(block)) return 'MXD-BLOCK:meta';
+    if (/<script\b/i.test(block)) return 'MXD-BLOCK:script';
+    if (/<link\b/i.test(block)) return 'MXD-BLOCK:link';
+    return 'MXD-BLOCK:auto';
+  }
+
+  function detectMeta(block){
+    const mFile = block.match(/\[file:\s*\/([^\]\s]+)\s*\]/i);
+    const mType = block.match(/\[type:\s*(hub|store|product|index|blog)\s*\]/i);
+    let file = mFile ? mFile[1] : '';
+    let type = mType ? mType[1].toLowerCase() : '';
+    if (type === 'store') type = 'hub';
+    return { file, type };
+  }
+  function pickTargets({ file, type, overrides }){
+    const { paths, glob, regex } = overrides || {};
+    if (paths) return { paths: toArr(paths) };
+    if (glob)  return { glob };
+    if (regex) return { regex };
+    if (file) return { paths:[file] };
+    switch (type){
+      case 'hub':     return { glob:'store/*.html' };
+      case 'product': return { paths:['g.html'] };
+      case 'index':   return { paths:['index.html'] };
+      case 'blog':    return { glob:'blog/*.html' };
+      default:        return { glob:'store/*.html' };
+    }
+  }
+  function chooseAnchorsForType(type){
+    switch(type){
+      case 'product':
+        return [
+          { mode:'before', anchor:'(?is)<a[^>]+class="[^"]*\\bbuy\\b[^"]*"' },
+          { mode:'after',  anchor:'(?is)<(?:article|div)\\s+id="product"[^>]*>' }
+        ];
+      case 'index':
+        return [
+          { mode:'after', anchor:'(?is)<(?:nav|div)[^>]*id="quick-nav"[^>]*>.*?</(?:nav|div)>' },
+          { mode:'after', anchor:'(?is)<main[^>]*>' }
+        ];
+      case 'blog':
+        return [
+          { mode:'after', anchor:'(?is)<(?:header|div)\\s+[^>]*class="[^"]*(?:post-header|post_header)\\b[^"]*"[^>]*>.*?</(?:header|div)>' },
+          { mode:'after', anchor:'(?is)<h1[^>]*>.*?</h1>' }
+        ];
+      case 'hub':
+      default:
+        return [
+          { mode:'after',  anchor:'(?is)<h1[^>]*>.*?</h1>' },
+          { mode:'before', anchor:'(?is)<(?:div|ul)\\s+[^>]*class="[^"]*\\bcategory-grid\\b[^"]*"[^>]*>' },
+          { mode:'after',  anchor:'(?is)<main[^>]*>' }
+        ];
+    }
+  }
 
   async function call(url, method='GET', payload=null, admin=false){
     try{
@@ -452,22 +540,10 @@ ${templateNote.replaceAll('{{date}}', date)}
     }catch(e){ $('#out').textContent = JSON.stringify({ok:false,error:String(e)}, null, 2); }
   }
 
-  function showDiff(res){
-    if (res && res.diffs) $('#diff').textContent = renderDiffs(res.diffs);
-  }
-  function showDiffsFromJobs(results){
-    const merged = (results||[]).flatMap(r=> (r && r.diffs) ? r.diffs : []);
-    if (merged.length) $('#diff').textContent = renderDiffs(merged);
-  }
-  function showTraces(res){
-    if (res && res.traces){
-      const mini = res.traces.map(t=>`${t.path} ▸ ${t.intent} ▸ ${t.mode} @ ${t.anchor_used} (${Math.round((t.confidence||0)*100)}%)`).join('\n');
-      $('#out').textContent = JSON.stringify(res, null, 2) + '\n\nTRACE:\n' + mini;
-    }
-  }
   function renderDiffs(diffs){
     return (diffs||[]).map(d=>`# ${d.path}\n--- BEFORE ---\n${(d.beforeSample||'').slice(0,400)}\n--- AFTER ---\n${(d.afterSample||'').slice(0,400)}`).join('\n\n');
   }
+  function showDiff(res){ if (res && res.diffs) $('#diff').textContent = renderDiffs(res.diffs); }
 
   async function applyPatch({paths, glob, regex, mode, anchor, marker, nth=1, block}){
     const args = { cmd: 'html.patch', dry_run: ($('#dry').value==='true'), args: { mode, anchor, marker, nth, block } };
@@ -476,7 +552,6 @@ ${templateNote.replaceAll('{{date}}', date)}
     if (regex) args.args.regex = regex;
     return await call(`${base()}/admin/command`, 'POST', args, true);
   }
-
   async function removeByMarkerAcrossTargets(marker){
     const pattern = `(?is)<!--\\s*${escapeRegex(marker)}\\s*START\\s*-->[\\s\\S]*?<!--\\s*${escapeRegex(marker)}\\s*END\\s*-->`;
     const jobs = [];
@@ -487,5 +562,6 @@ ${templateNote.replaceAll('{{date}}', date)}
     await Promise.all(jobs);
   }
   function escapeRegex(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  console.info('%c[SOI] v2.4.3 mounted', 'color:#7cc4ff');
 })();
-</script>
