@@ -1,321 +1,155 @@
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-
-  <title>Máy laser – Cân mực 4/8/12 tia, Laser xanh/đỏ, Thước laser | MXD</title>
-  <meta name="description" content="Chọn máy cân mực 4/8/12 tia, laser xanh/đỏ; thước đo khoảng cách 20–100m. Hàng chọn lọc, phù hợp thi công và hoàn thiện."/>
-  <link rel="canonical" href="https://mxd210.github.io/store/may-laze.html"/>
-  <meta name="robots" content="index,follow"/>
-<meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o" />
-  <!-- OG -->
-  <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Máy laser – Cân mực 4/8/12 tia, Laser xanh/đỏ, Thước laser | MXD"/>
-  <meta property="og:description" content="Cân mực 4/8/12 tia, laser xanh/đỏ; thước đo khoảng cách 20–100m. Sàng lọc theo số tia, màu tia, tầm đo, thương hiệu."/>
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/may-laze-og.webp"/>
-  <meta property="og:url" content="https://mxd210.github.io/store/may-laze.html"/>
-
-  <!-- CSS canonical -->
-  <link rel="stylesheet" href="/assets/site.css"/>
-
-  <!-- GA4 trước Affiliate (MXD rule) -->
-  <script src="/assets/analytics.js" defer></script>
-</head>
-<body>
-  <header class="container">
-    <nav class="breadcrumb" style="padding:12px 0;border-bottom:1px solid var(--border,#eaeaea);margin-bottom:8px">
-      <a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › <span>Máy laser</span>
-    </nav>
-    <h1>Máy laser (cân mực, thước laser)</h1>
-    <p class="muted">Phục vụ cân cốt, ốp lát, hoàn thiện: cân mực 4/8/12 tia, laser xanh/đỏ; thước laser 20–100m.</p>
-  </header>
-
-  <nav class="container quick-nav" aria-label="Điều hướng nhanh">
-    <a href="#can-muc-4" data-filter="{"key":"tia","val":"4"}">Cân mực 4 tia</a>
-    <a href="#can-muc-8" data-filter="{"key":"tia","val":"8"}">Cân mực 8 tia</a>
-    <a href="#can-muc-12" data-filter="{"key":"tia","val":"12"}">Cân mực 12 tia / 360°</a>
-    <a href="#mau-tia-xanh" data-filter="{"key":"mau","val":"laser-xanh"}">Laser xanh</a>
-    <a href="#mau-tia-do" data-filter="{"key":"mau","val":"laser-do"}">Laser đỏ</a>
-    <a href="#thuoc-laser" data-filter="{"key":"tag","val":"thuoc-laser"}">Thước laser 20–100m</a>
-  </nav>
-
-  <section class="container" id="filters" aria-label="Bộ lọc">
-    <div class="filters-grid">
-      <label>Số tia
-        <select id="f-tia">
-          <option value="">Tất cả</option>
-          <option value="4">4 tia</option>
-          <option value="8">8 tia</option>
-          <option value="12">12 tia / 360°</option>
-        </select>
-      </label>
-      <label>Màu tia
-        <select id="f-mau">
-          <option value="">Tất cả</option>
-          <option value="laser-xanh">Laser xanh</option>
-          <option value="laser-do">Laser đỏ</option>
-        </select>
-      </label>
-      <label>Tầm đo (thước)
-        <select id="f-tam">
-          <option value="">Tất cả</option>
-          <option value="20">20m</option>
-          <option value="40">40m</option>
-          <option value="50">50m</option>
-          <option value="70">70m</option>
-          <option value="100">100m</option>
-        </select>
-      </label>
-      <label>Thương hiệu
-        <input id="f-brand" placeholder="Bosch, Makita, HUKAN…"/>
-      </label>
-      <label>Tìm kiếm
-        <input id="f-q" placeholder="từ khóa (ví dụ: 12 line, 360)…"/>
-      </label>
-    </div>
-  </section>
-
-  <main class="container" id="content">
-    <!-- Nơi thả meta link (ẩn) để tương thích trình dựng card chuẩn MXD -->
-    <div id="meta" hidden></div>
-
-    <!-- Lưới sản phẩm -->
-    <div id="product-grid" class="product-grid" aria-live="polite"></div>
-
-    <p id="empty" class="muted" style="display:none">Không tìm thấy sản phẩm theo bộ lọc hiện tại.</p>
-  </main>
-
-  <!-- Liên hệ nổi (theo quy ước MXD #44) -->
-  <div class="contact-floating">
-    <a class="zalo" href="https://zalo.me/0338328898" aria-label="Chat Zalo">Zalo</a>
-    <a class="fb" href="https://www.facebook.com/mxd6686" aria-label="Facebook">FB</a>
-    <a class="call" href="tel:0338328898" aria-label="Gọi 0338328898">Gọi</a>
-  </div>
-
-  <script>
-  (function(){
-    const $meta = document.getElementById('meta');
-    const $grid = document.getElementById('product-grid');
-    const $empty = document.getElementById('empty');
-    const $tia = document.getElementById('f-tia');
-    const $mau = document.getElementById('f-mau');
-    const $tam = document.getElementById('f-tam');
-    const $brand = document.getElementById('f-brand');
-    const $q = document.getElementById('f-q');
-
-    const STATE = {items:[], view:[]};
-
-    const isLaserItem = (it) => {
-      const t = (it.name||it.title||'').toLowerCase();
-      const cats = (it.category||'').toLowerCase();
-      const tags = (it.tags||[]).map(s=>String(s).toLowerCase());
-      const hitName = /(laser|cân mực|can muc|thước laser|thuoc laser|distance meter|ldm|line laser)/.test(t);
-      const hitCat = /may-laze/.test(cats);
-      const hitTag = tags.some(x=>/laser|cân|thuoc|ldm/.test(x));
-      return hitCat || hitTag || hitName;
-    };
-
-    const parseTags = (it) => {
-      const t = (it.name||it.title||'').toLowerCase();
-      const tags = new Set((it.tags||[]).map(String));
-      // số tia
-      if (/\b4\s*(tia|line)\b/.test(t)) tags.add('4-tia');
-      if (/\b8\s*(tia|line)\b/.test(t)) tags.add('8-tia');
-      if (/\b12\s*(tia|line)\b/.test(t) || /360/.test(t)) tags.add('12-tia');
-      // màu
-      if (/(laser xanh|green)/.test(t)) tags.add('laser-xanh');
-      if (/(laser đỏ|laser do|red)/.test(t)) tags.add('laser-do');
-      // thước khoảng cách
-      if (/\b(20)\s*m\b/.test(t)) tags.add('thuoc-laser-20m');
-      if (/\b(40)\s*m\b/.test(t)) tags.add('thuoc-laser-40m');
-      if (/\b(50)\s*m\b/.test(t)) tags.add('thuoc-laser-50m');
-      if (/\b(70)\s*m\b/.test(t)) tags.add('thuoc-laser-70m');
-      if (/\b(100)\s*m\b/.test(t)) tags.add('thuoc-laser-100m');
-      return Array.from(tags);
-    };
-
-    const formatVND = (n) => {
-      const x = Number(n||0);
-      return x ? x.toLocaleString('vi-VN')+"₫" : '';
-    };
-
-    const buildMetaLink = (it) => {
-      const sku = it.sku || (it.id||'').toString().toLowerCase();
-      const merchant = (it.merchant||it.source||'').toString().toLowerCase() || 'shopee';
-      const img = it.image || `/assets/img/products/${sku}.webp`;
-      const price = it.price || it.data_price || '';
-      const origin = (it.url || (it.links&&it.links[0]&&it.links[0].url) || '#');
-      const name = it.name || it.title || sku;
-      const a = document.createElement('a');
-      a.className = 'product-meta';
-      a.href = origin; // link gốc: sẽ được rewrite bởi mxd-affiliate.js
-      a.textContent = name;
-      a.setAttribute('data-merchant', merchant);
-      a.setAttribute('data-sku', sku);
-      a.setAttribute('data-img', img);
-      if (price) a.setAttribute('data-price', price);
-      $meta.appendChild(a);
-
-      // buy links nếu có
-      if (Array.isArray(it.links)){
-        it.links.forEach(l => {
-          if(!l||!l.url) return;
-          const b = document.createElement('a');
-          b.className = 'buy';
-          b.href = l.url;
-          if (l.merchant) b.setAttribute('data-merchant', (l.merchant||'').toLowerCase());
-          b.textContent = l.label || (l.merchant ? ('Mua '+l.merchant) : 'Mua');
-          $meta.appendChild(b);
-        });
-      }
-    };
-
-    const localCardBuilder = (meta, buys=[]) => {
-      // Tối giản: render card dùng meta link
-      const sku = meta.getAttribute('data-sku');
-      const img = meta.getAttribute('data-img');
-      const price = meta.getAttribute('data-price');
-      const name = meta.textContent;
-      const card = document.createElement('div');
-      card.className = 'card product';
-      const a = document.createElement('a');
-      a.href = `../g.html?sku=${encodeURIComponent(sku)}`;
-      a.className = 'cover';
-      a.setAttribute('aria-label', name);
-      const im = document.createElement('img');
-      im.loading = 'lazy';
-      im.src = img;
-      im.alt = name;
-      a.appendChild(im);
-      const h3 = document.createElement('h3');
-      h3.textContent = name;
-      const p = document.createElement('div');
-      p.className = 'price';
-      p.textContent = price ? formatVND(price) : '';
-      const actions = document.createElement('div');
-      actions.className = 'actions';
-      buys.forEach(b=>{
-        const bb = document.createElement('a');
-        bb.className = 'btn buy';
-        bb.href = b.href;
-        if (b.dataset.merchant) bb.setAttribute('data-merchant', b.dataset.merchant);
-        bb.textContent = b.textContent || 'Mua';
-        actions.appendChild(bb);
-      });
-      card.append(a,h3,p,actions);
-      return card;
-    };
-
-    const render = () => {
-      $grid.innerHTML = '';
-      const list = Array.from($meta.querySelectorAll('.product-meta'));
-      if (!list.length){ $empty.style.display = 'block'; return; }
-      $empty.style.display = 'none';
-      list.forEach(meta => {
-        const buys = [];
-        let el = meta.nextElementSibling;
-        while(el && el.classList.contains('buy')){ buys.push(el); el = el.nextElementSibling; }
-        if (window.MXD && typeof window.MXD.buildCardsFromMeta === 'function'){
-          // Nếu site đã có builder chuẩn, uỷ quyền cho nó
-          window.MXD.buildCardsFromMeta($meta, $grid);
-        } else {
-          $grid.appendChild(localCardBuilder(meta, buys));
-        }
-      });
-      injectItemListJSONLD();
-    };
-
-    const applyFilters = () => {
-      const tia = $tia.value;
-      const mau = $mau.value;
-      const tam = $tam.value;
-      const brand = ($brand.value||'').trim().toLowerCase();
-      const q = ($q.value||'').trim().toLowerCase();
-
-      $meta.innerHTML = '';
-      const filtered = STATE.items.filter(it => {
-        const tags = parseTags(it);
-        // Số tia
-        if (tia && !tags.includes(tia+'-tia')) return false; // map: 4 -> 4-tia
-        // Màu
-        if (mau && !tags.includes(mau)) return false;
-        // Tầm đo
-        if (tam && !(tags.includes('thuoc-laser-'+tam+'m'))) return false;
-        // Brand
-        if (brand){
-          const b = (it.brand||'').toLowerCase();
-          const inTitle = (it.name||it.title||'').toLowerCase().includes(brand);
-          if (!b && !inTitle) return false;
-          if (b && !b.includes(brand) && !inTitle) return false;
-        }
-        // Q
-        if (q){
-          const hay = (it.name||it.title||'')+ ' ' + (it.tags||[]).join(' ');
-          if (!hay.toLowerCase().includes(q)) return false;
-        }
-        return true;
-      });
-
-      filtered.forEach(buildMetaLink);
-      render();
-    };
-
-    const parseAndInit = (data) => {
-      const items = Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : []);
-      STATE.items = items.filter(isLaserItem).map(it => ({...it, tags: parseTags(it)}));
-      applyFilters();
-    };
-
-    // Quick-nav: map anchor click -> set filter
-    document.querySelectorAll('.quick-nav a[data-filter]').forEach(a=>{
-      a.addEventListener('click', (e)=>{
-        try{
-          const cfg = JSON.parse(a.getAttribute('data-filter'));
-          if (cfg.key === 'tia') $tia.value = cfg.val;
-          if (cfg.key === 'mau') $mau.value = cfg.val;
-          if (cfg.key === 'tag'){
-            // map thuoc-laser -> chỉ set tầm đo rỗng để hiển thị hết thước
-            $tia.value = '';
-            $mau.value = '';
-          }
-          applyFilters();
-        }catch(err){}
-      });
-    });
-
-    [$tia,$mau,$tam,$brand,$q].forEach(el=> el.addEventListener('input', applyFilters));
-
-    // Load data
-    fetch('/assets/data/affiliates.json',{cache:'no-store'})
-      .then(r=>r.json())
-      .then(parseAndInit)
-      .catch(()=>{$empty.style.display='block';});
-
-    // JSON-LD ItemList sau khi render
-    function injectItemListJSONLD(){
-      const skus = Array.from($meta.querySelectorAll('.product-meta')).map(a=>a.getAttribute('data-sku'));
-      if (!skus.length) return;
-      const items = skus.map((sku, i)=>({
-        '@type':'ListItem',
-        position:i+1,
-        url: `https://mxd210.github.io/g.html?sku=${encodeURIComponent(sku)}`
-      }));
-      const ld = {
-        '@context':'https://schema.org',
-        '@type':'ItemList',
-        itemListElement: items
-      };
-      let tag = document.getElementById('ld-itemlist');
-      if(!tag){ tag = document.createElement('script'); tag.type='application/ld+json'; tag.id='ld-itemlist'; document.body.appendChild(tag); }
-      tag.textContent = JSON.stringify(ld);
-    }
-  })();
-  </script>
-
-  <!-- Affiliate script cuối trang (sau GA4) -->
-  <script src="/assets/mxd-affiliate.js" defer></script>
-</body>
-</html>
-
-<!-- commit: feat(store): add Máy laser category page (may-laze.html) with quick-nav & filters -->
+<!-- MXD-SEED: may-lazer | regenerated 2025-10-07T03:12:14.348Z -->
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-12-tia-BOSCOM-BS-1288LD-c%C3%B3-%C4%91i%E1%BB%81u-khi%E1%BB%83n-t%E1%BB%AB-xa-i.355266415.21776517395?sp_atk=f85a904e-42d9-4ee8-916e-148a17f0b0a9&amp;xptdk=f85a904e-42d9-4ee8-916e-148a17f0b0a9"
+   data-merchant="shopee"
+   data-sku="can-bang-laser-12-tia-boscom-bs-1288ld"
+   data-img="/assets/img/products/can-bang-laser-12-tia-boscom-bs-1288ld.webp"
+   data-price="1300000">cân bằng laser 12 tia BOSCOM BS-1288LD</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laser-12-tia-BOSCOM-BS-1288LD-c%25C3%25B3-%25C4%2591i%25E1%25BB%2581u-khi%25E1%25BB%2583n-t%25E1%25BB%25AB-xa-i.355266415.21776517395%3Fsp_atk%3Df85a904e-42d9-4ee8-916e-148a17f0b0a9%26xptdk%3Df85a904e-42d9-4ee8-916e-148a17f0b0a9&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-Laser-12-tia-xanh-DEKTON-DK-LS1201-Tym-shop-i.37962412.15197890461?sp_atk=dc2c5f4a-7804-40b2-932c-74c533856f69&amp;xptdk=dc2c5f4a-7804-40b2-932c-74c533856f69"
+   data-merchant="shopee"
+   data-sku="can-bang-laser-12-tia-xanh-dekton-dk-ls1201"
+   data-img="/assets/img/products/can-bang-laser-12-tia-xanh-dekton-dk-ls1201.webp"
+   data-price="1550000">cân bằng Laser 12 tia xanh DEKTON DK-LS1201</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-Laser-12-tia-xanh-DEKTON-DK-LS1201-Tym-shop-i.37962412.15197890461%3Fsp_atk%3Ddc2c5f4a-7804-40b2-932c-74c533856f69%26xptdk%3Ddc2c5f4a-7804-40b2-932c-74c533856f69&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-Laser-16-tia-Kenmax-KMLS016-cao-c%E1%BA%A5p-m%C3%A1y-c%C3%A2n-m%E1%BB%B1c-l%E1%BA%A5y-n%C3%A9t-i.188067685.24807165474?sp_atk=f76da61c-b268-4442-a401-6592d1cbe217&amp;xptdk=f76da61c-b268-4442-a401-6592d1cbe217"
+   data-merchant="shopee"
+   data-sku="can-bang-laser-16-tia-kenmax-kmls016"
+   data-img="/assets/img/products/can-bang-laser-16-tia-kenmax-kmls016.webp"
+   data-price="1350000">cân bằng Laser 16 tia Kenmax KMLS016</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-Laser-16-tia-Kenmax-KMLS016-cao-c%25E1%25BA%25A5p-m%25C3%25A1y-c%25C3%25A2n-m%25E1%25BB%25B1c-l%25E1%25BA%25A5y-n%25C3%25A9t-i.188067685.24807165474%3Fsp_atk%3Df76da61c-b268-4442-a401-6592d1cbe217%26xptdk%3Df76da61c-b268-4442-a401-6592d1cbe217&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-C%C3%A2n-B%E1%BA%B1ng-Laser-Dekton-DK-LS1201-12-Tia-B%C3%B3ng-Led-Si%C3%AAu-S%C3%A1ng-B%E1%BA%A3o-H%C3%A0nh-6-Th%C3%A1ng-i.126345929.44302456595?sp_atk=d455a60f-904d-4659-a525-aaeb97c32c29&amp;xptdk=d455a60f-904d-4659-a525-aaeb97c32c29"
+   data-merchant="shopee"
+   data-sku="can-bang-laser-dekton-dk-ls1201-12-tia"
+   data-img="/assets/img/products/can-bang-laser-dekton-dk-ls1201-12-tia.webp"
+   data-price="1760000">Cân Bằng Laser Dekton DK-LS1201 - 12 Tia</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-C%25C3%25A2n-B%25E1%25BA%25B1ng-Laser-Dekton-DK-LS1201-12-Tia-B%25C3%25B3ng-Led-Si%25C3%25AAu-S%25C3%25A1ng-B%25E1%25BA%25A3o-H%25C3%25A0nh-6-Th%25C3%25A1ng-i.126345929.44302456595%3Fsp_atk%3Dd455a60f-904d-4659-a525-aaeb97c32c29%26xptdk%3Dd455a60f-904d-4659-a525-aaeb97c32c29&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-b%E1%BA%AFn-cos-c%C3%A2n-b%E1%BA%B1ng-laze-HUKAN-KH-12-tia-xanh-c%C3%B3-%C4%91i%E1%BB%81u-khi%E1%BB%83n-tia-t%E1%BB%AB-xa-i.93201189.13051209781?sp_atk=eeaebff4-8bd5-4c92-a5b3-db08820aa1d5&amp;xptdk=eeaebff4-8bd5-4c92-a5b3-db08820aa1d5"
+   data-merchant="shopee"
+   data-sku="can-bang-laze-hukan-kh-12"
+   data-img="/assets/img/products/can-bang-laze-hukan-kh-12.webp"
+   data-price="1440000">cân bằng laze HUKAN KH-12</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-b%25E1%25BA%25AFn-cos-c%25C3%25A2n-b%25E1%25BA%25B1ng-laze-HUKAN-KH-12-tia-xanh-c%25C3%25B3-%25C4%2591i%25E1%25BB%2581u-khi%25E1%25BB%2583n-tia-t%25E1%25BB%25AB-xa-i.93201189.13051209781%3Fsp_atk%3Deeaebff4-8bd5-4c92-a5b3-db08820aa1d5%26xptdk%3Deeaebff4-8bd5-4c92-a5b3-db08820aa1d5&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-B%E1%BA%AFn-C%E1%BB%91t-C%C3%A2n-B%E1%BA%B1ng-Tia-Laser-12-Tia-Xanh-DEKTON-DK-LS1201-%C4%90i%E1%BB%81u-Khi%E1%BB%83n-T%E1%BB%AB-Xa-H%C3%A0ng-Ch%C3%ADnh-H%C3%A3ng-i.355266415.23479576373?sp_atk=98e2b74c-8750-4a0b-a894-603829225dba&amp;xptdk=98e2b74c-8750-4a0b-a894-603829225dba"
+   data-merchant="shopee"
+   data-sku="can-bang-tia-laser-12-tia-xanh-dekton-dk-ls1201"
+   data-img="/assets/img/products/can-bang-tia-laser-12-tia-xanh-dekton-dk-ls1201.webp"
+   data-price="2015000">Cân Bằng Tia Laser 12 Tia Xanh DEKTON DK-LS1201</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-B%25E1%25BA%25AFn-C%25E1%25BB%2591t-C%25C3%25A2n-B%25E1%25BA%25B1ng-Tia-Laser-12-Tia-Xanh-DEKTON-DK-LS1201-%25C4%2590i%25E1%25BB%2581u-Khi%25E1%25BB%2583n-T%25E1%25BB%25AB-Xa-H%25C3%25A0ng-Ch%25C3%25ADnh-H%25C3%25A3ng-i.355266415.23479576373%3Fsp_atk%3D98e2b74c-8750-4a0b-a894-603829225dba%26xptdk%3D98e2b74c-8750-4a0b-a894-603829225dba&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-B%E1%BA%AFn-C%E1%BB%91t-C%C3%A2n-B%E1%BA%B1ng-Laser-12-Tia-Xanh-M%C3%A1y-C%C3%A2n-M%E1%BB%B1c-Laser-M%C3%A1y-B%E1%BA%AFn-Tia-BOSCOM-BS-%E2%80%93-1288LD-Ch%C3%ADnh-X%C3%A1c-M%C3%A1y-%C4%90%C3%BAc-B%E1%BA%B1ng-H%E1%BB%A3p-Ki-i.100232063.19591790278?sp_atk=6db9c47a-cccf-4473-90b5-05f5d4de44af&amp;xptdk=6db9c47a-cccf-4473-90b5-05f5d4de44af"
+   data-merchant="shopee"
+   data-sku="may-ban-tia-boscom-bs-1288ld"
+   data-img="/assets/img/products/may-ban-tia-boscom-bs-1288ld.webp"
+   data-price="1199000">Máy Bắn Tia BOSCOM BS – 1288LD</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-B%25E1%25BA%25AFn-C%25E1%25BB%2591t-C%25C3%25A2n-B%25E1%25BA%25B1ng-Laser-12-Tia-Xanh-M%25C3%25A1y-C%25C3%25A2n-M%25E1%25BB%25B1c-Laser-M%25C3%25A1y-B%25E1%25BA%25AFn-Tia-BOSCOM-BS-%25E2%2580%2593-1288LD-Ch%25C3%25ADnh-X%25C3%25A1c-M%25C3%25A1y-%25C4%2590%25C3%25BAc-B%25E1%25BA%25B1ng-H%25E1%25BB%25A3p-Ki-i.100232063.19591790278%3Fsp_atk%3D6db9c47a-cccf-4473-90b5-05f5d4de44af%26xptdk%3D6db9c47a-cccf-4473-90b5-05f5d4de44af&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-C%C3%A2n-B%E1%BA%B1ng-C%E1%BB%91t-12-Tia-Xanh-Hukan-HK-T97-Pin-Dung-L%C6%B0%E1%BB%A3ng-L%E1%BB%9Bn-K%C3%A8m-Ch%C3%A2m-Nh%C3%B4m-Cao-Baor-Hanhf-i.131704252.27520668616?sp_atk=db46102a-eaf0-49c7-a52b-57c31921a6e0&amp;xptdk=db46102a-eaf0-49c7-a52b-57c31921a6e0"
+   data-merchant="shopee"
+   data-sku="may-can-bang-cot-12-tia-xanh-hukan-hk-t97"
+   data-img="/assets/img/products/may-can-bang-cot-12-tia-xanh-hukan-hk-t97.webp"
+   data-price="1250000">Máy Cân Bằng Cốt 12 Tia Xanh Hukan HK - T97</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-C%25C3%25A2n-B%25E1%25BA%25B1ng-C%25E1%25BB%2591t-12-Tia-Xanh-Hukan-HK-T97-Pin-Dung-L%25C6%25B0%25E1%25BB%25A3ng-L%25E1%25BB%259Bn-K%25C3%25A8m-Ch%25C3%25A2m-Nh%25C3%25B4m-Cao-Baor-Hanhf-i.131704252.27520668616%3Fsp_atk%3Ddb46102a-eaf0-49c7-a52b-57c31921a6e0%26xptdk%3Ddb46102a-eaf0-49c7-a52b-57c31921a6e0&amp;sub1=may-can-bang-cot-12-tia-xanh-hukan-hk-t97&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-12-tia-Hukan-T97-cao-c%E1%BA%A5p-m%E1%BA%ABu-m%E1%BB%9Bi-tia-si%C3%AAu-s%C3%A1ng-v%C3%A0-m%E1%BA%A3nh-k%C3%A8m-4-lo%E1%BA%A1i-ch%C3%A2n-%C4%91%E1%BA%BF-v%C3%A0-h%E1%BB%99p-%C4%91%E1%BB%B1ng-i.259706672.23648805851?sp_atk=eaf7a7db-7bd2-4dcf-a671-1b9bb3cc9911&amp;xptdk=eaf7a7db-7bd2-4dcf-a671-1b9bb3cc9911"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laser-12-tia-hukan-t97"
+   data-img="/assets/img/products/may-can-bang-laser-12-tia-hukan-t97.webp"
+   data-price="1280000">Máy cân bằng laser 12 tia Hukan T97</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laser-12-tia-Hukan-T97-cao-c%25E1%25BA%25A5p-m%25E1%25BA%25ABu-m%25E1%25BB%259Bi-tia-si%25C3%25AAu-s%25C3%25A1ng-v%25C3%25A0-m%25E1%25BA%25A3nh-k%25C3%25A8m-4-lo%25E1%25BA%25A1i-ch%25C3%25A2n-%25C4%2591%25E1%25BA%25BF-v%25C3%25A0-h%25E1%25BB%2599p-%25C4%2591%25E1%25BB%25B1ng-i.259706672.23648805851%3Fsp_atk%3Deaf7a7db-7bd2-4dcf-a671-1b9bb3cc9911%26xptdk%3Deaf7a7db-7bd2-4dcf-a671-1b9bb3cc9911&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-12-tia-si%C3%AAu-s%C3%A1ng-LAiSAi-LSG6650S-cao-c%E1%BA%A5p-m%E1%BA%ABu-m%E1%BB%9Bi-%C4%90i%E1%BB%87n-m%C3%A1y-Vi%E1%BB%87t-Nh%E1%BA%ADt-i.259706672.21790928827?sp_atk=63389611-dc59-4e72-a80f-9d4d3c2a7f35&amp;xptdk=63389611-dc59-4e72-a80f-9d4d3c2a7f35"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laser-12-tia-sieu-sang-laisai-lsg6650s"
+   data-img="/assets/img/products/may-can-bang-laser-12-tia-sieu-sang-laisai-lsg6650s.webp"
+   data-price="3600000">Máy cân bằng laser 12 tia siêu sáng LAiSAi LSG6650S</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laser-12-tia-si%25C3%25AAu-s%25C3%25A1ng-LAiSAi-LSG6650S-cao-c%25E1%25BA%25A5p-m%25E1%25BA%25ABu-m%25E1%25BB%259Bi-%25C4%2590i%25E1%25BB%2587n-m%25C3%25A1y-Vi%25E1%25BB%2587t-Nh%25E1%25BA%25ADt-i.259706672.21790928827%3Fsp_atk%3D63389611-dc59-4e72-a80f-9d4d3c2a7f35%26xptdk%3D63389611-dc59-4e72-a80f-9d4d3c2a7f35&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-C%C3%A2n-B%E1%BA%B1ng-laser-16-tia-AKUZA-4D-si%C3%AAu-s%C3%A1ng-i.1156099998.24608552434?sp_atk=ece2b65f-e6e8-434c-a4da-1567d702feb9&amp;xptdk=ece2b65f-e6e8-434c-a4da-1567d702feb9"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laser-16-tia-akuza-4d"
+   data-img="/assets/img/products/may-can-bang-laser-16-tia-akuza-4d.webp"
+   data-price="1400000">Máy Cân Bằng laser 16 tia AKUZA 4D</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-C%25C3%25A2n-B%25E1%25BA%25B1ng-laser-16-tia-AKUZA-4D-si%25C3%25AAu-s%25C3%25A1ng-i.1156099998.24608552434%3Fsp_atk%3Dece2b65f-e6e8-434c-a4da-1567d702feb9%26xptdk%3Dece2b65f-e6e8-434c-a4da-1567d702feb9&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-Akuza-AK-X1-b%C3%B3ng-Led-si%C3%AAu-s%C3%A1ng-T%E1%BB%B1-%C4%91%E1%BB%99ng-c%C3%A2n-b%E1%BA%B1ng-%C4%91i%E1%BB%81u-khi%E1%BB%83n-t%E1%BB%AB-xa-motor-xoay-360-i.734728154.26089360854?sp_atk=59a6e63f-0e1f-4ef4-bd87-68c502871179&amp;xptdk=59a6e63f-0e1f-4ef4-bd87-68c502871179"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laser-akuza-ak-x1"
+   data-img="/assets/img/products/may-can-bang-laser-akuza-ak-x1.webp"
+   data-price="2250000">Máy cân bằng laser Akuza AK-X1</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laser-Akuza-AK-X1-b%25C3%25B3ng-Led-si%25C3%25AAu-s%25C3%25A1ng-T%25E1%25BB%25B1-%25C4%2591%25E1%25BB%2599ng-c%25C3%25A2n-b%25E1%25BA%25B1ng-%25C4%2591i%25E1%25BB%2581u-khi%25E1%25BB%2583n-t%25E1%25BB%25AB-xa-motor-xoay-360-i.734728154.26089360854%3Fsp_atk%3D59a6e63f-0e1f-4ef4-bd87-68c502871179%26xptdk%3D59a6e63f-0e1f-4ef4-bd87-68c502871179&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-%C4%90%C3%A8n-led-5-tia-xanh-HUKAN-HK-E63-2-pin-c%C3%B3-%C4%91i%E1%BB%81u-ki%E1%BB%83n-t%E1%BB%AB-xa-Chuy%C3%AAn-d%C3%B9ng-cho-c%C3%B4ng-tr%C3%ACnh-i.51683456.19373317893?sp_atk=d99f8bd8-7f38-4549-bb55-41b740cb32da&amp;xptdk=d99f8bd8-7f38-4549-bb55-41b740cb32da"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laser-den-led-5-tia-xanh-hukan-hk-e63"
+   data-img="/assets/img/products/may-can-bang-laser-den-led-5-tia-xanh-hukan-hk-e63.webp"
+   data-price="1080000">Máy cân bằng laser Đèn led 5 tia xanh HUKAN HK E63</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laser-%25C4%2590%25C3%25A8n-led-5-tia-xanh-HUKAN-HK-E63-2-pin-c%25C3%25B3-%25C4%2591i%25E1%25BB%2581u-ki%25E1%25BB%2583n-t%25E1%25BB%25AB-xa-Chuy%25C3%25AAn-d%25C3%25B9ng-cho-c%25C3%25B4ng-tr%25C3%25ACnh-i.51683456.19373317893%3Fsp_atk%3Dd99f8bd8-7f38-4549-bb55-41b740cb32da%26xptdk%3Dd99f8bd8-7f38-4549-bb55-41b740cb32da&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-C%C3%A2n-B%E1%BA%B1ng-Laser-HUKAN-Gen-2-G2-LS300-Si%C3%AAu-S%C3%A1ng-5-Tia-Xanh-Chip-th%C3%B4ng-minh-c%C3%A2n-b%E1%BA%B1ng-t%E1%BB%B1-%C4%91%E1%BB%99ng-i.1175273312.29976656071?sp_atk=f051c466-2377-4096-9ec1-90c454a7c06b&amp;xptdk=f051c466-2377-4096-9ec1-90c454a7c06b"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laser-hukan-gen-2-g2-ls300"
+   data-img="/assets/img/products/may-can-bang-laser-hukan-gen-2-g2-ls300.webp"
+   data-price="1480000">Máy Cân Bằng Laser HUKAN Gen 2 G2-LS300</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-C%25C3%25A2n-B%25E1%25BA%25B1ng-Laser-HUKAN-Gen-2-G2-LS300-Si%25C3%25AAu-S%25C3%25A1ng-5-Tia-Xanh-Chip-th%25C3%25B4ng-minh-c%25C3%25A2n-b%25E1%25BA%25B1ng-t%25E1%25BB%25B1-%25C4%2591%25E1%25BB%2599ng-i.1175273312.29976656071%3Fsp_atk%3Df051c466-2377-4096-9ec1-90c454a7c06b%26xptdk%3Df051c466-2377-4096-9ec1-90c454a7c06b&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/-C%E1%BA%A3i-ti%E1%BA%BFn-m%E1%BB%9Bi-M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-HUKAN-HK-G1-T97-12-tia-xanh-b%C3%B3ng-LED-c%C3%B3-%C4%91i%E1%BB%81u-khi%E1%BB%83n-T%E1%BA%B7ng-ch%C3%A2n-i.534027677.25863696029?sp_atk=a4a31b66-180d-4dae-865e-627819139105&amp;xptdk=a4a31b66-180d-4dae-865e-627819139105"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laser-hukan-hk-g1-t98"
+   data-img="/assets/img/products/may-can-bang-laser-hukan-hk-g1-t98.webp"
+   data-price="2120000">Máy cân bằng laser HUKAN HK-G1-T98</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2F-C%25E1%25BA%25A3i-ti%25E1%25BA%25BFn-m%25E1%25BB%259Bi-M%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laser-HUKAN-HK-G1-T97-12-tia-xanh-b%25C3%25B3ng-LED-c%25C3%25B3-%25C4%2591i%25E1%25BB%2581u-khi%25E1%25BB%2583n-T%25E1%25BA%25B7ng-ch%25C3%25A2n-i.534027677.25863696029%3Fsp_atk%3Da4a31b66-180d-4dae-865e-627819139105%26xptdk%3Da4a31b66-180d-4dae-865e-627819139105&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-HUKAN-T22-5-tia-xanh-b%C3%B3ng-LED-si%C3%AAu-s%C3%A1ng-Cu-%C4%90en-DEKTON-i.975320916.43364273469?sp_atk=837c0f26-1bdd-44ab-8655-5c4f8dc93775&amp;xptdk=837c0f26-1bdd-44ab-8655-5c4f8dc93775"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laser-hukan-t22-5-tia-xanh"
+   data-img="/assets/img/products/may-can-bang-laser-hukan-t22-5-tia-xanh.webp"
+   data-price="799000">Máy cân bằng laser HUKAN T22 5 tia xanh</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laser-HUKAN-T22-5-tia-xanh-b%25C3%25B3ng-LED-si%25C3%25AAu-s%25C3%25A1ng-Cu-%25C4%2590en-DEKTON-i.975320916.43364273469%3Fsp_atk%3D837c0f26-1bdd-44ab-8655-5c4f8dc93775%26xptdk%3D837c0f26-1bdd-44ab-8655-5c4f8dc93775&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laze-5-tia-xanh-Hukan-G2-LS300-m%E1%BA%ABu-m%E1%BB%9Bi-nh%C3%A2t-n%C4%83m-2024-h%C3%A0ng-ch%C3%ADnh-h%C3%A3ng-gi%C3%A1-r%E1%BA%BB-i.259706672.26909138734?sp_atk=3c26c185-b4d9-4447-97e5-3720ed4d0688&amp;xptdk=3c26c185-b4d9-4447-97e5-3720ed4d0688"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laze-5-tia-xanh-hukan-g2-ls300"
+   data-img="/assets/img/products/may-can-bang-laze-5-tia-xanh-hukan-g2-ls300.webp"
+   data-price="1490000">Máy cân bằng laze 5 tia xanh Hukan G2-LS300</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laze-5-tia-xanh-Hukan-G2-LS300-m%25E1%25BA%25ABu-m%25E1%25BB%259Bi-nh%25C3%25A2t-n%25C4%2583m-2024-h%25C3%25A0ng-ch%25C3%25ADnh-h%25C3%25A3ng-gi%25C3%25A1-r%25E1%25BA%25BB-i.259706672.26909138734%3Fsp_atk%3D3c26c185-b4d9-4447-97e5-3720ed4d0688%26xptdk%3D3c26c185-b4d9-4447-97e5-3720ed4d0688&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-C%C3%A2n-B%E1%BA%B1ng-Laze-HUKAN-G1-T85-5-tia-xanh-b%C3%B3ng-LED-si%C3%AAu-s%C3%A1ng-%C4%91%E1%BB%99-ch%C3%ADnh-x%C3%A1c-cao-Ch%C3%ADnh-H%C3%A3ng-i.319001815.22250719656?sp_atk=a1952bc8-9056-4b83-9251-4eb4c987f8bf&amp;xptdk=a1952bc8-9056-4b83-9251-4eb4c987f8bf"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laze-hukan-g1-t85"
+   data-img="/assets/img/products/may-can-bang-laze-hukan-g1-t85.webp"
+   data-price="699000">Máy Cân Bằng Laze HUKAN G1-T85</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-C%25C3%25A2n-B%25E1%25BA%B1ng-Laze-HUKAN-G1-T85-5-tia-xanh-b%25C3%25B3ng-LED-si%25C3%25AAu-s%25C3%25A1ng-%25C4%2591%25E1%25BB%2599-ch%25C3%25ADnh-x%25C3%25A1c-cao-Ch%25C3%25ADnh-H%25C3%25A3ng-i.319001815.22250719656%3Fsp_atk%3Da1952bc8-9056-4b83-9251-4eb4c987f8bf%26xptdk%3Da1952bc8-9056-4b83-9251-4eb4c987f8bf&amp;sub1=may-can-bang-laze-hukan-g1-t85&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/product/727253302/22983388549?gads_t_sig=VTJGc2RHVmtYMTlxTFVSVVRrdENkUm9yWVZMbGw0Q214S0d1TzNEZmUwNVdFd0kxcnRaWk9Uai9OQWt3bU1XcjYrTHczalhMMUFjWVVXZWcwRDVBTnkvS0lLU2pWTDNrRlRqSnoycHV3emc2bjdaaDVmbzVsd1BMU0h6RDBCb2s&amp;gad_source=1&amp;gad_campaignid=22496085537&amp;gbraid=0AAAAADPpQE5mKwIf15Y-93jKuVbx-BnCT&amp;gclid=CjwKCAjwuePGBhBZEiwAIGCVS-HMzCZpCfSgTkV7zS6Nhwcu8RH57jB8_cV9hpb2MYwr0--YDdci1xoCZj4QAvD_BwE"
+   data-merchant="shopee"
+   data-sku="may-can-bang-laze-hukan-hk-e63"
+   data-img="/assets/img/products/may-can-bang-laze-hukan-hk-e63.webp"
+   data-price="999000">Máy Cân Bằng Laze HUKAN HK-E63</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2Fproduct%2F727253302%2F22983388549%3Fgads_t_sig%3DVTJGc2RHVmtYMTlxTFVSVVRrdENkUm9yWVZMbGw0Q214S0d1TzNEZmUwNVdFd0kxcnRaWk9Uai9OQWt3bU1XcjYrTHczalhMMUFjWVVXZWcwRDVBTnkvS0lLU2pWTDNrRlRqSnoycHV3emc2bjdaaDVmbzVsd1BMU0h6RDBCb2s%26gad_source%3D1%26gad_campaignid%3D22496085537%26gbraid%3D0AAAAADPpQE5mKwIf15Y-93jKuVbx-BnCT%26gclid%3DCjwKCAjwuePGBhBZEiwAIGCVS-HMzCZpCfSgTkV7zS6Nhwcu8RH57jB8_cV9hpb2MYwr0--YDdci1xoCZj4QAvD_BwE&amp;sub1=may-can-bang-laze-hukan-hk-e63&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-m%C3%A1y-c%C3%A2n-m%E1%BB%B1c-KHAISON-16-tia-4-m%C3%A0u-si%C3%AAu-n%C3%A9t-b%E1%BB%99-d%E1%BB%A5ng-c%E1%BB%A5-cao-c%E1%BA%A5p-i.340941343.28430911624?sp_atk=8212431c-18e2-4397-82a1-ec685f055fe8&amp;xptdk=8212431c-18e2-4397-82a1-ec685f055fe8"
+   data-merchant="shopee"
+   data-sku="may-can-muc-khaison-16-tia-4-mau"
+   data-img="/assets/img/products/may-can-muc-khaison-16-tia-4-mau.webp"
+   data-price="1299000">máy cân mực KHAISON 16 tia 4 màu</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laser-m%25C3%25A1y-c%25C3%25A2n-m%25E1%25BB%25B1c-KHAISON-16-tia-4-m%25C3%25A0u-si%25C3%25AAu-n%25C3%25A9t-b%25E1%25BB%2599-d%25E1%25BB%25A5ng-c%25E1%25BB%25A5-cao-c%25E1%25BA%25A5p-i.340941343.28430911624%3Fsp_atk%3D8212431c-18e2-4397-82a1-ec685f055fe8%26xptdk%3D8212431c-18e2-4397-82a1-ec685f055fe8&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-C%C3%A2n-M%E1%BB%B1c-Laser-5-Tia-Xanh-Yamasu-%E2%80%93-LED-Si%C3%AAu-S%C3%A1ng-%E2%80%93-%C4%90i%E1%BB%81u-Khi%E1%BB%83n-T%E1%BB%AB-Xa-%E2%80%93-Full-Ph%E1%BB%A5-Ki%E1%BB%87n-%E2%80%93-H%C3%A0ng-Ch%C3%ADnh-H%C3%A3ng-C%C3%B3-VAT-i.361963356.44257445874?sp_atk=1ed6ffa0-5032-42f8-98d2-d0b7a2a98a50&amp;xptdk=1ed6ffa0-5032-42f8-98d2-d0b7a2a98a50"
+   data-merchant="shopee"
+   data-sku="may-can-muc-laser-5-tia-xanh-yamasu"
+   data-img="/assets/img/products/may-can-muc-laser-5-tia-xanh-yamasu.webp"
+   data-price="2370000">Máy Cân Mực Laser 5 Tia Xanh Yamasu</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-C%25C3%25A2n-M%25E1%25BB%25B1c-Laser-5-Tia-Xanh-Yamasu-%25E2%2580%2593-LED-Si%25C3%25AAu-S%25C3%25A1ng-%25E2%2580%2593-%25C4%2590i%25E1%25BB%2581u-Khi%25E1%25BB%2583n-T%25E1%25BB%25AB-Xa-%25E2%2580%2593-Full-Ph%25E1%25BB%25A5-Ki%25E1%25BB%2587n-%25E2%2580%2593-H%25C3%25A0ng-Ch%25C3%25ADnh-H%25C3%25A3ng-C%25C3%25B3-VAT-i.361963356.44257445874%3Fsp_atk%3D1ed6ffa0-5032-42f8-98d2-d0b7a2a98a50%26xptdk%3D1ed6ffa0-5032-42f8-98d2-d0b7a2a98a50&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
+<a class="product-meta"
+   href="https://shopee.vn/M%C3%A1y-c%C3%A2n-b%E1%BA%B1ng-laser-m%C3%A1y-th%E1%BB%A7y-b%C3%ACnh-12-tia-3-m%C3%A0u-m%E1%BA%ABu-m%E1%BB%9Bi-si%C3%AAu-n%C3%A9t-b%E1%BB%99-d%E1%BB%A5ng-c%E1%BB%A5-cao-c%E1%BA%A5p-i.106694827.27310073879?sp_atk=d182b98c-6762-487a-8922-b2c4c666829d&amp;xptdk=d182b98c-6762-487a-8922-b2c4c666829d"
+   data-merchant="shopee"
+   data-sku="may-thuy-binh-12-tia-3-mau"
+   data-img="/assets/img/products/may-thuy-binh-12-tia-3-mau.webp"
+   data-price="1190000">máy thủy bình 12 tia 3 màu</a>
+<a class="buy" href="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FM%25C3%25A1y-c%25C3%25A2n-b%25E1%25BA%25B1ng-laser-m%25C3%25A1y-th%25E1%25BB%25A7y-b%25C3%25ACnh-12-tia-3-m%25C3%25A0u-m%25E1%25BA%25ABu-m%25E1%25BB%259Bi-si%25C3%25AAu-n%25C3%25A9t-b%25E1%25BB%2599-d%25E1%25BB%25A5ng-c%25E1%25BB%25A5-cao-c%25E1%25BA%25A5p-i.106694827.27310073879%3Fsp_atk%3Dd182b98c-6762-487a-8922-b2c4c666829d%26xptdk%3Dd182b98c-6762-487a-8922-b2c4c666829d&amp;sub1=sku&amp;sub2=shopee&amp;sub3=tool&amp;sub4=mxd210">Mua trên SHOPEE</a>
