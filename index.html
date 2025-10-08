@@ -1,3 +1,4 @@
+<!-- FILE:/index.html -->
 <!-- MXD-CHECK v2025-10-06 [index]
 - Canonical: https://mxd210.github.io/ ; robots=index,follow
 - Meta verify: Google/Bing present
@@ -25,7 +26,7 @@ FIND: MXD-CHECK v2025-10-06 [index]
   <meta property="og:title" content="MXD — Trang chủ">
   <meta property="og:description" content="Danh mục rõ ràng, sản phẩm chuẩn ảnh .webp, link đo lường qua affiliate.">
   <meta property="og:url" content="https://mxd210.github.io/">
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/logo.webp">
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/home.webp">
 
   <!-- VERIFY: Google Search Console + (tuỳ chọn) Bing -->
   <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o">
@@ -34,7 +35,6 @@ FIND: MXD-CHECK v2025-10-06 [index]
   <link rel="stylesheet" href="/assets/site.css">
 
   <style>
-    /* ================== THEME CHUẨN MXD (có dark mode) ================== */
     :root{
       --bg:#ffffff; --text:#111111; --muted:#666666; --border:#eaeaea;
       --card:#ffffff; --brand:#0a84ff; --brand-contrast:#ffffff;
@@ -46,8 +46,6 @@ FIND: MXD-CHECK v2025-10-06 [index]
         --card:#14181d; --hover:#e8e8e8; --shadow:0 10px 28px rgba(0,0,0,.35);
       }
     }
-
-    /* ================== BASE ================== */
     html,body{height:100%}
     body{
       margin:0; background:var(--bg); color:var(--text);
@@ -61,8 +59,6 @@ FIND: MXD-CHECK v2025-10-06 [index]
     .container{max-width:1100px;margin:0 auto;padding:0 16px}
     .muted{color:var(--muted)}
     .sr-only{position:absolute;left:-9999px}
-
-    /* ================== GRID / CARD (tối ưu mobile) ================== */
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--gap);margin:16px 0}
     .card{
       border:1px solid var(--border); border-radius:var(--radius);
@@ -75,27 +71,22 @@ FIND: MXD-CHECK v2025-10-06 [index]
     .name{font-size:16px;line-height:1.35;margin:0 0 6px}
     .price{font-weight:800;margin:4px 0 10px}
     .actions{display:flex;gap:8px;flex-wrap:wrap}
-
-    /* Nút mua – tô màu theo merchant */
     .buy{
       display:inline-block; width:100%; text-align:center;
       padding:10px 12px; border-radius:12px; font-weight:800;
       text-decoration:none; color:#fff; border:1px solid transparent;
     }
-    .buy{ background:#1746ff; border-color:#1746ff }               /* mặc định */
-    .buy[data-merchant="shopee"] { background:#ee4d2d; border-color:#ee4d2d; }
-    .buy[data-merchant="lazada"] { background:#0f146d; border-color:#0f146d; }
-    .buy[data-merchant="tiki"]   { background:#1a94ff; border-color:#1a94ff; }
-    .buy[data-merchant="tiktok"] { background:#000;    border-color:#000; }
+    .buy{ background:#1746ff; border-color:#1746ff }
+    .buy[data-merchant="shopee"]{ background:#ee4d2d; border-color:#ee4d2d }
+    .buy[data-merchant="lazada"]{ background:#0f146d; border-color:#0f146d }
+    .buy[data-merchant="tiki"]  { background:#1a94ff; border-color:#1a94ff }
+    .buy[data-merchant="tiktok"]{ background:#000;    border-color:#000 }
     .buy:hover{ filter:brightness(1.05) }
-
     .badge{
       display:inline-block; background:var(--brand); color:var(--brand-contrast);
       padding:4px 8px; font-size:12px; border-radius:999px; margin:8px 8px 0;
       align-self:flex-start;
     }
-
-    /* ================== QUICK-NAV ================== */
     .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:8px 0 0}
     .quick-nav .qnav-item{
       display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);
@@ -104,17 +95,12 @@ FIND: MXD-CHECK v2025-10-06 [index]
     }
     .quick-nav .qnav-item:hover{background:rgba(23,70,255,.06)}
     .quick-nav img{width:28px;height:28px;border-radius:8px}
-
-    /* ================== SKELETON ================== */
     .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%)}
     .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
     @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-
-    /* ================== NAV + FLOATING CONTACTS ================== */
     .nav-link{ padding:8px 10px; border-radius:10px; color:var(--text); text-decoration:none; }
     .nav-link:hover{ background:rgba(23,70,255,.08) }
     .nav-link[aria-current="page"]{ background:#eef4ff; color:#1746ff }
-
     .fc{position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:1000}
     .fab{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer}
     .fab svg{width:22px;height:22px}
@@ -125,11 +111,11 @@ FIND: MXD-CHECK v2025-10-06 [index]
   </style>
 
   <!-- 1) GA4 -->
-  
+  <script defer src="/assets/analytics.js"></script>
   <!-- 2) Renderer (tuỳ chọn hiển thị sản phẩm ở Home) -->
   <script defer src="/assets/js/render-products.js"></script>
   <!-- 3) Affiliate (đúng chuẩn path) -->
-  
+  <script defer src="/assets/mxd-affiliate.js"></script>
 
   <!-- JSON-LD Organization (chuẩn index) -->
   <script type="application/ld+json">
@@ -338,14 +324,6 @@ FIND: MXD-CHECK v2025-10-06 [index]
     navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
   }
   </script>
-
-
-
-
-
-
-<script defer src="/assets/analytics.js"></script>
-<script defer src="/assets/mxd-affiliate.js"></script>
-<script defer src="/assets/data/mxd-affiliate.js"></script>
 </body>
 </html>
+<!-- /FILE -->
