@@ -1,3 +1,4 @@
+<!-- FILE:/store.html -->
 <!-- MXD-CHECK v2025-10-06 [store]
 - Canonical absolute; robots=index,follow; meta verify present
 - GA4 BEFORE /assets/mxd-affiliate.js (only once)
@@ -24,7 +25,7 @@ FIND: MXD-CHECK v2025-10-06 [store]
   <meta property="og:title" content="Cửa hàng MXD – Sản phẩm chọn lọc">
   <meta property="og:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
   <meta property="og:url" content="https://mxd210.github.io/store.html">
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/products/placeholder.webp">
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/store.webp">
 
   <!-- VERIFY: Google/Bing -->
   <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o">
@@ -33,7 +34,6 @@ FIND: MXD-CHECK v2025-10-06 [store]
   <link rel="stylesheet" href="/assets/site.css">
 
   <style>
-    /* Theme cơ bản (có dark mode) */
     :root{
       --bg:#fff; --text:#111; --muted:#666; --border:#eaeaea;
       --card:#fff; --brand:#0a84ff; --brand-contrast:#fff;
@@ -42,14 +42,10 @@ FIND: MXD-CHECK v2025-10-06 [store]
     @media (prefers-color-scheme: dark){
       :root{ --bg:#0f1215; --text:#e8e8e8; --muted:#a2a2a2; --border:#262b31; --card:#14181d; --shadow:0 10px 28px rgba(0,0,0,.35); }
     }
-
-    /* Nav */
     .nav-link{ padding:8px 10px; border-radius:10px; color:var(--text); text-decoration:none; }
     .nav-link:hover{ background:rgba(23,70,255,.08) }
     .nav-link[aria-current="page"]{ background:#eef4ff; color:#1746ff }
     @media (max-width:480px){ .nav-link{ padding:8px } }
-
-    /* Quick-Nav */
     .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:12px 0}
     .qnav-item{
       display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);
@@ -58,8 +54,6 @@ FIND: MXD-CHECK v2025-10-06 [store]
     }
     .qnav-item:hover{background:rgba(23,70,255,.06)}
     .quick-nav img{width:28px;height:28px;border-radius:8px}
-
-    /* Grid / Card */
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--gap);margin:16px 0}
     .card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .15s}
     .card:hover{transform:translateY(-2px)}
@@ -67,7 +61,6 @@ FIND: MXD-CHECK v2025-10-06 [store]
     .card .body{padding:12px}
     .name{font-size:16px;line-height:1.35;margin:0 0 6px}
     .price{font-weight:800;margin:4px 0 10px}
-    /* Buy button: tôn trọng merchant (Shopee/Lazada...) */
     .buy{display:inline-block;width:100%;text-align:center;padding:10px 12px;border-radius:12px;font-weight:800;text-decoration:none;color:#fff;border:1px solid transparent}
     .buy:focus-visible{outline:2px solid #0000ff55;outline-offset:2px}
     .buy:active{transform:translateY(1px)}
@@ -77,8 +70,6 @@ FIND: MXD-CHECK v2025-10-06 [store]
     .buy[data-merchant="tiki"]{ background:#1a94ff; border-color:#1a94ff }
     .buy[data-merchant="tiktok"]{ background:#111; border-color:#111 }
     .buy:hover{ filter:brightness(1.05) }
-
-    /* Skeleton */
     .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%)}
     .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
     @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
@@ -185,13 +176,6 @@ FIND: MXD-CHECK v2025-10-06 [store]
               </a>
             </li>
             <li>
-  <a class="chip" href="/store/may-ban-day.html">
-    <img src="/assets/img/categories/may-ban-day.webp" alt="Máy bàn đẩy">
-    <span>Máy bàn đẩy</span>
-  </a>
-</li>
-
-            <li>
               <a href="/store/may-khoan-duc-vit.html" class="qnav-item">
                 <img src="/assets/img/categories/may-khoan-duc-vit.webp" alt="Khoan · Đục · Vít — MXD" width="28" height="28" loading="lazy" decoding="async"/>Khoan · Đục · Vít
               </a>
@@ -222,6 +206,6 @@ FIND: MXD-CHECK v2025-10-06 [store]
       navigator.serviceWorker.register('/sw.js?v=2025-09-30-mlz1');
     }
   </script>
-
 </body>
 </html>
+<!-- /FILE -->
