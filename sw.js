@@ -10,8 +10,8 @@
 FIND: MXD-CHECK v2025-10-06 [sw]
 */
 
-// sw.js — MXD PWA (2025-10-07)
-const VERSION = '2025-10-07-mlz9'; // BUMP mỗi lần sửa
+// sw.js — MXD PWA (2025-10-08)
+const VERSION = '2025-10-08-mlz1'; // BUMP mỗi lần sửa
 
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
