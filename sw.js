@@ -1,3 +1,4 @@
+/* FILE:/sw.js */
 /* MXD-CHECK v2025-10-06 [sw]
 - VERSION bump mỗi lần sửa (định dạng YYYY-MM-DD-<tag>)
 - HTML: network-first (+ navigationPreload); fallback offlinePage
@@ -10,7 +11,7 @@ FIND: MXD-CHECK v2025-10-06 [sw]
 */
 
 // sw.js — MXD PWA (2025-10-07)
-const VERSION = '2025-10-07-mlz8'; // BUMP mỗi lần sửa
+const VERSION = '2025-10-07-mlz9'; // BUMP mỗi lần sửa
 
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
@@ -23,9 +24,8 @@ const ASSETS = [
   // CSS & JS nền tảng:
   '/assets/site.css',
   '/assets/js/render-products.js',
-  // Affiliate & GA4 (đưa cả 2 path để an toàn, 404 sẽ bị bỏ qua):
+  // Affiliate & GA4:
   '/assets/mxd-affiliate.js',
-  '/assets/data/mxd-affiliate.js',
   '/assets/analytics.js',
   // Ảnh placeholder
   '/assets/img/products/placeholder.webp'
@@ -232,3 +232,4 @@ self.addEventListener('fetch', (event) => {
     }
   })());
 });
+/* /FILE */
