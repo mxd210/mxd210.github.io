@@ -1,0 +1,12 @@
+{
+  "selectors": {
+    "hero_block": "<section[^>]+id=['\\\"]hero['\\\"][\\s\\S]*?</section>",
+    "banner_img": "id=['\\\"]hero['\\\"][\\s\\S]*?src=['\\\"]([^'\\\"]+)['\\\"]",
+    "title": "<title>([\\s\\S]*?)</title>",
+    "h1": "<h1[^>]*>([\\s\\S]*?)</h1>",
+    "og_image": "<meta[^>]+property=['\\\"]og:image['\\\"][^>]+content=['\\\"]([^'\\\"]+)['\\\"]"
+  },
+  "hero_template": "<section id=\"hero\" class=\"hero ${overlay}\"><img src=\"${img}\" alt=\"${alt}\"></section>",
+  "canonical_host": "mxd210.github.io",
+  "platforms": ["tiktok","lazada","tiki","shopee"]
+}
