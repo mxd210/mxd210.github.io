@@ -1,329 +1,79 @@
-<!-- FILE:/index.html -->
-<!-- MXD-CHECK v2025-10-06 [index]
-- Canonical: https://mxd210.github.io/ ; robots=index,follow
-- Meta verify: Google/Bing present
-- GA4 (/assets/analytics.js) BEFORE /assets/mxd-affiliate.js (only once)
-- JSON-LD: Organization on index
-- OG: title/desc/url/image (≥1200×630 .webp) absolute URL
-- Quick-nav: /store.html + hubs + 2–3 blog pillars
-- Floating contacts: Zalo 0338328898, Facebook /mxd6686
-- SW: HTML network-first; assets stale-while-revalidate; bump sw.js VERSION on asset changes
-FIND: MXD-CHECK v2025-10-06 [index]
--->
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>MXD — Trang chủ</title>
-  <meta name="description" content="MXD: Trung tâm mua sắm affiliate ngành xây dựng — danh mục rõ ràng, sản phẩm chuẩn ảnh .webp, link đo lường qua affiliate.">
-  <link rel="canonical" href="https://mxd210.github.io/">
-  <meta name="robots" content="index,follow">
+  <meta name="description" content="Trung tâm mua sắm ngành xây dựng — danh mục gọn gàng, ảnh .webp tối ưu, affiliate chuẩn đo lường."/>
+  <link rel="canonical" href="https://mxd210.github.io/"/>
+  <meta name="robots" content="index,follow"/>
 
-  <!-- OG -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="MXD — Trang chủ">
-  <meta property="og:description" content="Danh mục rõ ràng, sản phẩm chuẩn ảnh .webp, link đo lường qua affiliate.">
-  <meta property="og:url" content="https://mxd210.github.io/">
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/home.webp">
+  <!-- MXD-CHECK v2025-10-10 [page:/index.html]
+  - Canonical tuyệt đối = https://mxd210.github.io/
+  - GA4 (/assets/analytics.js) TRƯỚC /assets/mxd-affiliate.js (defer; duy nhất 1 lần)
+  - Quick-nav: /store.html, /store/may-cat.html, /blog/may-cat-gach.html, /blog/chong-tham-wc.html
+  - JSON-LD Organization hiện diện
+  -->
 
-  <!-- VERIFY: Google Search Console + (tuỳ chọn) Bing -->
-  <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o">
-  <!-- <meta name="msvalidate.01" content="PASTE_BING_CODE"> -->
+  <!-- MXD-ANCHOR:HEAD-META -->
+  <link rel="stylesheet" href="/assets/site.css"/>
 
-  <link rel="stylesheet" href="/assets/site.css">
-
-  <style>
-    :root{
-      --bg:#ffffff; --text:#111111; --muted:#666666; --border:#eaeaea;
-      --card:#ffffff; --brand:#0a84ff; --brand-contrast:#ffffff;
-      --hover:#111111; --radius:16px; --gap:16px; --shadow:0 6px 20px rgba(0,0,0,.06);
-    }
-    @media (prefers-color-scheme: dark){
-      :root{
-        --bg:#0f1215; --text:#e8e8e8; --muted:#a2a2a2; --border:#262b31;
-        --card:#14181d; --hover:#e8e8e8; --shadow:0 10px 28px rgba(0,0,0,.35);
-      }
-    }
-    html,body{height:100%}
-    body{
-      margin:0; background:var(--bg); color:var(--text);
-      font-family:'Inter', system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","DejaVu Sans",sans-serif;
-      text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased;
-    }
-    a{color:var(--brand); text-decoration:none}
-    a:hover{opacity:.9}
-    header,footer{padding:12px 16px; border-bottom:1px solid var(--border)}
-    footer{border-bottom:none;border-top:1px solid var(--border); margin-top:24px}
-    .container{max-width:1100px;margin:0 auto;padding:0 16px}
-    .muted{color:var(--muted)}
-    .sr-only{position:absolute;left:-9999px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--gap);margin:16px 0}
-    .card{
-      border:1px solid var(--border); border-radius:var(--radius);
-      background:var(--card); overflow:hidden; display:flex; flex-direction:column;
-      box-shadow:var(--shadow); transition:transform .15s ease;
-    }
-    .card:hover{transform:translateY(-2px)}
-    .card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#f7f7f7;height:auto}
-    .card .body{padding:12px}
-    .name{font-size:16px;line-height:1.35;margin:0 0 6px}
-    .price{font-weight:800;margin:4px 0 10px}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
-    .buy{
-      display:inline-block; width:100%; text-align:center;
-      padding:10px 12px; border-radius:12px; font-weight:800;
-      text-decoration:none; color:#fff; border:1px solid transparent;
-    }
-    .buy{ background:#1746ff; border-color:#1746ff }
-    .buy[data-merchant="shopee"]{ background:#ee4d2d; border-color:#ee4d2d }
-    .buy[data-merchant="lazada"]{ background:#0f146d; border-color:#0f146d }
-    .buy[data-merchant="tiki"]  { background:#1a94ff; border-color:#1a94ff }
-    .buy[data-merchant="tiktok"]{ background:#000;    border-color:#000 }
-    .buy:hover{ filter:brightness(1.05) }
-    .badge{
-      display:inline-block; background:var(--brand); color:var(--brand-contrast);
-      padding:4px 8px; font-size:12px; border-radius:999px; margin:8px 8px 0;
-      align-self:flex-start;
-    }
-    .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:8px 0 0}
-    .quick-nav .qnav-item{
-      display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);
-      border-radius:12px;background:var(--card);box-shadow:var(--shadow);color:var(--text);
-      text-decoration:none
-    }
-    .quick-nav .qnav-item:hover{background:rgba(23,70,255,.06)}
-    .quick-nav img{width:28px;height:28px;border-radius:8px}
-    .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%)}
-    .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
-    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-    .nav-link{ padding:8px 10px; border-radius:10px; color:var(--text); text-decoration:none; }
-    .nav-link:hover{ background:rgba(23,70,255,.08) }
-    .nav-link[aria-current="page"]{ background:#eef4ff; color:#1746ff }
-    .fc{position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:1000}
-    .fab{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer}
-    .fab svg{width:22px;height:22px}
-    .fab-brand{background:var(--brand); border-color:var(--brand); color:var(--brand-contrast)}
-    .fab:hover{filter:brightness(1.02)}
-    .fab-top{display:none}
-    @media (max-width:480px){ .name{font-size:15px} }
-  </style>
-
-  <!-- 1) GA4 -->
+  <!-- GA4 trước Affiliate -->
   <script defer src="/assets/analytics.js"></script>
-  <!-- 2) Renderer (tuỳ chọn hiển thị sản phẩm ở Home) -->
+  <!-- (Tùy trang cần) renderer sản phẩm -->
   <script defer src="/assets/js/render-products.js"></script>
-  <!-- 3) Affiliate (đúng chuẩn path) -->
   <script defer src="/assets/mxd-affiliate.js"></script>
 
-  <!-- JSON-LD Organization (chuẩn index) -->
+  <!-- JSON-LD: Organization -->
   <script type="application/ld+json">
   {
-    "@context":"https://schema.org",
-    "@type":"Organization",
-    "name":"MXD",
-    "url":"https://mxd210.github.io/",
-    "logo":"https://mxd210.github.io/assets/img/og/home.webp",
-    "sameAs":["https://www.facebook.com/mxd6686"],
-    "contactPoint":[{
-      "@type":"ContactPoint",
-      "telephone":"+84-338-328-898",
-      "contactType":"customer service",
-      "areaServed":"VN",
-      "availableLanguage":["vi","en"]
-    }]
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "MXD",
+    "url": "https://mxd210.github.io/",
+    "logo": "https://mxd210.github.io/logo.png",
+    "sameAs": [
+      "https://zalo.me/0338328898",
+      "https://www.facebook.com/mxd6686"
+    ]
   }
   </script>
 </head>
 <body>
-  <!-- Header -->
-  <header style="position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(6px)">
-    <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)">
-      <a href="/" class="brand" style="font-weight:900;font-size:18px;color:var(--text);text-decoration:none">MXD</a>
-      <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
-        <a href="/"                  class="nav-link" aria-current="page">Trang chủ</a>
-        <a href="/store.html"        class="nav-link">Cửa hàng</a>
-        <a href="/blog/"             class="nav-link">Tin tức</a>
-        <a href="/tu-van.html"       class="nav-link">Tư vấn</a>
-        <a href="/lien-he.html"      class="nav-link">Liên hệ</a>
-      </nav>
-    </div>
+  <header class="site-header">
+    <nav class="top-nav">
+      <a href="/">MXD</a>
+      <a href="/store.html">Cửa hàng</a>
+      <a href="/blog.html">Tin tức</a>
+      <a href="/tu-van.html">Tư vấn</a>
+      <a href="/lien-he.html">Liên hệ</a>
+    </nav>
   </header>
 
   <main class="container">
-    <!-- HERO -->
-    <section aria-label="Hero" style="margin:14px 0 4px">
-      <h1 style="margin:0">MXD — Trung tâm mua sắm ngành xây dựng</h1>
-      <p class="muted" style="margin:6px 0 0">Danh mục gọn gàng · Ảnh .webp tối ưu · Liên kết qua affiliate chuẩn đo lường.</p>
-    </section>
+    <h1>MXD — Trung tâm mua sắm ngành xây dựng</h1>
+    <p>Danh mục gọn gàng · Ảnh .webp tối ưu · Liên kết affiliate chuẩn đo lường.</p>
 
-    <!-- QUICK-NAV -->
-    <section aria-label="Danh mục nhanh" style="margin-top:12px">
-      <ul class="quick-nav">
-        <li>
-          <a href="/store.html" class="qnav-item">
-            <img src="/assets/img/og/store.webp" alt="Cửa hàng" width="28" height="28" loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
-            Cửa hàng
-          </a>
-        </li>
-        <li>
-          <a href="/store/bay-rang-cua.html" class="qnav-item">
-            <img src="/assets/img/categories/bay-rang-cua.webp" alt="Bàn răng cưa" width="28" height="28" loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
-            Bàn răng cưa
-          </a>
-        </li>
-        <li>
-          <a href="/store/may-rung-op-lat.html" class="qnav-item">
-            <img src="/assets/img/categories/may-rung-op-lat.webp" alt="Máy rung ốp lát" width="28" height="28" loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
-            Máy rung ốp lát
-          </a>
-        </li>
-        <li>
-          <a href="/blog/may-cat-gach.html" class="qnav-item">
-            <img src="/assets/img/og/blog-may-cat-gach.webp" alt="Máy cắt gạch: hướng dẫn chọn" width="28" height="28" loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
-            Máy cắt gạch (blog)
-          </a>
-        </li>
-        <li>
-          <a href="/blog/chong-tham-wc.html" class="qnav-item">
-            <img src="/assets/img/og/blog-chong-tham-wc.webp" alt="Chống thấm WC" width="28" height="28" loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
-            Chống thấm WC (blog)
-          </a>
-        </li>
-      </ul>
-    </section>
+    <!-- MXD-ANCHOR:QUICK-NAV -->
+    <ul class="quick-nav">
+      <li><a href="/store.html">Cửa hàng</a></li>
+      <li><a href="/store/may-cat.html">Máy cắt</a></li>
+      <li><a href="/blog/may-cat-gach.html">Máy cắt gạch (blog)</a></li>
+      <li><a href="/blog/chong-tham-wc.html">Chống thấm WC (blog)</a></li>
+    </ul>
 
-    <!-- SẢN PHẨM -->
-    <h2 style="margin:16px 0 0">Sản phẩm mới</h2>
-    <div id="product-list" class="grid" aria-live="polite"></div>
-    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/assets/data/affiliates.json</code> (nguồn chuẩn) hoặc <code>/products.json</code> (fallback).</p>
-    <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
+    <section>
+      <h2>Sản phẩm mới</h2>
+      <div id="home-products" class="product-grid" data-source="/assets/data/affiliates.json">
+        <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
+      </div>
+    </section>
   </main>
 
-  <footer>
-    <div class="container">
-      © MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a>
-    </div>
+  <footer class="site-footer">
+    <small>© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></small>
   </footer>
 
-  <!-- FLOATING CONTACTS — MXD -->
-  <div class="fc" id="floating-contacts" aria-label="Liên hệ nhanh">
-    <a class="fab fab-brand" href="https://zalo.me/0338328898" target="_blank" rel="noopener nofollow"
-       data-channel="zalo" aria-label="Chat Zalo 0338328898">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12.5a1.5 1.5 0 0 1-2.45 1.15l-2.77-2.31H5a2 2 0 0 1-2-2V5z"/></svg>
-    </a>
-    <a class="fab fab-brand" href="https://www.facebook.com/mxd6686" target="_blank" rel="noopener nofollow"
-       data-channel="facebook" aria-label="Facebook MXD6686">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 3h4a1 1 0 0 1 1 1v3h-3a2 2 0 0 0-2 2v3h5l-1 4h-4v7h-4v-7H7v-4h2V9a5 5 0 0 1 5-5z"/></svg>
-    </a>
-    <a class="fab" href="tel:0338328898" data-channel="phone" aria-label="Gọi 0338328898">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1.1-.2c1.2.5 2.6.8 4 .8a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C12.3 21 3 11.7 3 1a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1c0 1.4.3 2.8.8 4a1 1 0 0 1-.2 1.1L6.6 10.8z"/></svg>
-    </a>
-    <button class="fab fab-top" id="toTop" aria-label="Lên đầu trang">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 14l5-5 5 5H7z"/></svg>
-    </button>
-  </div>
-
-  <!-- Config renderer: dùng nguồn chuẩn -->
-  <script>
-    window.MXD_RENDER = window.MXD_RENDER || {};
-    window.MXD_RENDER.source = '/assets/data/affiliates.json';
-  </script>
-
-  <!-- Render sản phẩm -->
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      if (window.MXD?.renderProducts) {
-        MXD.renderProducts('#product-list'); 
-        return;
-      }
-      const wrap = document.querySelector('#product-list');
-      const empty = document.getElementById('empty');
-      wrap.innerHTML = Array.from({length:6}).map(()=>`
-        <article class="card">
-          <div class="skeleton" style="height:160px"></div>
-          <div class="body">
-            <div class="skeleton" style="height:18px"></div>
-            <div class="skeleton" style="height:16px;width:40%;margin-top:8px"></div>
-          </div>
-        </article>
-      `).join('');
-
-      fetch('/assets/data/affiliates.json', { cache: 'no-store' })
-        .then(r=>r.ok?r.json():[])
-        .then(all=>{
-          const arr = Array.isArray(all) ? all : (all.items||[]);
-          if (!arr.length){ empty.style.display='block'; wrap.innerHTML=''; return; }
-          const fmt = n => isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-          wrap.innerHTML = arr.map(p=>{
-            const sku = (p.sku||'').toLowerCase();
-            const name = p.name || sku || 'Sản phẩm';
-            const origin = p.origin_url || p.origin || p.url || p.link || '#';
-            const merchant = (p.merchant||'').toLowerCase();
-            const price = p.price ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>` : '';
-            return `
-              <article class="card">
-                <a class="product-meta sr-only"
-                   href="${origin}" data-merchant="${merchant}"
-                   data-sku="${sku}" data-img="/assets/img/products/${sku}.webp"
-                   ${p.price?`data-price="${p.price}"`:''}>${name}</a>
-
-                <a href="/g.html?sku=${encodeURIComponent(sku)}" aria-label="Xem chi tiết ${name}">
-                  <img loading="lazy" decoding="async"
-                       src="/assets/img/products/${sku}.webp"
-                       alt="${name}"
-                       onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-                </a>
-                <div class="body">
-                  <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${name}</a></h3>
-                  ${price}
-                  <div class="actions">
-                    <a class="buy" href="${origin}" data-merchant="${merchant}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
-                  </div>
-                </div>
-              </article>`;
-          }).join('');
-          if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
-        })
-        .catch(()=>{ empty.style.display='block'; wrap.innerHTML=''; });
-    });
-
-    // Nút lên đầu trang
-    addEventListener('scroll', () => {
-      const toTop = document.getElementById('toTop');
-      if (!toTop) return;
-      toTop.style.display = scrollY > 400 ? 'flex' : 'none';
-    }, { passive:true });
-    document.getElementById('toTop')?.addEventListener('click', () => scrollTo({ top:0, behavior:'smooth' }));
-  </script>
-
-  <!-- Floating contacts script riêng (nếu dùng) -->
-  <script defer src="/assets/js/floating-contact.js"></script>
-
-  <!-- Đăng ký SW -->
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
-      .then(reg => {
-        if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-        reg.addEventListener('updatefound', () => {
-          const nw = reg.installing;
-          nw && nw.addEventListener('statechange', () => {
-            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              reg.waiting && reg.waiting.postMessage('SKIP_WAITING');
-            }
-          });
-        });
-      });
-    navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
-  }
-  </script>
+  <!-- MXD-ANCHOR:BODY-END -->
 </body>
 </html>
-<!-- /FILE -->
