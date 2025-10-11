@@ -324,7 +324,7 @@ const DEFAULT_TPL_TIKTOK='https://go.isclix.com/deep_link/6803097511817356947/66
 /* UTILS */
 const slugify = s => s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4500); }
-function log(msg){ const d=$("#debugLog"); d.textContent = (d.textContent && d.textContent!=='–' ? d.textContent + "\n" : "") + msg; d.scrollTop = d.scrollHeight; }
+function log(msg){ const d=$("#debugLog"); const prev = (d.textContent && d.textContent!=='–' ? d.textContent + "\n" : "") + msg; d.textContent = prev.length > 3000 ? prev.slice(-3000) : prev; d.scrollTop = d.scrollHeight; }
 function cleanUrl(u){ return (u||'').trim().replace(/^[\"']+|[\"',]+$/g,''); }
 function sanitizeFolder(p){ if(!p) return '/assets/img/'; p=p.trim(); if(!p.startsWith('/')) p='/'+p; if(!p.endsWith('/')) p+='/'; return p; }
 function getExt(fmt){ return fmt==='jpg'?'jpg':(fmt==='png'?'png':'webp'); }
@@ -346,6 +346,7 @@ function autoCategory(text){ const MAP = window.CATEGORY_KEYWORDS||{}; for(const
 
 /* STATE */
 const state = { workerOk:false, imgBlob:null, imgName:null, imgW:0, imgH:0, srcDataUrl:null };
+let __prevThumbUrl = null; // URL preview hiện tại để revoke khi đổi ảnh
 
 /* UI bindings */
 function uiToSettings(){
@@ -482,7 +483,7 @@ async function resizeContainToBlob(img, opts){
 const drop=$("#drop"), file=$("#file"), thumb=$("#thumb"), imgName=$("#imgName"), imgInfo=$("#imgInfo");
 drop.addEventListener('click', ()=>file.click());
 $("#btnSelectImg").onclick=()=>file.click();
-drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.classList.add('dragover'); });
+drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.classList.add('dragover'); }, {passive:false});
 drop.addEventListener('dragleave', ()=>drop.classList.remove('dragover'));
 drop.addEventListener('drop', e=>{ e.preventDefault(); drop.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
 file.onchange=e=>handleFiles(e.target.files);
@@ -490,10 +491,18 @@ file.onchange=e=>handleFiles(e.target.files);
 function baseNameWithoutExt(filename){ const s=(filename||'').split('/').pop(); const i=s.lastIndexOf('.'); return (i>0?s.slice(0,i):s); }
 function decideNameFor(file){ const sku=$("#sku").value.trim(); const useFilename=$("#cbUseFilename").checked; if(sku) return slugify(sku); if(useFilename && file && file.name) return slugify(baseNameWithoutExt(file.name)); const nm=$("#name").value.trim(); if(nm) return slugify(nm); return 'mxd'; }
 
+const nextFrame = () => new Promise(r=>requestAnimationFrame(r));
+
 async function handleFiles(files){
   if(!files || !files.length) return;
   if(files.length===1){ await handleSingleFile(files[0]); }
-  else { for(const f of files){ await queueAddRawFile(f); } toast(`Đã thêm ${files.length} ảnh vào hàng đợi.`,"ok"); }
+  else {
+    for(const f of files){
+      await queueAddRawFile(f);
+      await nextFrame(); // nhường UI mỗi lần thêm để tránh đứng
+    }
+    toast(`Đã thêm ${files.length} ảnh vào hàng đợi.`,"ok");
+  }
 }
 function renderPreview(name, blob, w, h){
   state.imgBlob=blob; state.imgW=w; state.imgH=h;
@@ -505,8 +514,11 @@ function renderPreview(name, blob, w, h){
   } else {
     $("#image").value=`${folder}${name}.${ext}`;
   }
+  // revoke URL cũ trước khi set mới để tránh rò rỉ
+  if(__prevThumbUrl){ URL.revokeObjectURL(__prevThumbUrl); __prevThumbUrl=null; }
+  __prevThumbUrl = URL.createObjectURL(blob);
   $("#imgPreview").style.display='flex';
-  thumb.src=URL.createObjectURL(blob);
+  thumb.src=__prevThumbUrl;
   imgName.textContent=state.imgName;
   imgInfo.textContent=`${w}×${h}, ${(blob.size/1024).toFixed(1)} KB`;
   updateSingleUploadCta();
@@ -543,15 +555,17 @@ async function reconvertFromSource(){
 }
 
 $("#btnConvert").onclick=()=>{ reconvertFromSource().then(()=>toast("Đã convert theo tuỳ chọn.","ok")); };
-$("#btnSaveImg").onclick=()=>{ if(!state.imgBlob){ toast("Chưa có ảnh.","warn"); return; } const a=document.createElement('a'); a.href=URL.createObjectURL(state.imgBlob); a.download=state.imgName||('product.'+getExt(getSelectedFmt())); a.click(); };
+$("#btnSaveImg").onclick=()=>{ if(!state.imgBlob){ toast("Chưa có ảnh.","warn"); return; } const a=document.createElement('a'); const url=URL.createObjectURL(state.imgBlob); a.href=url; a.download=state.imgName||('product.'+getExt(getSelectedFmt())); a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); };
 
 /* Queue */
 const queue=[]; let seq=0;
 function readFileAsDataURL(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
+function revokeItemURL(it){ if(it && it._url){ try{ URL.revokeObjectURL(it._url); }catch(_){} it._url=null; } }
 async function queueProcess(item){
   if(item.outBlob && item.w && item.h){ item.status='ready'; return; }
   if(!item.srcFile){ item.status='error'; return; }
   item.status='processing';
+  revokeItemURL(item); // blob sẽ thay đổi → revoke URL cũ
   const dataUrl=await readFileAsDataURL(item.srcFile);
   const img=document.createElement('img'); await new Promise(r=>{ img.onload=r; img.src=dataUrl; });
   const g=getImageOpts();
@@ -563,29 +577,32 @@ async function queueAddRawFile(file){
   const name=decideNameFor(file);
   const fmt=getSelectedFmt();
   let folder=getSelectedFolder();
-  const item={ id:(++seq), srcFile:file, name, fmt, folder, customPath:$("#defaultFolder").value==='custom', outBlob:null, w:0, h:0, status:'pending' };
+  const item={ id:(++seq), srcFile:file, name, fmt, folder, customPath:$("#defaultFolder").value==='custom', outBlob:null, w:0, h:0, status:'pending', _url:null };
   queue.push(item);
   await queueProcess(item);
-  renderQueue();
+  scheduleRenderQueue();
 }
 async function queueAddCurrent(){
   if(!state.imgBlob){ toast("Chưa có ảnh xem trước.","warn"); return; }
   const fmt=getSelectedFmt();
   let folder=getSelectedFolder();
   const base=(state.imgName||'mxd.webp').replace(/\.(webp|png|jpg)$/,'');
-  const item={ id:(++seq), srcFile:null, name:base, fmt, folder, customPath:$("#defaultFolder").value==='custom', outBlob:state.imgBlob, w:state.imgW, h:state.imgH, status:'ready' };
+  const item={ id:(++seq), srcFile:null, name:base, fmt, folder, customPath:$("#defaultFolder").value==='custom', outBlob:state.imgBlob, w:state.imgW, h:state.imgH, status:'ready', _url:null };
   queue.push(item);
-  renderQueue();
+  scheduleRenderQueue();
   toast("Đã thêm vào hàng đợi.","ok");
 }
 $("#btnQueueCurrent").onclick=queueAddCurrent;
 function pathFor(it){ let base=sanitizeFolder(it.folder||'/assets/img/'); const ext='.'+getExt(it.fmt||'webp'); return base+it.name+ext; }
+
+let __rqPending=false; function scheduleRenderQueue(){ if(__rqPending) return; __rqPending=true; requestAnimationFrame(()=>{ __rqPending=false; renderQueue(); }); }
+
 function renderQueue(){
   const tbody=$("#queueBody");
   if(!tbody) return;
   if(!queue.length){ tbody.innerHTML='<tr><td colspan="8" class="muted">Chưa có gì trong hàng đợi.</td></tr>'; return; }
   tbody.innerHTML=queue.map(it=>{
-    const url=it.outBlob?URL.createObjectURL(it.outBlob):'';
+    const url=it.outBlob ? (it._url || (it._url = URL.createObjectURL(it.outBlob))) : '';
     const status=it.status==='ready'?'Sẵn sàng':(it.status==='processing'?'Đang xử lý':(it.status==='uploaded'?'Đã upload':(it.status==='error'?'Lỗi':'Chờ')));
     return `<tr data-id="${it.id}">
   <td><div class="mini">${ url ? `<img class="thumb" src="${url}" alt="thumb">` : '' }</div></td>
@@ -629,23 +646,23 @@ function renderQueue(){
     nameInput.oninput=()=>{ it.name=slugify(nameInput.value||'mxd'); pathCell.textContent=pathFor(it); };
     folderSel.onchange=()=>{ if(folderSel.value==='custom'){ it.customPath=true; customInput.style.display='block'; if(customInput.value.trim()==='') customInput.value='/assets/img/'; it.folder=sanitizeFolder(customInput.value.trim()); } else { it.customPath=false; customInput.style.display='none'; it.folder=folderSel.value; } pathCell.textContent=pathFor(it); };
     customInput.oninput=()=>{ it.folder=sanitizeFolder(customInput.value.trim()); pathCell.textContent=pathFor(it); };
-    fmtSel.onchange=async()=>{ it.fmt=fmtSel.value; pathCell.textContent=pathFor(it); await queueProcess(it); statusEl.textContent='Sẵn sàng'; renderQueue(); };
-    tr.querySelector('.do-remove').onclick=()=>{ const idx=queue.findIndex(x=>x.id===id); if(idx>=0){ queue.splice(idx,1); renderQueue(); } };
-    tr.querySelector('.do-convert').onclick=async()=>{ statusEl.textContent='Đang xử lý'; await queueProcess(it); statusEl.textContent='Sẵn sàng'; renderQueue(); };
-    tr.querySelector('.do-download').onclick=()=>{ if(!it.outBlob){ toast("Chưa convert.","warn"); return; } const a=document.createElement('a'); a.href=URL.createObjectURL(it.outBlob); a.download=it.name+'.'+getExt(it.fmt||'webp'); a.click(); };
+    fmtSel.onchange=async()=>{ it.fmt=fmtSel.value; pathCell.textContent=pathFor(it); await queueProcess(it); statusEl.textContent='Sẵn sàng'; scheduleRenderQueue(); };
+    tr.querySelector('.do-remove').onclick=()=>{ const idx=queue.findIndex(x=>x.id===id); if(idx>=0){ revokeItemURL(queue[idx]); queue.splice(idx,1); renderQueue(); } };
+    tr.querySelector('.do-convert').onclick=async()=>{ statusEl.textContent='Đang xử lý'; await queueProcess(it); statusEl.textContent='Sẵn sàng'; scheduleRenderQueue(); };
+    tr.querySelector('.do-download').onclick=()=>{ if(!it.outBlob){ toast("Chưa convert.","warn"); return; } const a=document.createElement('a'); const url=URL.createObjectURL(it.outBlob); a.href=url; a.download=it.name+'.'+getExt(it.fmt||'webp'); a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); };
     tr.querySelector('.do-upload').onclick=()=>uploadItem(it, statusEl);
   });
 }
-// SAFE BIND (tránh crash khi thiếu các nút hàng đợi trong DOM)
+// SAFE BIND cho nút queue nếu không có trong DOM
 bindClick('btnConvertAll', async ()=>{ for(const it of queue){ await queueProcess(it); } toast("Đã convert tất cả.","ok"); renderQueue(); });
-bindClick('btnDownloadAll', ()=>{ for(const it of queue){ if(!it.outBlob) continue; const a=document.createElement('a'); a.href=URL.createObjectURL(it.outBlob); a.download=it.name+'.'+getExt(it.fmt||'webp'); a.click(); } });
+bindClick('btnDownloadAll', ()=>{ for(const it of queue){ if(!it.outBlob) continue; const a=document.createElement('a'); const url=URL.createObjectURL(it.outBlob); a.href=url; a.download=it.name+'.'+getExt(it.fmt||'webp'); a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); } });
 bindClick('btnUploadAll', async ()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } for(const it of queue){ const row=document.querySelector(`tr[data-id="${it.id}"] .status`); await uploadItem(it,row||{textContent:''}); } toast("Upload tất cả xong (xem trạng thái từng mục).","ok"); });
-bindClick('btnClearQueue', ()=>{ queue.length=0; renderQueue(); });
+bindClick('btnClearQueue', ()=>{ queue.forEach(revokeItemURL); queue.length=0; renderQueue(); });
 
 /* Upload */
 function splitDataUrl(d){ const m = String(d||'').match(/^data:([^;]+);base64,(.+)$/); return m ? { mime:m[1], base64:m[2] } : { mime:'', base64:d||'' }; }
 async function blobToBase64(blob){ return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(blob); }); }
-async function convertBlobToWebp(blob, w, h){ const url=URL.createObjectURL(blob); const img=new Image(); await new Promise(r=>{ img.onload=r; img.src=url; }); const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); return await new Promise(res=>c.toBlob(res,'image/webp',0.82)); }
+async function convertBlobToWebp(blob, w, h){ const url=URL.createObjectURL(blob); const img=new Image(); await new Promise(r=>{ img.onload=r; img.src=url; }); URL.revokeObjectURL(url); const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); return await new Promise(res=>c.toBlob(res,'image/webp',0.82)); }
 async function uploadItem(it, statusEl){
   let path=pathFor(it);
   try{
@@ -671,7 +688,7 @@ async function uploadItem(it, statusEl){
       const newPath=path.replace(/\.(png|jpg)$/i,'.webp');
       r=await fetch(base+"/upload-image",{method:"POST",mode:"cors",headers:hdr(),body:JSON.stringify({ sku:it.name, path:newPath, file:newDataUrl })});
       text=await r.text().catch(()=>'' );
-      if(r.ok){ it.fmt='webp'; it.outBlob=webpBlob; path=newPath; }
+      if(r.ok){ it.fmt='webp'; it.outBlob=webpBlob; path=newPath; revokeItemURL(it); it._url = URL.createObjectURL(it.outBlob); }
     }
 
     if(!r.ok){ if(statusEl) statusEl.textContent='Lỗi upload'; log(`[upload ${path}] FAIL cuối ${r.status}: ${text.slice(0,200)}`); toast("Upload lỗi "+r.status,"err"); return; }
@@ -727,7 +744,7 @@ function makeDeeplink(){ const origin=cleanUrl($("#origin").value.trim()); const
 $("#btnMakeDeeplink").onclick=makeDeeplink;
 ["origin","sku","merchant","tplShopee","tplLazada","tplTiki","tplTiktok","defaultFolder","defaultCustomPath"].forEach(id=>{ const el=$("#"+id); if(el) el.addEventListener('input', ()=>{ if($("#origin").value.trim()) makeDeeplink(); updateSingleUploadCta(); runDiag(); saveSettings(); }); });
 $("#deeplink").addEventListener('input', validateDeeplink);
-function validateDeeplink(){ const dl=$("#deeplink").value.trim(); const badge=$("#dlCheck"); if(!dl){ badge.textContent="chưa có deeplink"; badge.className='badge'; return; } const okHost=/(^https?:\/\/)?([^/]*\.)?isclix\.com/i.test(dl); const hasUrl=/[?&]url=/.test(dl); const s1=/[?&]sub1=/.test(dl), s2=/[?&]sub2=/.test(dl), s3=/[?&]sub3=/.test(dl), s4=/[?&]sub4=/.test(dl); if(okHost && hasUrl && s1 && s2 && s3 && s4){ badge.textContent="OK affiliate"; badge.className='badge'; return; } if(okHost && !hasUrl){ badge.textContent="isclix thiếu url="; badge.className='badge'; return; } if(okHost){ const missing=['sub1','sub2','sub3','sub4'].filter(k=>!new RegExp(`[?&]${k}=`).test(dl)); badge.textContent="isclix thiếu: "+missing.join(', '); badge.className='badge'; return; } badge.textContent="KHÔNG qua affiliate"; badge.className='badge'; }
+function validateDeeplink(){ const dl=$("#deeplink").value.trim(); const badge=$("#dlCheck"); if(!dl){ badge.textContent="chưa có deeplink"; badge.className='badge'; return; } const okHost=/(^https?:\\/\\/)?([^/]*\\.)?isclix\\.com/i.test(dl); const hasUrl=/[?&]url=/.test(dl); const s1=/[?&]sub1=/.test(dl), s2=/[?&]sub2=/.test(dl), s3=/[?&]sub3=/.test(dl), s4=/[?&]sub4=/.test(dl); if(okHost && hasUrl && s1 && s2 && s3 && s4){ badge.textContent="OK affiliate"; badge.className='badge'; return; } if(okHost && !hasUrl){ badge.textContent="isclix thiếu url="; badge.className='badge'; return; } if(okHost){ const missing=['sub1','sub2','sub3','sub4'].filter(k=>!new RegExp(`[?&]${k}=`).test(dl)); badge.textContent="isclix thiếu: "+missing.join(', '); badge.className='badge'; return; } badge.textContent="KHÔNG qua affiliate"; badge.className='badge'; }
 
 /* Shortlink via Worker (optional) */
 $("#btnMakeShort").onclick=async()=>{
@@ -745,7 +762,7 @@ $("#btnMakeShort").onclick=async()=>{
 };
 $("#btnCopyShort").onclick=()=>{ const t=$("#shortlink"); t.select(); document.execCommand('copy'); toast("Đã copy Short-link."); };
 
-/* NEW: Copy/Mở Origin + Deeplink (bổ sung handler còn thiếu) */
+/* NEW: Copy/Mở Origin + Deeplink */
 bindClick('copyOrigin', ()=>{
   const v = ($("#originOut")?.value || $("#origin")?.value || '').trim();
   if(!v) return toast('Chưa có Origin để copy','warn');
@@ -838,7 +855,7 @@ function buildJson(){
 }
 $("#btnToJson").onclick=buildJson;
 $("#btnCopyJson").onclick=()=>{ $("#jsonOut").select(); document.execCommand('copy'); toast("Đã copy JSON."); };
-$("#btnDownloadJson").onclick=()=>{ if(!$("#jsonOut").value) buildJson(); const blob=new Blob([$("#jsonOut").value],{type:"application/json"}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='affiliates.append.json'; a.click(); };
+$("#btnDownloadJson").onclick=()=>{ if(!$("#jsonOut").value) buildJson(); const blob=new Blob([$("#jsonOut").value],{type:"application/json"}); const a=document.createElement('a'); const url=URL.createObjectURL(blob); a.href=url; a.download='affiliates.append.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); };
 $("#btnPublish").onclick=()=>doPublish(false); $("#btnPublishFeatured").onclick=()=>doPublish(true);
 async function doPublish(forceFeatured){
   const obj=buildJson();
@@ -860,7 +877,7 @@ async function doPublish(forceFeatured){
     }catch(e){ toast("Publish lỗi (sẽ tải JSON để commit tay): "+e.message,"err"); }
   }
   const blob=new Blob([JSON.stringify([obj],null,2)],{type:"application/json"});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='affiliates.append.json'; a.click();
+  const a=document.createElement('a'); const url=URL.createObjectURL(blob); a.href=url; a.download='affiliates.append.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000);
 }
 
 /* Form helpers */
@@ -874,7 +891,7 @@ function runDiag(){
   const msgs=[];
   if(!sku) msgs.push("• Thiếu SKU (bắt buộc cho publish).");
   if(img && !img.startsWith(`${expectedFolder}${sku||'...'}`)) msgs.push("• Ảnh nên là "+expectedFolder+(sku||'&lt;sku&gt;')+"."+ext);
-  if(origin && !/shopee\.vn|lazada\.vn|tiki\.vn|tiktok\.com/i.test(origin)) msgs.push("• Origin không phải Shopee/Lazada/Tiki/TikTok.");
+  if(origin && !/shopee\\.vn|lazada\\.vn|tiki\\.vn|tiktok\\.com/i.test(origin)) msgs.push("• Origin không phải Shopee/Lazada/Tiki/TikTok.");
   msgs.push("• Merchant: "+merchant);
   $("#diag").innerHTML=msgs.length?msgs.map(x=>`<div>${x}</div>`).join(""):'<span class="ok">Tạm ổn.</span>';
   $("#originOut").value=origin;
@@ -944,6 +961,9 @@ function updateAfterPreset(){ const p=$("#sizePreset").value; if(p==='og'){ $("#
 ["sizePreset"].forEach(id=>$("#"+id).addEventListener('change', ()=>{ updateAfterPreset(); }));
 ["quality","qualityNum","targetKB","targetKBNum","defaultCustomPath"].forEach(id=>$("#"+id).addEventListener('input', ()=>{ updateSingleUploadCta(); }));
 updateAfterPreset(); ensureFolderBase(); updateSingleUploadCta(); updateOriginMirror(); runDiag();
+
+// Thu gom URL khi rời trang
+window.addEventListener('beforeunload', ()=>{ if(__prevThumbUrl){ try{ URL.revokeObjectURL(__prevThumbUrl); }catch(_){} __prevThumbUrl=null; } queue.forEach(revokeItemURL); });
 </script>
 </body>
 </html>
