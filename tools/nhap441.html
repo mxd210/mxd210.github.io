@@ -310,6 +310,9 @@
 const $ = s => document.querySelector(s);
 const LS_KEY = 'MXD_IMPORTER_SETTINGS_V441';
 
+/* === Helper: safe binder (tránh crash nếu phần tử không tồn tại) === */
+function bindClick(id, handler){ const el=document.getElementById(id); if(!el){ try{ console.warn('[bindClick] missing #' + id); }catch(_){} return false; } el.addEventListener('click', handler); return true; }
+
 /* SETTINGS */
 function readSettings(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'{}'); }catch(_){ return {}; } }
 function writeSettings(s){ localStorage.setItem(LS_KEY, JSON.stringify(s)); }
@@ -319,26 +322,26 @@ const DEFAULT_TPL_TIKI='https://go.isclix.com/deep_link/6803097511817356947/4348
 const DEFAULT_TPL_TIKTOK='https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
 
 /* UTILS */
-const slugify = s => s.toString().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const slugify = s => s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4500); }
-function log(msg){ const d=$("#debugLog"); d.textContent = (d.textContent && d.textContent!=='–' ? d.textContent + "\\n" : "") + msg; d.scrollTop = d.scrollHeight; }
+function log(msg){ const d=$("#debugLog"); d.textContent = (d.textContent && d.textContent!=='–' ? d.textContent + "\n" : "") + msg; d.scrollTop = d.scrollHeight; }
 function cleanUrl(u){ return (u||'').trim().replace(/^[\"']+|[\"',]+$/g,''); }
 function sanitizeFolder(p){ if(!p) return '/assets/img/'; p=p.trim(); if(!p.startsWith('/')) p='/'+p; if(!p.endsWith('/')) p+='/'; return p; }
 function getExt(fmt){ return fmt==='jpg'?'jpg':(fmt==='png'?'png':'webp'); }
 
 /* CATEGORY (giữ nguyên mẫu) */
-function vn(s){ return (s||'').toString().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase(); }
+function vn(s){ return (s||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase(); }
 function normCategory(raw){
-  const base = vn(raw).replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
-  if (/^(may-?cat|maycat|may\\s*cat|may-mai|mai-goc|may-cat-sat|may-cat-gach)$/.test(base)) return 'may-cat';
+  const base = vn(raw).replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
+  if (/^(may-?cat|maycat|may\s*cat|may-mai|mai-goc|may-cat-sat|may-cat-gach)$/.test(base)) return 'may-cat';
   if (/^(may-?khoan(-|_)?duc(-|_)?vit|may-khoan|khoan-duc-vit|khoan-bua|impact(-|_)?(driver|wrench)|sds(plus|max)?)$/.test(base)) return 'may-khoan-duc-vit';
   if (/^(phu-?kien|phu-?kien-?may|phu-kien-may)$/.test(base)) return 'phu-kien-may';
   return base;
 }
 window.CATEGORY_KEYWORDS = window.CATEGORY_KEYWORDS || {};
-window.CATEGORY_KEYWORDS["may-cat"] = { include:[/\\b(máy\\s*)?cắt\\b/i,/\\bmáy\\s*cưa\\b/i,/\\bcưa\\s*(đĩa|bàn|kiếm|lọng)\\b/i,/\\bcut[\\s-]?off\\b/i,/\\bcircular(\\s*saw)?\\b/i,/\\bjig\\s*saw\\b/i,/\\bjigsaw\\b/i,/\\breciprocating\\b/i,/\\bsabre\\b/i,/\\bmáy\\s*cắt\\s*(gạch|sắt|nhôm|đa\\s*năng)\\b/i,/\\bm[ảa]i\\s*g[óo]c\\b/i,/\\bmay\\s*cat\\b/i], exclude:[/\\b(lưỡi|blade|đĩa|disc|đá\\s*cắt|phụ\\s*kiện|mũi)\\b/i,/\\b(pin|sạc|chổi\\s*than|than|đế|vỏ|collet|bầu\\s*kẹp|adapter|đá\\s*mài|giấy\\s*nhám|guard|chụp\\s*bảo\\s*vệ)\\b/i], set:{category:"may-cat"} };
-window.CATEGORY_KEYWORDS["may-khoan-duc-vit"] = { include:[/\\bmáy\\s*khoan\\b/i,/\\bkhoan\\s*búa\\b/i,/\\bSDS[\\s-]?(Plus|Max)\\b/i,/\\bimpact\\s*(driver|wrench)\\b/i,/\\bb[ắa]n\\s*v[íi]t\\b/i,/\\bsi[ếe]t\\s*bu\\s*l[oô]ng\\b/i], exclude:[/\\b(pin|sạc|lưỡi|đĩa|mũi|chén|chổi\\s*than|than|đế|vỏ|collet|bầu\\s*kẹp|adapter|đá\\s*mài|giấy\\s*nhám|guard|chụp\\s*bảo\\s*vệ)\\b/i], set:{category:"may-khoan-duc-vit"} };
-window.CATEGORY_KEYWORDS["phu-kien-may"] = { include:[/\\bpin\\b/i,/\\bsạc\\b/i,/\\blưỡi\\b/i,/\\bđĩa\\b/i,/\\bblade\\b/i,/\\bdisc\\b/i,/\\bmũi\\b/i,/\\bmũi\\s*khoan\\b/i,/\\bđầu\\s*vít\\b/i,/\\bđầu\\s*khẩu\\b/i,/\\bchén\\b/i,/\\bđá\\s*mài\\b/i,/\\bcup\\s*wheel\\b/i,/\\bchổi\\s*than\\b/i,/\\bthan\\b/i,/\\bđế\\b/i,/\\bcollet\\b/i,/\\bbầu\\s*kẹp\\b/i,/\\badapter\\b/i,/\\bgiấy\\s*nhám\\b/i,/\\bguard\\b/i,/\\bchụp\\s*bảo\\s*vệ\\b/i], exclude:[/^(máy|thân\\s*máy|tool[\\s-]?only|bare\\s*tool)\\b/i], set:{category:"phu-kien-may"} };
+window.CATEGORY_KEYWORDS["may-cat"] = { include:[/\b(máy\s*)?cắt\b/i,/\bmáy\s*cưa\b/i,/\bcưa\s*(đĩa|bàn|kiếm|lọng)\b/i,/\bcut[\s-]?off\b/i,/\bcircular(\s*saw)?\b/i,/\bjig\s*saw\b/i,/\bjigsaw\b/i,/\breciprocating\b/i,/\bsabre\b/i,/\bmáy\s*cắt\s*(gạch|sắt|nhôm|đa\s*năng)\b/i,/\bm[ảa]i\s*g[óo]c\b/i,/\bmay\s*cat\b/i], exclude:[/\b(lưỡi|blade|đĩa|disc|đá\s*cắt|phụ\s*kiện|mũi)\b/i,/\b(pin|sạc|chổi\s*than|than|đế|vỏ|collet|bầu\s*kẹp|adapter|đá\s*mài|giấy\s*nhám|guard|chụp\s*bảo\s*vệ)\b/i], set:{category:"may-cat"} };
+window.CATEGORY_KEYWORDS["may-khoan-duc-vit"] = { include:[/\bmáy\s*khoan\b/i,/\bkhoan\s*búa\b/i,/\bSDS[\s-]?(Plus|Max)\b/i,/\bimpact\s*(driver|wrench)\b/i,/\bb[ắa]n\s*v[íi]t\b/i,/\bsi[ếe]t\s*bu\s*l[oô]ng\b/i], exclude:[/\b(pin|sạc|lưỡi|đĩa|mũi|chén|chổi\s*than|than|đế|vỏ|collet|bầu\s*kẹp|adapter|đá\s*mài|giấy\s*nhám|guard|chụp\s*bảo\s*vệ)\b/i], set:{category:"may-khoan-duc-vit"} };
+window.CATEGORY_KEYWORDS["phu-kien-may"] = { include:[/\bpin\b/i,/\bsạc\b/i,/\blưỡi\b/i,/\bđĩa\b/i,/\bblade\b/i,/\bdisc\b/i,/\bmũi\b/i,/\bmũi\s*khoan\b/i,/\bđầu\s*vít\b/i,/\bđầu\s*khẩu\b/i,/\bchén\b/i,/\bđá\s*mài\b/i,/\bcup\s*wheel\b/i,/\bchổi\s*than\b/i,/\bthan\b/i,/\bđế\b/i,/\bcollet\b/i,/\bbầu\s*kẹp\b/i,/\badapter\b/i,/\bgiấy\s*nhám\b/i,/\bguard\b/i,/\bchụp\s*bảo\s*vệ\b/i], exclude:[/^(máy|thân\s*máy|tool[\s-]?only|bare\s*tool)\b/i], set:{category:"phu-kien-may"} };
 function autoCategory(text){ const MAP = window.CATEGORY_KEYWORDS||{}; for(const [slug,rule] of Object.entries(MAP)){ const okInc=(rule.include||[]).some(rx=>rx.test(text)); const okExc=(rule.exclude||[]).some(rx=>rx.test(text)); if(okInc && !okExc) return slug; } return ''; }
 
 /* STATE */
@@ -377,11 +380,11 @@ $("#btnSaveSettings").onclick=saveSettings; $("#btnLoadSettings").onclick=loadSe
 /* Worker checks */
 function hdr(){ const s=readSettings(); const h={}; if(s.xKey) h['x-key']=s.xKey; h['content-type']='application/json'; return h; }
 async function check(url){ try{ const r=await fetch(url,{mode:"cors",headers:hdr()}); const text=await r.text().catch(()=>'' ); return {ok:r.ok,status:r.status,text}; }catch(e){ return {ok:false,status:-1,text:String(e)}; } }
-$("#btnCheckWorker").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ $("#workerStatus").textContent="Chưa cấu hình Worker."; return; } const u=s.workerUrl.replace(/\\/$/,'')+"/health"; const r=await check(u); state.workerOk=r.ok; const msg=r.ok?`Worker OK (health ${r.status})`:`Worker lỗi (${r.status}). ${r.text.slice(0,120)}`; $("#workerStatus").textContent=msg; log("[/health] "+msg); toast(r.ok?"Worker OK":"Worker lỗi "+r.status, r.ok?"ok":"err"); };
-$("#btnCheckAuth").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } const u=s.workerUrl.replace(/\\/$/,'')+"/whoami"; const r=await check(u); const msg=r.ok?"X-Key hợp lệ.":"X-Key không hợp lệ ("+r.status+")"; log("[/whoami] "+msg+" — "+r.text.slice(0,120)); toast(msg, r.ok?"ok":"err"); };
-$("#btnCheckWrite").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } const u=s.workerUrl.replace(/\\/$/,'')+"/can-write"; const r=await check(u); const msg=r.ok?"Có quyền commit.":"Không có quyền ("+r.status+")"; log("[/can-write] "+msg+" — "+r.text.slice(0,120)); toast(msg, r.ok?"ok":"err"); };
-$("#btnProbeOptions").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } try{ const u=s.workerUrl.replace(/\\/$/,'')+"/upload-image"; const r=await fetch(u,{method:"OPTIONS",mode:"cors",headers:hdr()}); log(`[OPTIONS /upload-image] ${r.status} ${r.ok?'OK':''} — ALLOW: ${r.headers.get('allow')||'-'} | ACR: ${r.headers.get('access-control-allow-methods')||'-'}`); toast("Đã probe OPTIONS /upload-image","ok"); }catch(e){ log("[OPTIONS /upload-image] Lỗi: "+e.message); toast("Probe lỗi.","err"); } };
-$("#btnProbePublish").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } try{ const u=s.workerUrl.replace(/\\/$/,'')+"/publish"; const r=await fetch(u,{method:"OPTIONS",mode:"cors",headers:hdr()}); log(`[OPTIONS /publish] ${r.status} ${r.ok?'OK':''} — ALLOW: ${r.headers.get('allow')||'-'} | ACR: ${r.headers.get('access-control-allow-methods')||'-'}`); toast("Đã probe OPTIONS /publish","ok"); }catch(e){ log("[OPTIONS /publish] Lỗi: "+e.message); toast("Probe lỗi.","err"); } };
+$("#btnCheckWorker").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ $("#workerStatus").textContent="Chưa cấu hình Worker."; return; } const u=s.workerUrl.replace(/\/$/,'')+"/health"; const r=await check(u); state.workerOk=r.ok; const msg=r.ok?`Worker OK (health ${r.status})`:`Worker lỗi (${r.status}). ${r.text.slice(0,120)}`; $("#workerStatus").textContent=msg; log("[/health] "+msg); toast(r.ok?"Worker OK":"Worker lỗi "+r.status, r.ok?"ok":"err"); };
+$("#btnCheckAuth").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } const u=s.workerUrl.replace(/\/$/,'')+"/whoami"; const r=await check(u); const msg=r.ok?"X-Key hợp lệ.":"X-Key không hợp lệ ("+r.status+")"; log("[/whoami] "+msg+" — "+r.text.slice(0,120)); toast(msg, r.ok?"ok":"err"); };
+$("#btnCheckWrite").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } const u=s.workerUrl.replace(/\/$/,'')+"/can-write"; const r=await check(u); const msg=r.ok?"Có quyền commit.":"Không có quyền ("+r.status+")"; log("[/can-write] "+msg+" — "+r.text.slice(0,120)); toast(msg, r.ok?"ok":"err"); };
+$("#btnProbeOptions").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } try{ const u=s.workerUrl.replace(/\/$/,'')+"/upload-image"; const r=await fetch(u,{method:"OPTIONS",mode:"cors",headers:hdr()}); log(`[OPTIONS /upload-image] ${r.status} ${r.ok?'OK':''} — ALLOW: ${r.headers.get('allow')||'-'} | ACR: ${r.headers.get('access-control-allow-methods')||'-'}`); toast("Đã probe OPTIONS /upload-image","ok"); }catch(e){ log("[OPTIONS /upload-image] Lỗi: "+e.message); toast("Probe lỗi.","err"); } };
+$("#btnProbePublish").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } try{ const u=s.workerUrl.replace(/\/$/,'')+"/publish"; const r=await fetch(u,{method:"OPTIONS",mode:"cors",headers:hdr()}); log(`[OPTIONS /publish] ${r.status} ${r.ok?'OK':''} — ALLOW: ${r.headers.get('allow')||'-'} | ACR: ${r.headers.get('access-control-allow-methods')||'-'}`); toast("Đã probe OPTIONS /publish","ok"); }catch(e){ log("[OPTIONS /publish] Lỗi: "+e.message); toast("Probe lỗi.","err"); } };
 $("#btnTestUpload").onclick=async()=>{
   const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; }
   const c=document.createElement('canvas'); c.width=1; c.height=1;
@@ -389,7 +392,7 @@ $("#btnTestUpload").onclick=async()=>{
   const b64=await blobToBase64(blob);
   const path='/assets/img/test/ping.webp';
   try{
-    const r=await fetch(s.workerUrl.replace(/\\/$/,'')+'/upload-image',{method:'POST',mode:'cors',headers:hdr(),body:JSON.stringify({sku:'ping',path,file:b64})});
+    const r=await fetch(s.workerUrl.replace(/\/$/,'')+'/upload-image',{method:'POST',mode:'cors',headers:hdr(),body:JSON.stringify({sku:'ping',path,file:b64})});
     const text=await r.text().catch(()=>'');
     log(`[TEST UPLOAD] ${r.status} ${r.ok?'OK':'FAIL'} — ${text.slice(0,180)}`);
     toast(r.ok?'Test upload OK':'Test upload FAIL '+r.status, r.ok?'ok':'err');
@@ -490,7 +493,7 @@ function decideNameFor(file){ const sku=$("#sku").value.trim(); const useFilenam
 async function handleFiles(files){
   if(!files || !files.length) return;
   if(files.length===1){ await handleSingleFile(files[0]); }
-  else { for(const f of files){ await queueAddRawFile(f); } toast(`Đã thêm ${files.length} ảnh vào hàng đợi.`,'ok'); }
+  else { for(const f of files){ await queueAddRawFile(f); } toast(`Đã thêm ${files.length} ảnh vào hàng đợi.`,"ok"); }
 }
 function renderPreview(name, blob, w, h){
   state.imgBlob=blob; state.imgW=w; state.imgH=h;
@@ -534,7 +537,7 @@ async function reconvertFromSource(){
   const img=new Image();
   await new Promise(r=>{ img.onload=r; img.src=state.srcDataUrl; });
   const opts=getImageOpts();
-  const base=(state.imgName||'mxd').replace(/\\.(webp|png|jpg)$/,'');
+  const base=(state.imgName||'mxd').replace(/\.(webp|png|jpg)$/,'');
   const out=await resizeContainToBlob(img, opts);
   renderPreview(base, out.blob, out.w, out.h);
 }
@@ -569,7 +572,7 @@ async function queueAddCurrent(){
   if(!state.imgBlob){ toast("Chưa có ảnh xem trước.","warn"); return; }
   const fmt=getSelectedFmt();
   let folder=getSelectedFolder();
-  const base=(state.imgName||'mxd.webp').replace(/\\.(webp|png|jpg)$/,'');
+  const base=(state.imgName||'mxd.webp').replace(/\.(webp|png|jpg)$/,'');
   const item={ id:(++seq), srcFile:null, name:base, fmt, folder, customPath:$("#defaultFolder").value==='custom', outBlob:state.imgBlob, w:state.imgW, h:state.imgH, status:'ready' };
   queue.push(item);
   renderQueue();
@@ -633,10 +636,11 @@ function renderQueue(){
     tr.querySelector('.do-upload').onclick=()=>uploadItem(it, statusEl);
   });
 }
-$("#btnConvertAll").onclick=async()=>{ for(const it of queue){ await queueProcess(it); } toast("Đã convert tất cả.","ok"); renderQueue(); };
-$("#btnDownloadAll").onclick=()=>{ for(const it of queue){ if(!it.outBlob) continue; const a=document.createElement('a'); a.href=URL.createObjectURL(it.outBlob); a.download=it.name+'.'+getExt(it.fmt||'webp'); a.click(); } };
-$("#btnUploadAll").onclick=async()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } for(const it of queue){ const row=document.querySelector(`tr[data-id="${it.id}"] .status`); await uploadItem(it,row); } toast("Upload tất cả xong (xem trạng thái từng mục).","ok"); };
-$("#btnClearQueue").onclick=()=>{ queue.length=0; renderQueue(); };
+// SAFE BIND (tránh crash khi thiếu các nút hàng đợi trong DOM)
+bindClick('btnConvertAll', async ()=>{ for(const it of queue){ await queueProcess(it); } toast("Đã convert tất cả.","ok"); renderQueue(); });
+bindClick('btnDownloadAll', ()=>{ for(const it of queue){ if(!it.outBlob) continue; const a=document.createElement('a'); a.href=URL.createObjectURL(it.outBlob); a.download=it.name+'.'+getExt(it.fmt||'webp'); a.click(); } });
+bindClick('btnUploadAll', async ()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } for(const it of queue){ const row=document.querySelector(`tr[data-id="${it.id}"] .status`); await uploadItem(it,row||{textContent:''}); } toast("Upload tất cả xong (xem trạng thái từng mục).","ok"); });
+bindClick('btnClearQueue', ()=>{ queue.length=0; renderQueue(); });
 
 /* Upload */
 function splitDataUrl(d){ const m = String(d||'').match(/^data:([^;]+);base64,(.+)$/); return m ? { mime:m[1], base64:m[2] } : { mime:'', base64:d||'' }; }
@@ -645,11 +649,11 @@ async function convertBlobToWebp(blob, w, h){ const url=URL.createObjectURL(blob
 async function uploadItem(it, statusEl){
   let path=pathFor(it);
   try{
-    if(!it.outBlob){ statusEl.textContent='Đang xử lý'; await queueProcess(it); }
+    if(!it.outBlob){ if(statusEl) statusEl.textContent='Đang xử lý'; await queueProcess(it); }
     const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; }
-    const base=s.workerUrl.replace(/\\/$/,'');
+    const base=s.workerUrl.replace(/\/$/,'');
     const dataUrl=await blobToBase64(it.outBlob);
-    statusEl.textContent='Uploading…';
+    if(statusEl) statusEl.textContent='Uploading…';
     let r=await fetch(base+"/upload-image",{method:"POST",mode:"cors",headers:hdr(),body:JSON.stringify({ sku:it.name, path, file:dataUrl })});
     let text=await r.text().catch(()=>'');
 
@@ -670,19 +674,19 @@ async function uploadItem(it, statusEl){
       if(r.ok){ it.fmt='webp'; it.outBlob=webpBlob; path=newPath; }
     }
 
-    if(!r.ok){ statusEl.textContent='Lỗi upload'; log(`[upload ${path}] FAIL cuối ${r.status}: ${text.slice(0,200)}`); toast("Upload lỗi "+r.status,"err"); return; }
+    if(!r.ok){ if(statusEl) statusEl.textContent='Lỗi upload'; log(`[upload ${path}] FAIL cuối ${r.status}: ${text.slice(0,200)}`); toast("Upload lỗi "+r.status,"err"); return; }
 
-    statusEl.textContent='Đã upload'; it.status='uploaded'; log(`[upload ${path}] OK`);
+    if(statusEl) statusEl.textContent='Đã upload'; it.status='uploaded'; log(`[upload ${path}] OK`);
     const sku=$("#sku").value.trim();
     if(sku && it.name===slugify(sku)) $("#image").value=path;
   }catch(e){
-    statusEl.textContent='Lỗi upload'; log(`[upload ${path}] EXC: ${e.message}`); toast("Upload lỗi: "+e.message,"err");
+    if(statusEl) statusEl.textContent='Lỗi upload'; log(`[upload ${path}] EXC: ${e.message}`); toast("Upload lỗi: "+e.message,"err");
   }
 }
 $("#btnUploadImg").onclick=async()=>{
   if(!state.imgBlob){ toast("Chưa có ảnh.","warn"); return; }
   const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; }
-  const base=s.workerUrl.replace(/\\/$/,'');
+  const base=s.workerUrl.replace(/\/$/,'');
   const sku=($("#sku").value.trim()||'mxd');
   const folder=getSelectedFolder();
   const ext=getExt(getSelectedFmt());
@@ -719,15 +723,15 @@ function activeTplFor(merchant){
 }
 function computeSubs(sku, merchant){ return { sub1: sku||'sku', sub2:(merchant||'merchant').toLowerCase(), sub3:'tool', sub4:'mxd210' }; }
 function ensureSubsInUrl(u, subs){ const has = k => new RegExp(`[?&]${k}=`,`i`).test(u); const qs=[]; for(const k of ['sub1','sub2','sub3','sub4']) if(!has(k)) qs.push(`${k}=${encodeURIComponent(subs[k])}`); return qs.length?(u+(u.includes('?')?'&':'?')+qs.join('&')):u; }
-function makeDeeplink(){ const origin=cleanUrl($("#origin").value.trim()); const sku=$("#sku").value.trim(); const merchant=$("#merchant").value; if(!origin){ toast("Thiếu Origin.","warn"); return; } const tpl=activeTplFor(merchant); const subs=computeSubs(sku,merchant); let link=tpl.replace(/\\{url\\}/g,encodeURIComponent(origin)).replace(/\\{sku\\}/g,sku||'sku').replace(/\\{sub1\\}/g,subs.sub1).replace(/\\{sub2\\}/g,subs.sub2).replace(/\\{sub3\\}/g,subs.sub3).replace(/\\{sub4\\}/g,subs.sub4); link=ensureSubsInUrl(link,subs); $("#deeplink").value=link; validateDeeplink(); }
+function makeDeeplink(){ const origin=cleanUrl($("#origin").value.trim()); const sku=$("#sku").value.trim(); const merchant=$("#merchant").value; if(!origin){ toast("Thiếu Origin.","warn"); return; } const tpl=activeTplFor(merchant); const subs=computeSubs(sku,merchant); let link=tpl.replace(/\{url\}/g,encodeURIComponent(origin)).replace(/\{sku\}/g,sku||'sku').replace(/\{sub1\}/g,subs.sub1).replace(/\{sub2\}/g,subs.sub2).replace(/\{sub3\}/g,subs.sub3).replace(/\{sub4\}/g,subs.sub4); link=ensureSubsInUrl(link,subs); $("#deeplink").value=link; validateDeeplink(); }
 $("#btnMakeDeeplink").onclick=makeDeeplink;
 ["origin","sku","merchant","tplShopee","tplLazada","tplTiki","tplTiktok","defaultFolder","defaultCustomPath"].forEach(id=>{ const el=$("#"+id); if(el) el.addEventListener('input', ()=>{ if($("#origin").value.trim()) makeDeeplink(); updateSingleUploadCta(); runDiag(); saveSettings(); }); });
 $("#deeplink").addEventListener('input', validateDeeplink);
-function validateDeeplink(){ const dl=$("#deeplink").value.trim(); const badge=$("#dlCheck"); if(!dl){ badge.textContent="chưa có deeplink"; badge.className='badge'; return; } const okHost=/(^https?:\\/\\/)?([^/]*\\.)?isclix\\.com/i.test(dl); const hasUrl=/[?&]url=/.test(dl); const s1=/[?&]sub1=/.test(dl), s2=/[?&]sub2=/.test(dl), s3=/[?&]sub3=/.test(dl), s4=/[?&]sub4=/.test(dl); if(okHost && hasUrl && s1 && s2 && s3 && s4){ badge.textContent="OK affiliate"; badge.className='badge'; return; } if(okHost && !hasUrl){ badge.textContent="isclix thiếu url="; badge.className='badge'; return; } if(okHost){ const missing=['sub1','sub2','sub3','sub4'].filter(k=>!new RegExp(`[?&]${k}=`).test(dl)); badge.textContent="isclix thiếu: "+missing.join(', '); badge.className='badge'; return; } badge.textContent="KHÔNG qua affiliate"; badge.className='badge'; }
+function validateDeeplink(){ const dl=$("#deeplink").value.trim(); const badge=$("#dlCheck"); if(!dl){ badge.textContent="chưa có deeplink"; badge.className='badge'; return; } const okHost=/(^https?:\/\/)?([^/]*\.)?isclix\.com/i.test(dl); const hasUrl=/[?&]url=/.test(dl); const s1=/[?&]sub1=/.test(dl), s2=/[?&]sub2=/.test(dl), s3=/[?&]sub3=/.test(dl), s4=/[?&]sub4=/.test(dl); if(okHost && hasUrl && s1 && s2 && s3 && s4){ badge.textContent="OK affiliate"; badge.className='badge'; return; } if(okHost && !hasUrl){ badge.textContent="isclix thiếu url="; badge.className='badge'; return; } if(okHost){ const missing=['sub1','sub2','sub3','sub4'].filter(k=>!new RegExp(`[?&]${k}=`).test(dl)); badge.textContent="isclix thiếu: "+missing.join(', '); badge.className='badge'; return; } badge.textContent="KHÔNG qua affiliate"; badge.className='badge'; }
 
 /* Shortlink via Worker (optional) */
 $("#btnMakeShort").onclick=async()=>{
-  const s=readSettings(); const base=(s.workerUrl||'').replace(/\\/$/,'');
+  const s=readSettings(); const base=(s.workerUrl||'').replace(/\/$/,'');
   const url=$("#deeplink").value.trim()||$("#origin").value.trim();
   const merchant=$("#merchant").value;
   if(!base){ toast("Chưa cấu hình Worker.","warn"); return; }
@@ -740,6 +744,29 @@ $("#btnMakeShort").onclick=async()=>{
   }catch(e){ toast("Shorten lỗi: "+e.message, "err"); }
 };
 $("#btnCopyShort").onclick=()=>{ const t=$("#shortlink"); t.select(); document.execCommand('copy'); toast("Đã copy Short-link."); };
+
+/* NEW: Copy/Mở Origin + Deeplink (bổ sung handler còn thiếu) */
+bindClick('copyOrigin', ()=>{
+  const v = ($("#originOut")?.value || $("#origin")?.value || '').trim();
+  if(!v) return toast('Chưa có Origin để copy','warn');
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(v).then(()=>toast('Đã copy Origin.','ok')).catch(()=>{ const ta=document.createElement('textarea'); ta.value=v; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Đã copy Origin.','ok'); }); } else { const ta=document.createElement('textarea'); ta.value=v; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Đã copy Origin.','ok'); }
+});
+bindClick('openOrigin', ()=>{
+  const v = cleanUrl($("#originOut")?.value || $("#origin")?.value || '');
+  if(!v) return toast('Chưa có Origin để mở','warn');
+  const hasProto=/^https?:\/\//i.test(v); window.open(hasProto?v:('https://'+v),'_blank');
+});
+bindClick('copyDeeplink', ()=>{
+  const v = ($("#deeplink")?.value||'').trim();
+  if(!v) return toast('Chưa có Deep-link để copy','warn');
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(v).then(()=>toast('Đã copy Deep-link.','ok')); }
+  else { const ta=document.createElement('textarea'); ta.value=v; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Đã copy Deep-link.','ok'); }
+});
+bindClick('btnOpenDeeplink', ()=>{
+  const v = cleanUrl($("#deeplink")?.value||'');
+  if(!v) return toast('Chưa có Deep-link để mở','warn');
+  const hasProto=/^https?:\/\//i.test(v); window.open(hasProto?v:('https://'+v),'_blank');
+});
 
 /* Gen commit */
 $("#btnGenCommit").onclick=()=>{
@@ -764,8 +791,8 @@ $("#btnGenCommit").onclick=()=>{
     dl?`deeplink: ${dl}`:'',
     sl?`short: ${sl}`:'',
     uploaded?`uploaded: ${uploaded}`:''
-  ].filter(Boolean).join('\\n');
-  const msg=header+(body?`\\n\\n${body}`:'');
+  ].filter(Boolean).join('\n');
+  const msg=header+(body?`\n\n${body}`:'');
   $("#commitMsg").value=msg;
   toast("Đã tạo commit message.","ok");
 };
@@ -825,7 +852,7 @@ async function doPublish(forceFeatured){
   const s=readSettings();
   if(s.workerUrl){
     try{
-      const r=await fetch(s.workerUrl.replace(/\\/$/,'')+"/publish",{method:"POST",mode:"cors",headers:hdr(),body:JSON.stringify(obj)});
+      const r=await fetch(s.workerUrl.replace(/\/$/,'')+"/publish",{method:"POST",mode:"cors",headers:hdr(),body:JSON.stringify(obj)});
       const text=await r.text().catch(()=>'' );
       log(`[publish ${obj.sku}] ${r.status} ${r.ok?'OK':'FAIL'} — ${text.slice(0,200)}`);
       if(!r.ok) throw new Error('HTTP '+r.status);
@@ -847,7 +874,7 @@ function runDiag(){
   const msgs=[];
   if(!sku) msgs.push("• Thiếu SKU (bắt buộc cho publish).");
   if(img && !img.startsWith(`${expectedFolder}${sku||'...'}`)) msgs.push("• Ảnh nên là "+expectedFolder+(sku||'&lt;sku&gt;')+"."+ext);
-  if(origin && !/shopee\\.vn|lazada\\.vn|tiki\\.vn|tiktok\\.com/i.test(origin)) msgs.push("• Origin không phải Shopee/Lazada/Tiki/TikTok.");
+  if(origin && !/shopee\.vn|lazada\.vn|tiki\.vn|tiktok\.com/i.test(origin)) msgs.push("• Origin không phải Shopee/Lazada/Tiki/TikTok.");
   msgs.push("• Merchant: "+merchant);
   $("#diag").innerHTML=msgs.length?msgs.map(x=>`<div>${x}</div>`).join(""):'<span class="ok">Tạm ổn.</span>';
   $("#originOut").value=origin;
@@ -890,6 +917,26 @@ function addClearButton(wrap, el){
   wrap.appendChild(b);
 }
 installClearers();
+
+/* Input sync: quality & targetKB (2 chiều) */
+(function syncSliders(){
+  const qRange=document.getElementById('quality');
+  const qNum=document.getElementById('qualityNum');
+  if(qRange && qNum){
+    const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
+    qRange.addEventListener('input', ()=>{ qNum.value=(+qRange.value).toFixed(2); });
+    qNum.addEventListener('input', ()=>{ const v=clamp(parseFloat(qNum.value)||0.82,0.4,0.95); qNum.value=v.toFixed(2); qRange.value=v; });
+    qNum.dispatchEvent(new Event('input'));
+  }
+  const kbRange=document.getElementById('targetKB');
+  const kbNum=document.getElementById('targetKBNum');
+  if(kbRange && kbNum){
+    const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
+    kbRange.addEventListener('input', ()=>{ kbNum.value=kbRange.value; });
+    kbNum.addEventListener('input', ()=>{ const v=clamp(parseInt(kbNum.value)||0,0,2048); kbNum.value=v; kbRange.value=Math.min(512,v); });
+    kbNum.dispatchEvent(new Event('input'));
+  }
+})();
 
 /* Init */
 function updateOriginMirror(){ $("#originOut").value=cleanUrl($("#origin").value); }
