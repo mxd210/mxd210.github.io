@@ -1,3 +1,9 @@
+/* GHI CHÚ NGUYÊN TẮC
+   - Sử dụng đúng mã code gốc do bạn cung cấp.
+   - Chỉ chỉnh sửa cần thiết; ở đây chỉ bổ sung ghi chú này, KHÔNG đổi logic.
+   - Trả lại toàn bộ file sau khi sửa.
+*/
+
 // /assets/js/render-hub.js — MXD hub renderer (fixed, alias-aware, status-flex)
 (function(){
   const $  = (sel, root=document) => root.querySelector(sel);
