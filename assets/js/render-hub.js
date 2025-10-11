@@ -1,115 +1,115 @@
-/* MXD render-hub v2025-10-11 +compat-deeplink
- * Đọc affiliates.json + category-alias.json, render lưới cho hub.
- * Thêm tương thích: nếu origin là deeplink -> tự tách origin gốc.
- */
-(function () {
-  const AFF_PATH = '/assets/data/affiliates.json';
-  const ALIAS_PATH = '/assets/data/category-alias.json';
-  const DEEP_HOSTS = ['go.isclix.com', 'deeplink', 'deep_link'];
+/* ====== MXD Category Aliases (global) ======
+   - Hợp nhất mọi biến thể/telex/không dấu → 1 khóa chuẩn
+   - Dùng cho renderer & cho script quét affiliates.json
+*/
+(function (root){
+  const deaccent = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const slug = s => deaccent(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/(^-|-$)/g,'');
 
-  const $ = (sel, el = document) => el.querySelector(sel);
-  const $$ = (sel, el = document) => Array.from(el.querySelectorAll(sel));
-  const money = n => Number(n || 0).toLocaleString('vi-VN');
+  const MAP = {
+    // --- Máy laze (laser level) ---
+    "may-laze": [
+      "may-laze","may-lazer","may-laser","laser","laze","la-ze","la re","la-re",
+      "may-can-bang-laser","can-bang-laser","laser-level","muc-tia-laser","level-laser"
+    ],
 
-  async function loadJSON(url, fallback = null) {
-    try {
-      const r = await fetch(url, { cache: 'no-store' });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return await r.json();
-    } catch (e) {
-      return fallback;
+    // --- Máy cắt ---
+    "may-cat": [
+      "may-cat","cat-gach","may-cat-gach","may-cat-da","tile-cutter","tile-saw",
+      "oscillating","may-cat-da-nang","may-cat-sat","may-cat-nhom","cut-off","luoi-cat"
+    ],
+
+    // --- Khoan/đục/vít/bulông + phụ trợ pin ---
+    "may-khoan-duc-vit": [
+      "may-khoan-duc-vit","may-khoan","may-khoan-be-tong","khoan-sds","khoan-sds-plus","may-duc",
+      "may-ban-vit","may-bat-vit","impact-driver","may-bulong","sung-bulong","impact-wrench",
+      "khoan-rut-loi","may-rut-loi","may-thoi","may-thoi-la","blower","may-bom-hoi","bom-hoi-pin",
+      "phu-kien-khoan"
+    ],
+
+    // --- Máy mài/đánh bóng/chà nhám ---
+    "may-mai": [
+      "may-mai","may-mai-goc","may-mai-pin","angle-grinder","grinder",
+      "may-cha-nham","sander","may-danh-bong","polisher","mai-be-tong"
+    ],
+
+    // --- Máy rung ốp lát (đầm gạch) ---
+    "may-rung-op-lat": [
+      "may-rung-op-lat","may-rung-gach","rung-op","tile-vibrator","vibrator-tile","may-rung-hut"
+    ],
+
+    // --- Dây mực / bắn dây ---
+    "may-ban-day": [
+      "may-ban-day","ban-day-muc","chalk-line","may-ban-muc","day-muc"
+    ],
+
+    // --- Tool cầm tay ốp lát khác ---
+    "bay-rang-cua": [
+      "bay-rang-cua","bay-rang-cua-4mm","notched-trowel","bay-tra-keo"
+    ],
+    "dung-cu-op-lat": [
+      "dung-cu-op-lat","nem-gach","kep-can-bang","ke-gach","bo-ke-nem","cu-op-lat"
+    ],
+    "keo-op-lat": [
+      "keo-op-lat","tile-adhesive","xi-mang-keo","keo-gach"
+    ],
+    "chong-tham": [
+      "chong-tham","waterproof","son-chong-tham","phu-chong-tham"
+    ],
+
+    // --- Phụ kiện máy (mặc định đổ về đây nếu chỉ là lưỡi/mũi/bit/pin) ---
+    "phu-kien-may": [
+      "phu-kien-may","mui-khoan","mui-duc","socket","khau","bit","adapter",
+      "pin","sac-pin","dia-mai","luoi-cat-phu-kien","phu-kien"
+    ],
+
+    // === THỜI TRANG (NEW) ===
+    // Hub: /store/thoi-trang.html  → gom các nhánh con như thoi-trang-nu/nam/tre-em...
+    "thoi-trang": [
+      "thoi-trang","thoi-trang-nu","thoi-trang-nam","thoi-trang-tre-em","tre-em",
+      "do-bao-ho","do-bao-ho-lao-dong",
+      "mua-he","thu-dong",
+      // vài nhóm item phổ biến (để guess/normalize tiện hơn)
+      "ao","quan","vay","dam","ao-khoac","ao-phao","ao-hoodie","ao-thun","ao-polo","so-mi","somi",
+      "quan-jean","quan-kaki","quan-short","do-bo","do-ngu","do-tap",
+      "phu-kien-thoi-trang","that-lung","mu-non","gang-tay","tat","tat-vo"
+    ]
+  };
+
+  function normalizeCategory(input){
+    const s = slug(input||'');
+    if (!s) return '';
+    for (const [canon, aliases] of Object.entries(MAP)){
+      if (aliases.some(a => s.startsWith(slug(a)))) return canon;
     }
+    return s; // không khớp alias thì để slug hiện có
   }
 
-  function isDeeplink(u='') {
-    try { const x = new URL(u); return DEEP_HOSTS.some(h => x.hostname.includes(h) || u.includes(h)); }
-    catch { return false; }
-  }
-  function extractOriginFromDeep(u='') {
-    try {
-      const x = new URL(u);
-      const inner = x.searchParams.get('url') || x.searchParams.get('deeplink');
-      return inner ? decodeURIComponent(inner) : u;
-    } catch { return u; }
-  }
-  function cleanAff(arr) {
-    return (arr||[]).map(p => {
-      if (!p) return p;
-      const out = { ...p };
-      if (out.origin && isDeeplink(out.origin)) {
-        out.origin = extractOriginFromDeep(out.origin);
-      }
-      // chuẩn hoá status (tương thích legacy true/false)
-      if (out.status === true) out.status = 'active';
-      else if (out.status === false) out.status = 'archived';
-      return out;
-    });
+  // Dò đoán từ name/tags (khi category trống/sai)
+  function guessCategoryByText(name='', tags=[]){
+    const t = slug([name, ...(Array.isArray(tags)?tags:[])].join(' '));
+    const hit = (keyArr)=> keyArr.some(k => t.includes(slug(k)));
+
+    // Ưu tiên các nhóm lớn trước
+    if (hit(MAP["thoi-trang"])) return "thoi-trang";
+    if (hit(MAP["may-laze"])) return "may-laze";
+    if (hit(MAP["may-khoan-duc-vit"])) return "may-khoan-duc-vit";
+    if (hit(MAP["may-cat"])) return "may-cat";
+    if (hit(MAP["may-mai"])) return "may-mai";
+    if (hit(MAP["may-rung-op-lat"])) return "may-rung-op-lat";
+    if (hit(MAP["may-ban-day"])) return "may-ban-day";
+    if (hit(MAP["bay-rang-cua"])) return "bay-rang-cua";
+    if (hit(MAP["dung-cu-op-lat"])) return "dung-cu-op-lat";
+    if (hit(MAP["keo-op-lat"])) return "keo-op-lat";
+    if (hit(MAP["chong-tham"])) return "chong-tham";
+    if (hit(MAP["phu-kien-may"])) return "phu-kien-may";
+    return "";
   }
 
-  function buildCard(p) {
-    const img = p.image || `/assets/img/products/${p.sku}.webp`;
-    return `
-<article class="product" data-sku="${p.sku}">
-  <a class="thumb" href="/g.html?sku=${encodeURIComponent(p.sku)}" title="${escapeHtml(p.name)}">
-    <img src="${img}" alt="${escapeHtml(p.name)} — MXD" loading="lazy" width="320" height="320">
-  </a>
-  <div class="info">
-    <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(p.sku)}">${escapeHtml(p.name)}</a></h3>
-    <div class="price">${money(p.price)} đ</div>
-    <div class="actions">
-      <a class="buy" data-merchant="${p.merchant || ''}" href="${p.origin}" rel="noopener">Mua</a>
-      <a class="more" href="/g.html?sku=${encodeURIComponent(p.sku)}">Chi tiết</a>
-    </div>
-  </div>
-</article>`.trim();
-  }
-
-  function escapeHtml(s='') {
-    return String(s).replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[c]));
-  }
-
-  async function initHub(hubEl) {
-    const hub = hubEl.dataset.hub; // ví dụ: "thoi-trang"
-    const grid = $('[data-grid]', hubEl);
-    const tabs = $$('[data-tab]', hubEl);
-
-    const alias = await loadJSON(ALIAS_PATH, { 'thoi-trang': ['thoi-trang-nam','thoi-trang-nu','thoi-trang-tre-em','thu-dong'] });
-    const affRaw = await loadJSON(AFF_PATH, []);
-    const aff = cleanAff(affRaw);
-
-    function filterBy(catSlugs) {
-      const catSet = new Set(catSlugs);
-      return aff.filter(p =>
-        p && p.status !== 'archived' &&
-        p.status !== 'draft' &&
-        p.category && catSet.has(p.category));
-    }
-
-    function render(catSlugs) {
-      const items = filterBy(catSlugs);
-      grid.innerHTML = items.length ? items.map(buildCard).join('\n')
-        : `<p class="muted">Chưa có sản phẩm hiển thị cho mục này.</p>`;
-    }
-
-    // Tab events
-    tabs.forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.preventDefault();
-        tabs.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const mode = btn.dataset.tab; // all | slug
-        if (mode === 'all') render(alias[hub] || []);
-        else render([mode]);
-      });
-    });
-
-    // Mặc định: 'all'
-    ( $('[data-tab].active', hubEl) || $('[data-tab="all"]', hubEl) )?.click();
-  }
-
-  function boot() { $$('[data-hub]').forEach(initHub); }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-})();
+  // expose
+  root.MXD = root.MXD || {};
+  root.MXD.normalizeCategory = normalizeCategory;
+  root.MXD.guessCategoryByText = guessCategoryByText;
+  root.MXD._CATEGORY_ALIASES = MAP;           // tiện debug
+  root.MXD_CATEGORY_ALIAS = MAP;              // COMPAT cho renderer cũ (đọc trực tiếp alias map)
+})(window);
