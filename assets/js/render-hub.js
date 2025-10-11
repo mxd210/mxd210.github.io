@@ -1,10 +1,11 @@
-/* MXD render-hub v2025-10-11
- * Tác dụng: đọc affiliates.json + category-alias.json và render lưới sản phẩm cho các trang hub.
- * Không thay đổi render-products.js cũ; file này chỉ vận hành ở các trang có [data-hub].
+/* MXD render-hub v2025-10-11 +compat-deeplink
+ * Đọc affiliates.json + category-alias.json, render lưới cho hub.
+ * Thêm tương thích: nếu origin là deeplink -> tự tách origin gốc.
  */
 (function () {
   const AFF_PATH = '/assets/data/affiliates.json';
   const ALIAS_PATH = '/assets/data/category-alias.json';
+  const DEEP_HOSTS = ['go.isclix.com', 'deeplink', 'deep_link'];
 
   const $ = (sel, el = document) => el.querySelector(sel);
   const $$ = (sel, el = document) => Array.from(el.querySelectorAll(sel));
@@ -18,6 +19,31 @@
     } catch (e) {
       return fallback;
     }
+  }
+
+  function isDeeplink(u='') {
+    try { const x = new URL(u); return DEEP_HOSTS.some(h => x.hostname.includes(h) || u.includes(h)); }
+    catch { return false; }
+  }
+  function extractOriginFromDeep(u='') {
+    try {
+      const x = new URL(u);
+      const inner = x.searchParams.get('url') || x.searchParams.get('deeplink');
+      return inner ? decodeURIComponent(inner) : u;
+    } catch { return u; }
+  }
+  function cleanAff(arr) {
+    return (arr||[]).map(p => {
+      if (!p) return p;
+      const out = { ...p };
+      if (out.origin && isDeeplink(out.origin)) {
+        out.origin = extractOriginFromDeep(out.origin);
+      }
+      // chuẩn hoá status (tương thích legacy true/false)
+      if (out.status === true) out.status = 'active';
+      else if (out.status === false) out.status = 'archived';
+      return out;
+    });
   }
 
   function buildCard(p) {
@@ -50,7 +76,8 @@
     const tabs = $$('[data-tab]', hubEl);
 
     const alias = await loadJSON(ALIAS_PATH, { 'thoi-trang': ['thoi-trang-nam','thoi-trang-nu','thoi-trang-tre-em','thu-dong'] });
-    const aff = await loadJSON(AFF_PATH, []);
+    const affRaw = await loadJSON(AFF_PATH, []);
+    const aff = cleanAff(affRaw);
 
     function filterBy(catSlugs) {
       const catSet = new Set(catSlugs);
@@ -62,11 +89,8 @@
 
     function render(catSlugs) {
       const items = filterBy(catSlugs);
-      if (!items.length) {
-        grid.innerHTML = `<p class="muted">Chưa có sản phẩm hiển thị cho mục này.</p>`;
-        return;
-      }
-      grid.innerHTML = items.map(buildCard).join('\n');
+      grid.innerHTML = items.length ? items.map(buildCard).join('\n')
+        : `<p class="muted">Chưa có sản phẩm hiển thị cho mục này.</p>`;
     }
 
     // Tab events
@@ -76,27 +100,16 @@
         tabs.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const mode = btn.dataset.tab; // all | slug
-        if (mode === 'all') {
-          render(alias[hub] || []);
-        } else {
-          render([mode]);
-        }
-        // affiliate rewrite sẽ tự chạy lại khi DOM thay đổi
-        // (nếu cần, có thể trigger sự kiện tùy script affiliate đang dùng)
+        if (mode === 'all') render(alias[hub] || []);
+        else render([mode]);
       });
     });
 
     // Mặc định: 'all'
-    const first = $('[data-tab].active', hubEl) || $('[data-tab="all"]', hubEl);
-    first && first.click();
+    ( $('[data-tab].active', hubEl) || $('[data-tab="all"]', hubEl) )?.click();
   }
 
-  function boot() {
-    $$('[data-hub]').forEach(initHub);
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
+  function boot() { $$('[data-hub]').forEach(initHub); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
