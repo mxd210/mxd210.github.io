@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MXD-OPS v1.5 — Console (Static)</title>
+<meta name="robots" content="noindex,follow"/>
+<style>
+  body{margin:0;background:#0b0f14;color:#e8f0fb;font:14px/1.45 ui-sans-serif,system-ui}
+  .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
+  .grid{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+  .card{background:#101722;border:1px solid #1c2634;border-radius:14px;padding:16px}
+  h1{font-size:22px;margin:0 0 12px}
+  h2{font-size:16px;margin:0 0 8px;color:#a7b4c2}
+  input,select,button,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #263244;background:#0e1622;color:#e8f0fb}
+  button{border:0;background:#7cc4ff;color:#001528;font-weight:700;cursor:pointer}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .out{white-space:pre-wrap;background:#0e1622;border:1px dashed #263244;border-radius:10px;padding:10px;margin-top:8px;min-height:60px}
+  .hint{color:#93a3b5;font-size:12px;margin:6px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>MXD-OPS v1.5 — Console (Static)</h1>
+
+  <div class="grid">
+    <div class="card">
+      <h2>1) Ảnh sản phẩm / OG</h2>
+      <div class="row">
+        <label>Chọn ảnh (từ máy)<input type="file" id="f" accept="image/*"></label>
+        <label>Hoặc dán URL ảnh<input id="imgUrl" placeholder="https://..."></label>
+      </div>
+      <div class="row">
+        <label>Thư mục đích
+          <select id="dir">
+            <option value="products">/assets/img/products — Ảnh sản phẩm</option>
+            <option value="categories">/assets/img/categories — Icon danh mục</option>
+            <option value="tin-tuc">/assets/img/tin-tuc — Ảnh OG/Tin tức</option>
+          </select>
+        </label>
+        <label>SKU / Slug<input id="sku" placeholder="hukan-t22"></label>
+      </div>
+      <div class="row">
+        <label>Chế độ OG 1200×630
+          <select id="ogMode">
+            <option value="none">Không tạo OG</option>
+            <option value="contain">Tạo OG (contain + nền)</option>
+            <option value="cover">Tạo OG (cover + cắt)</option>
+          </select>
+        </label>
+        <label>Chất lượng WebP (0–100)<input id="q" type="number" min="0" max="100" value="86"></label>
+      </div>
+      <button id="btnUpload">Nén & Upload</button>
+      <div id="out1" class="out"></div>
+      <p class="hint">Gợi ý: Ảnh sản phẩm sẽ lưu tên /assets/img/products/&lt;sku&gt;.webp ; Ảnh OG: /assets/img/tin-tuc/&lt;sku&gt;-og.webp</p>
+    </div>
+
+    <div class="card">
+      <h2>2) Deeplink & Commit</h2>
+      <div class="row">
+        <label>Merchant
+          <select id="merchant">
+            <option value="shopee">Shopee</option>
+            <option value="lazada">Lazada</option>
+            <option value="tiki">Tiki</option>
+            <option value="tiktok">TikTok</option>
+          </select>
+        </label>
+        <label>Link gốc sản phẩm<input id="origin" placeholder="https://shopee.vn/..."></label>
+      </div>
+      <button id="btnDeep">Sinh deeplink</button>
+      <div id="out2" class="out"></div>
+
+      <div class="row" style="margin-top:12px">
+        <label>Type
+          <select id="ctype">
+            <option>feat</option><option>fix</option><option>chore</option><option>docs</option><option>refactor</option>
+          </select>
+        </label>
+        <label>Scope<input id="cscope" placeholder="assets|layout|seo|affiliate|worker|store|product|pwa"></label>
+      </div>
+      <label>Tóm tắt commit<input id="csummary" placeholder="add product image & OG for hukan-t22 (webp, 1200x630)"></label>
+      <button id="btnCommit">Gen commit</button>
+      <div id="out3" class="out"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>3) HTML Smart Insert</h2>
+    <div class="row">
+      <label>File<input id="hfile" placeholder="/store.html"></label>
+      <label>Anchor (tên sau MXD-ANCHOR:)<input id="hanchor" placeholder="STORE-HUBS | CATEGORY-GRID | BODY-END"></label>
+    </div>
+    <label>Content để chèn (HTML)<textarea id="hcontent" rows="4" placeholder='&lt;a class="category-tile" href="/store/may-cat.html"&gt;...&lt;/a&gt;'></textarea></label>
+    <div class="row">
+      <label>Mode
+        <select id="hmode">
+          <option>insert_after</option><option>insert_before</option>
+        </select>
+      </label>
+      <label>Dedupe.includes (tùy chọn)<input id="hdedupe" placeholder="chuỗi ngắn nhận diện content"></label>
+    </div>
+    <button id="btnHTML">Chèn nội dung</button>
+    <div id="out4" class="out"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>4) Worker</h2>
+    <div class="row">
+      <button id="btnHealth">Health</button>
+      <button id="btnXKey">X-Key</button>
+    </div>
+    <div id="out5" class="out"></div>
+  </div>
+</div>
+
+<script>
+const WORKER_BASE = 'https://mxd-control-v2.mxd6686.workers.dev'; // ĐỔI theo tên Worker của bạn
+async function postJSON(path, data){
+  const r = await fetch(WORKER_BASE + path, {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(data)});
+  const j = await r.json().catch(()=>({}));
+  return {ok:r.ok, status:r.status, data:j};
+}
+function drawContain(img, W, H, bg='#0b0f14'){
+  const c = document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  g.fillStyle=bg; g.fillRect(0,0,W,H);
+  const r = Math.min(W/img.width, H/img.height);
+  const w = Math.round(img.width*r), h = Math.round(img.height*r);
+  const x = Math.round((W-w)/2), y = Math.round((H-h)/2);
+  g.drawImage(img, x, y, w, h);
+  return c;
+}
+function drawCover(img, W, H){
+  const c = document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  const r = Math.max(W/img.width, H/img.height);
+  const w = Math.round(img.width*r), h = Math.round(img.height*r);
+  const x = Math.round((W-w)/2), y = Math.round((H-h)/2);
+  g.drawImage(img, x, y, w, h);
+  return c;
+}
+function toWebP(canvas, quality){
+  return new Promise(res=>canvas.toBlob(b=>res(b), 'image/webp', Math.max(0,Math.min(1,quality/100))));
+}
+function blobToDataURL(blob){
+  return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(blob); });
+}
+async function pickImage(){
+  const f = document.getElementById('f').files[0];
+  const url = document.getElementById('imgUrl').value.trim();
+  if (!f && !url) throw new Error('Chọn tệp hoặc dán URL ảnh');
+  return f ? URL.createObjectURL(f) : url;
+}
+async function loadImage(src){
+  return new Promise((res,rej)=>{ const i = new Image(); i.crossOrigin='anonymous'; i.onload=()=>res(i); i.onerror=()=>rej(new Error('Không tải được ảnh')); i.src=src; });
+}
+
+document.getElementById('btnUpload').onclick = async ()=>{
+  const out = document.getElementById('out1'); out.textContent='Đang xử lý...';
+  try{
+    const dir = document.getElementById('dir').value;
+    const sku = document.getElementById('sku').value.trim();
+    const ogMode = document.getElementById('ogMode').value;
+    const q = parseInt(document.getElementById('q').value || '86', 10);
+
+    if (!sku) throw new Error('SKU trống');
+    const src = await pickImage();
+    const img = await loadImage(src);
+
+    let W = img.width, H = img.height;
+    const maxEdge = 1200;
+    if (Math.max(W,H) > maxEdge){
+      const r = maxEdge / Math.max(W,H);
+      W = Math.round(W*r); H = Math.round(H*r);
+    }
+    const cMain = document.createElement('canvas'); cMain.width=W; cMain.height=H; cMain.getContext('2d').drawImage(img,0,0,W,H);
+    const webpBlob = await toWebP(cMain, q);
+    const webpData = await blobToDataURL(webpBlob);
+
+    let ogWebpData = null;
+    if (ogMode !== 'none'){
+      const W2=1200, H2=630;
+      const cOG = ogMode==='contain' ? drawContain(img, W2, H2) : drawCover(img, W2, H2);
+      const ogBlob = await toWebP(cOG, q);
+      ogWebpData = await blobToDataURL(ogBlob);
+    }
+
+    const r = await postJSON('/ops/upload', {dir, sku, webpData, ogWebpData});
+    out.textContent = r.ok ? ('✔ Uploaded\n' + JSON.stringify(r.data,null,2)) : ('✖ ' + r.status + ': ' + JSON.stringify(r.data));
+  }catch(e){
+    out.textContent = '✖ ' + e.message;
+  }
+};
+
+document.getElementById('btnDeep').onclick = async ()=>{
+  const out = document.getElementById('out2'); out.textContent='...';
+  const merchant = document.getElementById('merchant').value;
+  const origin = document.getElementById('origin').value.trim();
+  const sku = document.getElementById('sku').value.trim();
+  const r = await postJSON('/ops/deeplink', {merchant, origin, sku});
+  out.textContent = r.ok ? JSON.stringify(r.data,null,2) : ('✖ ' + r.status + ': ' + JSON.stringify(r.data));
+};
+document.getElementById('btnCommit').onclick = async ()=>{
+  const out = document.getElementById('out3'); out.textContent='...';
+  const ctype = document.getElementById('ctype').value;
+  const cscope = document.getElementById('cscope').value.trim() || 'ops';
+  const csummary = document.getElementById('csummary').value.trim() || 'update';
+  const r = await postJSON('/ops/gencommit', {type: ctype, scope: cscope, summary: csummary});
+  out.textContent = r.ok ? r.data.commit : ('✖ ' + r.status + ': ' + JSON.stringify(r.data));
+};
+document.getElementById('btnHTML').onclick = async ()=>{
+  const out = document.getElementById('out4'); out.textContent='...';
+  const file = document.getElementById('hfile').value.trim();
+  const anchor = document.getElementById('hanchor').value.trim();
+  const content = document.getElementById('hcontent').value;
+  const mode = document.getElementById('hmode').value;
+  const dedupe = document.getElementById('hdedupe').value.trim();
+  const r = await postJSON('/ops/html.smart', {file, anchor, content, mode, dedupe: dedupe?{includes: dedupe}:undefined});
+  out.textContent = r.ok ? JSON.stringify(r.data,null,2) : ('✖ ' + r.status + ': ' + JSON.stringify(r.data));
+};
+document.getElementById('btnHealth').onclick = async ()=>{
+  const out = document.getElementById('out5'); out.textContent='...';
+  const r = await fetch(WORKER_BASE + '/ops/health'); out.textContent = await r.text();
+};
+document.getElementById('btnXKey').onclick = async ()=>{
+  const out = document.getElementById('out5'); out.textContent='...';
+  const r = await fetch(WORKER_BASE + '/ops/xkey'); out.textContent = await r.text();
+};
+</script>
+</body>
+</html>
