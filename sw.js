@@ -11,7 +11,8 @@ FIND: MXD-CHECK v2025-10-06 [sw]
 */
 
 // sw.js — MXD PWA (2025-10-08)
-const VERSION = '2025-10-08-mlz1'; // BUMP mỗi lần sửa
+const VERSION = '2025-10-11-hub-fashion'; // BUMP
+
 
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
