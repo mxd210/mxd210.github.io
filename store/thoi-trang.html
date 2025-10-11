@@ -4,6 +4,11 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
+  <!-- GHI CHÚ NGUYÊN TẮC
+       - Dùng đúng mã gốc do bạn cung cấp.
+       - Chỉ chỉnh sửa cần thiết; giữ nguyên cấu trúc.
+       - Đã thêm bust cache cho JS để chắc chắn chạy bản mới. -->
+
   <!-- MXD-HUB:thoi-trang v2025-10-11 -->
   <!-- MXD-CHECK [hub]
     - Canonical tuyệt đối: https://mxd210.github.io/store/thoi-trang.html
@@ -31,7 +36,8 @@
   <script defer src="/assets/analytics.js"></script>
 
   <!-- Alias PHẢI đứng trước renderer -->
-  <script defer src="/assets/js/category-alias.js"></script>
+  <!-- Bust cache để chắc chắn nạp bản alias mới -->
+  <script defer src="/assets/js/category-alias.js?v=2025-10-11-fix1"></script>
 
   <!-- Giữ để tương thích nếu nơi khác gọi (renderer cũ dùng DOM metas) -->
   <script defer src="/assets/js/render-products.js"></script>
@@ -40,7 +46,8 @@
   <script defer src="/assets/mxd-affiliate.js"></script>
 
   <!-- Hub renderer (đọc AFF + alias) -->
-  <script defer src="/assets/js/render-hub.js"></script>
+  <!-- Bust cache để chắc chắn chạy bản render-hub.js mới -->
+  <script defer src="/assets/js/render-hub.js?v=2025-10-11-fix1"></script>
 </head>
 <body>
   <header class="site-header">
