@@ -10,6 +10,7 @@
     - robots=index,follow
     - GA4 TRƯỚC affiliate (defer; 1 lần)
     - CSS: /assets/site.css
+    - Alias PHẢI nạp trước renderer
     - Script hub: /assets/js/render-hub.js sau affiliate (không xung đột)
   -->
 
@@ -28,9 +29,16 @@
 
   <!-- GA4 trước Affiliate -->
   <script defer src="/assets/analytics.js"></script>
-  <!-- giữ để tương thích nếu nơi khác gọi -->
+
+  <!-- Alias PHẢI đứng trước renderer -->
+  <script defer src="/assets/js/category-alias.js"></script>
+
+  <!-- Giữ để tương thích nếu nơi khác gọi (renderer cũ dùng DOM metas) -->
   <script defer src="/assets/js/render-products.js"></script>
+
+  <!-- Affiliate rewrite -->
   <script defer src="/assets/mxd-affiliate.js"></script>
+
   <!-- Hub renderer (đọc AFF + alias) -->
   <script defer src="/assets/js/render-hub.js"></script>
 </head>
@@ -55,7 +63,8 @@
     </div>
 
     <!-- GRID: render-hub.js sẽ điền sản phẩm vào đây -->
-    <section class="product-grid" data-hub="thoi-trang" data-grid></section>
+    <!-- Compat: thêm data-category để renderer cũ cũng nhận -->
+    <section class="product-grid" data-hub="thoi-trang" data-category="thoi-trang" data-grid></section>
 
     <p class="muted" style="margin-top:16px">Danh mục này đang được xây dựng. Chúng tôi sẽ liên tục bổ sung sản phẩm và nội dung hướng dẫn trong thời gian tới.</p>
   </main>
@@ -65,5 +74,25 @@
       © MXD · <a href="/bao-mat.html">Bảo mật</a> · <a href="/doi-tra.html">Đổi trả</a> · <a href="/bao-hanh.html">Bảo hành</a>
     </div>
   </footer>
+
+  <!-- Compat shim: hợp nhất hub/category + expose aliases cho renderer cũ -->
+  <script>
+    (function(){
+      const grid = document.querySelector('.product-grid');
+      if(!grid) return;
+      // đồng bộ hub→category để renderer cũ không bị trống
+      const hub = grid.dataset.hub || grid.dataset.category || 'thoi-trang';
+      grid.dataset.category = hub;
+
+      // alias map (ưu tiên new → fallback old)
+      const aliasMap = (window.MXD && (MXD._CATEGORY_ALIASES || window.MXD_CATEGORY_ALIAS)) || window.MXD_CATEGORY_ALIAS || {};
+      const aliases = aliasMap[hub] || [hub];
+
+      // expose cho render-products.js đời cũ (nếu có dùng)
+      window.MXD = window.MXD || {};
+      MXD.__hub = hub;
+      MXD.__aliases = aliases;
+    })();
+  </script>
 </body>
 </html>
