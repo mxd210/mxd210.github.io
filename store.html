@@ -85,7 +85,7 @@ FIND: MXD-ANCHOR:CATEGORY-GRID
     .category-tile span{display:block;padding:10px 12px;font-weight:800}
   </style>
 
-  <!-- SUB mặc định (override bằng ?sub1=&sub2=... khi test) -->
+  <!-- SUB mặc định -->
   <meta name="at:sub1" content="">
   <meta name="at:sub2" content="">
   <meta name="at:sub3" content="store">
@@ -114,7 +114,7 @@ FIND: MXD-ANCHOR:CATEGORY-GRID
   </header>
 
   <main class="container">
-    <!-- QUICK-NAV -->
+    <!-- QUICK-NAV (HUBS ONLY) -->
     <section aria-label="Danh mục nhanh">
       <ul class="quick-nav" id="quick-nav"></ul>
     </section>
@@ -122,14 +122,21 @@ FIND: MXD-ANCHOR:CATEGORY-GRID
     <!-- MXD-ANCHOR:CATEGORY-GRID -->
     <!-- BEGIN category-grid -->
     <div class="category-grid">
-      <!-- NEW: Máy móc xây dựng hub tile -->
+      <!-- NEW: Nổi bật hub tile -->
+      <a class="category-tile" href="/store/noi-bat.html">
+        <img src="/assets/img/categories/noi-bat.webp"
+             alt="Sản phẩm nổi bật — MXD" width="320" height="200" loading="lazy" decoding="async">
+        <span>Sản phẩm nổi bật</span>
+      </a>
+
+      <!-- Máy móc xây dựng hub tile -->
       <a class="category-tile" href="/store/may-moc-xay-dung.html">
         <img src="/assets/img/categories/may-moc-xay-dung.webp"
              alt="Máy móc xây dựng — MXD" width="320" height="200" loading="lazy" decoding="async">
         <span>Máy móc xây dựng</span>
       </a>
 
-      <!-- Giữ tile Thời trang như hiện trạng -->
+      <!-- Thời trang hub tile -->
       <a class="category-tile" href="/store/thoi-trang.html">
         <img src="/assets/img/categories/thoi-trang.webp"
              alt="Thời trang — MXD" width="320" height="200" loading="lazy" decoding="async">
@@ -149,16 +156,14 @@ FIND: MXD-ANCHOR:CATEGORY-GRID
     </div>
   </footer>
 
-  <!-- Loader Quick-Nav + Render sản phẩm -->
+  <!-- Loader Quick-Nav (hubs only) + Render sản phẩm -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      // QUICK-NAV: đọc nhiều nguồn + fallback
       const qn = document.getElementById('quick-nav');
 
       (async () => {
         const sources = ['/assets/categories.json', '/assets/data/categories.json'];
         let raw = null;
-
         for (const url of sources) {
           try {
             const r = await fetch(url, { cache: 'no-store' });
@@ -166,7 +171,7 @@ FIND: MXD-ANCHOR:CATEGORY-GRID
           } catch(_) {}
         }
 
-        // Chuẩn hoá list
+        // Chuẩn hoá list từ file (nếu có)
         let list = [];
         if (Array.isArray(raw)) list = raw;
         else if (raw && Array.isArray(raw.categories)) list = raw.categories;
@@ -181,40 +186,28 @@ FIND: MXD-ANCHOR:CATEGORY-GRID
             path: x.path || x.canonical || (slug ? `/store/${slug}.html` : '#')
           };
         };
+        const items = list.map(norm);
 
-        let items = list.map(norm);
+        // Giữ đúng 3 HUB
+        const HUBS = new Map([
+          ['noi-bat',          { name: 'Sản phẩm nổi bật', icon: '/assets/img/categories/noi-bat.webp' }],
+          ['may-moc-xay-dung', { name: 'Máy móc xây dựng', icon: '/assets/img/categories/may-moc-xay-dung.webp' }],
+          ['thoi-trang',       { name: 'Thời trang',        icon: '/assets/img/categories/thoi-trang.webp' }]
+        ]);
 
-        // Fallback: đảm bảo có các danh mục cốt lõi (thêm Máy móc xây dựng)
-        const ensure = (slug, name, icon) => {
-          if (!items.some(i => i.slug === slug)) {
-            items.push(norm({ slug, name, icon, path: `/store/${slug}.html` }));
-          }
-        };
-        ensure('may-moc-xay-dung', 'Máy móc xây dựng', '/assets/img/categories/may-moc-xay-dung.webp');
-        ensure('may-cat', 'Máy cắt', '/assets/img/categories/may-cat.webp');
-        ensure('may-khoan-duc-vit', 'Khoan · Đục · Vít', '/assets/img/categories/may-khoan-duc-vit.webp');
-        ensure('may-laze', 'Máy laser', '/assets/img/categories/may-laze.webp');
-        ensure('phu-kien-may', 'Phụ kiện máy', '/assets/img/categories/phu-kien-may.webp');
-        ensure('thoi-trang', 'Thời trang & làm việc', '/assets/img/categories/thoi-trang.webp');
+        const hubsOnly = Array.from(HUBS.keys()).map(slug => {
+          const found = items.find(i => i.slug === slug);
+          return found || { slug, name: HUBS.get(slug).name, icon: HUBS.get(slug).icon, path: `/store/${slug}.html` };
+        });
 
-        // Render quick-nav
-        if (!items.length) {
-          qn.innerHTML = `
-            <li>
-              <a href="/store/may-moc-xay-dung.html" class="qnav-item">
-                <img src="/assets/img/categories/may-moc-xay-dung.webp" alt="Máy móc xây dựng — MXD" width="28" height="28" loading="lazy" decoding="async"/>Máy móc xây dựng
-              </a>
-            </li>`;
-        } else {
-          qn.innerHTML = items.map(c => `
-            <li>
-              <a href="${c.path}" class="qnav-item">
-                <img src="${c.icon}" alt="${c.name} — MXD" width="28" height="28" loading="lazy" decoding="async"/>
-                ${c.name}
-              </a>
-            </li>
-          `).join('');
-        }
+        qn.innerHTML = hubsOnly.map(c => `
+          <li>
+            <a href="${c.path}" class="qnav-item">
+              <img src="${c.icon}" alt="${c.name} — MXD" width="28" height="28" loading="lazy" decoding="async"/>
+              ${c.name}
+            </a>
+          </li>
+        `).join('');
       })();
 
       // Hiển thị sản phẩm (limit qua ?limit=12 nếu muốn)
