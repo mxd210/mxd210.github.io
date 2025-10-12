@@ -1,20 +1,95 @@
+<!-- FILE:/index.html -->
 <!-- MXD-LOCK v2025-10-12 [page:index] DO NOT EDIT WITHOUT label: unlock(layout) -->
-<!-- MXD-CHECK v2025-10-12 [index] … giữ nguyên như bạn gửi … -->
+<!-- MXD-CHECK v2025-10-12 [index] -->
 <!doctype html>
 <html lang="vi">
 <head>
-  … (phần <head> GIỮ NGUYÊN như bạn đang chạy) …
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+
+  <title>MXD — Trang chủ</title>
+  <meta name="description" content="MXD: Trung tâm mua sắm affiliate ngành xây dựng">
+  <link rel="canonical" href="https://mxd210.github.io/">
+  <meta name="robots" content="index,follow">
+
+  <!-- OG -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="MXD — Trang chủ">
+  <meta property="og:description" content="Danh mục rõ ràng, sản phẩm chuẩn ảnh .webp, link đo lường qua affiliate.">
+  <meta property="og:url" content="https://mxd210.github.io/">
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/home.webp">
+
+  <!-- VERIFY -->
+  <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o">
+
+  <link rel="stylesheet" href="/assets/site.css">
+
+  <style>
+    :root{ --bg:#fff; --text:#111; --muted:#666; --border:#eaeaea; --card:#fff; --brand:#0a84ff; --brand-contrast:#fff; --radius:16px; --gap:16px; --shadow:0 6px 20px rgba(0,0,0,.06) }
+    @media (prefers-color-scheme: dark){ :root{ --bg:#0f1215; --text:#e8e8e8; --muted:#a2a2a2; --border:#262b31; --card:#14181d; --shadow:0 10px 28px rgba(0,0,0,.35) } }
+    html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","DejaVu Sans",sans-serif}
+    a{color:var(--brand);text-decoration:none} a:hover{opacity:.9}
+    header,footer{padding:12px 16px;border-bottom:1px solid var(--border)} footer{border-bottom:none;border-top:1px solid var(--border);margin-top:24px}
+    .container{max-width:1100px;margin:0 auto;padding:0 16px}
+    .muted{color:var(--muted)} .sr-only{position:absolute;left:-9999px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--gap);margin:16px 0}
+    .card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .15s}
+    .card:hover{transform:translateY(-2px)} .card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#f7f7f7;height:auto}
+    .card .body{padding:12px} .name{font-size:16px;line-height:1.35;margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .price{font-weight:800;margin:4px 0 10px} .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .buy{display:inline-block;width:100%;text-align:center;padding:10px 12px;border-radius:12px;font-weight:800;text-decoration:none;color:#fff;border:1px solid transparent;background:#1746ff}
+    .buy[data-merchant="shopee"]{background:#ee4d2d;border-color:#ee4d2d} .buy[data-merchant="lazada"]{background:#0f146d;border-color:#0f146d}
+    .buy[data-merchant="tiki"]{background:#1a94ff;border-color:#1a94ff} .buy[data-merchant="tiktok"]{background:#000;border-color:#000}
+    .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:8px 0 0}
+    .quick-nav .qnav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:12px;background:var(--card);box-shadow:var(--shadow);color:var(--text);text-decoration:none}
+    .quick-nav .qnav-item:hover{background:rgba(23,70,255,.06)} .quick-nav img{width:28px;height:28px;border-radius:8px}
+    .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%)} .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
+    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+    .nav-link{padding:8px 10px;border-radius:10px;color:var(--text);text-decoration:none} .nav-link[aria-current="page"]{background:#eef4ff;color:#1746ff}
+    .blog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin:16px 0}
+    .post{border:1px solid var(--border);border-radius:16px;background:var(--card);box-shadow:var(--shadow);overflow:hidden}
+    .post img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#f7f7f7}
+    .post .body{padding:10px 12px} .post h3{margin:0 0 6px;font-size:16px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  </style>
+
+  <!-- GA4 (trước affiliate) -->
+  <script defer src="/assets/analytics.js"></script>
+  <!-- Loader sản phẩm -->
+  <script defer src="/assets/js/render-products.js"></script>
+  <!-- Affiliate -->
+  <script defer src="/assets/mxd-affiliate.js"></script>
 </head>
 <body>
-  <!-- Header giữ nguyên -->
-  … 
+  <header style="position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(6px)">
+    <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)">
+      <a href="/" class="brand" style="font-weight:900;font-size:18px;color:var(--text);text-decoration:none">MXD</a>
+      <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
+        <a href="/" class="nav-link" aria-current="page">Trang chủ</a>
+        <a href="/store.html" class="nav-link">Cửa hàng</a>
+        <a href="/blog/" class="nav-link">Tin tức</a>
+        <a href="/tu-van.html" class="nav-link">Tư vấn</a>
+        <a href="/lien-he.html" class="nav-link">Liên hệ</a>
+      </nav>
+    </div>
+  </header>
 
   <main class="container">
-    <!-- HERO giữ nguyên -->
+    <!-- HERO -->
+    <section aria-label="Hero" style="margin:14px 0 4px">
+      <h1 style="margin:0">MXD — Trung tâm mua sắm ngành xây dựng</h1>
+      <p class="muted" style="margin:6px 0 0">Danh mục gọn gàng · Ảnh .webp tối ưu · Liên kết qua affiliate chuẩn đo lường.</p>
+    </section>
 
-    <!-- QUICK-NAV (store only) giữ nguyên -->
+    <!-- QUICK-NAV (chỉ store) -->
+    <section aria-label="Danh mục nhanh" style="margin-top:12px">
+      <ul class="quick-nav">
+        <li><a href="/store.html" class="qnav-item"><img src="/assets/img/og/store.webp" alt="Cửa hàng" width="28" height="28" loading="lazy" decoding="async"/>Cửa hàng</a></li>
+        <li><a href="/store/bay-rang-cua.html" class="qnav-item"><img src="/assets/img/categories/bay-rang-cua.webp" alt="Bàn răng cưa" width="28" height="28" loading="lazy" decoding="async"/>Bàn răng cưa</a></li>
+        <li><a href="/store/may-rung-op-lat.html" class="qnav-item"><img src="/assets/img/categories/may-rung-op-lat.webp" alt="Máy rung ốp lát" width="28" height="28" loading="lazy" decoding="async"/>Máy rung ốp lát</a></li>
+      </ul>
+    </section>
 
-    <!-- FEATURED PRODUCTS (đã đổi sang loader + fallback) -->
+    <!-- FEATURED PRODUCTS (fallback=all) -->
     <h2 style="margin:16px 0 0">Sản phẩm nổi bật</h2>
     <div id="featured-grid" class="grid product-grid"
          data-category="noi-bat"
@@ -22,31 +97,54 @@
          data-fallback="all"></div>
     <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
 
-    <!-- BLOG LATEST giữ nguyên -->
+    <!-- BLOG LATEST -->
     <h2 style="margin:22px 0 8px">Tin tức mới</h2>
     <div id="home-blog" class="blog-grid"></div>
     <noscript>Vui lòng bật JavaScript để xem tin tức mới.</noscript>
   </main>
 
-  <!-- Footer + Floating contacts giữ nguyên -->
+  <footer>
+    <div class="container">
+      © MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a>
+    </div>
+  </footer>
 
-  <!-- GA4 trước affiliate giữ nguyên -->
-  <script defer src="/assets/floating-contact.js"></script>
+  <!-- Floating contacts -->
+  <script defer src="/assets/js/floating-contact.js?v=2025-10-12-1"></script>
 
-  <!-- GỌI LOADER CHO FEATURED (có fallback) -->
+  <!-- Gọi loader Featured: nếu không có 'featured' sẽ fallback ra tất cả -->
+  <script> MXD.renderProducts('#featured-grid', 12); </script>
+
+  <!-- BLOG LATEST -->
   <script>
-    MXD.renderProducts('#featured-grid', 12);
+    (async ()=>{
+      const host = document.getElementById('home-blog');
+      const sources = ['/blog/feed.json','/assets/data/blog-feed.json','/blog/index.json'];
+      let raw=null; for(const u of sources){ try{ const r=await fetch(u,{cache:'no-store'}); if(r.ok){ raw=await r.json(); break; } }catch{} }
+      if(!raw){ host.innerHTML=''; return; }
+      const items = (Array.isArray(raw) ? raw : (raw.items || raw.posts || [])).slice(0,4).map(x=>{
+        const t = x.title || x.name || 'Bài viết';
+        const u = x.url || x.link || x.href || '#';
+        const img = x.image || x.thumbnail || '/assets/img/og/home.webp';
+        const ex = x.excerpt || x.summary || '';
+        return {t,u,img,ex};
+      });
+      if(!items.length){ host.innerHTML=''; return; }
+      host.innerHTML = items.map(p=>`
+        <article class="post">
+          <a href="${p.u}"><img src="${p.img}" alt="${p.t} — MXD" loading="lazy" width="640" height="360"></a>
+          <div class="body">
+            <h3><a href="${p.u}">${p.t}</a></h3>
+            <p class="muted" style="margin:0">${p.ex ? p.ex : ''}</p>
+          </div>
+        </article>`).join('');
+    })();
   </script>
 
-  <!-- BLOG LATEST script giữ nguyên -->
-  <script>
-    (async ()=>{ /* … nguyên khối bạn đang dùng … */ })();
-  </script>
-
-  <!-- SW giữ nguyên -->
+  <!-- SW -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js?v=2025-10-12-home', { updateViaCache: 'none' });
+      navigator.serviceWorker.register('/sw.js?v=2025-10-12-home2', { updateViaCache: 'none' });
     }
   </script>
 </body>
