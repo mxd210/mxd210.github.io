@@ -191,32 +191,11 @@ FIND: MXD-CHECK v2025-10-06 [index]
       </div>
     </section>
 
-    <!-- QUICK-NAV -->
+    <!-- QUICK-NAV (đã bỏ 3 mục theo yêu cầu) -->
     <section aria-label="Danh mục nhanh" style="margin-top:12px">
       <!-- MXD-ANCHOR:QUICK-NAV -->
       <ul class="quick-nav">
-        <li>
-          <a href="/store.html" class="qnav-item">
-            <img src="/assets/img/og/store.webp" alt="Cửa hàng" width="28" height="28" loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
-            Cửa hàng
-          </a>
-        </li>
-        <li>
-          <a href="/store/bay-rang-cua.html" class="qnav-item">
-            <img src="/assets/img/categories/bay-rang-cua.webp" alt="Bàn răng cưa" width="28" height="28" loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
-            Bàn răng cưa
-          </a>
-        </li>
-        <li>
-          <a href="/store/may-rung-op-lat.html" class="qnav-item">
-            <img src="/assets/img/categories/may-rung-op-lat.webp" alt="Máy rung ốp lát" width="28" height="28" loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
-            Máy rung ốp lát
-          </a>
-        </li>
-        <!-- ĐÃ BỎ 2 mục blog khỏi HOME theo yêu cầu -->
+        <!-- (rỗng theo chuẩn mới; ĐÃ XOÁ: Cửa hàng, Bàn răng cưa, Máy rung ốp lát) -->
       </ul>
     </section>
 
@@ -383,7 +362,6 @@ FIND: MXD-CHECK v2025-10-06 [index]
             </article>`;
         }).join('');
 
-        // Cho mxd-affiliate quét lại nếu cần
         if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
       }
 
