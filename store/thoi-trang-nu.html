@@ -4,52 +4,119 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Thời trang nữ | MXD</title>
-  <meta name="description" content="Đầm váy, công sở, thể thao, bảo hộ — khu nữ MXD hiển thị tự động từ affiliates.json."/>
+  <meta name="description" content="Thời trang nữ: công sở, thường ngày, bảo hộ làm việc — hiển thị tự động từ dữ liệu MXD."/>
   <link rel="canonical" href="https://mxd210.github.io/store/thoi-trang-nu.html"/>
   <meta name="robots" content="index,follow"/>
 
+  <!-- OG -->
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Thời trang nữ | MXD"/>
-  <meta property="og:description" content="Danh mục thời trang nữ. Dữ liệu từ affiliates.json (OSOT)."/>
+  <meta property="og:description" content="Danh mục thời trang nữ — MXD."/>
   <meta property="og:url" content="https://mxd210.github.io/store/thoi-trang-nu.html"/>
   <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/thoi-trang.webp"/>
 
+  <!-- CSS chuẩn MXD -->
   <link rel="stylesheet" href="/assets/site.css"/>
+
+  <!-- GA4 TRƯỚC affiliate (chuẩn MXD) -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
 </head>
 <body>
   <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Thời trang nữ</nav>
   <h1>Thời trang nữ</h1>
+
   <div class="filter-row">
     <a class="btn" href="/store/thoi-trang.html">Tất cả</a>
     <a class="btn" href="/store/thoi-trang-nam.html">Nam</a>
-    <a class="btn is-active" href="/store/thoi-trang-nu.html">Nữ</a>
+    <a class="btn" href="/store/thoi-trang-nu.html" aria-current="page">Nữ</a>
+    <a class="btn" href="/store/tre-em.html">Trẻ em</a>
+    <a class="btn" href="/store/thoi-trang-thu-dong.html">Thu đông</a>
   </div>
 
-  <section id="product-grid" class="product-grid" data-category="thoi-trang-nu" data-alias="thoi-trang,nu"></section>
+  <!-- Lưới sản phẩm -->
+  <section id="product-grid"
+           class="product-grid"
+           data-category="thoi-trang-nu"
+           data-alias="thoi-trang,thoi-trang-nu,nu">
+  </section>
 
   <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
 
+  <!-- Loader MXD: affiliates.json → products.json → /affiliates.json ; hỗ trợ array hoặc {items:[...]} -->
   <script>
-  (async function(){
-    const grid=document.getElementById('product-grid');
-    const cat=grid.getAttribute('data-category'); const aliases=(grid.getAttribute('data-alias')||'').split(',').map(s=>s.trim());
-    const srcs=['/assets/data/affiliates.json','/products.json','/affiliates.json'];
-    let data; for(const s of srcs){ try{ const r=await fetch(s,{cache:'no-store'}); if(r.ok){ data=await r.json(); break; } }catch{} }
-    if(!Array.isArray(data)){ grid.innerHTML='<p class="muted">Không đọc được dữ liệu sản phẩm.</p>'; return; }
-    const ok=p=> (p.category||'').toLowerCase()===cat || aliases.includes((p.category||'').toLowerCase());
-    const items=data.filter(p=>p && p.status!=='archived' && ok(p));
-    grid.innerHTML=items.map(p=>{
-      const img=p.image||(`/assets/img/products/${p.sku}.webp`);
-      const price=(p.price!=null)? new Intl.NumberFormat('vi-VN').format(p.price)+'₫' : '';
-      return `<article class="product-card" data-sku="${p.sku}">
-        <a class="thumb" href="/g.html?sku=${encodeURIComponent(p.sku)}"><img loading="lazy" src="${img}" alt="${p.name} — MXD" width="320" height="320"></a>
-        <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(p.sku)}">${p.name}</a></h3>
-        <div class="price">${price}</div>
-        <div class="actions"><a class="buy" href="${p.origin||'#'}" data-merchant="${p.merchant||''}" rel="nofollow">Mua ngay</a></div>
-      </article>`;
-    }).join('') || '<p class="muted">Chưa có sản phẩm cho danh mục này.</p>';
+  (async function renderMXD(){
+    const grid = document.getElementById('product-grid');
+    const cat = (grid.getAttribute('data-category')||'').trim().toLowerCase();
+    const aliases = (grid.getAttribute('data-alias')||'')
+      .split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    const sources = ['/assets/data/affiliates.json','/products.json','/affiliates.json'];
+
+    async function loadFirst(urls){
+      for (const src of urls){
+        try{
+          const r = await fetch(src,{cache:'no-store'});
+          if (!r.ok) continue;
+          const json = await r.json();
+          if (Array.isArray(json)) return json;
+          if (json && Array.isArray(json.items)) return json.items;
+        }catch(e){}
+      }
+      return null;
+    }
+
+    const data = await loadFirst(sources);
+    if (!Array.isArray(data)){
+      grid.innerHTML = `<p class="muted">Không tải được dữ liệu (đã thử ${sources.join(' → ')}).</p>`;
+      return;
+    }
+
+    const isLive = p => p && p.status !== false && p.status !== 'archived';
+    const hasCat = p => {
+      const c = p && p.category;
+      if (Array.isArray(c)){
+        const L = c.map(x=>String(x||'').toLowerCase());
+        return L.includes(cat) || L.some(x=>aliases.includes(x));
+      }
+      const s = String(c||'').toLowerCase();
+      return s === cat || aliases.includes(s);
+    };
+
+    const items = data.filter(p => isLive(p) && hasCat(p));
+
+    if (!items.length){
+      grid.innerHTML = `<p class="muted">Chưa có sản phẩm cho danh mục này (tạm hiển thị theo alias “thoi-trang/nu”).</p>`;
+      return;
+    }
+
+    const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
+    const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    const linkOf = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
+    const imgOf  = p => p.image || ((p.sku||'') ? `/assets/img/products/${String(p.sku).toLowerCase()}.webp` : '/assets/img/products/placeholder.webp');
+
+    grid.innerHTML = items.map(p=>{
+      const sku = (p.sku||'').toLowerCase();
+      const name = p.name || sku || 'Sản phẩm';
+      const price = fmt(p.price);
+      const merchant = (p.merchant||'').toLowerCase();
+      const buy = linkOf(p);
+      const img = imgOf(p);
+      return `
+        <article class="product-card" data-sku="${esc(sku)}">
+          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
+            <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
+                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+          </a>
+          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
+          ${price?`<div class="price">${price}</div>`:''}
+          <div class="actions">
+            <a class="buy" href="${esc(buy)}" data-merchant="${esc(merchant)}"
+               target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+          </div>
+        </article>`;
+    }).join('');
+
+    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
   })();
   </script>
 </body>
