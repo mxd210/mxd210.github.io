@@ -1,82 +1,80 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <title>Sản phẩm nổi bật — MXD</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="/assets/site.css" rel="stylesheet">
-  <style>
-    .wrap{max-width:1100px;margin:0 auto;padding:32px 16px}
-    h1{text-align:center;margin:0 0 8px}
-    .muted{color:#666;text-align:center;margin:0 0 20px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px}
-    .card{border:1px solid #eaeaea;border-radius:16px;background:#fff;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 20px rgba(0,0,0,.06)}
-    .card img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#f7f7f7}
-    .card .body{padding:12px}
-    .name{font-size:16px;line-height:1.35;margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
-    .price{font-weight:800;margin:4px 0 10px;color:#e11d48}
-    .buy{display:inline-block;width:100%;text-align:center;padding:10px 12px;border-radius:12px;font-weight:800;color:#fff;background:#1746ff;text-decoration:none}
-    .buy[data-merchant="shopee"]{background:#ee4d2d}
-  </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sản phẩm nổi bật | MXD</title>
+  <meta name="description" content="Danh sách sản phẩm nổi bật (featured) hiển thị tự động từ dữ liệu chuẩn của MXD."/>
+  <link rel="canonical" href="https://mxd210.github.io/store/noi-bat.html"/>
+  <meta name="robots" content="index,follow"/>
+
+  <!-- OG -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Sản phẩm nổi bật | MXD"/>
+  <meta property="og:description" content="Các sản phẩm được gắn nổi bật từ dữ liệu MXD, cập nhật theo thời gian."/>
+  <meta property="og:url" content="https://mxd210.github.io/store/noi-bat.html"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/noi-bat.webp"/>
+
+  <link rel="stylesheet" href="/assets/site.css"/>
+
+  <!-- GA4 trước affiliate -->
+  <script defer src="/assets/analytics.js"></script>
+  <script defer src="/assets/mxd-affiliate.js"></script>
 </head>
 <body>
-  <main class="wrap">
-    <h1>Sản phẩm nổi bật</h1>
-    <p class="muted">Danh sách tự động từ dữ liệu chuẩn.</p>
-    <div id="grid" class="grid" aria-live="polite"></div>
-    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm nổi bật.</p>
-  </main>
+  <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Sản phẩm nổi bật</nav>
+  <h1>Sản phẩm nổi bật</h1>
+  <p>Danh sách tự động từ dữ liệu chuẩn của MXD. Hiển thị các mục có <code>featured:true</code>.</p>
+
+  <section id="product-grid" class="product-grid"></section>
+
+  <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
 
   <script>
-    const money = n => Number.isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
-    const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-    const pickUrl = p => p.deeplink || p.origin_url || p.origin || p.url || p.link || '#';
-    const pickImg = (p) => p.image || (p.sku ? `/assets/img/products/${String(p.sku).toLowerCase()}.webp` : '/assets/img/products/placeholder.webp');
-    const isLive = (p) => p && (p.status !== false); // thiếu status thì coi như true
+  (async function renderMXD(){
+    const grid = document.getElementById('product-grid');
+    const sources = ['/assets/data/affiliates.json','/products.json','/affiliates.json'];
+    let data=null;
 
-    async function loadFirst(paths){
-      for (const path of paths){
-        try{
-          const r = await fetch(path, { cache:'no-store' });
-          if (!r.ok) continue;
-          const data = await r.json();
-          const arr = Array.isArray(data) ? data : (data.items || []);
-          if (arr.length) return arr;
-          // nếu file có mà rỗng, vẫn thử file tiếp
-        }catch(e){}
-      }
-      return [];
+    for (const src of sources){
+      try { const r = await fetch(src,{cache:'no-store'}); if(r.ok){ data = await r.json(); break; } } catch {}
+    }
+    if (!Array.isArray(data)) {
+      grid.innerHTML = `<p class="muted">Không tải được dữ liệu (đã thử ${sources.join(' → ')}).</p>`;
+      return;
     }
 
-    (async function init(){
-      const all = await loadFirst(['/assets/data/affiliates.json','/products.json']);
-      const list = all.filter(isLive).filter(p => p.featured === true);
-      const grid = document.getElementById('grid');
-      const empty = document.getElementById('empty');
+    const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
+    const items = data.filter(p => p && p.featured === true && p.status !== 'archived');
 
-      if (!list.length){ empty.style.display='block'; return; }
+    if (!items.length) {
+      grid.innerHTML = `<p class="muted">Chưa có sản phẩm nổi bật.</p>`;
+      return;
+    }
 
-      grid.innerHTML = list.map(p=>{
-        const name = p.name || p.sku || 'Sản phẩm';
-        const img  = pickImg(p);
-        const href = pickUrl(p);
-        const price = Number.isFinite(+p.price) ? `<div class="price">${money(+p.price)}</div>` : '';
-        const merchant = (p.merchant||'').toLowerCase();
-        return `
-          <article class="card">
-            <a href="${href}" target="_blank" rel="nofollow sponsored noopener">
-              <img loading="lazy" decoding="async" src="${esc(img)}" alt="${esc(name)}"
-                   onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-            </a>
-            <div class="body">
-              <h3 class="name"><a href="${href}" target="_blank" rel="nofollow noopener">${esc(name)}</a></h3>
-              ${price}
-              <a class="buy" data-merchant="${merchant}" href="${href}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
-            </div>
-          </article>`;
-      }).join('');
-      if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
-    })();
+    grid.innerHTML = items.map(p=>{
+      const sku = p.sku || '';
+      const name = p.name || sku || 'Sản phẩm';
+      const img  = p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp');
+      const price = fmt(p.price);
+      const merchant = (p.merchant||'').toLowerCase();
+      const origin = p.deeplink || p.origin || p.origin_url || p.url || '#';
+      return `
+        <article class="product-card" data-sku="${sku}">
+          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
+            <img loading="lazy" src="${img}" alt="${name} — MXD" width="320" height="320"
+                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+          </a>
+          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${name}</a></h3>
+          ${price?`<div class="price">${price}</div>`:''}
+          <div class="actions">
+            <a class="buy" href="${origin}" data-merchant="${merchant}" rel="nofollow sponsored noopener" target="_blank">Mua ngay</a>
+          </div>
+        </article>`;
+    }).join('');
+
+    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+  })();
   </script>
 </body>
 </html>
