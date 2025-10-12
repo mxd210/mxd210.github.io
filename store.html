@@ -7,7 +7,7 @@
 - Quick-Nav loads from categories.json (fallback ensured)
 - Renderer uses affiliates.json; buy links are origin (rewritten by affiliate script)
 - SW registered; bump sw.js VERSION on asset changes
-FIND: MXD-CHECK v2025-10-06 [store]
+FIND: MXD-ANCHOR:CATEGORY-GRID
 -->
 <!doctype html>
 <html lang="vi">
@@ -38,7 +38,7 @@ FIND: MXD-CHECK v2025-10-06 [store]
     :root{
       --bg:#fff; --text:#111; --muted:#666; --border:#eaeaea;
       --card:#fff; --brand:#0a84ff; --brand-contrast:#fff;
-      --hover:#111; --radius:16px; --gap:16px; --shadow:0 6px 20px rgba(0,0,0,.06);
+      --hover:#111; --radius:16px; --gap:24px; --shadow:0 6px 20px rgba(0,0,0,.06);
     }
     @media (prefers-color-scheme: dark){
       :root{ --bg:#0f1215; --text:#e8e8e8; --muted:#a2a2a2; --border:#262b31; --card:#14181d; --shadow:0 10px 28px rgba(0,0,0,.35); }
@@ -55,14 +55,16 @@ FIND: MXD-CHECK v2025-10-06 [store]
     }
     .qnav-item:hover{background:rgba(23,70,255,.06)}
     .quick-nav img{width:28px;height:28px;border-radius:8px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--gap);margin:16px 0}
-    .card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .15s}
+
+    /* GRID & CARD (đồng nhất ảnh 1:1, khoảng cách bằng gap) */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--gap);margin:16px 0}
+    .card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .15s;height:100%}
     .card:hover{transform:translateY(-2px)}
-    .card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#f7f7f7;height:auto}
+    .card img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#f7f7f7;height:auto}
     .card .body{padding:12px}
-    .name{font-size:16px;line-height:1.35;margin:0 0 6px}
+    .name{font-size:16px;line-height:1.35;margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
     .price{font-weight:800;margin:4px 0 10px}
-    .buy{display:inline-block;width:100%;text-align:center;padding:10px 12px;border-radius:12px;font-weight:800;text-decoration:none;color:#fff;border:1px solid transparent}
+    .buy{display:inline-block;width:100%;text-align:center;padding:10px 12px;border-radius:12px;font-weight:800;text-decoration:none;color:#fff;border:1px solid transparent;margin-top:auto}
     .buy:focus-visible{outline:2px solid #0000ff55;outline-offset:2px}
     .buy:active{transform:translateY(1px)}
     .buy{ background:#1746ff; border-color:#1746ff }
@@ -71,9 +73,11 @@ FIND: MXD-CHECK v2025-10-06 [store]
     .buy[data-merchant="tiki"]{ background:#1a94ff; border-color:#1a94ff }
     .buy[data-merchant="tiktok"]{ background:#111; border-color:#111 }
     .buy:hover{ filter:brightness(1.05) }
+
     .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%)}
     .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
     @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
     /* nhẹ nhàng cho .category-grid nếu site.css chưa có */
     .category-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin:18px 0}
     .category-tile{display:block;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--card);box-shadow:var(--shadow);text-decoration:none;color:var(--text)}
@@ -116,10 +120,16 @@ FIND: MXD-CHECK v2025-10-06 [store]
     </section>
 
     <!-- MXD-ANCHOR:CATEGORY-GRID -->
-    <!-- (Anchor dành cho trường hợp cần hiển thị lưới tile danh mục theo Rule 53.
-         Không thay đổi layout hiện tại. Tool/worker có thể INSERT các <a class="category-tile" ...> vào đây khi cần.) -->
     <!-- BEGIN category-grid -->
     <div class="category-grid">
+      <!-- NEW: Máy móc xây dựng hub tile -->
+      <a class="category-tile" href="/store/may-moc-xay-dung.html">
+        <img src="/assets/img/categories/may-moc-xay-dung.webp"
+             alt="Máy móc xây dựng — MXD" width="320" height="200" loading="lazy" decoding="async">
+        <span>Máy móc xây dựng</span>
+      </a>
+
+      <!-- Giữ tile Thời trang như hiện trạng -->
       <a class="category-tile" href="/store/thoi-trang.html">
         <img src="/assets/img/categories/thoi-trang.webp"
              alt="Thời trang — MXD" width="320" height="200" loading="lazy" decoding="async">
@@ -174,12 +184,13 @@ FIND: MXD-CHECK v2025-10-06 [store]
 
         let items = list.map(norm);
 
-        // Fallback: đảm bảo có các danh mục cốt lõi
+        // Fallback: đảm bảo có các danh mục cốt lõi (thêm Máy móc xây dựng)
         const ensure = (slug, name, icon) => {
           if (!items.some(i => i.slug === slug)) {
             items.push(norm({ slug, name, icon, path: `/store/${slug}.html` }));
           }
         };
+        ensure('may-moc-xay-dung', 'Máy móc xây dựng', '/assets/img/categories/may-moc-xay-dung.webp');
         ensure('may-cat', 'Máy cắt', '/assets/img/categories/may-cat.webp');
         ensure('may-khoan-duc-vit', 'Khoan · Đục · Vít', '/assets/img/categories/may-khoan-duc-vit.webp');
         ensure('may-laze', 'Máy laser', '/assets/img/categories/may-laze.webp');
@@ -190,13 +201,8 @@ FIND: MXD-CHECK v2025-10-06 [store]
         if (!items.length) {
           qn.innerHTML = `
             <li>
-              <a href="/store/may-cat.html" class="qnav-item">
-                <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt — MXD" width="28" height="28" loading="lazy" decoding="async"/>Máy cắt
-              </a>
-            </li>
-            <li>
-              <a href="/store/may-khoan-duc-vit.html" class="qnav-item">
-                <img src="/assets/img/categories/may-khoan-duc-vit.webp" alt="Khoan · Đục · Vít — MXD" width="28" height="28" loading="lazy" decoding="async"/>Khoan · Đục · Vít
+              <a href="/store/may-moc-xay-dung.html" class="qnav-item">
+                <img src="/assets/img/categories/may-moc-xay-dung.webp" alt="Máy móc xây dựng — MXD" width="28" height="28" loading="lazy" decoding="async"/>Máy móc xây dựng
               </a>
             </li>`;
         } else {
@@ -211,7 +217,7 @@ FIND: MXD-CHECK v2025-10-06 [store]
         }
       })();
 
-      // Hiển thị TẤT CẢ sản phẩm (có thể giới hạn bằng ?limit=12)
+      // Hiển thị sản phẩm (limit qua ?limit=12 nếu muốn)
       const qs = new URLSearchParams(location.search);
       const lim = qs.has('limit') ? Number(qs.get('limit')) : undefined;
       const limit = Number.isFinite(lim) ? lim : undefined;
