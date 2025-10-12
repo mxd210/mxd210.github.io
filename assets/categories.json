@@ -59,5 +59,12 @@
     ],
     "canonical": "https://mxd210.github.io/store/thoi-trang.html",
     "priority": 0.7
-  }
+  },
+  {
+  "slug": "noi-bat",
+  "name": "Sản phẩm nổi bật",
+  "icon": "/assets/img/categories/noi-bat.webp",
+  "path": "/store/noi-bat.html"
+}
+
 ]
