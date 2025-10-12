@@ -1,0 +1,17 @@
+{
+  "schema_version": "mxd-aff-v1",
+  "paths": {
+    "products": "/assets/data/affiliates.json",
+    "categories": "/assets/data/categories.json",
+    "images_pattern": "/assets/img/products/{sku}.webp"
+  },
+  "featured": {
+    "category_slug": "noi-bat",
+    "tag": "featured"
+  },
+  "hubs": [
+    "thoi-trang",
+    "thoi-trang-nu",
+    "noi-bat"
+  ]
+}
