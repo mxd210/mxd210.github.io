@@ -45,12 +45,15 @@
   <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
 
   <!-- Loader MXD: affiliates.json → products.json → /affiliates.json ; hỗ trợ dạng {items:[...]} -->
+  <!-- MXD-ANCHOR:THOI-TRANG-FILTER -->
   <script>
   (async function renderMXD(){
     const grid = document.getElementById('product-grid');
     const cat = (grid.getAttribute('data-category')||'').trim().toLowerCase();
     const aliases = (grid.getAttribute('data-alias')||'')
       .split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    const ALIASES = new Set([cat, ...aliases]);
+
     const sources = ['/assets/data/affiliates.json','/products.json','/affiliates.json'];
 
     async function loadFirst(urls){
@@ -72,11 +75,37 @@
       return;
     }
 
+    // ===== Bộ lọc mở rộng (an toàn, không phá dữ liệu cũ) =====
+    const norm = v => String(v||'').toLowerCase().trim();
+    const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
+    const toSlug = v => norm(v).replace(/[^a-z0-9\-]+/g,'-').replace(/--+/g,'-');
+
+    function labelsOf(p){
+      const labels = [];
+      // 1) Trường đơn
+      labels.push(...split(p.cat||p.category||p.section||''));
+      // 2) Mảng chuẩn
+      const m1 = Array.isArray(p.cats)? p.cats : (Array.isArray(p.categories)? p.categories : []);
+      labels.push(...m1.flatMap(split));
+      // 3) tags
+      if (Array.isArray(p.tags)) labels.push(...p.tags.flatMap(split));
+      // Chuẩn hóa slug
+      return Array.from(new Set(labels.map(toSlug).filter(Boolean)));
+    }
+
     const isLive = p => p && p.status !== false && p.status !== 'archived';
-    const inCat  = p => {
-      const c = (p.category||'').toLowerCase();
-      return c === cat || aliases.includes(c);
-    };
+
+    function inCat(p){
+      const labels = labelsOf(p);
+      if (!labels.length) return false;
+      // Match chặt: trùng alias
+      if (labels.some(l => ALIASES.has(l))) return true;
+      // Match rộng: alias & label bắt đầu bằng nhau (thoi-trang bao trùm thoi-trang-nu/nam/thu-dong)
+      for (const a of ALIASES){
+        if (labels.some(l => l.startsWith(a) || a.startsWith(l))) return true;
+      }
+      return false;
+    }
 
     const items = data.filter(p => isLive(p) && inCat(p));
 
@@ -109,7 +138,7 @@
           <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
           ${price?`<div class="price">${price}</div>`:''}
           <div class="actions">
-            <a class="buy" href="${esc(link)}" data-merchant="${esc(merchant)}"
+            <a class="buy buy-btn" href="${esc(link)}" data-merchant="${esc(merchant)}"
                target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
           </div>
         </article>`;
