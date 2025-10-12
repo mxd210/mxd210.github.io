@@ -164,8 +164,8 @@ FIND: MXD-CHECK v2025-10-06 [index]
   <main class="container">
     <!-- HERO -->
     <section aria-label="Hero" style="margin:14px 0 4px">
-      <h1 style="margin:0">MXD — Trung tâm mua sắm ngành xây dựng</h1>
-      <p class="muted" style="margin:6px 0 0">Danh mục gọn gàng · Ảnh .webp tối ưu · Liên kết qua affiliate chuẩn đo lường.</p>
+      <h1 style="margin:0">MXD — Trung tâm mua sắm đa ngành </h1>
+      <p class="muted" style="margin:6px 0 0">Mang đến cho bạn trải nghiệm và lựa chọn đáng tin cậy.</p>
     </section>
 
     <!-- METRICS (mới) -->
@@ -182,7 +182,7 @@ FIND: MXD-CHECK v2025-10-06 [index]
         </div>
         <div class="metric">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/></svg>
-          <div><strong>Hàng chọn lọc</strong><span>ảnh .webp, đo lường chuẩn</span></div>
+          <div><strong>Hàng chọn lọc</strong><span> cho bạn sự hài lòng</span></div>
         </div>
         <div class="metric">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 4h14v14H5zM9 8h6v6H9z"/></svg>
@@ -220,11 +220,17 @@ FIND: MXD-CHECK v2025-10-06 [index]
       </ul>
     </section>
 
-    <!-- SẢN PHẨM -->
+    <!-- SẢN PHẨM (nguồn affiliates.json qua render-products.js) -->
     <h2 style="margin:16px 0 0">Sản phẩm mới</h2>
     <div id="product-list" class="grid" aria-live="polite"></div>
     <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/assets/data/affiliates.json</code> (nguồn chuẩn) hoặc <code>/products.json</code> (fallback).</p>
     <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
+
+    <!-- MỚI CẬP NHẬT (nguồn products.json; updated_at desc) -->
+    <!-- MXD-ANCHOR:UPDATED-STRIP -->
+    <h2 style="margin:24px 0 0">Mới cập nhật</h2>
+    <div id="updated-list" class="grid" aria-live="polite"></div>
+    <p id="updated-empty" class="muted" style="display:none">Chưa có sản phẩm mới cập nhật.</p>
   </main>
 
   <footer>
@@ -258,7 +264,7 @@ FIND: MXD-CHECK v2025-10-06 [index]
     window.MXD_RENDER.limit = 30; /* hiển thị nhiều sản phẩm hơn trên HOME */
   </script>
 
-  <!-- Render sản phẩm -->
+  <!-- Render sản phẩm (affiliates.json) -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
       if (window.MXD?.renderProducts) {
@@ -324,6 +330,110 @@ FIND: MXD-CHECK v2025-10-06 [index]
       toTop.style.display = scrollY > 400 ? 'flex' : 'none';
     }, { passive:true });
     document.getElementById('toTop')?.addEventListener('click', () => scrollTo({ top:0, behavior:'smooth' }));
+  </script>
+
+  <!-- Dải MỚI CẬP NHẬT + JSON-LD ItemList (products.json) -->
+  <script>
+    (function(){
+      const updatedWrap   = document.getElementById('updated-list');
+      const updatedEmpty  = document.getElementById('updated-empty');
+      if (!updatedWrap) return;
+
+      const money = n => Number.isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
+      const esc   = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const abs   = (u) => {
+        if (!u) return '';
+        try {
+          const url = new URL(u, location.origin);
+          if (url.origin === location.origin && u.startsWith('/')) {
+            return 'https://mxd210.github.io' + u; // absolute cho JSON-LD
+          }
+          return url.href;
+        } catch { return ''; }
+      };
+      const parseDate = s => {
+        const t = Date.parse(s);
+        return isNaN(t) ? null : t;
+      };
+
+      // Render UI
+      function render(list){
+        if (!list.length){ updatedEmpty.style.display='block'; updatedWrap.innerHTML=''; return; }
+        updatedWrap.innerHTML = list.map(p=>{
+          const sku = (p.sku||'').toLowerCase();
+          const name = p.name || sku || 'Sản phẩm';
+          const buy  = p.deeplink || p.origin || '#';
+          const priceHtml = Number.isFinite(+p.price) ? `<div class="price">${money(+p.price)}</div>` : '';
+          const img = p.image || `/assets/img/products/${sku}.webp`;
+          return `
+            <article class="card">
+              <a href="${buy}" target="_blank" rel="nofollow sponsored noopener" aria-label="Mua ${esc(name)}">
+                <img loading="lazy" decoding="async"
+                     src="${esc(img)}"
+                     alt="${esc(name)}"
+                     onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+              </a>
+              <div class="body">
+                <h3 class="name"><a href="${buy}" target="_blank" rel="nofollow noopener">${esc(name)}</a></h3>
+                ${priceHtml}
+                <div class="actions">
+                  <a class="buy" data-merchant="${(p.merchant||'').toLowerCase()}" href="${buy}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+                </div>
+              </div>
+            </article>`;
+        }).join('');
+
+        // Cho mxd-affiliate quét lại nếu cần
+        if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+      }
+
+      // Inject JSON-LD ItemList cho dải này
+      function injectJSONLD(list){
+        if (!list.length) return;
+        const itemList = {
+          "@context":"https://schema.org",
+          "@type":"ItemList",
+          "name":"Mới cập nhật — MXD",
+          "url":"https://mxd210.github.io/",
+          "itemListElement": list.map((p, i) => {
+            const url = p.deeplink || p.origin || 'https://mxd210.github.io/';
+            const product = {
+              "@type":"Product",
+              "name": p.name || p.sku || "Sản phẩm",
+              "image": abs(p.image || `/assets/img/products/${(p.sku||'').toLowerCase()}.webp`),
+              "url": url
+            };
+            if (Number.isFinite(+p.price)) {
+              product.offers = {
+                "@type":"Offer",
+                "priceCurrency":"VND",
+                "price": String(+p.price),
+                "availability":"https://schema.org/InStock",
+                "url": url
+              };
+            }
+            if (p.brand) product.brand = { "@type":"Brand", "name": String(p.brand) };
+            return { "@type":"ListItem", "position": i+1, "url": url, "item": product };
+          })
+        };
+        const tag = document.createElement('script');
+        tag.type = 'application/ld+json';
+        tag.textContent = JSON.stringify(itemList);
+        document.head.appendChild(tag);
+      }
+
+      // Fetch + sort by updated_at desc, limit 8
+      fetch('/products.json', { cache:'no-store' })
+        .then(r => r.ok ? r.json() : [])
+        .then(all => {
+          const list = (Array.isArray(all) ? all : []).filter(p => p && p.status && parseDate(p.updated_at));
+          list.sort((a,b) => parseDate(b.updated_at) - parseDate(a.updated_at));
+          const top = list.slice(0, 8);
+          render(top);
+          injectJSONLD(top);
+        })
+        .catch(() => { updatedEmpty.style.display='block'; updatedWrap.innerHTML=''; });
+    })();
   </script>
 
   <!-- Floating contacts script riêng (nếu dùng) -->
