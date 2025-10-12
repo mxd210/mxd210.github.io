@@ -37,9 +37,14 @@
     const origin = rec.origin || "";
     const deeplink = rec.deeplink || "";
     const url = origin || deeplink || rec.url || rec.link || rec.href || "";
-    const merchant =
-      (rec.merchant || (/shopee\.vn/i.test(url) ? "shopee" :
-                        /lazada\.vn/i.test(url) ? "lazada" : "")).toLowerCase();
+    // MXD-CHANGE: mở rộng nhận diện merchant (tiki, tiktok) ngoài shopee/lazada
+    const merchant = (rec.merchant ||
+      (/shopee\.vn/i.test(url) ? "shopee" :
+       /lazada\.vn/i.test(url) ? "lazada" :
+       /tiki\.vn/i.test(url)   ? "tiki"    :
+       /(tiktok|tiktokcdn)\./i.test(url) ? "tiktok" : "")
+    ).toLowerCase();
+
     const image = rec.image || rec.img || `/assets/img/products/${sku}.webp`;
     const category = (rec.category || "").toLowerCase();
     const desc = rec.description || rec.desc || "";
