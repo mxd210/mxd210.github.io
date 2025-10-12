@@ -1,14 +1,14 @@
 <!-- FILE:/index.html -->
-<!-- MXD-CHECK v2025-10-06 [index]
+<!-- MXD-LOCK v2025-10-12 [page:index] DO NOT EDIT WITHOUT label: unlock(layout) -->
+<!-- MXD-CHECK v2025-10-12 [index]
 - Canonical: https://mxd210.github.io/ ; robots=index,follow
-- Meta verify: Google/Bing present
-- GA4 (/assets/analytics.js) BEFORE /assets/mxd-affiliate.js (only once)
-- JSON-LD: Organization on index
-- OG: title/desc/url/image (≥1200×630 .webp) absolute URL
-- Quick-nav: /store.html + hubs + 2–3 blog pillars
+- GA4 BEFORE /assets/mxd-affiliate.js (only once)
+- HOME: Hero → Quick-Nav (store only) → Featured Products → Blog Latest
+- Featured: lấy từ /assets/data/affiliates.json theo category="noi-bat" hoặc tags chứa "featured"
+- Blog Latest: đọc /blog/feed.json (fallback /assets/data/blog-feed.json, /blog/index.json), hiển thị 4 bài
 - Floating contacts: Zalo 0338328898, Facebook /mxd6686
-- SW: HTML network-first; assets stale-while-revalidate; bump sw.js VERSION on asset changes
-FIND: MXD-CHECK v2025-10-06 [index]
+- SW: bump sw.js VERSION khi đổi asset
+FIND: MXD-LOCK v2025-10-12 [page:index]
 -->
 <!doctype html>
 <html lang="vi">
@@ -28,9 +28,8 @@ FIND: MXD-CHECK v2025-10-06 [index]
   <meta property="og:url" content="https://mxd210.github.io/">
   <meta property="og:image" content="https://mxd210.github.io/assets/img/og/home.webp">
 
-  <!-- VERIFY: Google Search Console + (tuỳ chọn) Bing -->
+  <!-- VERIFY -->
   <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o">
-  <!-- <meta name="msvalidate.01" content="PASTE_BING_CODE"> -->
 
   <!-- MXD-ANCHOR:HEAD-META -->
   <link rel="stylesheet" href="/assets/site.css">
@@ -69,7 +68,7 @@ FIND: MXD-CHECK v2025-10-06 [index]
     .card:hover{transform:translateY(-2px)}
     .card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#f7f7f7;height:auto}
     .card .body{padding:12px}
-    .name{font-size:16px;line-height:1.35;margin:0 0 6px}
+    .name{font-size:16px;line-height:1.35;margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .price{font-weight:800;margin:4px 0 10px}
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     .buy{
@@ -83,11 +82,6 @@ FIND: MXD-CHECK v2025-10-06 [index]
     .buy[data-merchant="tiki"]  { background:#1a94ff; border-color:#1a94ff }
     .buy[data-merchant="tiktok"]{ background:#000;    border-color:#000 }
     .buy:hover{ filter:brightness(1.05) }
-    .badge{
-      display:inline-block; background:var(--brand); color:var(--brand-contrast);
-      padding:4px 8px; font-size:12px; border-radius:999px; margin:8px 8px 0;
-      align-self:flex-start;
-    }
     .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:8px 0 0}
     .quick-nav .qnav-item{
       display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);
@@ -108,17 +102,23 @@ FIND: MXD-CHECK v2025-10-06 [index]
     .fab-brand{background:var(--brand); border-color:var(--brand); color:var(--brand-contrast)}
     .fab:hover{filter:brightness(1.02)}
     .fab-top{display:none}
-    @media (max-width:480px){ .name{font-size:15px} }
+
+    /* BLOG LIST (nhỏ, gọn) */
+    .blog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin:16px 0}
+    .post{border:1px solid var(--border);border-radius:16px;background:var(--card);box-shadow:var(--shadow);overflow:hidden}
+    .post img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#f7f7f7}
+    .post .body{padding:10px 12px}
+    .post h3{margin:0 0 6px;font-size:16px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   </style>
 
   <!-- 1) GA4 -->
   <script defer src="/assets/analytics.js"></script>
   <!-- 2) Renderer (tuỳ chọn hiển thị sản phẩm ở Home) -->
   <script defer src="/assets/js/render-products.js"></script>
-  <!-- 3) Affiliate (đúng chuẩn path) -->
+  <!-- 3) Affiliate -->
   <script defer src="/assets/mxd-affiliate.js"></script>
 
-  <!-- JSON-LD Organization (chuẩn index) -->
+  <!-- JSON-LD Organization -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -159,7 +159,7 @@ FIND: MXD-CHECK v2025-10-06 [index]
       <p class="muted" style="margin:6px 0 0">Danh mục gọn gàng · Ảnh .webp tối ưu · Liên kết qua affiliate chuẩn đo lường.</p>
     </section>
 
-    <!-- QUICK-NAV -->
+    <!-- QUICK-NAV (store only) -->
     <section aria-label="Danh mục nhanh" style="margin-top:12px">
       <!-- MXD-ANCHOR:QUICK-NAV -->
       <ul class="quick-nav">
@@ -184,28 +184,20 @@ FIND: MXD-CHECK v2025-10-06 [index]
             Máy rung ốp lát
           </a>
         </li>
-        <li>
-          <a href="/blog/may-cat-gach.html" class="qnav-item">
-            <img src="/assets/img/og/blog-may-cat-gach.webp" alt="Máy cắt gạch: hướng dẫn chọn" width="28" height="28" loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
-            Máy cắt gạch (blog)
-          </a>
-        </li>
-        <li>
-          <a href="/blog/chong-tham-wc.html" class="qnav-item">
-            <img src="/assets/img/og/blog-chong-tham-wc.webp" alt="Chống thấm WC" width="28" height="28" loading="lazy" decoding="async"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
-            Chống thấm WC (blog)
-          </a>
-        </li>
+        <!-- Blog chips đã bỏ khỏi quick-nav theo yêu cầu -->
       </ul>
     </section>
 
-    <!-- SẢN PHẨM -->
-    <h2 style="margin:16px 0 0">Sản phẩm mới</h2>
+    <!-- FEATURED PRODUCTS -->
+    <h2 style="margin:16px 0 0">Sản phẩm nổi bật</h2>
     <div id="product-list" class="grid" aria-live="polite"></div>
-    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/assets/data/affiliates.json</code> (nguồn chuẩn) hoặc <code>/products.json</code> (fallback).</p>
+    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm nổi bật. Hãy thêm <code>tags:["featured"]</code> hoặc <code>category:"noi-bat"</code> vào <code>/assets/data/affiliates.json</code>.</p>
     <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
+
+    <!-- BLOG LATEST -->
+    <h2 style="margin:22px 0 8px">Tin tức mới</h2>
+    <div id="home-blog" class="blog-grid"></div>
+    <noscript>Vui lòng bật JavaScript để xem tin tức mới.</noscript>
   </main>
 
   <footer>
@@ -214,7 +206,7 @@ FIND: MXD-CHECK v2025-10-06 [index]
     </div>
   </footer>
 
-  <!-- FLOATING CONTACTS — MXD -->
+  <!-- FLOATING CONTACTS -->
   <div class="fc" id="floating-contacts" aria-label="Liên hệ nhanh">
     <a class="fab fab-brand" href="https://zalo.me/0338328898" target="_blank" rel="noopener nofollow"
        data-channel="zalo" aria-label="Chat Zalo 0338328898">
@@ -227,27 +219,19 @@ FIND: MXD-CHECK v2025-10-06 [index]
     <a class="fab" href="tel:0338328898" data-channel="phone" aria-label="Gọi 0338328898">
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1.1-.2c1.2.5 2.6.8 4 .8a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C12.3 21 3 11.7 3 1a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1c0 1.4.3 2.8.8 4a1 1 0 0 1-.2 1.1L6.6 10.8z"/></svg>
     </a>
-    <button class="fab fab-top" id="toTop" aria-label="Lên đầu trang">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 14l5-5 5 5H7z"/></svg>
-    </button>
   </div>
 
-  <!-- Config renderer: dùng nguồn chuẩn -->
-  <script>
-    window.MXD_RENDER = window.MXD_RENDER || {};
-    window.MXD_RENDER.source = '/assets/data/affiliates.json';
-  </script>
+  <!-- GA4 trước affiliate giữ nguyên -->
+  <script defer src="/assets/floating-contact.js"></script>
 
-  <!-- Render sản phẩm -->
+  <!-- Render sản phẩm NỔI BẬT (lọc theo category/tags) -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      if (window.MXD?.renderProducts) {
-        MXD.renderProducts('#product-list'); 
-        return;
-      }
       const wrap = document.querySelector('#product-list');
       const empty = document.getElementById('empty');
-      wrap.innerHTML = Array.from({length:6}).map(()=>`
+
+      // Skeleton
+      wrap.innerHTML = Array.from({length:8}).map(()=>`
         <article class="card">
           <div class="skeleton" style="height:160px"></div>
           <div class="body">
@@ -257,28 +241,42 @@ FIND: MXD-CHECK v2025-10-06 [index]
         </article>
       `).join('');
 
+      const toTags = v => Array.isArray(v)
+        ? v.map(x=>String(x).toLowerCase().trim()).filter(Boolean)
+        : String(v||'').split(',').map(x=>x.toLowerCase().trim()).filter(Boolean);
+
+      const isFeatured = p => {
+        const cat = String(p.category||'').toLowerCase();
+        if (cat === 'noi-bat') return true;
+        const tg  = toTags(p.tags||p.tag||p.labels||p.label);
+        return tg.includes('featured');
+      };
+
       fetch('/assets/data/affiliates.json', { cache: 'no-store' })
         .then(r=>r.ok?r.json():[])
         .then(all=>{
           const arr = Array.isArray(all) ? all : (all.items||[]);
-          if (!arr.length){ empty.style.display='block'; wrap.innerHTML=''; return; }
+          const list = arr.filter(isFeatured);
+          if (!list.length){ empty.style.display='block'; wrap.innerHTML=''; return; }
+
           const fmt = n => isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-          wrap.innerHTML = arr.map(p=>{
+          wrap.innerHTML = list.map(p=>{
             const sku = (p.sku||'').toLowerCase();
             const name = p.name || sku || 'Sản phẩm';
-            const origin = p.origin_url || p.origin || p.url || p.link || '#';
+            const origin = p.origin || p.origin_url || p.url || p.link || '#';
             const merchant = (p.merchant||'').toLowerCase();
             const price = p.price ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>` : '';
+            const img = `/assets/img/products/${sku}.webp`;
             return `
               <article class="card">
                 <a class="product-meta sr-only"
                    href="${origin}" data-merchant="${merchant}"
-                   data-sku="${sku}" data-img="/assets/img/products/${sku}.webp"
+                   data-sku="${sku}" data-img="${img}"
                    ${p.price?`data-price="${p.price}"`:''}>${name}</a>
 
                 <a href="/g.html?sku=${encodeURIComponent(sku)}" aria-label="Xem chi tiết ${name}">
                   <img loading="lazy" decoding="async"
-                       src="/assets/img/products/${sku}.webp"
+                       src="${img}"
                        alt="${name}"
                        onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
                 </a>
@@ -290,40 +288,43 @@ FIND: MXD-CHECK v2025-10-06 [index]
                   </div>
                 </div>
               </article>`;
-          }).join('');
+          }).slice(0,12).join('');
           if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
         })
         .catch(()=>{ empty.style.display='block'; wrap.innerHTML=''; });
     });
-
-    // Nút lên đầu trang
-    addEventListener('scroll', () => {
-      const toTop = document.getElementById('toTop');
-      if (!toTop) return;
-      toTop.style.display = scrollY > 400 ? 'flex' : 'none';
-    }, { passive:true });
-    document.getElementById('toTop')?.addEventListener('click', () => scrollTo({ top:0, behavior:'smooth' }));
   </script>
 
-  <!-- Floating contacts script riêng (nếu dùng) -->
-  <script defer src="/assets/js/floating-contact.js"></script>
+  <!-- BLOG LATEST -->
+  <script>
+    (async ()=>{
+      const host = document.getElementById('home-blog');
+      const sources = ['/blog/feed.json','/assets/data/blog-feed.json','/blog/index.json'];
+      let raw=null; for(const u of sources){ try{ const r=await fetch(u,{cache:'no-store'}); if(r.ok){ raw=await r.json(); break; } }catch{} }
+      if(!raw){ host.innerHTML=''; return; }
+      const items = (Array.isArray(raw) ? raw : (raw.items || raw.posts || [])).slice(0,4).map(x=>{
+        const t = x.title || x.name || 'Bài viết';
+        const u = x.url || x.link || x.href || '#';
+        const img = x.image || x.thumbnail || '/assets/img/og/home.webp';
+        const ex = x.excerpt || x.summary || '';
+        return {t,u,img,ex};
+      });
+      if(!items.length){ host.innerHTML=''; return; }
+      host.innerHTML = items.map(p=>`
+        <article class="post">
+          <a href="${p.u}"><img src="${p.img}" alt="${p.t} — MXD" loading="lazy" width="640" height="360"></a>
+          <div class="body">
+            <h3><a href="${p.u}">${p.t}</a></h3>
+            <p class="muted" style="margin:0">${p.ex ? p.ex : ''}</p>
+          </div>
+        </article>`).join('');
+    })();
+  </script>
 
-  <!-- Đăng ký SW -->
+  <!-- SW -->
   <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
-      .then(reg => {
-        if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-        reg.addEventListener('updatefound', () => {
-          const nw = reg.installing;
-          nw && nw.addEventListener('statechange', () => {
-            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              reg.waiting && reg.waiting.postMessage('SKIP_WAITING');
-            }
-          });
-        });
-      });
-    navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+    navigator.serviceWorker.register('/sw.js?v=2025-10-12-home', { updateViaCache: 'none' });
   }
   </script>
 
