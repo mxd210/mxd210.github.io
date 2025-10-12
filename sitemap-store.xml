@@ -24,6 +24,13 @@ Policy:
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
+<!-- INSERT -->
+<url>
+  <loc>https://mxd210.github.io/store/noi-bat.html</loc>
+  <lastmod>2025-10-12</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.9</priority>
+</url>
 
   <!-- Tool sẽ INSERT thêm các hub khác (may-cat, may-khoan-duc-vit, …) nếu thiếu -->
 
