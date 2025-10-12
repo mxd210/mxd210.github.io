@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Sản phẩm nổi bật — mxd210</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Danh sách sản phẩm nổi bật (featured:true) từ products.json.">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="/assets/css/style.css" rel="stylesheet">
+  <style>
+    body{font-family:'Inter',sans-serif;background:#f9f9f9;color:#222}
+    .wrap{max-width:1200px;margin:0 auto;padding:40px 20px}
+    h1{font-size:28px;text-align:center;margin:0 0 24px}
+    .product-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:24px}
+    .product-card{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1);padding:12px;width:100%;max-width:220px;text-align:center}
+    .product-card img{max-width:100%;height:auto;border-radius:8px}
+    .price{color:#e60000;font-weight:700;margin:8px 0}
+    .buy-btn{background:#ff4500;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:8px}
+    .buy-btn:hover{background:#d13a00}
+    @media (max-width:768px){.product-card{max-width:100%;margin:0 auto}.product-grid{flex-direction:column;align-items:center}}
+  </style>
+</head>
+<body>
+  <section class="wrap">
+    <h1>Sản phẩm nổi bật</h1>
+    <div id="grid" class="product-grid" aria-live="polite"></div>
+  </section>
+
+  <script>
+    const fmt = n => (n||n===0) ? n.toLocaleString('vi-VN') + '₫' : '—';
+    fetch('/products.json', { cache:'no-store' })
+      .then(r=>r.json())
+      .then(all=>{
+        const list = all.filter(p => p && p.status && p.featured);
+        document.getElementById('grid').innerHTML =
+          (list.length ? list : []).map(p=>`
+            <div class="product-card">
+              <img loading="lazy" src="${p.image}" alt="${p.name}">
+              <h3>${p.name}</h3>
+              <p class="price">${fmt(p.price)}</p>
+              <a class="buy-btn" href="${p.deeplink || p.origin}" target="_blank" rel="nofollow noopener">Mua ngay</a>
+            </div>
+          `).join('') || '<p>Chưa có sản phẩm nổi bật.</p>';
+      })
+      .catch(()=>{ document.getElementById('grid').innerHTML = '<p>Lỗi tải sản phẩm.</p>'; });
+  </script>
+</body>
+</html>
