@@ -1,4 +1,5 @@
 /* === MXD PRODUCT UI — PATCH GỌN & PRO (override cuối) === */
+/* MXD-ANCHOR:SITECSS-PRODUCT-PATCH v2025-10-12 */
 :root{
   --card-bg:#fff;
   --card-border:#e6eaf0;
@@ -11,7 +12,7 @@
   --gap:20px;
 }
 
-/* Chỉ áp cho 2 khối đang dùng */
+/* Chỉ áp cho 2 khối đang dùng (ưu tiên cao hơn .card chung trong <style>) */
 #product-list.grid, #featured-grid.grid{
   display:grid;
   gap:var(--gap);
@@ -23,7 +24,7 @@
   display:flex;flex-direction:column;overflow:hidden;
   border:1px solid var(--card-border);border-radius:var(--radius);
   background:var(--card-bg);box-shadow:var(--card-shadow);
-  transition:transform .15s ease, box-shadow .15s ease;
+  transition:transform .15s ease, box-shadow .15s ease; height:100%;
 }
 #product-list .card:hover, #featured-grid .card:hover{
   transform:translateY(-2px);box-shadow:var(--card-shadow-hover);
@@ -35,38 +36,57 @@
   background:var(--surface);border-bottom:1px solid var(--card-border);
 }
 #product-list .thumb img, #featured-grid .thumb img{
-  width:100%;height:100%;object-fit:contain;
+  width:100%;height:100%;object-fit:contain;display:block;
+}
+
+/* Trường hợp không có .thumb wrapper (render-products tạo <img> trực tiếp) */
+.product-grid .card img{
+  width:100%;aspect-ratio:1;object-fit:contain;display:block;
+  background:var(--surface);border-bottom:1px solid var(--card-border);
 }
 
 /* Thân card */
-#product-list .body, #featured-grid .body{
+#product-list .body, #featured-grid .body,
+.product-grid .card .body{
   padding:14px;display:flex;flex-direction:column;gap:8px;min-height:136px;
 }
-#product-list .name, #featured-grid .name{
+#product-list .name, #featured-grid .name,
+.product-grid .card .name{
   margin:0;font-weight:700;font-size:15px;line-height:1.35;color:var(--title);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em;
 }
-#product-list .name a, #featured-grid .name a{color:inherit;text-decoration:none}
-#product-list .name a:hover, #featured-grid .name a:hover{text-decoration:underline}
+#product-list .name a, #featured-grid .name a,
+.product-grid .card .name a{color:inherit;text-decoration:none}
+#product-list .name a:hover, #featured-grid .name a:hover,
+.product-grid .card .name a:hover{text-decoration:underline}
 
-#product-list .price, #featured-grid .price{
+#product-list .price, #featured-grid .price,
+.product-grid .card .price{
   margin-top:2px;font-weight:900;font-size:16px;color:var(--price);letter-spacing:.2px;
 }
 
-/* Nút mua — gọn, sắc nét; màu theo sàn */
-#product-list .actions, #featured-grid .actions{margin-top:auto}
-#product-list .buy, #featured-grid .buy{
+/* Nút mua — gọn, sắc nét; màu theo sàn (giữ class .buy để affiliate hoạt động) */
+#product-list .actions, #featured-grid .actions,
+.product-grid .card .actions{margin-top:auto}
+#product-list .buy, #featured-grid .buy,
+.product-grid .card .buy{
   display:inline-block;width:100%;text-align:center;
   padding:10px 12px;border-radius:10px;font-weight:900;
   color:#fff;border:1px solid transparent;background:#1746ff;border-color:#1746ff;
   transition:transform .05s ease, box-shadow .12s ease, filter .1s ease;
 }
-#product-list .buy:active, #featured-grid .buy:active{transform:translateY(1px)}
-#product-list .buy:hover,  #featured-grid .buy:hover {box-shadow:0 6px 16px rgba(0,0,0,.12);filter:brightness(1.03)}
-#product-list .buy[data-merchant="shopee"], #featured-grid .buy[data-merchant="shopee"]{background:#ee4d2d;border-color:#ee4d2d}
-#product-list .buy[data-merchant="lazada"], #featured-grid .buy[data-merchant="lazada"]{background:#0f146d;border-color:#0f146d}
-#product-list .buy[data-merchant="tiki"],   #featured-grid .buy[data-merchant="tiki"]{background:#1a94ff;border-color:#1a94ff}
-#product-list .buy[data-merchant="tiktok"], #featured-grid .buy[data-merchant="tiktok"]{background:#111;border-color:#111}
+#product-list .buy:active, #featured-grid .buy:active,
+.product-grid .card .buy:active{transform:translateY(1px)}
+#product-list .buy:hover,  #featured-grid .buy:hover,
+.product-grid .card .buy:hover{box-shadow:0 6px 16px rgba(0,0,0,.12);filter:brightness(1.03)}
+#product-list .buy[data-merchant="shopee"], #featured-grid .buy[data-merchant="shopee"],
+.product-grid .card .buy[data-merchant="shopee"]{background:#ee4d2d;border-color:#ee4d2d}
+#product-list .buy[data-merchant="lazada"], #featured-grid .buy[data-merchant="lazada"],
+.product-grid .card .buy[data-merchant="lazada"]{background:#0f146d;border-color:#0f146d}
+#product-list .buy[data-merchant="tiki"],   #featured-grid .buy[data-merchant="tiki"],
+.product-grid .card .buy[data-merchant="tiki"]{background:#1a94ff;border-color:#1a94ff}
+#product-list .buy[data-merchant="tiktok"], #featured-grid .buy[data-merchant="tiktok"],
+.product-grid .card .buy[data-merchant="tiktok"]{background:#111;border-color:#111}
 
 /* Skeleton đồng bộ tông */
 #product-list .skeleton, #featured-grid .skeleton{
@@ -78,134 +98,17 @@
 }
 @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 
-@media (max-width:480px){
-  #product-list.grid, #featured-grid.grid{gap:14px}
-  #product-list .body, #featured-grid .body{padding:12px}
-}
-/* MXD badges (share across store & g.html) */
-.mxd-badges{position:absolute; top:10px; left:10px; display:flex; gap:6px; flex-wrap:wrap; z-index:2}
-.mxd-badge{font-size:11px; font-weight:700; padding:6px 8px; border-radius:999px; color:#fff}
-.mxd-badge.new{background:#10b981}
-.mxd-badge.hot{background:#ef4444}
-.mxd-badge.sale{background:#f59e0b}
-
-/* === MXD PRODUCT GRID (dynamic store pages) ===
-   The default `.product-grid` generated by render-products.js lacked styling, causing
-   large, unaligned images and text.  These rules unify the layout with our
-   existing card design: a responsive grid with cards that include a square
-   thumbnail, product name, price and buy buttons.  The variables defined at
-   the top of this file (card colors, border radius, shadows, etc.) are
-   reused here for consistency across the site. */
+/* === MXD PRODUCT GRID (dynamic store pages) === */
 .product-grid{
   display:grid;
   gap:var(--gap);
   grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
 }
 
-.product-grid .card{
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  border:1px solid var(--card-border);
-  border-radius:var(--radius);
-  background:var(--card-bg);
-  box-shadow:var(--card-shadow);
-  transition:transform .15s ease, box-shadow .15s ease;
-}
-.product-grid .card:hover{
-  transform:translateY(-2px);
-  box-shadow:var(--card-shadow-hover);
-}
-
-/* Square thumbnail with contain fit and light background */
-.product-grid .card img{
-  width:100%;
-  aspect-ratio:1;
-  object-fit:contain;
-  background:var(--surface);
-  border-bottom:1px solid var(--card-border);
-}
-
-/* Card body holds the name, price and actions */
-.product-grid .card .body{
-  padding:14px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  min-height:136px;
-}
-
-/* Product name: two-line clamp with ellipsis */
-.product-grid .card .name{
-  margin:0;
-  font-weight:700;
-  font-size:15px;
-  line-height:1.35;
-  color:var(--title);
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-  min-height:2.7em;
-}
-
-/* Price text */
-.product-grid .card .price{
-  margin-top:2px;
-  font-weight:900;
-  font-size:16px;
-  color:var(--price);
-  letter-spacing:.2px;
-}
-
-/* Optional description text under the price.  Some products include a short
-   description or tính năng to aid SEO and provide more context.  We clamp
-   to two lines to keep cards compact. */
-.product-grid .card .desc{
-  margin-top:4px;
-  font-size:13px;
-  line-height:1.4;
-  color:var(--muted,#666);
-  display:-webkit-box;
-  -webkit-box-orient:vertical;
-  -webkit-line-clamp:2;
-  overflow:hidden;
-}
-
-/* Buy button with merchant-colour overrides */
-.product-grid .card .buy{
-  display:inline-block;
-  width:100%;
-  text-align:center;
-  padding:10px 12px;
-  border-radius:10px;
-  font-weight:900;
-  color:#fff;
-  border:1px solid transparent;
-  background:#1746ff;
-  border-color:#1746ff;
-  transition:transform .05s ease, box-shadow .12s ease, filter .1s ease;
-}
-.product-grid .card .buy:active{
-  transform:translateY(1px);
-}
-.product-grid .card .buy:hover{
-  box-shadow:0 6px 16px rgba(0,0,0,.12);
-  filter:brightness(1.03);
-}
-.product-grid .card .buy[data-merchant="shopee"]{
-  background:#ee4d2d;
-  border-color:#ee4d2d;
-}
-.product-grid .card .buy[data-merchant="lazada"]{
-  background:#0f146d;
-  border-color:#0f146d;
-}
-.product-grid .card .buy[data-merchant="tiki"]{
-  background:#1a94ff;
-  border-color:#1a94ff;
-}
-.product-grid .card .buy[data-merchant="tiktok"]{
-  background:#111;
-  border-color:#111;
-}
+/* Badges dùng chung (store & g.html) */
+.mxd-badges{position:absolute; top:10px; left:10px; display:flex; gap:6px; flex-wrap:wrap; z-index:2}
+.mxd-badge{font-size:11px; font-weight:700; padding:6px 8px; border-radius:999px; color:#fff}
+.mxd-badge.new{background:#10b981}
+.mxd-badge.hot{background:#ef4444}
+.mxd-badge.sale{background:#f59e0b}
+/* === /MXD PATCH === */
