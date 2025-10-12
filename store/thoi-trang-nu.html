@@ -38,18 +38,21 @@
   <section id="product-grid"
            class="product-grid"
            data-category="thoi-trang-nu"
-           data-alias="thoi-trang,thoi-trang-nu,nu">
+           data-alias="thoi-trang,thoi-trang-nu,nu,women,nu-cong-so,nu-thuong-ngay">
   </section>
 
   <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
 
   <!-- Loader MXD: affiliates.json → products.json → /affiliates.json ; hỗ trợ array hoặc {items:[...]} -->
+  <!-- MXD-ANCHOR:THOI-TRANG-NU-FILTER -->
   <script>
   (async function renderMXD(){
     const grid = document.getElementById('product-grid');
     const cat = (grid.getAttribute('data-category')||'').trim().toLowerCase();
     const aliases = (grid.getAttribute('data-alias')||'')
       .split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    const ALIASES = new Set([cat, ...aliases]);
+
     const sources = ['/assets/data/affiliates.json','/products.json','/affiliates.json'];
 
     async function loadFirst(urls){
@@ -71,28 +74,48 @@
       return;
     }
 
-    const isLive = p => p && p.status !== false && p.status !== 'archived';
-    const hasCat = p => {
-      const c = p && p.category;
-      if (Array.isArray(c)){
-        const L = c.map(x=>String(x||'').toLowerCase());
-        return L.includes(cat) || L.some(x=>aliases.includes(x));
-      }
-      const s = String(c||'').toLowerCase();
-      return s === cat || aliases.includes(s);
-    };
+    // === Bộ lọc mở rộng: cat/category/section + cats/categories + tags; hỗ trợ tiền tố ===
+    const norm  = v => String(v||'').toLowerCase().trim();
+    const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
+    const slug  = v => norm(v).replace(/[^a-z0-9\-]+/g,'-').replace(/--+/g,'-');
 
-    const items = data.filter(p => isLive(p) && hasCat(p));
+    function labelsOf(p){
+      const out = [];
+      out.push(...split(p.cat||p.category||p.section||''));              // string
+      const cats = Array.isArray(p.cats)? p.cats : (Array.isArray(p.categories)? p.categories : []);
+      out.push(...cats.flatMap(split));                                   // array
+      if (Array.isArray(p.tags)) out.push(...p.tags.flatMap(split));      // tags
+      return Array.from(new Set(out.map(slug).filter(Boolean)));
+    }
+
+    const isLive = p => p && p.status !== false && p.status !== 'archived';
+
+    function inCat(p){
+      const labels = labelsOf(p);
+      if (!labels.length) return false;
+      // match chặt: trùng alias
+      if (labels.some(l => ALIASES.has(l))) return true;
+      // match rộng: alias và label bắt đầu bằng nhau (thoi-trang bao trùm thoi-trang-nu, v.v.)
+      for (const a of ALIASES){
+        if (labels.some(l => l.startsWith(a) || a.startsWith(l))) return true;
+      }
+      return false;
+    }
+
+    const items = data.filter(p => isLive(p) && inCat(p));
 
     if (!items.length){
-      grid.innerHTML = `<p class="muted">Chưa có sản phẩm cho danh mục này (tạm hiển thị theo alias “thoi-trang/nu”).</p>`;
+      grid.innerHTML = `<p class="muted">Chưa có sản phẩm cho danh mục này. Thêm tag/slug <code>thoi-trang-nu</code> (hoặc alias liên quan) trong <code>affiliates.json</code>.</p>`;
       return;
     }
 
     const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
     const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
     const linkOf = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
-    const imgOf  = p => p.image || ((p.sku||'') ? `/assets/img/products/${String(p.sku).toLowerCase()}.webp` : '/assets/img/products/placeholder.webp');
+    const imgOf  = p => {
+      const sku = (p.sku||'').toLowerCase();
+      return p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp`);
+    };
 
     grid.innerHTML = items.map(p=>{
       const sku = (p.sku||'').toLowerCase();
