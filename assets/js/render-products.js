@@ -1,6 +1,7 @@
-/* MXD render-products — v2025-10-12a
+/* MXD render-products — v2025-10-12b
    - OSOT: /assets/data/affiliates.json; fallback: /products.json -> /affiliates.json
-   - Hỗ trợ lọc: data-category + data-alias + data-tags (ví dụ: data-tags="featured,hot")
+   - Lọc: data-category + data-alias + data-tags
+   - Fallback: data-fallback="all" => nếu lọc rỗng, hiển thị tất cả (giới hạn theo limit)
    - Ảnh: /assets/img/products/<sku>.webp
    - Nút mua: data-merchant (shopee|lazada|tiki|tiktok)
 */
@@ -14,12 +15,11 @@
   }
 
   const slugify = (s) => (s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
-
-  function toTags(v){
+  const toTags = (v)=>{
     if (!v) return [];
     if (Array.isArray(v)) return v.map(x=>String(x).toLowerCase().trim()).filter(Boolean);
     return String(v).split(",").map(x=>x.toLowerCase().trim()).filter(Boolean);
-  }
+  };
 
   function normalize(rec) {
     const name = rec.name || rec.title || "";
@@ -65,21 +65,33 @@
     const category = (host.getAttribute("data-category")||"").toLowerCase().trim();
     const aliases  = (host.getAttribute("data-alias")||"").split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
     const tagsAny  = (host.getAttribute("data-tags") || "").split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
+    const fallbackAll = (host.getAttribute("data-fallback")||"").toLowerCase()==="all";
 
     const raw = await loadData();
     const rows = Array.isArray(raw) ? raw : [];
-    const items = rows.map(normalize).filter(x =>
-      x.url && inCategory(x, category, aliases) && hasAnyTag(x, tagsAny)
-    );
+    const all  = rows.map(normalize).filter(x=>x && x.url);
+    // limit từ query (?limit=) ưu tiên cao hơn tham số
+    const qs  = new URLSearchParams(location.search);
+    const limQ = qs.has("limit") ? Number(qs.get("limit")) : undefined;
+    const lim = Number.isFinite(limQ) ? limQ : (Number.isFinite(limit) ? limit : undefined);
 
-    if (!items.length){
-      host.innerHTML = `<div class="empty"><p class="muted">Chưa có sản phẩm cho danh mục này. Hãy nạp dữ liệu vào <code>/assets/data/affiliates.json</code>.</p></div>`;
+    let items = all.filter(x => inCategory(x, category, aliases) && hasAnyTag(x, tagsAny));
+
+    // Fallback: nếu lọc rỗng và bật data-fallback="all" -> hiển thị tất cả
+    if (!items.length && fallbackAll) {
+      items = lim ? all.slice(0, lim) : all.slice(0, 12);
+    }
+
+    if (!items.length) {
+      host.innerHTML = `
+        <div class="empty"><p class="muted">
+          Chưa có sản phẩm cho danh mục này. Hãy nạp dữ liệu vào
+          <code>/assets/data/affiliates.json</code>.
+        </p></div>`;
       return;
     }
 
-    const qs  = new URLSearchParams(location.search);
-    const lim = qs.has("limit") ? Number(qs.get("limit")) : (Number.isFinite(limit)?limit:undefined);
-    const take= Number.isFinite(lim) ? items.slice(0, lim) : items;
+    const take = Number.isFinite(lim) ? items.slice(0, lim) : items;
 
     host.innerHTML = take.map(x=>{
       const detail = `/g.html?sku=${encodeURIComponent(x.sku)}`;
@@ -91,7 +103,7 @@
   <h3 class="name"><a href="${detail}">${x.name}</a></h3>
   <div class="price">${priceText(x.price)}</div>
   <div class="actions">
-    <a class="buy" href="${x.url}" data-merchant="${x.merchant}" rel="nofollow">Mua trên ${x.merchant ? x.merchant.charAt(0).toUpperCase()+x.merchant.slice(1) : "cửa hàng"}</a>
+    <a class="buy" href="${x.url}" data-merchant="${x.merchant}" rel="nofollow">Mua ngay</a>
   </div>
 </article>`;
     }).join("");
