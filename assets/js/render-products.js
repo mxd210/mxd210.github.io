@@ -70,14 +70,13 @@
     const raw = await loadData();
     const rows = Array.isArray(raw) ? raw : [];
     const all  = rows.map(normalize).filter(x=>x && x.url);
-    // limit từ query (?limit=) ưu tiên cao hơn tham số
+
     const qs  = new URLSearchParams(location.search);
     const limQ = qs.has("limit") ? Number(qs.get("limit")) : undefined;
     const lim = Number.isFinite(limQ) ? limQ : (Number.isFinite(limit) ? limit : undefined);
 
     let items = all.filter(x => inCategory(x, category, aliases) && hasAnyTag(x, tagsAny));
 
-    // Fallback: nếu lọc rỗng và bật data-fallback="all" -> hiển thị tất cả
     if (!items.length && fallbackAll) {
       items = lim ? all.slice(0, lim) : all.slice(0, 12);
     }
