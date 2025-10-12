@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- MXD-SITEMAP v2025-10-10 [file:/sitemap-store.xml]
+<!-- MXD-SITEMAP v2025-10-12 [file:/sitemap-store.xml]
 Policy:
 - Mỗi <loc> chỉ xuất hiện MỘT lần (dedupe).
 - lastmod = ngày commit (YYYY-MM-DD); changefreq=weekly; priority 0.8–0.9 cho hub.
@@ -10,12 +10,21 @@ Policy:
   <!-- Hub chính của store -->
   <url>
     <loc>https://mxd210.github.io/store.html</loc>
-    <lastmod>2025-10-10</lastmod>
+    <lastmod>2025-10-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- MXD-ANCHOR:STORE-HUBS -->
-  <!-- Tool sẽ INSERT các hub: /store/may-cat.html, /store/may-khoan-duc-vit.html, v.v. -->
+
+  <!-- INSERT: Thời trang hub -->
+  <url>
+    <loc>https://mxd210.github.io/store/thoi-trang.html</loc>
+    <lastmod>2025-10-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Tool sẽ INSERT thêm các hub khác (may-cat, may-khoan-duc-vit, …) nếu thiếu -->
 
 </urlset>
