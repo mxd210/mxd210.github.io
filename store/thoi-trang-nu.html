@@ -4,63 +4,53 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Thời trang nữ | MXD</title>
-  <meta name="description" content="Thời trang nữ MXD: công sở, thường ngày, bảo hộ lao động nhẹ, phụ kiện làm việc."/>
+  <meta name="description" content="Đầm váy, công sở, thể thao, bảo hộ — khu nữ MXD hiển thị tự động từ affiliates.json."/>
   <link rel="canonical" href="https://mxd210.github.io/store/thoi-trang-nu.html"/>
   <meta name="robots" content="index,follow"/>
-<meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o" />
+
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Thời trang nữ | MXD"/>
-  <meta property="og:description" content="Công sở, thường ngày, bảo hộ nhẹ, phụ kiện làm việc."/>
+  <meta property="og:description" content="Danh mục thời trang nữ. Dữ liệu từ affiliates.json (OSOT)."/>
   <meta property="og:url" content="https://mxd210.github.io/store/thoi-trang-nu.html"/>
-  <meta property="og:image" content="/assets/img/categories/thoi-trang.webp"/>
-
-  <meta name="at:sub1" content="">
-  <meta name="at:sub2" content="thoi-trang-nu">
-  <meta name="at:sub3" content="store">
-  <meta name="at:sub4" content="mxd210">
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/thoi-trang.webp"/>
 
   <link rel="stylesheet" href="/assets/site.css"/>
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
-  <script defer src="/assets/js/render-products.js"></script>
-  <script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
-
-  <style>
-    .container{max-width:1100px;margin:0 auto;padding:0 16px}
-    .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:8px 0 16px;list-style:none}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border,#eaeaea);border-radius:12px;background:var(--card,#fff);box-shadow:0 4px 12px rgba(0,0,0,.05);color:inherit;text-decoration:none}
-    .chip[aria-current="page"]{outline:2px solid #1a73e8}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
-  </style>
 </head>
 <body>
-  <header class="container">
-    <nav class="breadcrumb" style="padding:12px 0;border-bottom:1px solid var(--border,#eaeaea);margin-bottom:8px">
-      <a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › <a href="/store/thoi-trang.html">Thời trang</a> › <span>Nữ</span>
-    </nav>
-    <h1>Thời trang nữ</h1>
-    <p class="lead">Trang phục làm việc, thường ngày, bảo hộ nhẹ và phụ kiện tiện dụng.</p>
-  </header>
+  <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Thời trang nữ</nav>
+  <h1>Thời trang nữ</h1>
+  <div class="filter-row">
+    <a class="btn" href="/store/thoi-trang.html">Tất cả</a>
+    <a class="btn" href="/store/thoi-trang-nam.html">Nam</a>
+    <a class="btn is-active" href="/store/thoi-trang-nu.html">Nữ</a>
+  </div>
 
-  <main class="container">
-    <nav class="quick-nav" aria-label="Danh mục thời trang">
-      <a class="chip" href="/store/thoi-trang-nam.html">Thời trang nam</a>
-      <a class="chip" href="/store/thoi-trang-nu.html" aria-current="page">Thời trang nữ</a>
-      <a class="chip" href="/store/thoi-trang-tre-em.html">Trẻ em</a>
-      <a class="chip" href="/store/thoi-trang-thu-dong.html">Thu đông</a>
-      <a class="chip" href="/store/thoi-trang-he.html">Hè</a>
-    </nav>
+  <section id="product-grid" class="product-grid" data-category="thoi-trang-nu" data-alias="thoi-trang,nu"></section>
 
-    <div id="product-list" class="grid" aria-live="polite"></div>
-    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Thêm trong <code>affiliates.json</code> hoặc <code>products.json</code>.</p>
-  </main>
-
-  <footer class="container" style="margin-top:32px;padding-top:16px;border-top:1px solid var(--border,#eaeaea)">
-    <small>© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></small>
-  </footer>
+  <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
 
   <script>
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  (async function(){
+    const grid=document.getElementById('product-grid');
+    const cat=grid.getAttribute('data-category'); const aliases=(grid.getAttribute('data-alias')||'').split(',').map(s=>s.trim());
+    const srcs=['/assets/data/affiliates.json','/products.json','/affiliates.json'];
+    let data; for(const s of srcs){ try{ const r=await fetch(s,{cache:'no-store'}); if(r.ok){ data=await r.json(); break; } }catch{} }
+    if(!Array.isArray(data)){ grid.innerHTML='<p class="muted">Không đọc được dữ liệu sản phẩm.</p>'; return; }
+    const ok=p=> (p.category||'').toLowerCase()===cat || aliases.includes((p.category||'').toLowerCase());
+    const items=data.filter(p=>p && p.status!=='archived' && ok(p));
+    grid.innerHTML=items.map(p=>{
+      const img=p.image||(`/assets/img/products/${p.sku}.webp`);
+      const price=(p.price!=null)? new Intl.NumberFormat('vi-VN').format(p.price)+'₫' : '';
+      return `<article class="product-card" data-sku="${p.sku}">
+        <a class="thumb" href="/g.html?sku=${encodeURIComponent(p.sku)}"><img loading="lazy" src="${img}" alt="${p.name} — MXD" width="320" height="320"></a>
+        <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(p.sku)}">${p.name}</a></h3>
+        <div class="price">${price}</div>
+        <div class="actions"><a class="buy" href="${p.origin||'#'}" data-merchant="${p.merchant||''}" rel="nofollow">Mua ngay</a></div>
+      </article>`;
+    }).join('') || '<p class="muted">Chưa có sản phẩm cho danh mục này.</p>';
+  })();
   </script>
 </body>
 </html>
