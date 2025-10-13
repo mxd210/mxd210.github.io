@@ -204,6 +204,19 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     .metric svg{width:22px;height:22px}
     .metric strong{display:block}
     .metric span{color:var(--muted);font-size:13px}
+
+     */
+    .floating-contacts{
+      position:fixed;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));
+      display:flex;flex-direction:column;gap:12px;z-index:40;pointer-events:none;
+    }
+    .floating-contacts a,
+    .floating-contacts button{
+      pointer-events:auto;width:52px;height:52px;border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.18);
+    }
+    body.has-fixed-cta .floating-contacts{ bottom:112px }
   </style>
 
   <!-- 1) GA4 -->
@@ -225,6 +238,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     "contactPoint":[{"@type":"ContactPoint","telephone":"+84-338-328-898","contactType":"customer service","areaServed":"VN","availableLanguage":["vi","en"]}]
   }
   </script>
+  <script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
 </head>
 <body>
   <!-- Header -->
@@ -311,25 +325,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       © MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a>
     </div>
   </footer>
-
-  <!-- FLOATING CONTACTS — MXD (duy nhất 1 block) -->
-  <div class="fc" id="floating-contacts" aria-label="Liên hệ nhanh">
-    <a class="fab fab-brand" href="https://zalo.me/0338328898" target="_blank" rel="noopener nofollow"
-       data-channel="zalo" aria-label="Chat Zalo 0338328898">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12.5a1.5 1.5 0 0 1-2.45 1.15l-2.77-2.31H5a2 2 0 0 1-2-2V5z"/></svg>
-    </a>
-    <a class="fab fab-brand" href="https://www.facebook.com/mxd6686" target="_blank" rel="noopener nofollow"
-       data-channel="facebook" aria-label="Facebook MXD6686">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 3h4a1 1 0 0 1 1 1v3h-3a2 2 0 0 0-2 2v3h5l-1 4h-4v7h-4v-7H7v-4h2V9a5 5 0 0 1 5-5z"/></svg>
-    </a>
-    <a class="fab" href="tel:0338328898" data-channel="phone" aria-label="Gọi 0338328898">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1.1-.2c1.2.5 2.6.8 4 .8a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C12.3 21 3 11.7 3 1a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1c0 1.4.3 2.8.8 4a1 1 0 0 1-.2 1.1L6.6 10.8z"/></svg>
-    </a>
-    <button class="fab fab-top" id="toTop" aria-label="Lên đầu trang">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 14l5-5 5 5H7z"/></svg>
-    </button>
-  </div>
-
+  
   <!-- Config renderer -->
   <script>
     window.MXD_RENDER = window.MXD_RENDER || {};
