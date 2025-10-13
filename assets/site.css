@@ -1,5 +1,5 @@
 /* === MXD PRODUCT UI — PATCH GỌN & PRO (override cuối) === */
-/* MXD-ANCHOR:SITECSS-PRODUCT-PATCH v2025-10-12 */
+/* MXD-ANCHOR:SITECSS-PRODUCT-PATCH v2025-10-13 */
 :root{
   --card-bg:#fff;
   --card-border:#e6eaf0;
@@ -50,15 +50,40 @@
 .product-grid .card .body{
   padding:14px;display:flex;flex-direction:column;gap:8px;min-height:136px;
 }
+
+/* TÊN SẢN PHẨM — đảm bảo luôn hiện trên mobile
+   - Thêm fallback cho các class khác (.title, .product-title)
+   - Fallback không webkit: max-height + overflow-hidden
+*/
 #product-list .name, #featured-grid .name,
-.product-grid .card .name{
+.product-grid .card .name,
+#product-list .title, #featured-grid .title,
+.product-grid .card .title,
+#product-list .product-title, #featured-grid .product-title,
+.product-grid .card .product-title{
   margin:0;font-weight:700;font-size:15px;line-height:1.35;color:var(--title);
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em;
+  /* Fallback thường */
+  display:block;max-height:calc(1.35em * 2);overflow:hidden;
+  overflow-wrap:anywhere;word-break:break-word;
+  /* WebKit clamp 2 dòng */
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
 }
 #product-list .name a, #featured-grid .name a,
-.product-grid .card .name a{color:inherit;text-decoration:none}
+.product-grid .card .name a,
+#product-list .title a, #featured-grid .title a,
+.product-grid .card .title a,
+#product-list .product-title a, #featured-grid .product-title a,
+.product-grid .card .product-title a{
+  color:inherit;text-decoration:none
+}
 #product-list .name a:hover, #featured-grid .name a:hover,
-.product-grid .card .name a:hover{text-decoration:underline}
+.product-grid .card .name a:hover,
+#product-list .title a:hover, #featured-grid .title a:hover,
+.product-grid .card .title a:hover,
+#product-list .product-title a:hover, #featured-grid .product-title a:hover,
+.product-grid .card .product-title a:hover{
+  text-decoration:underline
+}
 
 #product-list .price, #featured-grid .price,
 .product-grid .card .price{
@@ -111,4 +136,30 @@
 .mxd-badge.new{background:#10b981}
 .mxd-badge.hot{background:#ef4444}
 .mxd-badge.sale{background:#f59e0b}
+
+/* ====== FLOATING CONTACTS — Sửa chồng chéo trên mobile ======
+   - stack theo cột + gap
+   - không che CTA: khi body có class .has-fixed-cta, đẩy bottom lên
+   - chỉ nút mới nhận click (pointer-events)
+*/
+.floating-contacts{
+  position:fixed;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:12px;z-index:40;
+  pointer-events:none; /* khung không chặn click nội dung */
+}
+.floating-contacts a,
+.floating-contacts button{
+  pointer-events:auto;
+  width:52px;height:52px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;
+  background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.18);
+}
+body.has-fixed-cta .floating-contacts{
+  bottom:112px; /* tránh đè nút Mua ngay cố định */
+}
+
+/* Nếu có lớp cũ .contact-fab/.contact-buttons thì đồng bộ */
+.contact-fab,.contact-buttons{position:fixed;right:12px;z-index:40}
+.contact-buttons{display:flex;flex-direction:column;gap:12px;pointer-events:none}
+.contact-buttons a,.contact-buttons button{pointer-events:auto;width:52px;height:52px;border-radius:999px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 /* === /MXD PATCH === */
