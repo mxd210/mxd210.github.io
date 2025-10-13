@@ -270,6 +270,35 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   border-color:var(--chip-border) !important;
   box-shadow:var(--chip-shadow) !important;
 }
+/* === MXD NAV STRIP (blue) v2025-10-13 — minimal override ================ */
+:root{
+  --nav-blue-1:#1746ff;     /* xanh dương chính */
+  --nav-blue-2:#1a94ff;     /* xanh dương phối */
+  --nav-blue-ring:rgba(255,255,255,.18);
+}
+
+/* Dải nền xanh dương cho toàn bộ cụm menu */
+.site-nav{
+  background:linear-gradient(135deg,var(--nav-blue-1),var(--nav-blue-2)) !important;
+  padding:6px 10px !important;
+  border-radius:14px !important;
+  border:1px solid var(--nav-blue-ring) !important;
+  box-shadow:0 10px 24px rgba(23,70,255,.20) !important;
+}
+
+/* Link trắng trên nền xanh, hover/active dịu mắt */
+.site-nav .nav-link{
+  color:#fff !important;
+  border-color:transparent !important;
+  background:transparent !important;
+}
+.site-nav .nav-link:hover{
+  background:rgba(255,255,255,.14) !important;
+}
+.site-nav .nav-link[aria-current="page"]{
+  background:rgba(255,255,255,.22) !important;
+  color:#fff !important;
+}
 
   </style>
 
