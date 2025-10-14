@@ -1,44 +1,82 @@
-/* MXD-DEDUPE SAFE MODE v2025-10-14
- * Mục tiêu: chỉ gỡ TRÙNG, KHÔNG xoá nhầm.
- * - Chỉ đụng vào: dải danh mục (category bar), block "Sản phẩm nổi bật / Máy móc xây dựng / Thời trang",
- *   và floating contacts. Giữ lại đúng 1, ưu tiên phần có nhiều link nhất.
- * - Không dùng fuzzy rộng; chỉ so heading trực tiếp để tránh xoá nhầm card sản phẩm.
+/* MXD-DEDUPE STORE FINAL v2025-10-14
+ * Một file, một việc: gỡ TRÙNG trên store.html, không đụng phần lưới sản phẩm.
+ * Gỡ các thứ sau, theo thứ tự ưu tiên:
+ *   1) Dải danh mục (category strip) – giữ bản nằm trên cùng.
+ *   2) Các block có heading: "Sản phẩm nổi bật" | "Máy móc xây dựng" | "Thời trang" – giữ bản đầu.
+ *   3) Floating contacts – giữ 1.
+ * Có observer theo dõi DOM; nếu script khác chèn muộn, nó tự dọn tiếp.
  */
 (function(){
   'use strict';
-  if (window.__MXD_DEDUPE_SAFE__) return; // guard
-  window.__MXD_DEDUPE_SAFE__ = true;
+  if (window.__MXD_DEDUPE_STORE__) return; window.__MXD_DEDUPE_STORE__ = true;
 
-  const norm = s => (s||'')
-    .toString().toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  // ===== helpers =====
+  const norm = s => (s||'').toString().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // bỏ dấu
     .replace(/\s+/g,' ').trim();
 
-  function keepOne(nodeList){
-    const list = Array.from(nodeList);
-    if (list.length <= 1) return 0;
-    // chọn phần có nhiều link nhất, nếu hoà thì lấy phần nằm trên (offsetTop nhỏ hơn)
-    const keep = list.sort((a,b)=> (b.querySelectorAll('a').length - a.querySelectorAll('a').length) || (a.offsetTop - b.offsetTop))[0];
-    list.forEach(el => { if (el !== keep) el.remove(); });
-    return list.length - 1;
+  const SLUGS = ['san-pham-noi-bat','may-moc-xay-dung','thoi-trang','thoi-trang-nam','thoi-trang-nu'];
+  const LABELS = ['san pham noi bat','may moc xay dung','thoi trang'];
+
+  const byTop = (a,b)=> (a?.offsetTop||0) - (b?.offsetTop||0);
+
+  function keepFirst(nodes){
+    const arr = Array.from(nodes).sort(byTop);
+    if (arr.length <= 1) return 0;
+    arr.slice(1).forEach(n=> n && n.remove());
+    return arr.length-1;
   }
 
-  // 1) CATEGORY BAR (dải danh mục ở đầu trang Cửa hàng)
-  keepOne(document.querySelectorAll('#categories-bar, .quick-nav, .categories-strip'));
+  // Strip danh mục: container có >=3 link trỏ tới các slug trên
+  function findCategoryStrips(){
+    const candidates = Array.from(document.querySelectorAll('section,div,ul,nav'));
+    return candidates.filter(el=>{
+      const links = Array.from(el.querySelectorAll('a[href]'));
+      if (links.length < 3) return false;
+      const hit = new Set();
+      for (const a of links){
+        const href = (a.getAttribute('href')||'').toLowerCase();
+        for (const s of SLUGS){ if (href.includes(s)) { hit.add(s); break; } }
+      }
+      return hit.size >= 2; // đủ bằng chứng là 1 hàng danh mục
+    }).sort(byTop);
+  }
 
-  // 2) CÁC BLOCK THEO HEADING CHÍNH XÁC (chỉ h2/h3 trực tiếp của section)
-  const labels = ['san pham noi bat','may moc xay dung','thoi trang'];
-  const groups = new Map();
-  document.querySelectorAll('section').forEach(sec => {
-    const h = sec.querySelector(':scope>h2, :scope>header>h2, :scope>h3, :scope>header>h3');
-    if (!h) return;
-    const key = norm(h.textContent);
-    if (!labels.includes(key)) return;
-    const arr = groups.get(key) || [];
-    arr.push(sec); groups.set(key, arr);
+  // Block theo heading
+  function findHeadingBlocks(){
+    const map = new Map(); // key -> [elements]
+    document.querySelectorAll('h1,h2,h3').forEach(h=>{
+      const t = norm(h.textContent);
+      if (!LABELS.includes(t)) return;
+      const sec = h.closest('section') || h.parentElement;
+      if (!sec) return;
+      const arr = map.get(t) || []; arr.push(sec); map.set(t, arr);
+    });
+    return map; // Map<label, nodes[]>
+  }
+
+  function dedupe(){
+    // 1) Category strips
+    const strips = findCategoryStrips();
+    if (strips.length>1) keepFirst(strips);
+
+    // 2) Heading blocks
+    const groups = findHeadingBlocks();
+    groups.forEach(nodes=>{ if (nodes.length>1) keepFirst(nodes); });
+
+    // 3) Floating contacts
+    keepFirst(document.querySelectorAll('#floating-contacts, .floating-contacts, .fc'));
+  }
+
+  function run(){ dedupe(); setTimeout(dedupe,300); setTimeout(dedupe,1000); }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', run, { once:true });
+  } else { run(); }
+
+  // Theo dõi DOM: script khác chèn muộn → dọn tiếp
+  const mo = new MutationObserver(list=>{
+    for (const rec of list){ if (rec.addedNodes && rec.addedNodes.length){ dedupe(); break; } }
   });
-  groups.forEach(nodes => keepOne(nodes));
-
-  // 3) FLOATING CONTACTS — giữ 1
-  keepOne(document.querySelectorAll('#floating-contacts, .floating-contacts, .fc'));
+  mo.observe(document.documentElement,{childList:true,subtree:true});
 })();
