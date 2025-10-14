@@ -5,13 +5,29 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>MXD LinkAuto — Crawler Shopee/Lazada</title>
   <style>
-    :root{--bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--card:#0e1722;--line:#203148}
+    :root{--bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--card:#0e1722;--line:#203148;--ok:#34d399;--warn:#f59e0b;--err:#ef4444}
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,Segoe UI}
+    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI}
     .wrap{max-width:1100px;margin:0 auto;padding:20px;display:grid;gap:16px}
     h1{margin:0 0 6px;font-size:20px}
     .hint{color:var(--muted)}
     .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .row3{display:grid;grid-template-columns:1.2fr .8fr .6fr .6fr .6fr;gap:10px}
+    label{display:block;font-size:12px;color:var(--muted);margin:4px 0}
+    input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0b1420;color:var(--fg)}
+    button{cursor:pointer;background:#122033;border-color:#1f334b}
+    button.primary{background:#1a3556}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .status{font-size:12px}
+    .status.ok{color:var(--ok)} .status.warn{color:var(--warn)} .status.err{color:var(--err)}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:8px 10px;border-bottom:1px solid #223347;vertical-align:top}
+    th{position:sticky;top:0;background:#0f1a29}
+    a{color:#7cc4ff;text-decoration:none}
+    .right{display:flex;gap:10px;justify-content:flex-end}
+    .muted{color:var(--muted)}
+    .pill{padding:2px 8px;border-radius:999px;background:#102033;border:1px solid #203148;font-size:12px}
   </style>
 </head>
 <body>
@@ -21,14 +37,172 @@
       <div class="hint">Nhập từ khóa → chọn sàn → Limit → <b>Lấy dữ liệu</b>. Sau đó có thể <b>Export CSV</b> hoặc <b>Tải ảnh ZIP</b>.</div>
     </div>
 
-    <div id="panel" class="card"></div>
+    <div id="panel" class="card"><!-- MXD-ANCHOR:LINKAUTO-PANEL --></div>
+
+    <div class="card">
+      <div class="muted">Ghi chú: API cần header <code>x-key</code>. CORS đã mở cho <code>https://mxd210.github.io</code>. Khi test từ domain khác có thể bị chặn.</div>
+    </div>
   </div>
 
-  <!-- Gọi file JS vừa tạo -->
-  <script src="/assets/js/linkauto-crawler.js"></script>
   <script>
-    // mount panel vào thẻ #panel
-    renderCrawlerPanel(document.getElementById('panel'));
+  // ===== UI + Logic (self-contained) =====
+  function renderCrawlerPanel(root){
+    root.innerHTML = `
+      <div class="row">
+        <div>
+          <label>Worker Base URL</label>
+          <input id="w_base" placeholder="https://link-auto.<sub>.workers.dev" value="https://link-auto.mxd6686.workers.dev">
+        </div>
+        <div>
+          <label>X-Key</label>
+          <input id="w_key" placeholder="mxd-2025-super">
+        </div>
+      </div>
+
+      <div class="row3" style="margin-top:8px">
+        <div>
+          <label>Từ khóa (mode=keyword)</label>
+          <input id="q_kw" placeholder="máy laze">
+        </div>
+        <div>
+          <label>Sàn</label>
+          <select id="src">
+            <option value="shopee">Shopee</option>
+            <option value="lazada">Lazada</option>
+          </select>
+        </div>
+        <div>
+          <label>Limit</label>
+          <input id="limit" type="number" min="1" max="50" value="20">
+        </div>
+        <div>
+          <label>Sắp xếp</label>
+          <select id="by"><option value="sales">Bán chạy</option></select>
+        </div>
+        <div>
+          <label>Brand (tuỳ chọn)</label>
+          <input id="brand" placeholder="hukan">
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top:10px">
+        <button class="primary" id="btnFetch">Lấy dữ liệu</button>
+        <button id="btnCSV" disabled>Export CSV</button>
+        <button id="btnZIP" disabled>Tải ảnh ZIP</button>
+        <span id="st" class="status muted">Đang chờ…</span>
+        <span id="count" class="pill">0 items</span>
+      </div>
+
+      <div style="overflow:auto;max-height:60vh;margin-top:6px">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th style="width:36px">#</th>
+              <th>Tên</th>
+              <th>Giá</th>
+              <th>Brand</th>
+              <th>Link gốc</th>
+              <th>Ảnh</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    `;
+
+    const $ = (id)=>root.querySelector(id);
+    let lastData = [];
+
+    $('#btnFetch').onclick = async ()=>{
+      const base = $('#w_base').value.trim().replace(/\/+$/,'');
+      const key  = $('#w_key').value.trim();
+      const src  = $('#src').value;
+      const q    = $('#q_kw').value.trim();
+      const limit = Math.max(1, Math.min(50, Number($('#limit').value||20)));
+      const by   = $('#by').value;
+      const brand= $('#brand').value.trim();
+
+      $('#st').className='status muted'; $('#st').textContent='Đang gọi…';
+      $('#btnCSV').disabled = true; $('#btnZIP').disabled = true;
+      $('#count').textContent='0 items';
+
+      try{
+        const url = new URL(base + `/crawler/${src}/top`);
+        url.searchParams.set('mode','keyword');
+        if(q) url.searchParams.set('q', q);
+        url.searchParams.set('limit', String(limit));
+        url.searchParams.set('by', by);
+        if(brand) url.searchParams.set('brand', brand);
+
+        const res = await fetch(url.toString(), { headers: { 'x-key': key }});
+        const js = await res.json();
+        if(!js.ok) throw new Error(js.error || 'Worker trả về lỗi');
+
+        lastData = Array.isArray(js.items) ? js.items : [];
+        renderRows(lastData);
+        $('#count').textContent = `${lastData.length} items`;
+        $('#st').className = 'status ok';
+        $('#st').textContent = js.status + (js.note ? ` · ${js.note}` : '');
+        $('#btnCSV').disabled = lastData.length===0;
+        $('#btnZIP').disabled = lastData.every(x=>!x.image_url);
+      }catch(err){
+        $('#st').className='status err';
+        $('#st').textContent = 'Lỗi: ' + err.message;
+        renderRows([]);
+      }
+    };
+
+    $('#btnCSV').onclick = ()=>{
+      const rows = [['name','price_vnd','brand','origin_url','image_url']];
+      for(const x of lastData){
+        rows.push([x.name||'', x.price_vnd||0, x.brand||'', x.origin_url||'', x.image_url||'']);
+      }
+      const csv = rows.map(r=>r.map(escapeCSV).join(',')).join('\n');
+      downloadText('linkauto.csv', csv);
+    };
+
+    $('#btnZIP').onclick = async ()=>{
+      const base = $('#w_base').value.trim().replace(/\/+$/,'');
+      const key  = $('#w_key').value.trim();
+      const images = [...new Set(lastData.map(x=>x.image_url).filter(Boolean))].slice(0, 200);
+      if(!images.length){ alert('Không có ảnh để tải.'); return; }
+
+      $('#st').className='status muted'; $('#st').textContent='Đang nén ảnh…';
+      try{
+        const r = await fetch(base + '/asset/zip', {
+          method:'POST',
+          headers:{'content-type':'application/json','x-key':key},
+          body: JSON.stringify({images})
+        });
+        const blob = await r.blob();
+        downloadBlob('images.zip', blob);
+        $('#st').className='status ok'; $('#st').textContent='Đã tải ZIP';
+      }catch(e){
+        $('#st').className='status err'; $('#st').textContent='ZIP lỗi: '+e.message;
+      }
+    };
+
+    function renderRows(arr){
+      const tbody = root.querySelector('#tbl tbody');
+      tbody.innerHTML = arr.map((x,i)=>`
+        <tr>
+          <td>${i+1}</td>
+          <td>${escapeHTML(x.name||'')}</td>
+          <td>${(x.price_vnd||0).toLocaleString('vi-VN')}</td>
+          <td>${escapeHTML(x.brand||'')}</td>
+          <td>${x.origin_url?`<a href="${x.origin_url}" target="_blank">mở</a>`:''}</td>
+          <td>${x.image_url?`<a href="${x.image_url}" target="_blank">ảnh</a>`:''}</td>
+        </tr>
+      `).join('');
+    }
+    function escapeCSV(s){ s = String(s??''); if(/[",\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`; return s; }
+    function escapeHTML(s){ return String(s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+    function downloadText(name, text){ const b=new Blob([text],{type:'text/csv;charset=utf-8'}); downloadBlob(name,b); }
+    function downloadBlob(name, blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); }
+  }
+
+  // Mount
+  renderCrawlerPanel(document.getElementById('panel'));
   </script>
 </body>
 </html>
