@@ -1,5 +1,5 @@
 /* ==== MXD LinkAuto Crawler Panel (Shopee/Lazada) ==== */
-/* Cấu hình — nếu sau này đổi worker hoặc key thì chỉ cần sửa 2 dòng này */
+/* Cấu hình — nếu đổi worker hoặc key chỉ cần sửa 2 dòng này */
 const CRAWLER_CFG = {
   WORKER: 'https://link-auto.mxd6686.workers.dev',
   X_KEY:  'mxd-2025-super',
@@ -9,8 +9,8 @@ const CRAWLER_CFG = {
 function renderCrawlerPanel(root){
   if(!root){ console.warn('renderCrawlerPanel: thiếu phần tử mount'); return; }
 
+  // UI
   root.innerHTML = `
-   root.innerHTML = `
   <div style="display:grid;gap:12px;padding:12px;background:#0e1722;border:1px solid #203148;border-radius:12px;color:#e8f0fb">
 
     <!-- HÀNG MÔI TRƯỜNG -->
@@ -76,30 +76,32 @@ function renderCrawlerPanel(root){
     </div>
   </div>`;
 
-
+  // refs
   const el = {
-    src: root.querySelector('#cr-src'),
-    q: root.querySelector('#cr-q'),
-    limit: root.querySelector('#cr-limit'),
-    brand: root.querySelector('#cr-brand'),
-    run: root.querySelector('#cr-run'),
-    export: root.querySelector('#cr-export'),
-    zip: root.querySelector('#cr-zip'),
+    src:    root.querySelector('#cr-src'),
+    q:      root.querySelector('#cr-q'),
+    limit:  root.querySelector('#cr-limit'),
+    brand:  root.querySelector('#cr-brand'),
+    run:    root.querySelector('#cr-run'),
+    btnExport: root.querySelector('#cr-export'),
+    btnZip:    root.querySelector('#cr-zip'),
     status: root.querySelector('#cr-status'),
-    tbody: root.querySelector('#cr-table tbody'),
-    el.ping = root.querySelector('#cr-ping');
-  document.getElementById('cr-worker').textContent = CRAWLER_CFG.WORKER;
-  document.getElementById('cr-key').textContent = mask(CRAWLER_CFG.X_KEY);
-  el.ping.onclick = checkWorker;
-  checkWorker(); // tự check khi mở trang
-
+    tbody:  root.querySelector('#cr-table tbody'),
+    ping:   root.querySelector('#cr-ping'),
   };
 
-  let last = [];  // cache kết quả
+  // hiển thị worker/key + ping
+  document.getElementById('cr-worker').textContent = CRAWLER_CFG.WORKER;
+  document.getElementById('cr-key').textContent    = mask(CRAWLER_CFG.X_KEY);
+  el.ping.onclick = checkWorker;
+  checkWorker();
 
+  let last = [];  // cache kết quả để export/zip
+
+  // chạy crawler
   el.run.onclick = async () => {
-    const src = el.src.value;
-    const q = (el.q.value||'').trim();
+    const src   = el.src.value;
+    const q     = (el.q.value||'').trim();
     const limit = Math.max(1, Math.min(50, Number(el.limit.value||50)));
     const brand = (el.brand.value||'').trim();
     if(!q){ alert('Nhập từ khóa.'); return; }
@@ -117,7 +119,7 @@ function renderCrawlerPanel(root){
     last = [];
 
     const t0 = performance.now();
-    const r = await fetch(url.toString());
+    const r  = await fetch(url.toString());
     const js = await r.json().catch(()=>({ok:false,error:'Bad JSON'}));
     const took = Math.round(performance.now()-t0);
 
@@ -147,7 +149,8 @@ function renderCrawlerPanel(root){
     `).join('');
   };
 
-  el.export.onclick = () => {
+  // export CSV
+  el.btnExport.onclick = () => {
     if(!last.length){ alert('Chưa có dữ liệu.'); return; }
     const rows = last.map(r => ({
       name: r.name,
@@ -160,7 +163,8 @@ function renderCrawlerPanel(root){
     downloadCSV(rows, 'crawler_export.csv');
   };
 
-  el.zip.onclick = async () => {
+  // tải ảnh ZIP
+  el.btnZip.onclick = async () => {
     if(!last.length){ alert('Chưa có dữ liệu.'); return; }
     el.status.textContent = 'Đang tải ảnh & đóng gói ZIP...';
     try{
@@ -193,6 +197,7 @@ function renderCrawlerPanel(root){
 function fmtVND(n){ n = Number(n||0); return n? n.toLocaleString('vi-VN') : ''; }
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
 function slug(s){ return String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
 function downloadCSV(rows, filename){
   const cols = ['name','price_vnd','source','brand','origin_url','image_url'];
   const csv = [cols.join(',')]
@@ -200,24 +205,28 @@ function downloadCSV(rows, filename){
     .join('\r\n');
   const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'}); // BOM cho Excel
   saveBlob(blob, filename);
-  function mask(s){
+}
+
+// hiển thị key đã che
+function mask(s){
   s = String(s||'');
   if(s.length <= 6) return s.replace(/.(?=..)/g,'*');
   return s.slice(0,3) + '***' + s.slice(-2);
 }
 
+// ping worker/health + auth
 async function checkWorker(){
   const out = document.getElementById('cr-ping-res');
+  if(!out) return;
   out.textContent = 'Đang kiểm tra...';
   out.style.color = '#a7b4c2';
 
-  const paths = ['/ops/health','/health']; // worker của bạn hỗ trợ cả 2
+  const paths = ['/ops/health','/health'];
   let ok = false, lastErr = '';
   for(const p of paths){
     try{
       const u = new URL(CRAWLER_CFG.WORKER + p);
-      // truyền key (một số route yêu cầu; health thì không, nhưng truyền vào không sao)
-      u.searchParams.set('key', CRAWLER_CFG.X_KEY);
+      u.searchParams.set('key', CRAWLER_CFG.X_KEY); // một số route cần key
       const r = await fetch(u.toString(), { headers: { 'x-key': CRAWLER_CFG.X_KEY }});
       const js = await r.json().catch(()=>null);
       if(js && js.ok){ ok = true; break; }
@@ -232,6 +241,7 @@ async function checkWorker(){
     out.style.color = '#ff9aa2';
   }
 }
+
 function csvCell(v){
   let s = String(v==null? '' : v);
   if(/[",\n]/.test(s)) s = '"' + s.replace(/"/g,'""') + '"';
