@@ -1,53 +1,102 @@
-/*
- * MXD-DEDUPE v2025-10-14
- * Mục tiêu: gỡ trùng các block "Sản phẩm nổi bật" / hàng chip / quick-nav trên store.html (và cả index nếu bị).
- * Cách dùng (chọn 1 trong 2):
- *  A) Dán inline đoạn <script> này ngay TRƯỚC </body> của store.html.
- *  B) Lưu file này thành /assets/js/mxd-dedupe.js rồi include:
- *       <script defer src="/assets/js/mxd-dedupe.js?v=2025-10-14"></script>
- * Ghi chú: Có guard để chỉ chạy 1 lần; không đụng GA4/affiliate.
+/* MXD-DEDUPE v2025-10-14 — BẢN CUỐI
+ * Gỡ trùng các block "Sản phẩm nổi bật" / hàng chip / quick-nav trên store.html & index.html.
+ *   - Chạy nhiều nhịp (0ms/300ms/1s/3s/7s) để bắt kịp renderer async.
+ *   - So khớp fuzzy theo heading (bỏ dấu, bỏ ký tự đặc biệt) → bắt cả biến thể “— MXD”.
+ *   - So khớp theo chữ ký liên kết của hàng danh mục (nếu 2 hàng giống hệt → giữ 1).
+ *   - Có MutationObserver: khi script khác chèn DOM, tự dọn ngay.
+ * Một file, một lần. Không đụng GA4/affiliate.
  */
 (function(){
-  if (window.__MXD_DEDUPE_RUN__) return; // guard
-  window.__MXD_DEDUPE_RUN__ = true;
+  'use strict';
+  if (window.__MXD_DEDUPE_FINAL__) return; // guard toàn cục
+  window.__MXD_DEDUPE_FINAL__ = true;
 
-  const lower = s => (s||'').toString().trim().toLowerCase();
+  // ===== helpers =====
+  const N = (s)=> (s||'')
+    .toString()
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // bỏ dấu tiếng Việt
+    .replace(/[\s–—-]+/g,' ')                          // gộp khoảng trắng & gạch dài
+    .replace(/[^\p{L}\p{N}\s]/gu,'')                 // bỏ ký tự đặc biệt
+    .trim();
 
-  // 1) DEDUPE QUICK-NAV (nếu có nhiều ul.quick-nav)
-  const qnavs = document.querySelectorAll('.quick-nav');
-  if (qnavs.length > 1) [...qnavs].slice(1).forEach(el => el.remove());
-
-  // 2) DEDUPE HÀNG CHIP/FILTER (các class hay dùng)
-  const chipRows = document.querySelectorAll('.chip-row, .pill-row, .filter-row');
-  if (chipRows.length > 1) [...chipRows].slice(1).forEach(el => el.remove());
-
-  // 3) DEDUPE SECTION THEO TIÊU ĐỀ (h2/h3)
-  const labels = [
-    'sản phẩm nổi bật',
-    'máy móc xây dựng',
-    'thời trang',
-    'ưu đãi hôm nay',
-    'đề xuất cho bạn'
+  const LABELS = [
+    'san pham noi bat',
+    'may moc xay dung',
+    'thoi trang',
+    'uu dai hom nay',
+    'de xuat cho ban'
   ];
-  const seen = new Set();
-  document.querySelectorAll('section, .strip, .block').forEach(sec => {
-    const h = sec.querySelector('h2, h3, header h2, header h3');
-    if (!h) return;
-    const key = lower(h.textContent);
-    if (labels.includes(key)){
-      if (seen.has(key)) { sec.remove(); return; }
-      seen.add(key);
-    }
+  const CAT_KEYS = [
+    'san-pham-noi-bat','may-moc-xay-dung','thoi-trang',
+    'thoi-trang-nam','thoi-trang-nu','thoi-trang-tre-em'
+  ];
+
+  function signatureOfCategoryRow(el){
+    // Tạo chữ ký từ tập hợp link-href + text chuẩn hoá để phát hiện 2 hàng giống nhau
+    const links = Array.from(el.querySelectorAll('a[href]'));
+    const cats = links
+      .map(a => ({h: (a.getAttribute('href')||'').toLowerCase(), t: N(a.textContent)}))
+      .filter(x => CAT_KEYS.some(k => x.h.includes(k)) || LABELS.some(l => x.t.includes(l)))
+      .map(x => (x.h||'') + '|' + (x.t||''));
+    if (cats.length < 2) return null; // không đủ đặc trưng để xem là hàng danh mục
+    return Array.from(new Set(cats)).sort().join('||');
+  }
+
+  function dedupeOnce(){
+    // 1) DEDUPE theo selector cố định
+    const sels = [
+      '.quick-nav', '.chip-row', '.pill-row', '.filter-row',
+      '#featured', '#featured-products', '.section-featured',
+      '#categories-bar', '.categories-strip'
+    ];
+    sels.forEach(sel => {
+      const nodes = Array.from(document.querySelectorAll(sel));
+      if (nodes.length > 1) nodes.slice(1).forEach(n => n.remove());
+    });
+
+    // 2) DEDUPE theo heading (fuzzy)
+    const seen = new Set();
+    document.querySelectorAll('section, .strip, .block').forEach(sec => {
+      const h = sec.querySelector('h1, h2, h3, header h1, header h2, header h3');
+      if (!h) return;
+      const t = N(h.textContent);
+      const hit = LABELS.find(l => t.includes(l));
+      if (!hit) return;
+      if (seen.has(hit)) { sec.remove(); return; }
+      seen.add(hit);
+      sec.dataset.mxdKeep = '1';
+    });
+
+    // 3) DEDUPE theo chữ ký hàng danh mục (khi có 2 hàng giống nhau)
+    const candidates = Array.from(document.querySelectorAll('section,div,ul')).filter(el => signatureOfCategoryRow(el));
+    const map = new Map();
+    candidates.forEach(el => {
+      const sig = signatureOfCategoryRow(el);
+      if (!sig) return;
+      if (map.has(sig)) { el.remove(); } else { map.set(sig, el); }
+    });
+  }
+
+  // chạy nhiều nhịp để bắt render muộn
+  function runMany(){
+    dedupeOnce();
+    setTimeout(dedupeOnce, 300);
+    setTimeout(dedupeOnce, 1000);
+    setTimeout(dedupeOnce, 3000);
+    setTimeout(dedupeOnce, 7000);
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', runMany, { once: true });
+  } else { runMany(); }
+
+  // Quan sát DOM: khi có node mới → dọn tiếp
+  const mo = new MutationObserver(list => {
+    for (const rec of list){ if (rec.addedNodes && rec.addedNodes.length){ dedupeOnce(); break; } }
   });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
 
-  // 4) DEDUPE CONTAINER ID PHỔ BIẾN
-  const conts = document.querySelectorAll('#featured, #featured-products, .section-featured');
-  if (conts.length > 1) [...conts].slice(1).forEach(el => el.remove());
-  
-window.MXD_FEATURED_INIT = (window.MXD_FEATURED_INIT||0) + 1;
-if (window.MXD_FEATURED_INIT > 1) return; // ngăn render lần 2
-
-  // 5) (TÙY CHỌN) nếu renderer nào đó bị gọi 2 lần → giữ 1 lần
-  //    Thêm guard sau đây vào file render tương ứng để ngăn render lặp:
-  //    window.MXD_FEATURED_INIT = (window.MXD_FEATURED_INIT||0)+1; if (window.MXD_FEATURED_INIT>1) return;
+  // hook thủ công nếu muốn gọi trong console
+  window.MXD = window.MXD || {}; window.MXD.dedupe = dedupeOnce;
 })();
