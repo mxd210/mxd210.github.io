@@ -1,102 +1,44 @@
-/* MXD-DEDUPE v2025-10-14 — BẢN CUỐI
- * Gỡ trùng các block "Sản phẩm nổi bật" / hàng chip / quick-nav trên store.html & index.html.
- *   - Chạy nhiều nhịp (0ms/300ms/1s/3s/7s) để bắt kịp renderer async.
- *   - So khớp fuzzy theo heading (bỏ dấu, bỏ ký tự đặc biệt) → bắt cả biến thể “— MXD”.
- *   - So khớp theo chữ ký liên kết của hàng danh mục (nếu 2 hàng giống hệt → giữ 1).
- *   - Có MutationObserver: khi script khác chèn DOM, tự dọn ngay.
- * Một file, một lần. Không đụng GA4/affiliate.
+/* MXD-DEDUPE SAFE MODE v2025-10-14
+ * Mục tiêu: chỉ gỡ TRÙNG, KHÔNG xoá nhầm.
+ * - Chỉ đụng vào: dải danh mục (category bar), block "Sản phẩm nổi bật / Máy móc xây dựng / Thời trang",
+ *   và floating contacts. Giữ lại đúng 1, ưu tiên phần có nhiều link nhất.
+ * - Không dùng fuzzy rộng; chỉ so heading trực tiếp để tránh xoá nhầm card sản phẩm.
  */
 (function(){
   'use strict';
-  if (window.__MXD_DEDUPE_FINAL__) return; // guard toàn cục
-  window.__MXD_DEDUPE_FINAL__ = true;
+  if (window.__MXD_DEDUPE_SAFE__) return; // guard
+  window.__MXD_DEDUPE_SAFE__ = true;
 
-  // ===== helpers =====
-  const N = (s)=> (s||'')
-    .toString()
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // bỏ dấu tiếng Việt
-    .replace(/[\s–—-]+/g,' ')                          // gộp khoảng trắng & gạch dài
-    .replace(/[^\p{L}\p{N}\s]/gu,'')                 // bỏ ký tự đặc biệt
-    .trim();
+  const norm = s => (s||'')
+    .toString().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/\s+/g,' ').trim();
 
-  const LABELS = [
-    'san pham noi bat',
-    'may moc xay dung',
-    'thoi trang',
-    'uu dai hom nay',
-    'de xuat cho ban'
-  ];
-  const CAT_KEYS = [
-    'san-pham-noi-bat','may-moc-xay-dung','thoi-trang',
-    'thoi-trang-nam','thoi-trang-nu','thoi-trang-tre-em'
-  ];
-
-  function signatureOfCategoryRow(el){
-    // Tạo chữ ký từ tập hợp link-href + text chuẩn hoá để phát hiện 2 hàng giống nhau
-    const links = Array.from(el.querySelectorAll('a[href]'));
-    const cats = links
-      .map(a => ({h: (a.getAttribute('href')||'').toLowerCase(), t: N(a.textContent)}))
-      .filter(x => CAT_KEYS.some(k => x.h.includes(k)) || LABELS.some(l => x.t.includes(l)))
-      .map(x => (x.h||'') + '|' + (x.t||''));
-    if (cats.length < 2) return null; // không đủ đặc trưng để xem là hàng danh mục
-    return Array.from(new Set(cats)).sort().join('||');
+  function keepOne(nodeList){
+    const list = Array.from(nodeList);
+    if (list.length <= 1) return 0;
+    // chọn phần có nhiều link nhất, nếu hoà thì lấy phần nằm trên (offsetTop nhỏ hơn)
+    const keep = list.sort((a,b)=> (b.querySelectorAll('a').length - a.querySelectorAll('a').length) || (a.offsetTop - b.offsetTop))[0];
+    list.forEach(el => { if (el !== keep) el.remove(); });
+    return list.length - 1;
   }
 
-  function dedupeOnce(){
-    // 1) DEDUPE theo selector cố định
-    const sels = [
-      '.quick-nav', '.chip-row', '.pill-row', '.filter-row',
-      '#featured', '#featured-products', '.section-featured',
-      '#categories-bar', '.categories-strip'
-    ];
-    sels.forEach(sel => {
-      const nodes = Array.from(document.querySelectorAll(sel));
-      if (nodes.length > 1) nodes.slice(1).forEach(n => n.remove());
-    });
+  // 1) CATEGORY BAR (dải danh mục ở đầu trang Cửa hàng)
+  keepOne(document.querySelectorAll('#categories-bar, .quick-nav, .categories-strip'));
 
-    // 2) DEDUPE theo heading (fuzzy)
-    const seen = new Set();
-    document.querySelectorAll('section, .strip, .block').forEach(sec => {
-      const h = sec.querySelector('h1, h2, h3, header h1, header h2, header h3');
-      if (!h) return;
-      const t = N(h.textContent);
-      const hit = LABELS.find(l => t.includes(l));
-      if (!hit) return;
-      if (seen.has(hit)) { sec.remove(); return; }
-      seen.add(hit);
-      sec.dataset.mxdKeep = '1';
-    });
-
-    // 3) DEDUPE theo chữ ký hàng danh mục (khi có 2 hàng giống nhau)
-    const candidates = Array.from(document.querySelectorAll('section,div,ul')).filter(el => signatureOfCategoryRow(el));
-    const map = new Map();
-    candidates.forEach(el => {
-      const sig = signatureOfCategoryRow(el);
-      if (!sig) return;
-      if (map.has(sig)) { el.remove(); } else { map.set(sig, el); }
-    });
-  }
-
-  // chạy nhiều nhịp để bắt render muộn
-  function runMany(){
-    dedupeOnce();
-    setTimeout(dedupeOnce, 300);
-    setTimeout(dedupeOnce, 1000);
-    setTimeout(dedupeOnce, 3000);
-    setTimeout(dedupeOnce, 7000);
-  }
-
-  if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', runMany, { once: true });
-  } else { runMany(); }
-
-  // Quan sát DOM: khi có node mới → dọn tiếp
-  const mo = new MutationObserver(list => {
-    for (const rec of list){ if (rec.addedNodes && rec.addedNodes.length){ dedupeOnce(); break; } }
+  // 2) CÁC BLOCK THEO HEADING CHÍNH XÁC (chỉ h2/h3 trực tiếp của section)
+  const labels = ['san pham noi bat','may moc xay dung','thoi trang'];
+  const groups = new Map();
+  document.querySelectorAll('section').forEach(sec => {
+    const h = sec.querySelector(':scope>h2, :scope>header>h2, :scope>h3, :scope>header>h3');
+    if (!h) return;
+    const key = norm(h.textContent);
+    if (!labels.includes(key)) return;
+    const arr = groups.get(key) || [];
+    arr.push(sec); groups.set(key, arr);
   });
-  mo.observe(document.documentElement, { childList: true, subtree: true });
+  groups.forEach(nodes => keepOne(nodes));
 
-  // hook thủ công nếu muốn gọi trong console
-  window.MXD = window.MXD || {}; window.MXD.dedupe = dedupeOnce;
+  // 3) FLOATING CONTACTS — giữ 1
+  keepOne(document.querySelectorAll('#floating-contacts, .floating-contacts, .fc'));
 })();
