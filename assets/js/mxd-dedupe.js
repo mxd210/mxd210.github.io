@@ -43,6 +43,9 @@
   // 4) DEDUPE CONTAINER ID PHỔ BIẾN
   const conts = document.querySelectorAll('#featured, #featured-products, .section-featured');
   if (conts.length > 1) [...conts].slice(1).forEach(el => el.remove());
+  
+window.MXD_FEATURED_INIT = (window.MXD_FEATURED_INIT||0) + 1;
+if (window.MXD_FEATURED_INIT > 1) return; // ngăn render lần 2
 
   // 5) (TÙY CHỌN) nếu renderer nào đó bị gọi 2 lần → giữ 1 lần
   //    Thêm guard sau đây vào file render tương ứng để ngăn render lặp:
