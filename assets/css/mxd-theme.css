@@ -1,0 +1,55 @@
+/* MXD THEME v2025-10-14 — palette + components */
+:root{
+  /* neutrals */
+  --bg:#ffffff; --text:#111111; --muted:#6b7280; --border:#e5e7eb; --card:#ffffff;
+  /* brand */
+  --brand:#1746ff;      /* xanh chủ đạo */
+  --brand-2:#1a94ff;    /* phối */
+  --accent:#ff6a00;     /* cam nhấn */
+  /* signals */
+  --success:#16a34a; --danger:#ef4444; --warning:#f59e0b; --info:#0ea5e9;
+  /* gradients & effects */
+  --grad-brand:linear-gradient(135deg,var(--brand),var(--brand-2));
+  --grad-accent:linear-gradient(135deg,#ff6a00,#ffb703);
+  --shadow-sm:0 4px 12px rgba(0,0,0,.08);
+  --shadow-md:0 10px 24px rgba(0,0,0,.16);
+  --radius:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f1215; --text:#e8e8e8; --muted:#a2a2a2; --border:#262b31; --card:#14181d;
+    --shadow-sm:0 6px 18px rgba(0,0,0,.30); --shadow-md:0 12px 30px rgba(0,0,0,.45);
+  }
+}
+
+/* ===== NAV STRIP (áp cho .site-nav) */
+.nav-strip{ background:var(--grad-brand); padding:6px 10px; border-radius:14px; border:1px solid rgba(255,255,255,.18); box-shadow:var(--shadow-md) }
+.nav-strip .nav-link{ color:#fff !important; border-radius:12px; border:1px solid transparent }
+.nav-strip .nav-link:hover{ background:rgba(255,255,255,.14) }
+.nav-strip .nav-link[aria-current="page"]{ background:rgba(255,255,255,.22) }
+
+/* ===== CHIPS (Quick-Nav) */
+.chips{ display:flex; gap:12px; flex-wrap:wrap; padding:8px 0; margin:12px 0 }
+.chip{ display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; border:1px solid var(--border); background:var(--card); box-shadow:var(--shadow-sm); color:var(--text); text-decoration:none }
+.chip--brand{ border-color:#cfe3ff; background:linear-gradient(135deg, rgba(26,148,255,.10), rgba(23,70,255,.10)) }
+.chip:hover{ filter:brightness(1.03) }
+.chip img{ width:28px; height:28px; border-radius:8px; object-fit:cover }
+
+/* ===== BUTTONS */
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; border-radius:12px; font-weight:800; text-decoration:none; border:1px solid transparent }
+.btn--brand{ color:#fff; background:var(--brand); border-color:var(--brand) }
+.btn--accent{ color:#fff; background:var(--accent); border-color:var(--accent) }
+.btn:hover{ filter:brightness(1.05) }
+
+/* ===== PRODUCT CARD bits */
+.price{ font-weight:800 }
+.old-price{ color:#9ca3af; text-decoration:line-through; margin-left:8px; font-weight:500 }
+.badge{ display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; font-weight:800 }
+.badge--sale{ background:#ef4444; color:#fff; box-shadow:0 6px 16px rgba(239,68,68,.4) }
+.badge--new{ background:#10b981; color:#fff }
+.cdown{ font-size:12px; color:#ef4444; font-weight:700 }
+
+/* ===== FLOATING CONTACTS fallback */
+.floating-contacts{ position:fixed; right:12px; bottom:calc(16px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:12px; z-index:40; pointer-events:none }
+.floating-contacts a,.floating-contacts button{ pointer-events:auto; width:52px; height:52px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:#111; color:#fff; box-shadow:var(--shadow-sm) }
+```
