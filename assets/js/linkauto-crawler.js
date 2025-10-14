@@ -119,7 +119,10 @@ function renderCrawlerPanel(root){
     last = [];
 
     const t0 = performance.now();
-    const r  = await fetch(url.toString());
+    const r = await fetch(url.toString(), {
+  headers: { 'x-key': CRAWLER_CFG.X_KEY }
+});
+
     const js = await r.json().catch(()=>({ok:false,error:'Bad JSON'}));
     const took = Math.round(performance.now()-t0);
 
