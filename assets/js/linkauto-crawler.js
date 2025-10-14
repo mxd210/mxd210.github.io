@@ -10,7 +10,18 @@ function renderCrawlerPanel(root){
   if(!root){ console.warn('renderCrawlerPanel: thiếu phần tử mount'); return; }
 
   root.innerHTML = `
+   root.innerHTML = `
   <div style="display:grid;gap:12px;padding:12px;background:#0e1722;border:1px solid #203148;border-radius:12px;color:#e8f0fb">
+
+    <!-- HÀNG MÔI TRƯỜNG -->
+    <div style="display:flex;gap:10px;align-items:center;font-size:12px;opacity:.9">
+      <div>Worker: <code id="cr-worker"></code></div>
+      <div>Key: <code id="cr-key"></code></div>
+      <button id="cr-ping" style="margin-left:6px">Kiểm tra Worker</button>
+      <span id="cr-ping-res" style="margin-left:6px"></span>
+    </div>
+
+    <!-- HÀNG FORM -->
     <div style="display:grid;gap:10px;grid-template-columns:120px 1fr 100px 160px auto">
       <label style="display:grid;gap:6px">
         <span>Source</span>
@@ -65,6 +76,7 @@ function renderCrawlerPanel(root){
     </div>
   </div>`;
 
+
   const el = {
     src: root.querySelector('#cr-src'),
     q: root.querySelector('#cr-q'),
@@ -75,6 +87,12 @@ function renderCrawlerPanel(root){
     zip: root.querySelector('#cr-zip'),
     status: root.querySelector('#cr-status'),
     tbody: root.querySelector('#cr-table tbody'),
+    el.ping = root.querySelector('#cr-ping');
+  document.getElementById('cr-worker').textContent = CRAWLER_CFG.WORKER;
+  document.getElementById('cr-key').textContent = mask(CRAWLER_CFG.X_KEY);
+  el.ping.onclick = checkWorker;
+  checkWorker(); // tự check khi mở trang
+
   };
 
   let last = [];  // cache kết quả
@@ -182,6 +200,37 @@ function downloadCSV(rows, filename){
     .join('\r\n');
   const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'}); // BOM cho Excel
   saveBlob(blob, filename);
+  function mask(s){
+  s = String(s||'');
+  if(s.length <= 6) return s.replace(/.(?=..)/g,'*');
+  return s.slice(0,3) + '***' + s.slice(-2);
+}
+
+async function checkWorker(){
+  const out = document.getElementById('cr-ping-res');
+  out.textContent = 'Đang kiểm tra...';
+  out.style.color = '#a7b4c2';
+
+  const paths = ['/ops/health','/health']; // worker của bạn hỗ trợ cả 2
+  let ok = false, lastErr = '';
+  for(const p of paths){
+    try{
+      const u = new URL(CRAWLER_CFG.WORKER + p);
+      // truyền key (một số route yêu cầu; health thì không, nhưng truyền vào không sao)
+      u.searchParams.set('key', CRAWLER_CFG.X_KEY);
+      const r = await fetch(u.toString(), { headers: { 'x-key': CRAWLER_CFG.X_KEY }});
+      const js = await r.json().catch(()=>null);
+      if(js && js.ok){ ok = true; break; }
+      lastErr = js?.error || `HTTP ${r.status}`;
+    }catch(e){ lastErr = String(e); }
+  }
+  if(ok){
+    out.textContent = '✅ Worker kết nối OK';
+    out.style.color = '#7CFC7C';
+  }else{
+    out.textContent = '❌ Worker/Key lỗi: ' + (lastErr||'Unauthorized');
+    out.style.color = '#ff9aa2';
+  }
 }
 function csvCell(v){
   let s = String(v==null? '' : v);
