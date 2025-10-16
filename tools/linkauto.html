@@ -15,19 +15,20 @@
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .row3{display:grid;grid-template-columns:1.2fr .8fr .6fr .6fr .6fr;gap:10px}
     label{display:block;font-size:12px;color:var(--muted);margin:4px 0}
-    input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0b1420;color:var(--fg)}
+    input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0b1420;color:var(--fg')}
     button{cursor:pointer;background:#122033;border-color:#1f334b}
     button.primary{background:#1a3556}
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .status{font-size:12px}
     .status.ok{color:var(--ok)} .status.warn{color:var(--warn)} .status.err{color:var(--err)}
     table{width:100%;border-collapse:collapse;margin-top:10px}
     th,td{padding:8px 10px;border-bottom:1px solid #223347;vertical-align:top}
-    th{position:sticky;top:0;background:#0f1a29}
+    th{position:sticky;top:0;background:#0f1a29;z-index:1}
     a{color:#7cc4ff;text-decoration:none}
-    .right{display:flex;gap:10px;justify-content:flex-end}
     .muted{color:var(--muted)}
     .pill{padding:2px 8px;border-radius:999px;background:#102033;border:1px solid #203148;font-size:12px}
+    .right{display:flex;gap:10px;justify-content:flex-end}
+    .nowrap{white-space:nowrap}
   </style>
 </head>
 <body>
@@ -40,7 +41,7 @@
     <div id="panel" class="card"><!-- MXD-ANCHOR:LINKAUTO-PANEL --></div>
 
     <div class="card">
-      <div class="muted">Ghi chú: API cần header <code>x-key</code>. CORS đã mở cho <code>https://mxd210.github.io</code>. Khi test từ domain khác có thể bị chặn.</div>
+      <div class="muted">Yêu cầu header <code>x-key</code>. CORS mở cho <code>https://mxd210.github.io</code>. Trường <b>Base URL</b> &amp; <b>X-Key</b> được lưu lại (LocalStorage) cho lần sau.</div>
     </div>
   </div>
 
@@ -86,6 +87,7 @@
       </div>
 
       <div class="actions" style="margin-top:10px">
+        <button id="btnHealth">Kiểm tra</button>
         <button class="primary" id="btnFetch">Lấy dữ liệu</button>
         <button id="btnCSV" disabled>Export CSV</button>
         <button id="btnZIP" disabled>Tải ảnh ZIP</button>
@@ -99,7 +101,7 @@
             <tr>
               <th style="width:36px">#</th>
               <th>Tên</th>
-              <th>Giá</th>
+              <th class="nowrap">Giá (₫)</th>
               <th>Brand</th>
               <th>Link gốc</th>
               <th>Ảnh</th>
@@ -110,11 +112,55 @@
       </div>
     `;
 
-    const $ = (id)=>root.querySelector(id);
+    const $ = (sel)=>root.querySelector(sel);
     let lastData = [];
+    let fetchCtl = null;
+
+    // ---- persist settings
+    const LS = {
+      get(k, def=""){ try{ const v=localStorage.getItem(k); return v!=null?v:def; }catch{ return def; } },
+      set(k, v){ try{ localStorage.setItem(k, v); }catch{} }
+    };
+    const KEYS = {
+      base:'mxd_linkauto_base',
+      key :'mxd_linkauto_key',
+      q   :'mxd_linkauto_q',
+      src :'mxd_linkauto_src',
+      limit:'mxd_linkauto_limit',
+      by  :'mxd_linkauto_by',
+      brand:'mxd_linkauto_brand'
+    };
+
+    // load
+    $('#w_base').value = LS.get(KEYS.base, $('#w_base').value);
+    $('#w_key').value  = LS.get(KEYS.key, '');
+    $('#q_kw').value   = LS.get(KEYS.q, '');
+    $('#src').value    = LS.get(KEYS.src, 'shopee');
+    $('#limit').value  = LS.get(KEYS.limit, '20');
+    $('#by').value     = LS.get(KEYS.by, 'sales');
+    $('#brand').value  = LS.get(KEYS.brand, '');
+
+    // save
+    ['w_base','w_key','q_kw','src','limit','by','brand'].forEach(id=>{
+      $('#'+id).addEventListener('change', ()=> {
+        const map={w_base:KEYS.base,w_key:KEYS.key,q_kw:KEYS.q,src:KEYS.src,limit:KEYS.limit,by:KEYS.by,brand:KEYS.brand};
+        LS.set(map[id], $('#'+id).value.trim());
+      });
+    });
+
+    $('#btnHealth').onclick = async ()=>{
+      setStatus('Đang kiểm tra…','muted');
+      try{
+        const base = cleanBase($('#w_base').value);
+        const key  = $('#w_key').value.trim();
+        const res = await fetch(base + '/ops/health', { headers: { 'x-key': key }});
+        const js = await safeJson(res);
+        if(js.ok){ setStatus('OK · '+(js.time||''),'ok'); } else { setStatus('Health lỗi','err'); }
+      }catch(e){ setStatus('Health lỗi: '+e.message,'err'); }
+    };
 
     $('#btnFetch').onclick = async ()=>{
-      const base = $('#w_base').value.trim().replace(/\/+$/,'');
+      const base = cleanBase($('#w_base').value);
       const key  = $('#w_key').value.trim();
       const src  = $('#src').value;
       const q    = $('#q_kw').value.trim();
@@ -122,11 +168,16 @@
       const by   = $('#by').value;
       const brand= $('#brand').value.trim();
 
-      $('#st').className='status muted'; $('#st').textContent='Đang gọi…';
-      $('#btnCSV').disabled = true; $('#btnZIP').disabled = true;
-      $('#count').textContent='0 items';
+      if(!key){ alert('Thiếu X-Key'); return; }
+
+      setStatus('Đang gọi…','muted'); setCount(0);
+      toggleExport(false);
 
       try{
+        // abort before new call
+        if(fetchCtl) fetchCtl.abort();
+        fetchCtl = new AbortController();
+
         const url = new URL(base + `/crawler/${src}/top`);
         url.searchParams.set('mode','keyword');
         if(q) url.searchParams.set('q', q);
@@ -134,52 +185,50 @@
         url.searchParams.set('by', by);
         if(brand) url.searchParams.set('brand', brand);
 
-        const res = await fetch(url.toString(), { headers: { 'x-key': key }});
-        const js = await res.json();
-        if(!js.ok) throw new Error(js.error || 'Worker trả về lỗi');
+        const res = await fetch(url.toString(), { headers: { 'x-key': key }, signal: fetchCtl.signal });
+        const js = await safeJson(res);
+        if(!js.ok) throw new Error(js.error || ('HTTP '+res.status));
 
         lastData = Array.isArray(js.items) ? js.items : [];
         renderRows(lastData);
-        $('#count').textContent = `${lastData.length} items`;
-        $('#st').className = 'status ok';
-        $('#st').textContent = js.status + (js.note ? ` · ${js.note}` : '');
-        $('#btnCSV').disabled = lastData.length===0;
-        $('#btnZIP').disabled = lastData.every(x=>!x.image_url);
+        setCount(lastData.length);
+        const state = js.status || 'OK';
+        const cls = state==='OK' ? 'ok' : (state==='DEGRADED' ? 'warn' : 'err');
+        setStatus(state + (js.note?(' · '+js.note):''), cls);
+        toggleExport(lastData.length>0, lastData.some(x=>x.image_url));
       }catch(err){
-        $('#st').className='status err';
-        $('#st').textContent = 'Lỗi: ' + err.message;
-        renderRows([]);
+        setStatus('Lỗi: ' + err.message,'err');
+        renderRows([]); setCount(0); toggleExport(false);
       }
     };
 
     $('#btnCSV').onclick = ()=>{
       const rows = [['name','price_vnd','brand','origin_url','image_url']];
-      for(const x of lastData){
-        rows.push([x.name||'', x.price_vnd||0, x.brand||'', x.origin_url||'', x.image_url||'']);
-      }
+      for(const x of lastData){ rows.push([x.name||'', x.price_vnd||0, x.brand||'', x.origin_url||'', x.image_url||'']); }
       const csv = rows.map(r=>r.map(escapeCSV).join(',')).join('\n');
-      downloadText('linkauto.csv', csv);
+      // BOM để Excel hiểu UTF-8 tiếng Việt
+      const out = new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8'});
+      downloadBlob(makeName('linkauto', {src:$('#src').value,q:$('#q_kw').value,limit:$('#limit').value})+'.csv', out);
     };
 
     $('#btnZIP').onclick = async ()=>{
-      const base = $('#w_base').value.trim().replace(/\/+$/,'');
+      const base = cleanBase($('#w_base').value);
       const key  = $('#w_key').value.trim();
       const images = [...new Set(lastData.map(x=>x.image_url).filter(Boolean))].slice(0, 200);
       if(!images.length){ alert('Không có ảnh để tải.'); return; }
 
-      $('#st').className='status muted'; $('#st').textContent='Đang nén ảnh…';
+      setStatus('Đang nén ảnh…','muted');
       try{
         const r = await fetch(base + '/asset/zip', {
           method:'POST',
           headers:{'content-type':'application/json','x-key':key},
           body: JSON.stringify({images})
         });
+        if(!r.ok) throw new Error('HTTP '+r.status);
         const blob = await r.blob();
-        downloadBlob('images.zip', blob);
-        $('#st').className='status ok'; $('#st').textContent='Đã tải ZIP';
-      }catch(e){
-        $('#st').className='status err'; $('#st').textContent='ZIP lỗi: '+e.message;
-      }
+        downloadBlob(makeName('images', {src:$('#src').value,q:$('#q_kw').value,limit:$('#limit').value})+'.zip', blob);
+        setStatus('Đã tải ZIP','ok');
+      }catch(e){ setStatus('ZIP lỗi: '+e.message,'err'); }
     };
 
     function renderRows(arr){
@@ -188,17 +237,22 @@
         <tr>
           <td>${i+1}</td>
           <td>${escapeHTML(x.name||'')}</td>
-          <td>${(x.price_vnd||0).toLocaleString('vi-VN')}</td>
+          <td class="nowrap">${Number(x.price_vnd||0).toLocaleString('vi-VN')}</td>
           <td>${escapeHTML(x.brand||'')}</td>
-          <td>${x.origin_url?`<a href="${x.origin_url}" target="_blank">mở</a>`:''}</td>
-          <td>${x.image_url?`<a href="${x.image_url}" target="_blank">ảnh</a>`:''}</td>
+          <td>${x.origin_url?`<a href="${x.origin_url}" target="_blank" rel="noopener">mở</a>`:''}</td>
+          <td>${x.image_url?`<a href="${x.image_url}" target="_blank" rel="noopener">ảnh</a>`:''}</td>
         </tr>
       `).join('');
     }
+    function toggleExport(csvOn, zipOn=false){ $('#btnCSV').disabled=!csvOn; $('#btnZIP').disabled=!zipOn; }
+    function setStatus(t,cls){ const el=$('#st'); el.className='status ' + (cls||'muted'); el.textContent=t; }
+    function setCount(n){ $('#count').textContent = n + ' items'; }
     function escapeCSV(s){ s = String(s??''); if(/[",\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`; return s; }
     function escapeHTML(s){ return String(s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
-    function downloadText(name, text){ const b=new Blob([text],{type:'text/csv;charset=utf-8'}); downloadBlob(name,b); }
     function downloadBlob(name, blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); }
+    function makeName(prefix, {src,q,limit}){ const slug=(s)=>String(s||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); return `${prefix}-${slug(src)}-${slug(q)}-l${limit||''}`.replace(/-+/g,'-'); }
+    function cleanBase(s){ return String(s||'').trim().replace(/\/+$/,''); }
+    async function safeJson(res){ const text = await res.text(); try{ return JSON.parse(text); }catch{ return { ok:false, error:text.slice(0,120) }; } }
   }
 
   // Mount
