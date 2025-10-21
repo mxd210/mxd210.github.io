@@ -8,13 +8,16 @@
   <link rel="canonical" href="https://mxd210.github.io/store/thoi-trang-nam.html"/>
   <meta name="robots" content="index,follow"/>
 
+  <!-- SEO: OG -->
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Thời trang nam | MXD"/>
   <meta property="og:description" content="Danh mục thời trang nam. Dữ liệu từ affiliates.json (OSOT)."/>
   <meta property="og:url" content="https://mxd210.github.io/store/thoi-trang-nam.html"/>
   <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/thoi-trang.webp"/>
 
+  <!-- CSS cố định -->
   <link rel="stylesheet" href="/assets/site.css"/>
+
   <!-- GA4 TRƯỚC affiliate (chuẩn MXD) -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
@@ -22,17 +25,41 @@
 <body>
   <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Thời trang nam</nav>
   <h1>Thời trang nam</h1>
-  <div class="filter-row">
+
+  <!-- Subnav đồng nhất cụm Thời trang (không hard-code .is-active) -->
+  <div class="filter-row" data-subnav="thoi-trang">
     <a class="btn" href="/store/thoi-trang.html">Tất cả</a>
-    <a class="btn is-active" href="/store/thoi-trang-nam.html">Nam</a>
-    <a class="btn" href="/store/thoi-trang-nu.html">Nữ</a>
+    <a class="btn" href="/store/thoi-trang-nam.html">Thời trang nam</a>
+    <a class="btn" href="/store/thoi-trang-nu.html">Thời trang nữ</a>
+    <a class="btn" href="/store/tre-em.html">Trẻ em</a>
+    <a class="btn" href="/store/thoi-trang-thu-dong.html">Thu đông</a>
   </div>
 
+  <!-- Lưới sản phẩm -->
   <section id="product-grid" class="product-grid"
            data-category="thoi-trang-nam"
            data-alias="thoi-trang,thoi-trang-nam,nam,men,do-nam"></section>
 
   <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
+
+  <!-- MXD-ANCHOR:SUBNAV-ACTIVE -->
+  <script>
+  (function mxdSubnavActive(){
+    try{
+      const here = new URL(location.href);
+      document.querySelectorAll('.filter-row a.btn').forEach(a=>{
+        try{
+          const u = new URL(a.getAttribute('href'), location.origin);
+          if (u.pathname === here.pathname){
+            a.classList.add('is-active'); a.setAttribute('aria-current','page');
+          } else {
+            a.classList.remove('is-active'); a.removeAttribute('aria-current');
+          }
+        }catch(_){}
+      });
+    }catch(_){}
+  })();
+  </script>
 
   <!-- MXD-ANCHOR:THOI-TRANG-NAM-FILTER -->
   <script>
@@ -64,7 +91,7 @@
       return;
     }
 
-    // === Chuẩn hóa & lọc mở rộng ===
+    // === Chuẩn hóa & lọc mở rộng (an toàn, không phá dữ liệu cũ) ===
     const norm  = v => String(v||'').toLowerCase().trim();
     const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
     const slug  = v => norm(v).replace(/[^a-z0-9\-]+/g,'-').replace(/--+/g,'-');
@@ -103,7 +130,7 @@
       return;
     }
 
-    // === Render card ===
+    // === Render card + phòng thủ 404 ===
     const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
     const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
     const linkOf = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
@@ -119,12 +146,13 @@
       const price = fmt(p.price);
       const merchant = norm(p.merchant||'');
       const buy   = linkOf(p);
+      const broken = !/^https?:\/\//.test(buy);
 
       return `
-        <article class="product-card" data-sku="${esc(sku)}">
+        <article class="product-card" data-sku="${esc(sku)}" ${broken?'data-broken="link"':''}>
           <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
             <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+                 onerror="this.onerror=null;this.dataset.err=1;this.src='/assets/img/products/placeholder.webp';this.closest('article').setAttribute('data-img-missing','1')">
           </a>
           <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
           ${price ? `<div class="price">${price}</div>` : ''}
@@ -135,8 +163,40 @@
         </article>`;
     }).join('');
 
+    // Ẩn card hỏng cơ bản (link không hợp lệ hoặc ảnh lỗi)
+    grid.querySelectorAll('article.product-card[data-broken], article.product-card[data-img-missing="1"]').forEach(el=>{
+      el.style.display = 'none';
+    });
+
     // Gọi lại affiliate rewriter nếu có
     if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+
+    // (Tùy chọn) Audit 404 qua Worker nếu đã bật endpoint
+    try{
+      const itemsForAudit = Array.from(grid.querySelectorAll('article.product-card'))
+        .map(el=>{
+          const sku = el.getAttribute('data-sku')||'';
+          const a = el.querySelector('.buy');
+          return { sku, url: a ? a.getAttribute('href') : '' };
+        }).filter(x=>/^https?:\/\//.test(x.url));
+      if (itemsForAudit.length){
+        const r = await fetch('/ops/audit-links', {
+          method:'POST',
+          headers:{'content-type':'application/json'},
+          body: JSON.stringify({ items: itemsForAudit, src: location.pathname })
+        });
+        if (r.ok){
+          const rep = await r.json();
+          if (rep && Array.isArray(rep.broken)){
+            const bad = new Set(rep.broken.map(x=>String(x).toLowerCase()));
+            grid.querySelectorAll('article.product-card').forEach(el=>{
+              const sku = (el.getAttribute('data-sku')||'').toLowerCase();
+              if (bad.has(sku)) el.style.display='none';
+            });
+          }
+        }
+      }
+    }catch(_){ /* im lặng, không chặn render */ }
   })();
   </script>
 </body>
