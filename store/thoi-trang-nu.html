@@ -8,7 +8,7 @@
   <link rel="canonical" href="https://mxd210.github.io/store/thoi-trang-nu.html"/>
   <meta name="robots" content="index,follow"/>
 
-  <!-- OG -->
+  <!-- SEO: OG -->
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Thời trang nữ | MXD"/>
   <meta property="og:description" content="Danh mục thời trang nữ — MXD."/>
@@ -26,10 +26,11 @@
   <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Thời trang nữ</nav>
   <h1>Thời trang nữ</h1>
 
-  <div class="filter-row">
+  <!-- Subnav đồng nhất cụm Thời trang (không hard-code .is-active) -->
+  <div class="filter-row" data-subnav="thoi-trang">
     <a class="btn" href="/store/thoi-trang.html">Tất cả</a>
-    <a class="btn" href="/store/thoi-trang-nam.html">Nam</a>
-    <a class="btn" href="/store/thoi-trang-nu.html" aria-current="page">Nữ</a>
+    <a class="btn" href="/store/thoi-trang-nam.html">Thời trang nam</a>
+    <a class="btn" href="/store/thoi-trang-nu.html">Thời trang nữ</a>
     <a class="btn" href="/store/tre-em.html">Trẻ em</a>
     <a class="btn" href="/store/thoi-trang-thu-dong.html">Thu đông</a>
   </div>
@@ -43,7 +44,26 @@
 
   <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
 
-  <!-- Loader MXD: affiliates.json → products.json → /affiliates.json ; hỗ trợ array hoặc {items:[...]} -->
+  <!-- MXD-ANCHOR:SUBNAV-ACTIVE -->
+  <script>
+  (function mxdSubnavActive(){
+    try{
+      const here = new URL(location.href);
+      document.querySelectorAll('.filter-row a.btn').forEach(a=>{
+        try{
+          const u = new URL(a.getAttribute('href'), location.origin);
+          if (u.pathname === here.pathname){
+            a.classList.add('is-active'); a.setAttribute('aria-current','page');
+          } else {
+            a.classList.remove('is-active'); a.removeAttribute('aria-current');
+          }
+        }catch(_){}
+      });
+    }catch(_){}
+  })();
+  </script>
+
+  <!-- Loader MXD: affiliates.json → products.json → /affiliates.json; hỗ trợ array hoặc {items:[...]} -->
   <!-- MXD-ANCHOR:THOI-TRANG-NU-FILTER -->
   <script>
   (async function renderMXD(){
@@ -124,11 +144,13 @@
       const merchant = (p.merchant||'').toLowerCase();
       const buy = linkOf(p);
       const img = imgOf(p);
+      const broken = !/^https?:\/\//.test(buy);
+
       return `
-        <article class="product-card" data-sku="${esc(sku)}">
+        <article class="product-card" data-sku="${esc(sku)}" ${broken?'data-broken="link"':''}>
           <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
             <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+                 onerror="this.onerror=null;this.dataset.err=1;this.src='/assets/img/products/placeholder.webp';this.closest('article').setAttribute('data-img-missing','1')">
           </a>
           <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
           ${price?`<div class="price">${price}</div>`:''}
@@ -139,7 +161,39 @@
         </article>`;
     }).join('');
 
+    // Ẩn card hỏng cơ bản (link không hợp lệ hoặc ảnh lỗi)
+    grid.querySelectorAll('article.product-card[data-broken], article.product-card[data-img-missing="1"]').forEach(el=>{
+      el.style.display = 'none';
+    });
+
     if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+
+    // (Tùy chọn) Audit 404 qua Worker nếu đã bật endpoint
+    try{
+      const itemsForAudit = Array.from(grid.querySelectorAll('article.product-card'))
+        .map(el=>{
+          const sku = el.getAttribute('data-sku')||'';
+          const a = el.querySelector('.buy');
+          return { sku, url: a ? a.getAttribute('href') : '' };
+        }).filter(x=>/^https?:\/\//.test(x.url));
+      if (itemsForAudit.length){
+        const r = await fetch('/ops/audit-links', {
+          method:'POST',
+          headers:{'content-type':'application/json'},
+          body: JSON.stringify({ items: itemsForAudit, src: location.pathname })
+        });
+        if (r.ok){
+          const rep = await r.json();
+          if (rep && Array.isArray(rep.broken)){
+            const bad = new Set(rep.broken.map(x=>String(x).toLowerCase()));
+            grid.querySelectorAll('article.product-card').forEach(el=>{
+              const sku = (el.getAttribute('data-sku')||'').toLowerCase();
+              if (bad.has(sku)) el.style.display='none';
+            });
+          }
+        }
+      }
+    }catch(_){ /* im lặng, không chặn render */ }
   })();
   </script>
 </body>
