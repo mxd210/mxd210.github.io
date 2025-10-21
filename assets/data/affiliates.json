@@ -183,43 +183,7 @@
       "description": "Bộ ngủ tay dài kiểu tiểu thư, chất dày ấm, dễ thương — giá tham khảo 93.000 đ."
     }
   },
-  {
-    "name": "Bộ ngủ pyjama nữ dài tay hoạ tiết",
-    "price": 168000,
-    "origin": "https://shopee.vn/-S%E1%BA%B5n-B%E1%BB%99-ng%E1%BB%A7-pyjama-n%E1%BB%AF-d%C3%A0i-tay-ho%E1%BA%A1-ti%E1%BA%BFt-nhi%E1%BB%81u-m%C3%A0u-ch%E1%BA%A5t-%C4%91%C5%A9i-c%E1%BB%95-sen-ti%E1%BB%83u-th%C6%B0-m%E1%BA%B7c-nh%C3%A0-thu-%C4%91%C3%B4ng-i.57462176.24596919459?sp_atk=3c160345-7415-4968-a68b-3b37afa6b073&xptdk=3c160345-7415-4968-a68b-3b37afa6b073",
-    "merchant": "shopee",
-    "sku": "bo-ngu-pyjama-nu-dai-tay-hoa-tiet",
-    "image": "/assets/img/products/bo-ngu-pyjama-nu-dai-tay-hoa-tiet.webp",
-    "category": "thoi-trang-nu",
-    "brand": "",
-    "featured": true,
-    "status": true,
-    "updated_at": "2025-10-11T16:03:36.935Z",
-    "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2F-S%25E1%25BA%25B5n-B%25E1%25BB%2599-ng%25E1%25BB%25A7-pyjama-n%25E1%25BB%25AF-d%25C3%25A0i-tay-ho%25E1%25BA%25A1-ti%25E1%25BA%25BFt-nhi%25E1%25BB%2581u-m%25C3%25A0u-ch%25E1%25BA%25A5t-%25C4%2591%25C5%25A9i-c%25E1%25BB%2595-sen-ti%25E1%25BB%2583u-th%25C6%25B0-m%25E1%25BA%B7c-nh%25C3%25A0-thu-%25C4%2591%25C3%25B4ng-i.57462176.24596919459%3Fsp_atk%3D3c160345-7415-4968-a68b-3b37afa6b073%26xptdk%3D3c160345-7415-4968-a68b-3b37afa6b073&sub1=sku&sub2=shopee&sub3=tool&sub4=mxd210",
-    "desc": "Set pyjama dài tay, chất nỉ dày ấm, cổ sen dễ thương, nhiều hoạ tiết đẹp — 168.000 đ.",
-    "seo": {
-      "description": "Bộ pyjama nữ dài tay, chất dày ấm, hoạ tiết xinh — giá tham khảo 168.000 đ."
-    }
-  },
-  {
-    "name": "Bộ Nỉ Hoodie Chữ Thêu Chất Nỉ Bông Cotton",
-    "price": 169000,
-    "origin": "https://shopee.vn/Set-B%E1%BB%99-N%E1%BB%89-Hoodie-Ch%E1%BB%AF-Th%C3%AAu-Ch%E1%BA%A5t-N%E1%BB%89-B%C3%B4ng-Cotton-D%C3%A0y-D%E1%BA%B7n-Hai-L%E1%BB%9Bp-Si%C3%AAu-%E1%BA%A4m-Set-Thu-%C4%90%C3%B4ng-Cao-C%E1%BA%A5p-T9-i.28471701.25157373285?sp_atk=331df6df-e557-4192-8c42-933cf63839c2&xptdk=331df6df-e557-4192-8c42-933cf63839c2",
-    "merchant": "shopee",
-    "sku": "bo-ni-hoodie-chu-theu-chat-ni-bong-cotton",
-    "image": "/assets/img/products/bo-ni-hoodie-chu-theu-chat-ni-bong-cotton.webp",
-    "category": "thoi-trang-nu",
-    "brand": "",
-    "featured": false,
-    "status": true,
-    "updated_at": "2025-10-11T16:02:26.289Z",
-    "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FSet-B%25E1%25BB%2599-N%25E1%25BB%2589-Hoodie-Ch%25E1%25BB%25AF-Th%25C3%25AAu-Ch%25E1%25BA%25A5t-N%25E1%25BB%2589-B%25C3%25B4ng-Cotton-D%25C3%25A0y-D%25E1%25BA%B7n-Hai-L%25E1%25BB%259Bp-Si%25C3%25AAu-%25E1%25BA%25A4m-Set-Thu-%25C4%2590%25C3%25B4ng-Cao-C%25E1%25BA%25A5p-T9-i.28471701.25157373285%3Fsp_atk%3D331df6df-e557-4192-8c42-933cf63839c2%26xptdk%3D331df6df-e557-4192-8c42-933cf63839c2&sub1=sku&sub2=shopee&sub3=tool&sub4=mxd210",
-    "desc": "Set nỉ hoodie chữ thêu, nỉ bông dày dặn 2 lớp, giữ ấm cực ổn — 169.000 đ.",
-    "seo": {
-      "description": "Set nỉ hoodie chữ thêu, nỉ bông dày 2 lớp ấm áp — giá tham khảo 169.000 đ."
-    }
-  },
-  {
+    {
     "name": "Bộ nỉ nữ thu đông chất vải nỉ bông",
     "price": 175000,
     "origin": "https://shopee.vn/B%E1%BB%99-n%E1%BB%89-n%E1%BB%AF-thu-%C4%91%C3%B4ng-ch%E1%BA%A5t-v%E1%BA%A3i-n%E1%BB%89-b%C3%B4ng-Set-%C4%91%E1%BB%93-n%E1%BB%AF-thu-%C4%91%C3%B4ng-qu%E1%BA%A7n-%C3%A1o-d%C3%A0i-tay-tr%E1%BA%BB-trung-phong-c%C3%A1ch-H%C3%A0n-Qu%E1%BB%91c-i.403990146.13742655195?sp_atk=ee0f1a57-f24e-4d3f-aa57-51f846c54685&xptdk=ee0f1a57-f24e-4d3f-aa57-51f846c54685",
@@ -255,42 +219,7 @@
       "description": "GUNO set nỉ cổ tròn logo thêu, quần suông ấm áp — giá tham khảo 249.000 đ."
     }
   },
-  {
-    "name": "Bộ Quần Áo Nỉ Nữ GUNO In Hình Gấu Cổ Tròn",
-    "price": 310000,
-    "origin": "https://shopee.vn/B%E1%BB%99-Qu%E1%BA%A7n-%C3%81o-N%E1%BB%89-N%E1%BB%AF-GUNO-In-H%C3%ACnh-G%E1%BA%A5u-C%E1%BB%95-Tr%C3%B2n-K%C3%A8m-Qu%E1%BA%A7n-Bo-G%E1%BA%A5u-Set-B%E1%BB%99-Thu-%C4%90%C3%B4ng-Th%E1%BB%9Di-Trang-SP5-25BG135-i.225457932.43914907921?sp_atk=2937eb4c-9f86-4dfa-a102-b903749ac454&xptdk=2937eb4c-9f86-4dfa-a102-b903749ac454",
-    "merchant": "shopee",
-    "sku": "bo-quan-ao-ni-nu-guno-in-hinh-gau-co-tron",
-    "image": "/assets/img/products/bo-quan-ao-ni-nu-guno-in-hinh-gau-co-tron.webp",
-    "category": "thoi-trang-nu",
-    "brand": "",
-    "featured": true,
-    "status": true,
-    "updated_at": "2025-10-11T16:01:42.943Z",
-    "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FB%25E1%25BB%2599-Qu%25E1%25BA%25A7n-%25C3%2581o-N%25E1%25BB%2589-N%25E1%25BB%25AF-GUNO-In-H%25C3%25ACnh-G%25E1%25BA%25A5u-C%25E1%25BB%2595-Tr%25C3%25B2n-K%25C3%25A8m-Qu%25E1%25BA%25A7n-Bo-G%25E1%25BA%A5u-Set-B%25E1%25BB%2599-Thu-%25C4%2590%25C3%25B4ng-Th%25E1%25BB%259Di-Trang-SP5-25BG135-i.225457932.43914907921%3Fsp_atk%3D2937eb4c-9f86-4dfa-a102-b903749ac454%26xptdk%3D2937eb4c-9f86-4dfa-a102-b903749ac454&sub1=sku&sub2=shopee&sub3=tool&sub4=mxd210",
-    "desc": "Set nỉ cổ tròn in gấu xinh, quần bo gấu ấm áp, mặc nhà/đi chơi đều đẹp — 310.000 đ.",
-    "seo": {
-      "description": "Bộ nỉ GUNO in hình gấu, ấm áp, dễ thương — giá tham khảo 310.000 đ."
-    }
-  },
-  {
-    "name": "Bộ thu đông chất vải nỉ ép len gân",
-    "price": 179000,
-    "origin": "https://shopee.vn/B%E1%BB%99-thu-%C4%91%C3%B4ng-ch%E1%BA%A5t-v%E1%BA%A3i-n%E1%BB%89-%C3%A9p-len-g%C3%A2n-c%C3%B3-Bigsize%E2%9D%A4Leeshu%E2%9D%A4ch%E1%BA%A5t-v%E1%BA%A3i-xu%E1%BA%A5t-d%C6%B0-xin-x%C3%B2-n%E1%BA%B7ng1kg-si%C3%AAu-%E1%BA%A5m-m%E1%BA%B7c-nh%C3%A0-%C4%91i-ch%C6%A1i-b15-i.400497211.18785390406?sp_atk=7a7d586a-ec12-452a-a955-f8d6b35db4f4&xptdk=7a7d586a-ec12-452a-a955-f8d6b35db4f4",
-    "merchant": "shopee",
-    "sku": "bo-thu-dong-chat-vai-ni-ep-len-gan",
-    "image": "/assets/img/products/bo-thu-dong-chat-vai-ni-ep-len-gan.webp",
-    "category": "thoi-trang-nu",
-    "brand": "",
-    "featured": false,
-    "status": true,
-    "updated_at": "2025-10-11T16:04:15.561Z",
-    "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FB%25E1%25BB%2599-thu-%25C4%2591%25C3%25B4ng-ch%25E1%25BA%25A5t-v%25E1%25BA%25A3i-n%25E1%25BB%2589-%25C3%25A9p-len-g%25C3%25A2n-c%25C3%25B3-Bigsize%25E2%259D%25A4Leeshu%25E2%259D%25A4ch%25E1%25BA%25A5t-v%25E1%25BA%25A3i-xu%25E1%25BA%25A5t-d%25C6%25B0-xin-x%25C3%25B2-n%25E1%25BA%B7ng1kg-si%25C3%25AAu-%25E1%25BA%25A5m-m%25E1%25BA%B7c-nh%25C3%25A0-%25C4%2591i-ch%25C6%25A1i-b15-i.400497211.18785390406%3Fsp_atk%3D7a7d586a-ec12-452a-a955-f8d6b35db4f4%26xptdk%3D7a7d586a-ec12-452a-a955-f8d6b35db4f4&sub1=sku&sub2=shopee&sub3=tool&sub4=mxd210",
-    "desc": "Bộ nỉ ép len gân nặng tay, ấm áp, có bigsize, mặc nhà/đi chơi đều hợp — 179.000 đ.",
-    "seo": {
-      "description": "Bộ nỉ ép len gân ấm áp, form đẹp, có bigsize — giá tham khảo 179.000 đ."
-    }
-  },
+ 
   {
     "name": "Bộ Thu Đông Nữ Dài Tay Cổ Tim",
     "price": 169000,
