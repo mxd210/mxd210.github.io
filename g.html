@@ -1,10 +1,10 @@
-<!-- FILE:/g.html -->
+<!-- FILE:/g.html (REPLACE WHOLE FILE) -->
 <!-- MXD-CHECK v2025-10-06 [g]
 - Canonical dynamic (?sku=) + robots=index,follow (auto switch to noindex on 404 SKU)
 - Meta verify present; GA4 BEFORE /assets/mxd-affiliate.js (only once)
 - Product JSON-LD: name, sku, image (absolute), description, offers{price, priceCurrency:"VND", availability, url}
 - Product image path: /assets/img/products/<sku>.webp (fallback ok)
-- No manual deep-links; meta link + buy links use origin; affiliate script rewrites
+- Prefer ORIGIN links (origin/origin_url) → affiliate script rewrites; no hard deep-links
 - OG updated per SKU; og:url reflects canonical with ?sku=
 FIND: MXD-CHECK v2025-10-06 [g]
 -->
@@ -45,7 +45,7 @@ FIND: MXD-CHECK v2025-10-06 [g]
     .wrap{max-width:980px;margin:0 auto;padding:16px}
     .card{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);align-items:start}
     .media{position:relative}
-    .media img{width:100%;aspect-ratio:1/1;object-fit:cover;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .media img{width:100%;aspect-ratio:1/1;object-fit:contain;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);background:#fff}
     .price{font-size:1.25rem;font-weight:700;margin:8px 0}
     .buybox a.buy{display:inline-block;margin-right:8px;margin-bottom:8px;padding:10px 14px;border-radius:12px;border:1px solid #111;text-decoration:none;color:#fff;background:#1746ff;border-color:#1746ff}
     .buybox a.buy[data-merchant="shopee"]{background:#ee4d2d;border-color:#ee4d2d}
@@ -67,7 +67,7 @@ FIND: MXD-CHECK v2025-10-06 [g]
     if(can){ var u=new URL(can.href, location.origin); u.searchParams.set('sku', sku); can.href=u.href; }
     var title=document.querySelector('#og-title'); if(title) title.setAttribute('content', sku+' | MXD');
     var desc=document.querySelector('#og-desc'); if(desc) desc.setAttribute('content', 'Sản phẩm '+sku+' tại MXD');
-    var img=document.querySelector('#og-image'); if(img) img.setAttribute('content', 'https://mxd210.github.io/assets/img/products/'+sku+'.webp');
+    var img=document.querySelector('#og-image'); if(img) img.setAttribute('content', 'https://mxd210.github.io/assets/img/products/'+sku.toLowerCase()+'.webp');
   })();
   </script>
 </head>
@@ -133,7 +133,6 @@ FIND: MXD-CHECK v2025-10-06 [g]
           "url": p.link
         }
       };
-      // brand/rating (tuỳ dữ liệu có sẵn)
       if (p.brand) data.brand = {"@type":"Brand","name":p.brand};
       if (p.ratingValue && p.reviewCount){
         data.aggregateRating = {"@type":"AggregateRating","ratingValue":String(p.ratingValue),"reviewCount":String(p.reviewCount)};
@@ -177,56 +176,60 @@ FIND: MXD-CHECK v2025-10-06 [g]
     setCanonical();
     root.innerHTML = '<p class="muted">Đang tải sản phẩm…</p>';
 
-    fetch('/assets/data/affiliates.json', {cache:'no-store'})
-      .then(r => r.ok ? r.json() : fetch('/products.json',{cache:'no-store'}).then(rr=>rr.json()))
-      .then(list=>{
-        if (!Array.isArray(list)) {
-          if (list && typeof list === 'object') {
-            list = Array.isArray(list.items) ? list.items : Object.values(list);
-          } else {
-            list = [];
-          }
-        }
+    // Nguồn dữ liệu OSOT + fallback
+    const SOURCES = ['/assets/data/affiliates.json','/products.json','/affiliates.json'];
 
+    function loadFirst(urls){
+      return (async () => {
+        for (const src of urls){
+          try{
+            const r = await fetch(src, {cache:'no-store'});
+            if (!r.ok) continue;
+            const j = await r.json();
+            if (Array.isArray(j)) return j;
+            if (j && Array.isArray(j.items)) return j.items;
+            if (j && typeof j === 'object') return Object.values(j);
+          }catch(_){}
+        }
+        return [];
+      })();
+    }
+
+    loadFirst(SOURCES)
+      .then(list=>{
         const p = list.find(x => [x.sku, x.p_sku, x.id].map(norm).includes(norm(skuParam)));
         if(!p){ renderNotFound(); return; }
 
-        const skuReal = p.sku || p.p_sku || p.id;
+        const skuReal = (p.sku || p.p_sku || p.id || '').toString();
+        const skuLower = skuReal.toLowerCase();
         const priceNum = typeof p.price === 'number' ? p.price : Number(String(p.price||'').replace(/[^\d]/g,''));
-        const link = p.link || p.url || firstValidLinkURL(p.links) || p.origin;
-        const image = p.image || `/assets/img/products/${skuReal}.webp`;
+
+        // PREFER ORIGIN: origin/origin_url trước, rồi mới đến links/url/link (để affiliate script rewrite)
+        const originLink = p.origin || p.origin_url || '';
+        const altLink = firstValidLinkURL(p.links) || p.url || p.link || '';
+        const finalLink = originLink || altLink || '';
+
+        const imageRel = p.image || `/assets/img/products/${skuLower}.webp`;
+        const imageAbs = imageRel.startsWith('http') ? imageRel : `https://mxd210.github.io${imageRel}`;
         const priceText = priceNum ? new Intl.NumberFormat('vi-VN').format(priceNum) + ' đ' : 'Liên hệ';
 
         // meta + JSON-LD
-        const seoDesc = (p.seo && p.seo.description) ? p.seo.description : `Sản phẩm ${p.name} – giá tham khảo ${priceText}.`;
-        setMeta(p.name || skuReal, seoDesc, `https://mxd210.github.io${image}`);
+        const seoDesc = (p.seo && p.seo.description) ? p.seo.description : `Sản phẩm ${p.name||skuReal} – giá tham khảo ${priceText}.`;
+        setMeta(p.name || skuReal, seoDesc, imageAbs);
         injectProductLD({
           name:p.name || skuReal, sku:skuReal, price:priceNum,
-          image:`https://mxd210.github.io${image}`, link:link,
+          image:imageAbs, link:finalLink,
           desc: seoDesc, brand:p.brand, ratingValue:p.ratingValue, reviewCount:p.reviewCount
         });
 
-        // buybox
-        function firstValidLink(links){
-          if (!Array.isArray(links)) return null;
-          const flat = links.map(l => {
-            if (!l) return null;
-            if (typeof l === 'string') return { url: l };
-            if (typeof l === 'object') return { url: l.url, label: l.label, merchant: l.merchant };
-            return null;
-          }).filter(x => x && x.url && String(x.url).startsWith('http'));
-          return flat[0] || null;
-        }
-        const primary = firstValidLink(p.links);
-        const metaHref = p.origin || link || '';
+        // buy button (duy nhất, theo link đã ưu tiên ORIGIN)
         let buyBox = '';
-        if (primary) {
-          const m = primary.merchant || getMerchant(primary.url);
-          const label = primary.label || (m ? `Mua ${m}` : 'Mua ngay');
-          buyBox = `<a class="buy" href="${primary.url}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow sponsored noopener">${label}</a>`;
-        } else if (metaHref) {
-          const m = getMerchant(metaHref);
-          buyBox = `<a class="buy" href="${metaHref}" data-merchant="${m}" data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd" rel="nofollow sponsored noopener">Mua ngay</a>`;
+        if (finalLink){
+          const m = p.merchant || getMerchant(finalLink);
+          const label = m ? `Mua ${m}` : 'Mua ngay';
+          buyBox = `<a class="buy" href="${finalLink}" data-merchant="${m}" aria-label="Mua ${p.name||skuReal} trên ${m||'cửa hàng'}"
+                     data-sub1="g_sku" data-sub2="${skuReal}" data-sub3="product" data-sub4="mxd"
+                     target="_blank" rel="nofollow sponsored noopener">${label}</a>`;
         } else {
           buyBox = `<span class="muted">Chưa có link mua</span>`;
         }
@@ -234,15 +237,15 @@ FIND: MXD-CHECK v2025-10-06 [g]
         // render: META phải TRƯỚC .buy
         root.innerHTML = `
           <a class="product-meta"
-             href="${metaHref || '#'}"
-             data-merchant="${p.merchant || getMerchant(metaHref || '')}"
+             href="${finalLink || '#'}"
+             data-merchant="${p.merchant || getMerchant(finalLink || '')}"
              data-sku="${skuReal}"
-             data-img="/assets/img/products/${skuReal}.webp"
+             data-img="/assets/img/products/${skuLower}.webp"
              data-price="${priceNum||''}">${p.name || skuReal}</a>
 
           <article class="card">
             <div class="media">
-              <img id="pimg" src="${image}" alt="${p.name || skuReal}" loading="eager" decoding="async"
+              <img id="pimg" src="${imageRel}" alt="${p.name || skuReal}" loading="eager" decoding="async"
                    onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
             </div>
             <div>
