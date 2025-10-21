@@ -151,6 +151,12 @@
           <div><label>Danh mục (category)</label><input id="category" data-clear placeholder="may-khoan-duc-vit / may-cat / phu-kien-may"/></div>
         </div>
 
+        <!-- v4.3.9 HOTFIX: thêm trường brand để tránh lỗi null trong gen mô tả/JSON -->
+        <div>
+          <label>Thương hiệu (brand)</label>
+          <input id="brand" data-clear placeholder="Makita / Dekton / Karcher"/>
+        </div>
+
         <!-- NEW: cat + tags -->
         <div class="row">
           <div>
@@ -380,7 +386,9 @@ const RX = {
   cold: /\b(thu[ -]?đông|thu[ -]?dong|đông|dong|ấm|am|phao|lông|long|nỉ|ni|len|sweater|hoodie|jacket|coat|ao\s*khoac|áo\s*khoác)\b/i
 };
 function autoFashionFill(){
-  const name = $("#name").value + " " + $("#brand").value + " " + $("#category").value;
+  // HOTFIX: đọc brand an toàn khi field vắng
+  const brandEl = $("#brand");
+  const name = $("#name").value + " " + (brandEl ? brandEl.value : "") + " " + $("#category").value;
   const origin = $("#origin").value;
   const text = (name + " " + origin).toLowerCase();
 
@@ -415,7 +423,10 @@ $("#btnAuto").onclick=()=>{
   const baseSku=$("#sku").value.trim()||'...';
   if($("#sku").value && !$("#image").value) $("#image").value=`${folder}${slugify(baseSku)}.webp`;
   $("#originOut").value=cleanUrl($("#origin").value.trim());
-  const g=autoCategory(`${name} ${$("#brand").value} ${$("#origin").value}`);
+  // HOTFIX: đọc brand/origin an toàn
+  const brandTxt = ($("#brand") ? $("#brand").value : "");
+  const originTxt = ($("#origin") ? $("#origin").value : "");
+  const g=autoCategory(`${name} ${brandTxt} ${originTxt}`);
   if(g && !$("#category").value.trim()) $("#category").value=g;
   autoFashionFill(); runDiag(); updateSingleUploadCta();
 };
@@ -647,18 +658,16 @@ function runDiag(){
 function fmtVND(n){ const v=Number(n); return isFinite(v) && v>0 ? new Intl.NumberFormat('vi-VN').format(v)+' đ' : ''; }
 function genDesc(){
   const name=$("#name").value.trim();
-  const brand=$("#brand").value.trim();
+  const brand = ($("#brand") ? $("#brand").value.trim() : ""); // HOTFIX safe
   const tags=normalizeTags($("#tags").value);
   const cat=$("#cat").value||'';
   const price=Number($("#price").value||0);
   const bits=[];
   if(brand) bits.push(brand);
-  // gợi ý mùa/đối tượng
   if(tags.includes('nu')) bits.push('nữ');
   if(tags.includes('nam')) bits.push('nam');
   if(tags.includes('tre-em')) bits.push('trẻ em');
   if(tags.includes('thu-dong')) bits.push('giữ ấm/thu đông');
-  // nhóm lớn
   if(cat==='thoi-trang') bits.push('thời trang');
   if(cat==='may-moc-xay-dung') bits.push('dụng cụ/máy');
   const head = name || 'Sản phẩm MXD';
@@ -675,7 +684,7 @@ $("#btnGenDesc").onclick=genDesc;
 /* ================= Build JSON & actions ================= */
 function buildJson(){
   if(!$("#category").value.trim()){
-    const text=`${$("#name").value} ${$("#brand").value} ${$("#origin").value}`;
+    const text=`${$("#name").value} ${($("#brand")?$("#brand").value:"")} ${$("#origin").value}`; // HOTFIX safe
     const guess=autoCategory(text);
     if(guess) $("#category").value=guess;
   }
@@ -692,7 +701,7 @@ function buildJson(){
     sku:$("#sku").value.trim(),
     image:$("#image").value.trim(),
     category:$("#category").value.trim(),
-    brand:$("#brand").value.trim(),
+    brand:(document.querySelector("#brand")?.value||'').trim(), // HOTFIX safe
     featured:$("#featured").checked,
     status:$("#status").checked,
     updated_at:now
