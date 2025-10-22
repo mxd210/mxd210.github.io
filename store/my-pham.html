@@ -1,0 +1,148 @@
+<!-- FILE:/store/my-pham.html -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Mỹ phẩm | MXD</title>
+  <!--
+    Trang danh mục mỹ phẩm cho cửa hàng MXD. Nội dung này tuân theo
+    quy chuẩn MXD: canonical tuyệt đối, robots index/follow, GA4 trước
+    affiliate, thẻ OG đầy đủ và không nhồi nhét liên kết tiếp thị thủ công.
+    Sản phẩm hiển thị tự động từ affiliates.json (hoặc products.json).
+  -->
+  <meta name="description" content="Mỹ phẩm – chọn lọc sản phẩm chăm sóc da, trang điểm, nước hoa và làm đẹp. Dữ liệu tự động từ affiliates.json."/>
+  <link rel="canonical" href="https://mxd210.github.io/store/my-pham.html"/>
+  <meta name="robots" content="index,follow"/>
+
+  <!-- SEO: OG -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Mỹ phẩm | MXD"/>
+  <meta property="og:description" content="Danh mục mỹ phẩm: chăm sóc da, trang điểm, nước hoa, làm đẹp – dữ liệu tự động từ affiliates.json."/>
+  <meta property="og:url" content="https://mxd210.github.io/store/my-pham.html"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/my-pham.webp"/>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/assets/site.css"/>
+
+  <!-- GA4 trước Affiliate (theo chuẩn MXD) -->
+  <script defer src="/assets/analytics.js"></script>
+  <script defer src="/assets/mxd-affiliate.js"></script>
+</head>
+<body>
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Mỹ phẩm</nav>
+  <h1>Mỹ phẩm</h1>
+  <p>Các sản phẩm mỹ phẩm được chọn lọc: chăm sóc da, trang điểm, nước hoa…</p>
+
+  <!-- Lưới sản phẩm. data-category và data-alias dùng để lọc tự động -->
+  <section id="product-grid" class="product-grid"
+           data-category="my-pham"
+           data-alias="my-pham,my pham,mypham,lam-dep,lam dep,lamdep,trang-diem,trang diem,skincare,make-up,makeup,nuoc-hoa,nuoc hoa,cosmetics,beauty"></section>
+
+  <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
+
+  <!-- Subnav active helper: nếu trang có .filter-row thì đánh dấu mục đang xem -->
+  <script>
+  (function mxdSubnavActive(){
+    try{
+      const here = new URL(location.href);
+      document.querySelectorAll('.filter-row a.btn').forEach(a=>{
+        try{
+          const u = new URL(a.getAttribute('href'), location.origin);
+          if (u.pathname === here.pathname){
+            a.classList.add('is-active'); a.setAttribute('aria-current','page');
+          } else {
+            a.classList.remove('is-active'); a.removeAttribute('aria-current');
+          }
+        }catch(_){}
+      });
+    }catch(_){}
+  })();
+  </script>
+
+  <!-- Render sản phẩm cho danh mục Mỹ phẩm -->
+  <script>
+  (async function(){
+    const grid = document.getElementById('product-grid');
+    const cat  = String(grid.getAttribute('data-category')||'').trim().toLowerCase();
+    const aliases = String(grid.getAttribute('data-alias')||'')
+      .split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    const ALIASES = new Set([cat, ...aliases]);
+
+    // Nguồn dữ liệu ưu tiên: affiliates.json → products.json → affiliates.json (fallback)
+    const SOURCES = ['/assets/data/affiliates.json','/products.json','/affiliates.json'];
+    async function loadFirst(urls){
+      for (const src of urls){
+        try{
+          const r = await fetch(src, { cache:'no-store' });
+          if (!r.ok) continue;
+          const json = await r.json();
+          if (Array.isArray(json)) return json;
+          if (json && Array.isArray(json.items)) return json.items;
+        }catch(e){}
+      }
+      return null;
+    }
+
+    const data = await loadFirst(SOURCES);
+    if (!Array.isArray(data)){
+      grid.innerHTML = `<p class="muted">Không đọc được dữ liệu sản phẩm (đã thử ${SOURCES.join(' → ')}).</p>`;
+      return;
+    }
+
+    // Chuẩn hóa & lọc nhãn
+    const norm  = v => String(v||'').toLowerCase().trim();
+    const split = v => norm(v).split(/[\s,\/|>]+/).filter(Boolean);
+    const slug  = v => norm(v).replace(/[^a-z0-9\-]+/g,'-').replace(/--+/g,'-');
+
+    function labelsOf(p){
+      const out = [];
+      // string: cat/category/section
+      out.push(...split(p.cat||p.category||p.section||''));
+      // array: cats/categories
+      const group = Array.isArray(p.cats) ? p.cats : (Array.isArray(p.categories) ? p.categories : []);
+      out.push(...group.flatMap(split));
+      // tags
+      if (Array.isArray(p.tags)) out.push(...p.tags.flatMap(split));
+      return Array.from(new Set(out.map(slug).filter(Boolean)));
+    }
+
+    const isLive = p => p && p.status !== false && p.status !== 'archived';
+
+    function inCat(p){
+      const labels = labelsOf(p);
+      if (!labels.length) return false;
+      // match chặt: trùng alias
+      if (labels.some(l => ALIASES.has(l))) return true;
+      // match rộng: alias/label có quan hệ tiền tố
+      for (const a of ALIASES){
+        if (labels.some(l => l.startsWith(a) || a.startsWith(l))) return true;
+      }
+      return false;
+    }
+
+    const items = data.filter(p => isLive(p) && inCat(p));
+
+    if (!items.length){
+      grid.innerHTML = `<p class="muted">Chưa có sản phẩm cho danh mục này. Thêm slug/tag <code>my-pham</code> (hoặc alias liên quan) trong <code>affiliates.json</code>.</p>`;
+      return;
+    }
+
+    const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
+    grid.innerHTML = items.map(p=>{
+      const sku = p.sku || '';
+      const name = p.name || sku || 'Sản phẩm';
+      const img  = p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp');
+      const price = fmt(p.price);
+      const merchant = (p.merchant||'').toLowerCase();
+      const origin = p.deeplink || p.origin || p.origin_url || p.url || '#';
+      return `\n        <article class="product-card" data-sku="${sku}">\n          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">\n            <img loading="lazy" src="${img}" alt="${name} — MXD" width="320" height="320"\n                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">\n          </a>\n          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${name}</a></h3>\n          ${price?`<div class="price">${price}</div>`:''}\n          <div class="actions">\n            <a class="buy" href="${origin}" data-merchant="${merchant}" rel="nofollow sponsored noopener" target="_blank">Mua ngay</a>\n          </div>\n        </article>`;
+    }).join('');
+
+    // Nếu mxdAffiliate có hàm scan, gọi để gắn affiliate id
+    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+  })();
+  </script>
+</body>
+</html>
