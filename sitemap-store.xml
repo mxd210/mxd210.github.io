@@ -31,6 +31,13 @@ Policy:
   <changefreq>weekly</changefreq>
   <priority>0.9</priority>
 </url>
+<!-- INSERT: Mỹ phẩm hub -->
+<url>
+  <loc>https://mxd210.github.io/store/my-pham.html</loc>
+  <lastmod>2025-10-22</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.9</priority>
+</url>
 
   <!-- Tool sẽ INSERT thêm các hub khác (may-cat, may-khoan-duc-vit, …) nếu thiếu -->
 
