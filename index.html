@@ -32,6 +32,8 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
 
   <!-- MXD-ANCHOR:HEAD-META -->
   <link rel="stylesheet" href="/assets/site.css">
+  <!-- Prefetch hub Mỹ phẩm để click mượt hơn -->
+  <link rel="prefetch" href="/store/my-pham.html">
 
   <style>
     :root{
@@ -384,10 +386,36 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       </div>
     </section>
 
-    <!-- QUICK-NAV (để trống hoặc sẽ fill từ categories.json sau) -->
+    <!-- QUICK-NAV -->
     <!-- MXD-ANCHOR:QUICK-NAV -->
     <section aria-label="Danh mục nhanh" style="margin-top:12px">
-      <ul class="quick-nav" id="quick-nav"></ul>
+      <ul class="quick-nav" id="quick-nav">
+        <li>
+          <a href="/store/noi-bat.html" class="qnav-item">
+            <img src="/assets/img/categories/noi-bat.webp" alt="Sản phẩm nổi bật — MXD" width="28" height="28"
+                 onerror="this.src='/assets/img/categories/placeholder.webp'"> Sản phẩm nổi bật
+          </a>
+        </li>
+        <li>
+          <a href="/store/may-moc-xay-dung.html" class="qnav-item">
+            <img src="/assets/img/categories/may-moc-xay-dung.webp" alt="Máy móc xây dựng — MXD" width="28" height="28"
+                 onerror="this.src='/assets/img/categories/placeholder.webp'"> Máy móc xây dựng
+          </a>
+        </li>
+        <li>
+          <a href="/store/thoi-trang.html" class="qnav-item">
+            <img src="/assets/img/categories/thoi-trang.webp" alt="Thời trang — MXD" width="28" height="28"
+                 onerror="this.src='/assets/img/categories/placeholder.webp'"> Thời trang
+          </a>
+        </li>
+        <!-- NEW: Mỹ phẩm -->
+        <li>
+          <a href="/store/my-pham.html" class="qnav-item">
+            <img src="/assets/img/categories/my-pham.webp" alt="Mỹ phẩm — MXD" width="28" height="28"
+                 onerror="this.src='/assets/img/categories/placeholder.webp'"> Mỹ phẩm
+          </a>
+        </li>
+      </ul>
     </section>
 
     <!-- SẢN PHẨM (affiliates.json) -->
