@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>MXD Importer v4.3.9 — PRO (Settings + X-Key + Publish 1-click)</title>
+  <meta name="robots" content="noindex,follow"/>
+  <style>
+    :root{
+      --bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--b:#152132;--accent:#7cc4ff;
+      --ok:#34d399;--warn:#f59e0b;--err:#ef4444;
+      /* NEW: khoảng cách mặc định cho toast; sẽ được cập nhật bằng JS theo chiều cao sticky */
+      --toast-bottom: 12px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto}
+    h1,h2{margin:16px 0 8px}
+    h1{font-size:20px}
+    h2{font-size:16px;color:#cfe5ff}
+    a{color:var(--accent)}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .grid{display:grid;gap:12px}
+    .g2{grid-template-columns:1fr 1fr}
+    .card{background:var(--b);border:1px solid #223348;border-radius:12px;padding:14px}
+    label{display:block;font-weight:700;margin:8px 0 6px;color:#cfe5ff}
+    input,select,textarea,button{width:100%;padding:10px;border-radius:10px;border:1px solid #2b3b52;background:#0f1622;color:var(--fg)}
+    textarea{min-height:70px;resize:vertical}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .row>*{flex:1}
+    .small{font-size:12px;color:var(--muted)}
+    .btn{cursor:pointer;border:1px solid #2b3b52;background:#102235}
+    .btn:hover{background:#132a43}
+    .btn.primary{background:#0b3a5e;border-color:#0b3a5e}
+    .btn.primary:hover{background:#0d4570}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #2a3b55;color:#a9c6ff}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
+    .deeplink-box{border:2px dashed #2f4666;border-radius:12px;padding:10px;background:#0c1623}
+    .deeplink-text{font-size:13px;font-weight:600}
+    .sticky-actions{position:sticky;bottom:0;background:linear-gradient(0deg,#0b0f14 60%,#0b0f1400);padding:12px;border-top:1px solid #1b2a3f;z-index:9}
+    .drop{border:2px dashed #3a5270;border-radius:12px;padding:16px;text-align:center;background:#0c1623}
+    .drop.dragover{border-color:#8ab9ff;background:#0f1e32}
+    .preview{display:flex;gap:12px;align-items:center}
+    .preview img{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid #27405e}
+    /* FIX: Toast nổi hẳn lên trên và né thanh sticky */
+    .toast{
+      position:fixed;right:12px;bottom:var(--toast-bottom);
+      display:none;max-width:520px;background:#122232;border:1px solid #2b425e;
+      border-radius:12px;padding:12px;box-shadow:0 10px 30px #0008;
+      z-index:99999;pointer-events:none
+    }
+    .toast.show{display:block}
+    code.inline{background:#0e1622;border:1px solid #223449;border-radius:6px;padding:2px 6px}
+    .badge{display:inline-block;border:1px solid #2b3b52;border-radius:999px;padding:2px 8px;font-size:11px;color:#a4bee8}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <!-- Updated header for cosmetics extended -->
+  <h1>MXD Importer v4.3.9 <span class="pill">PRO</span> — Mỹ&nbsp;phẩm Extended</h1>
+  <div class="small">Bản mở rộng này hỗ trợ danh mục mỹ&nbsp;phẩm và thêm các merchant mới (wowmart, longchau, guardian, watsons). “Một click lên web” nhưng không đánh rơi chuẩn MXD210: ảnh đúng đường dẫn, JSON đúng schema, link đi qua affiliate. Bản này có <b>Lưu cài đặt</b>, <b>X-Key</b>, auto-deeplink + <b>Kiểm tra trên Store</b>.</div>
+
+  <div class="card">
+    <h2>1) Cài đặt (lưu vào trình duyệt)</h2>
+    <div class="grid g2">
+      <div>
+        <label>Worker Base URL</label>
+        <input id="workerUrl" placeholder="https://mxd210.mxd6686.workers.dev"/>
+      </div>
+      <div>
+        <label>X-Key (header bảo vệ Worker)</label>
+        <input id="xKey" placeholder="Ví dụ: mxd210-secret-key"/>
+      </div>
+      <div>
+        <label>Shopee template</label>
+        <input id="tplShopee" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}"/>
+      </div>
+      <div>
+        <label>Lazada template</label>
+        <input id="tplLazada" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}"/>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btnSaveSettings"> Lưu cài đặt</button>
+      <button class="btn" id="btnLoadSettings">↻ Tải lại</button>
+      <button class="btn" id="btnClearSettings"> Xóa cài đặt</button>
+      <span class="small" id="settingsStatus"></span>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btnCheckWorker">Kiểm tra Worker</button>
+      <button class="btn" id="btnCheckAuth">Kiểm tra X-Key</button>
+      <button class="btn" id="btnCheckWrite">Kiểm tra quyền commit</button>
+      <span class="small" id="workerStatus"></span>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h2>2) Ảnh sản phẩm</h2>
+      <div id="drop" class="drop">Kéo ảnh vào đây hoặc chọn…</div>
+      <input type="file" id="file" accept="image/*" style="display:none"/>
+      <div id="imgPreview" class="preview" style="margin-top:10px;display:none">
+        <img id="thumb" alt="preview"/>
+        <div class="small">
+          <div><b>Tên file đề xuất:</b> <code class="inline" id="imgName">-</code></div>
+          <div><b>Kích thước:</b> <span id="imgInfo">-</span></div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btnSelectImg">Chọn ảnh</button>
+        <button class="btn" id="btnConvert">Nén .webp</button>
+        <button class="btn" id="btnSaveImg">Tải ảnh (.webp)</button>
+        <button class="btn primary" id="btnUploadImg">Upload ảnh → /assets/img/products/&lt;sku&gt;.webp</button>
+      </div>
+      <div class="small">Chuẩn: .webp, cạnh dài ~px, chất lượng 0.82.</div>
+    </div>
+
+    <div class="card">
+      <h2>3) Thông tin sản phẩm</h2>
+      <div class="grid">
+        <div class="row">
+          <div>
+            <label>Tên sản phẩm</label>
+            <input id="name" placeholder="Ví dụ: Dekton DK-AG950S"/>
+          </div>
+          <div>
+            <label>SKU (bắt buộc, có thể sửa)</label>
+            <input id="sku" placeholder="dekton-dk-ag950s"/>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Giá (VND, không chấm)</label>
+            <input id="price" type="number" placeholder="399000"/>
+          </div>
+          <div>
+            <label>Merchant</label>
+            <select id="merchant"><option value="shopee">shopee</option><option value="lazada">lazada</option><option value="wowmart">wowmart</option><option value="longchau">longchau</option><option value="guardian">guardian</option><option value="watsons">watsons</option></select>
+          </div>
+        </div>
+        <div>
+          <label>Link gốc (origin)</label>
+          <input id="origin" placeholder="https://shopee.vn/…"/>
+        </div>
+        <div class="row">
+          <div>
+            <label>Ảnh (đường dẫn)</label>
+            <input id="image" placeholder="/assets/img/products/dekton-dk-ag950s.webp"/>
+          </div>
+          <div>
+            <label>Danh mục (category)</label>
+            <input id="category" placeholder="may-khoan-duc-vit / may-cat / phu-kien-may / my-pham"/>
+          </div>
+        </div>
+        <div>
+          <label>Thương hiệu (brand)</label>
+          <input id="brand" placeholder="dekton, bosch, makuta…"/>
+        </div>
+        <div class="row">
+          <label style="display:flex;align-items:center;gap:8px;flex:unset">
+            <input type="checkbox" id="featured" style="width:auto"/> Nổi bật (featured)
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;flex:unset">
+            <input type="checkbox" id="status" checked style="width:auto"/> Hiển thị (status)
+          </label>
+          <button class="btn" id="btnAuto">Điền auto từ tên</button>
+        </div>
+        <div id="diag" class="small"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card deeplink-box">
+    <h2>4) Deep-link (to, rõ ràng, copy dễ)</h2>
+    <div class="grid g2">
+      <div>
+        <label>Origin (đã nhập)</label>
+        <textarea id="originOut" class="deeplink-text" readonly></textarea>
+        <div class="row" style="margin-top:6px">
+          <button class="btn" id="copyOrigin">Copy Origin</button>
+          <button class="btn" id="openOrigin">Mở Origin</button>
+        </div>
+      </div>
+      <div>
+        <label>Affiliate deep-link</label>
+        <textarea id="deeplink" class="deeplink-text" placeholder="Tự sinh từ template hoặc dán sẵn tại đây"></textarea>
+        <div class="row" style="margin-top:6px">
+          <button class="btn" id="btnMakeDeeplink">Tạo từ template</button>
+          <button class="btn" id="copyDeeplink">Copy Deep-link</button>
+          <button class="btn" id="openDeeplink">Mở Deep-link</button>
+          <span id="dlCheck" class="badge">–</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>5) JSON xuất bản</h2>
+    <textarea id="jsonOut" rows="8" spellcheck="false"></textarea>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btnToJson">Tạo JSON</button>
+      <button class="btn" id="btnCopyJson">Copy JSON</button>
+      <button class="btn" id="btnDownloadJson">Tải affiliates.append.json</button>
+    </div>
+  </div>
+
+  <div class="sticky-actions row">
+    <button class="btn primary" id="btnPublish">Publish → Store</button>
+    <button class="btn" id="btnPublishFeatured">Publish → Nổi bật</button>
+    <button class="btn" id="btnVerify">✅ Kiểm tra trên Store</button>
+    <button class="btn" id="btnGenCommit">Gen commit message</button>
+    <input id="commitMsg" readonly/>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+// Use a new settings key to avoid conflicts with older version
+const LS_KEY = 'MXD_IMPORTER_SETTINGS_V439';
+const slugify = s => s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+                     .replace(/đ/g,'d').replace(/Đ/g,'D')
+                     .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+
+// ==== Templates mặc định (AccessTrade) ====
+const DEFAULT_TPL_SHOPEE =
+  'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
+const DEFAULT_TPL_LAZADA =
+  'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
+
+// SUB chuẩn MXD210: s1=SKU, s2=merchant, s3=tool, s4=campaign
+function computeSubs(sku, merchant){
+  const sub1 = sku || 'sku';
+  const sub2 = (merchant||'merchant').toLowerCase();
+  const sub3 = 'tool';
+  const sub4 = 'mxd210';
+  return {sub1, sub2, sub3, sub4};
+}
+function ensureSubsInUrl(u, subs){
+  const has = k => new RegExp(`[?&]${k}=`,`i`).test(u);
+  const qs = [];
+  if(!has('sub1')) qs.push(`sub1=${encodeURIComponent(subs.sub1)}`);
+  if(!has('sub2')) qs.push(`sub2=${encodeURIComponent(subs.sub2)}`);
+  if(!has('sub3')) qs.push(`sub3=${encodeURIComponent(subs.sub3)}`);
+  if(!has('sub4')) qs.push(`sub4=${encodeURIComponent(subs.sub4)}`);
+  return qs.length ? (u + (u.includes('?') ? '&' : '?') + qs.join('&')) : u;
+}
+
+// Sanitize URL (loại ký tự " ' , thừa ở đầu/cuối)
+function cleanUrl(u){ return (u||'').trim().replace(/^["']+|["',]+$/g,''); }
+
+// === NORMALIZE HELPERS (vi → slug) ===
+function vn(s){
+  return (s||'').toString()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // bỏ dấu
+    .replace(/đ/g,'d').replace(/Đ/g,'D')
+    .toLowerCase();
+}
+function normCategory(raw){
+  const base = vn(raw).replace(/\s+/g,'-')
+    .replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
+  // alias hay gặp → gom về may-cat / may-khoan-duc-vit / phu-kien-may / my-pham
+  if (/^(may-?cat|maycat|may\s*cat|may-mai|mai-goc|may-cat-sat|may-cat-gach)$/.test(base)) return 'may-cat';
+  if (/^(may-?khoan(-|_)?duc(-|_)?vit|may-khoan|khoan-duc-vit|khoan-bua|impact(-|_)?(driver|wrench)|sds(plus|max)?)$/.test(base)) return 'may-khoan-duc-vit';
+  if (/^(phu-?kien|phu-?kien-?may|phu-kien-may)$/.test(base)) return 'phu-kien-may';
+  if (/^(my-?pham|mypham|my-pham|trang-?diem|trangdiem|skincare|makeup|duong-?da|duongda|son)$/.test(base)) return 'my-pham';
+  return base;
+}
+
+// ===================================================================
+// === CATEGORY MAP (CONFIG) — đặt TRƯỚC buildJson() — MXD Canonical ===
+window.CATEGORY_KEYWORDS = window.CATEGORY_KEYWORDS || {};
+
+/* Máy cắt */
+window.CATEGORY_KEYWORDS["may-cat"] = {
+  include: [
+    /\b(máy\s*)?cắt\b/i,
+    /\bmáy\s*cưa\b/i,
+    /\bcưa\s*(đĩa|bàn|kiếm|lọng)\b/i,
+    /\bcut[\s-]?off\b/i,
+    /\bcircular(\s*saw)?\b/i,
+    /\bjig\s*saw\b/i, /\bjigsaw\b/i,
+    /\breciprocating\b/i, /\bsabre\b/i,
+    /\bmáy\s*cắt\s*(gạch|sắt|nhôm|đa\s*năng)\b/i,
+    /\bm[ảa]i\s*g[óo]c\b/i,
+    /\bmay\s*cat\b/i
+  ],
+  /* Tap 8: mở rộng exclude để phụ kiện KHÔNG rơi vào 'may-cat' */
+  exclude: [
+    /\b(lưỡi|blade|đĩa|disc|đá\s*cắt|phụ\s*kiện|mũi)\b/i,
+    /\b(pin|sạc|chổi\s*than|than|đế|vỏ|collet|bầu\s*kẹp|adapter|đá\s*mài|giấy\s*nhám|guard|chụp\s*bảo\s*vệ)\b/i
+  ],
+  set: { category: "may-cat" }
+};
+
+/* Máy khoan · đục · vít (để tránh kit máy bị đẩy sang phụ kiện) */
+window.CATEGORY_KEYWORDS["may-khoan-duc-vit"] = {
+  include: [
+    /\bmáy\s*khoan\b/i, /\bkhoan\s*búa\b/i,
+    /\bSDS[\s-]?(Plus|Max)\b/i,
+    /\bimpact\s*(driver|wrench)\b/i,
+    /\bb[ắa]n\s*v[íi]t\b/i, /\bsi[ếe]t\s*bu\s*l[oô]ng\b/i
+  ],
+  exclude: [
+    /\b(pin|sạc|lưỡi|đĩa|mũi|chén|chổi\s*than|than|đế|vỏ|collet|bầu\s*kẹp|adapter|đá\s*mài|giấy\s*nhám|guard|chụp\s*bảo\s*vệ)\b/i
+  ],
+  set: { category: "may-khoan-duc-vit" }
+};
+
+/* PHỤ KIỆN MÁY — deny-list & route */
+window.CATEGORY_KEYWORDS["phu-kien-may"] = {
+  include: [
+    /\bpin\b/i, /\bsạc\b/i,
+    /\blưỡi\b/i, /\bđĩa\b/i, /\bblade\b/i, /\bdisc\b/i,
+    /\bmũi\b/i, /\bmũi\s*khoan\b/i, /\bđầu\s*vít\b/i, /\bđầu\s*khẩu\b/i,
+    /\bchén\b/i, /\bđá\s*mài\b/i, /\bcup\s*wheel\b/i,
+    /\bchổi\s*than\b/i, /\bthan\b/i,
+    /\bđế\b/i, /\bcollet\b/i, /\bbầu\s*kẹp\b/i, /\badapter\b/i,
+    /\bgiấy\s*nhám\b/i, /\bguard\b/i, /\bchụp\s*bảo\s*vệ\b/i
+  ],
+  /* Không exclude 'máy' toàn cục để không loại "chổi than máy mài". Chỉ loại nếu tiêu đề bắt đầu bằng "máy"/"thân máy". */
+  exclude: [ /^(máy|thân\s*máy|tool[\s-]?only|bare\s*tool)\b/i ],
+  set: { category: "phu-kien-may" }
+};
+
+/* Mỹ phẩm — new category */
+window.CATEGORY_KEYWORDS["my-pham"] = {
+  include: [
+    /\b(mỹ\s*phẩm|my\s*pham|skincare|makeup|trang\s*điểm|trang\s*diem|dưỡng\s*da|duong\s*da|son|kem)\b/i
+  ],
+  exclude: [],
+  set: { category: "my-pham" }
+};
+
+// Helper đoán slug danh mục từ text (theo thứ tự khai báo ở trên)
+function autoCategory(text){
+  const MAP = window.CATEGORY_KEYWORDS || {};
+  for (const [slug, rule] of Object.entries(MAP)){
+    const okInc = (rule.include||[]).some(rx => rx.test(text));
+    const okExc = (rule.exclude||[]).some(rx => rx.test(text));
+    if (okInc && !okExc) return slug;
+  }
+  return '';
+}
+// ===================================================================
+
+// ====== State / Toast
+const state = { workerOk:false, imgBlob:null, imgName:null, imgW:0, imgH:0 };
+function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4500); }
+
+/* NEW: tính khoảng cách cho toast dựa trên chiều cao thanh sticky */
+function updateToastOffset(){
+  const bar = document.querySelector('.sticky-actions');
+  const bottom = bar ? (bar.offsetHeight + 16) : 12; // 16 = khoảng cách an toàn
+  document.documentElement.style.setProperty('--toast-bottom', bottom + 'px');
+}
+window.addEventListener('load', updateToastOffset);
+window.addEventListener('resize', updateToastOffset);
+if ('ResizeObserver' in window){
+  new ResizeObserver(updateToastOffset).observe(document.querySelector('.sticky-actions'));
+}
+
+// ---------- Settings Save/Load ----------
+function readSettings(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY)||'{}'); }catch(_){ return {}; }
+}
+function writeSettings(s){ localStorage.setItem(LS_KEY, JSON.stringify(s)); }
+function uiToSettings(){
+  return {
+    workerUrl: $("#workerUrl").value.trim(),
+    xKey: $("#xKey").value.trim(),
+    tplShopee: $("#tplShopee").value.trim(),
+    tplLazada: $("#tplLazada").value.trim()
+  };
+}
+function settingsToUi(s){
+  $("#workerUrl").value = s.workerUrl||'';
+  $("#xKey").value = s.xKey||'';
+  $("#tplShopee").value = s.tplShopee||'';
+  $("#tplLazada").value = s.tplLazada||'';
+}
+function saveSettings(){ writeSettings(uiToSettings()); $("#settingsStatus").textContent="Đã lưu."; toast("Đã lưu cài đặt.","ok"); }
+function loadSettings(){
+  const s = readSettings();
+  settingsToUi(s);
+  if(!$("#tplShopee").value) $("#tplShopee").value = DEFAULT_TPL_SHOPEE;
+  if(!$("#tplLazada").value) $("#tplLazada").value = DEFAULT_TPL_LAZADA;
+  $("#settingsStatus").textContent="Đã tải cài đặt.";
+}
+$("#btnSaveSettings").onclick = saveSettings;
+$("#btnLoadSettings").onclick = loadSettings;
+$("#btnClearSettings").onclick = ()=>{ localStorage.removeItem(LS_KEY); settingsToUi({}); $("#settingsStatus").textContent="Đã xóa."; };
+loadSettings(); // Load once at start
+
+// ---------- Worker checks ----------
+function hdr(){ const s=readSettings(); const h={}; if(s.xKey) h['x-key']=s.xKey; h['content-type']='application/json'; return h; }
+async function check(url){
+  try{ const r = await fetch(url, {mode:"cors", headers: hdr()}); return {ok:r.ok, status:r.status, text: await r.text().catch(()=>'' )}; }catch(e){ return {ok:false, status:-1, text:String(e)}; }
+}
+$("#btnCheckWorker").onclick = async ()=>{
+  const s=readSettings(); if(!s.workerUrl){ $("#workerStatus").textContent="Chưa cấu hình Worker."; return; }
+  const u = s.workerUrl.replace(/\/$/,'') + "/health";
+  const r = await check(u);
+  state.workerOk = r.ok;
+  $("#workerStatus").textContent = r.ok ? "Worker OK (health "+r.status+")." : "Worker lỗi ("+r.status+"). " + r.text.slice(0,120);
+  toast(r.ok?"Worker OK":"Worker lỗi "+r.status, r.ok?"ok":"err");
+};
+$("#btnCheckAuth").onclick = async ()=>{
+  const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; }
+  const u = s.workerUrl.replace(/\/$/,'') + "/whoami";
+  const r = await check(u);
+  toast(r.ok?"X-Key hợp lệ.":"X-Key không hợp lệ ("+r.status+")", r.ok?"ok":"err");
+};
+$("#btnCheckWrite").onclick = async ()=>{
+  const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; }
+  const u = s.workerUrl.replace(/\/$/,'') + "/can-write";
+  const r = await check(u);
+  toast(r.ok?"Có quyền commit.":"Không có quyền ("+r.status+")", r.ok?"ok":"err");
+};
+
+// ---------- Auto fill / diagnostics ----------
+$("#btnAuto").onclick = ()=>{
+  const name=$("#name").value.trim();
+  const skuNow=$("#sku").value.trim();
+  if(name && !skuNow) $("#sku").value = slugify(name);
+  if($("#sku").value && !$("#image").value) $("#image").value = `/assets/img/products/${$("#sku").value}.webp`;
+  $("#originOut").value = cleanUrl($("#origin").value.trim());
+  // gợi ý danh mục nếu để trống
+  const g = autoCategory(`${name} ${$("#brand").value} ${$("#origin").value}`);
+  if (g && !$("#category").value.trim()) $("#category").value = g;
+  runDiag();
+};
+["name","sku","origin","image","merchant"].forEach(id=>$("#"+id).addEventListener('input', runDiag));
+
+function runDiag(){
+  const sku = $("#sku").value.trim();
+  const img = $("#image").value.trim();
+  const origin = cleanUrl($("#origin").value.trim());
+  const merchant = $("#merchant").value;
+  const msgs = [];
+  if(!sku) msgs.push("• Thiếu SKU.");
+  if(img && !img.startsWith(`/assets/img/products/${sku||'...'}`)) msgs.push("• Ảnh nên là /assets/img/products/"+(sku||'<sku>')+".webp");
+  // update origin check to accept new merchants (domain patterns)
+  if(origin && !/(shopee\.vn|lazada\.vn|wowmart\.com\.vn|longchau\.vn|guardian\.com\.vn|watsons\.vn)/i.test(origin)) msgs.push("• Origin không phải là website hợp lệ (Shopee, Lazada, Wowmart, Long Châu, Guardian, Watsons).");
+  msgs.push("• Merchant: "+merchant);
+  $("#diag").innerHTML = msgs.length? msgs.map(x=>`<div>${x}</div>`).join("") : '<span class="ok">Tạm ổn.</span>';
+  $("#originOut").value = origin;
+}
+
+// ---------- Deep-link ----------
+function activeTplFor(merchant){
+  const s = readSettings();
+  const raw = (merchant==='shopee' ? (s.tplShopee||'') : (s.tplLazada||'')).trim();
+  if(raw) return raw;
+  return merchant==='shopee' ? DEFAULT_TPL_SHOPEE : DEFAULT_TPL_LAZADA;
+}
+function makeDeeplink(){
+  const origin = cleanUrl($("#origin").value.trim());
+  const sku = $("#sku").value.trim();
+  const merchant = $("#merchant").value;
+  if(!origin){ toast("Thiếu Origin.","warn"); return; }
+  const tpl = activeTplFor(merchant);
+  const subs = computeSubs(sku, merchant);
+
+  let link = tpl
+    .replace(/\{url\}/g, encodeURIComponent(origin))
+    .replace(/\{sku\}/g, sku||'sku')
+    .replace(/\{sub1\}/g, subs.sub1)
+    .replace(/\{sub2\}/g, subs.sub2)
+    .replace(/\{sub3\}/g, subs.sub3)
+    .replace(/\{sub4\}/g, subs.sub4);
+
+  link = ensureSubsInUrl(link, subs); // bồi thêm nếu template thiếu {sub*}
+
+  $("#deeplink").value = link;
+  validateDeeplink();
+}
+$("#btnMakeDeeplink").onclick = makeDeeplink;
+["origin","sku","merchant","tplShopee","tplLazada"].forEach(id=>{
+  const el = $("#"+id);
+  if(el) el.addEventListener('input', ()=>{ if($("#origin").value.trim()) makeDeeplink(); });
+});
+$("#origin").addEventListener('input', ()=>$("#originOut").value=cleanUrl($("#origin").value));
+
+// Validator
+function validateDeeplink(){
+  const dl = $("#deeplink").value.trim();
+  const badge = $("#dlCheck");
+  if(!dl){ badge.textContent = "chưa có deeplink"; badge.className='badge'; return; }
+  const okHost = /(^https?:\/\/)?([^\/]*\.)?isclix\.com/i.test(dl);
+  const hasUrl = /[?&]url=/.test(dl);
+  const s1 = /[?&]sub1=/.test(dl), s2=/[?&]sub2=/.test(dl), s3=/[?&]sub3=/.test(dl), s4=/[?&]sub4=/.test(dl);
+  if(okHost && hasUrl && s1 && s2 && s3 && s4){ badge.textContent="OK affiliate"; badge.className='badge'; return; }
+  if(okHost && !hasUrl){ badge.textContent="isclix thiếu url="; badge.className='badge'; return; }
+  if(okHost){
+    const missing = ['sub1','sub2','sub3','sub4'].filter(k=>!new RegExp(`[?&]${k}=`).test(dl));
+    badge.textContent = "isclix thiếu: "+missing.join(', ');
+    badge.className='badge';
+    return;
+  }
+  badge.textContent="KHÔNG qua affiliate"; badge.className='badge';
+}
+$("#deeplink").addEventListener('input', validateDeeplink);
+
+// ---------- JSON ----------
+function buildJson(){
+  // Auto-fill category nếu trống → rồi chuẩn hoá về slug
+  if (!$("#category").value.trim()){
+    const text = `${$("#name").value} ${$("#brand").value} ${$("#origin").value}`;
+    const guess = autoCategory(text);
+    if (guess) $("#category").value = guess;
+  }
+  // luôn normalize để ra slug chuẩn
+  $("#category").value = normCategory($("#category").value);
+
+  const now = new Date().toISOString();
+  const obj = {
+    name: $("#name").value.trim(),
+    price: Number($("#price").value||0),
+    origin: cleanUrl($("#origin").value.trim()),
+    merchant: $("#merchant").value,
+    sku: $("#sku").value.trim(),
+    image: $("#image").value.trim(),
+    category: $("#category").value.trim(),
+    brand: $("#brand").value.trim(),
+    featured: $("#featured").checked,
+    status: $("#status").checked,
+    updated_at: now
+  };
+  const dl = $("#deeplink").value.trim();
+  if(dl) obj.deeplink = dl; // có cũng được; store sẽ rewrite từ origin khi click
+  $("#jsonOut").value = JSON.stringify([obj], null, 2);
+  return obj;
+}
+$("#btnToJson").onclick = buildJson;
+$("#btnCopyJson").onclick = ()=>{ $("#jsonOut").select(); document.execCommand('copy'); toast("Đã copy JSON."); };
+$("#btnDownloadJson").onclick = ()=>{
+  if(!$("#jsonOut").value) buildJson();
+  const blob = new Blob([$("#jsonOut").value], {type:"application/json"});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'affiliates.append.json'; a.click();
+};
+
+// ---------- Commit message ----------
+$("#btnGenCommit").onclick = ()=>{
+  const sku = $("#sku").value.trim()||'sku';
+  const msg = `feat(data): add/update ${sku} (+image?) via importer 4.3.9-pro`;
+  $("#commitMsg").value = msg;
+};
+
+// ---------- Image handling ----------
+const drop = $("#drop"), file=$("#file"), thumb=$("#thumb"), imgName=$("#imgName"), imgInfo=$("#imgInfo");
+drop.addEventListener('click', ()=>file.click());
+$("#btnSelectImg").onclick = ()=>file.click();
+drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.classList.add('dragover'); });
+drop.addEventListener('dragleave', ()=>drop.classList.remove('dragover'));
+drop.addEventListener('drop', e=>{ e.preventDefault(); drop.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
+file.onchange = e=>handleFile(e.target.files[0]);
+
+function handleFile(f){
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const sku = $("#sku").value.trim() || slugify($("#name").value.trim()||'mxd');
+      const maxSide = 1200;
+      const scale = Math.min(1, maxSide/Math.max(img.width, img.height));
+      const w = Math.round(img.width*scale), h = Math.round(img.height*scale);
+      const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      canvas.toBlob(blob=>{
+        state.imgBlob = blob; state.imgW = w; state.imgH = h; state.imgName = `${sku}.webp`;
+        $("#image").value = `/assets/img/products/${sku}.webp`;
+        $("#imgPreview").style.display='flex'; thumb.src = URL.createObjectURL(blob);
+        imgName.textContent = state.imgName; imgInfo.textContent = `${w}×${h}, ${(blob.size/1024).toFixed(1)} KB`;
+      }, 'image/webp', 0.82);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+$("#btnConvert").onclick = ()=>{ if(!state.imgBlob){ toast("Chưa chọn ảnh.","warn"); return; } toast("Đã nén .webp sẵn."); };
+$("#btnSaveImg").onclick = ()=>{
+  if(!state.imgBlob){ toast("Chưa có ảnh.","warn"); return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(state.imgBlob); a.download = state.imgName || 'product.webp'; a.click();
+};
+$("#btnUploadImg").onclick = async ()=>{
+  if(!state.imgBlob){ toast("Chưa có ảnh.","warn"); return; }
+  const s=readSettings();
+  if(!s.workerUrl){ toast("Chưa cấu hình Worker — dùng 'Tải ảnh' để lưu file và commit tay.", "warn"); return; }
+  const base = s.workerUrl.replace(/\/$/,'');
+  const sku = $("#sku").value.trim();
+  const path = `/assets/img/products/${sku}.webp`;
+  const b64 = await blobToBase64(state.imgBlob);
+  try{
+    const r = await fetch(base + "/upload-image", {
+      method:"POST", mode:"cors",
+      headers: hdr(),
+      body: JSON.stringify({ sku, path, file: b64 })
+    });
+    if(!r.ok) throw new Error(String(r.status));
+    toast("Đã upload ảnh lên repo.","ok");
+  }catch(e){ toast("Upload ảnh lỗi: "+e.message, "err"); }
+};
+function blobToBase64(blob){ return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(blob); }); }
+
+// ---------- Publish ----------
+$("#btnPublish").onclick = ()=>doPublish(false);
+$("#btnPublishFeatured").onclick = ()=>doPublish(true);
+
+async function doPublish(forceFeatured){
+  const obj = buildJson();
+  if(forceFeatured){ obj.featured = true; $("#featured").checked = true; $("#jsonOut").value = JSON.stringify([obj], null, 2); }
+  if(!obj.sku){ toast("Thiếu SKU.","err"); return; }
+  if(!obj.origin){ toast("Thiếu origin.","warn"); return; }
+
+  // đảm bảo deeplink trước khi publish
+  if(!$("#deeplink").value.trim()){
+    makeDeeplink();
+    const dl = $("#deeplink").value.trim();
+    if(dl) { obj.deeplink = dl; $("#jsonOut").value = JSON.stringify([obj], null, 2); }
+  }
+  validateDeeplink();
+
+  const s = readSettings();
+  // Worker-first
+  if(s.workerUrl){
+    try{
+      const r = await fetch(s.workerUrl.replace(/\/$/,'') + "/publish", {
+        method:"POST", mode:"cors", headers: hdr(), body: JSON.stringify(obj)
+      });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      toast("Publish OK → store"+(obj.featured?" + nổi bật":""),"ok");
+      window.scrollTo({top:0,behavior:'smooth'});
+      return;
+    }catch(e){ toast("Publish lỗi (sẽ tải JSON để commit tay): "+e.message,"err"); }
+  }
+  // Fallback
+  const blob = new Blob([JSON.stringify([obj],null,2)], {type:"application/json"});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'affiliates.append.json'; a.click();
+}
+
+// ---------- Verify on Store ----------
+$("#btnVerify").onclick = async ()=>{
+  const sku = $("#sku").value.trim();
+  if(!sku){ toast("Chưa có SKU để kiểm tra.","warn"); return; }
+  try{
+    const r = await fetch('/affiliates.json?_=' + Date.now(), {cache:'no-cache'});
+    const arr = await r.json();
+    const found = (Array.isArray(arr)?arr:(arr.items||[])).some(x => (String(x.sku||'').toLowerCase()) === sku.toLowerCase());
+    toast(found ? "ĐÃ CÓ trong affiliates.json." : "CHƯA THẤY trong affiliates.json.", found ? "ok":"warn");
+  }catch(e){
+    toast("Không đọc được affiliates.json: "+e.message, "err");
+  }
+  const url = `/store.html?dev=1&sku=${encodeURIComponent(sku)}&v=${Date.now()}`;
+  window.open(url, '_blank');
+};
+
+// keep origin mirror
+$("#origin").addEventListener('input', ()=>$("#originOut").value=cleanUrl($("#origin").value));
+
+// Init diag once
+runDiag();
+</script>
+</body>
+</html>
