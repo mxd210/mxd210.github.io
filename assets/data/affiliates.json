@@ -1,5 +1,5 @@
 [
-   {
+  {
     "name": "Áo croptop ba lỗ nữ TOPTIFY",
     "price": 99000,
     "origin": "https://shopee.vn/%C3%81o-croptop-ba-l%E1%BB%97-n%E1%BB%AF-TOPTIFY-c%E1%BB%95-l%E1%BB%8D-tr%C6%A1n-s%C3%A1t-n%C3%A1ch-thun-bo-g%C3%A2n-co-gi%C3%A3n-form-basic-Trip-Away-Top-AC221-TTF023-i.408175384.11370273132?sp_atk=00f330f5-6016-46bd-984a-0120c7a353c6&xptdk=00f330f5-6016-46bd-984a-0120c7a353c6",
@@ -408,6 +408,20 @@
     "seo": {
       "description": "Máy cắt mạch/ron gạch 1200W, kèm hút bụi, gọn sạch — giá tham khảo 1.900.000 đ."
     }
+  },
+  {
+    "name": "COMBO 10 Miếng Mặt Nạ BANOBAGI PREMIUM Thế Hệ Mới, Dưỡng Da Chuyên Sâu",
+    "price": 174900,
+    "origin": "shopee.vn/COMBO-10-Miếng-Mặt-Nạ-BANOBAGI-PREMIUM-Thế-Hệ-Mới-Dưỡng-Da-Chuyên-Sâu-Dành-Cho-Mọi-Loại-Da-30ml-i.1469171260.28576819573?extraParams=%7B\"display_model_id\"%3A157690775767%2C\"model_selection_logic\"%3A3%7D&rModelId=157690775767&sp_atk=06b9747a-72a5-4753-b936-45c13bf9c4ea&vItemId=40124065713&vModelId=306953939591&vShopId=1506174776&xptdk=06b9747a-72a5-4753-b936-45c13bf9c4ea",
+    "merchant": "shopee",
+    "sku": "combo-10-mieng-mat-na-banobagi-premium-the-he-moi-duong-da-chuyen-sau",
+    "image": "/assets/img/products/sg-11134253-825aj-mftalqodc1l456.webp",
+    "category": "my-pham",
+    "brand": "",
+    "featured": true,
+    "status": true,
+    "updated_at": "2025-10-27T15:02:39.759Z",
+    "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=shopee.vn%2FCOMBO-10-Mi%E1%BA%BFng-M%E1%BA%B7t-N%E1%BA%A1-BANOBAGI-PREMIUM-Th%E1%BA%BF-H%E1%BB%87-M%E1%BB%9Bi-D%C6%B0%E1%BB%A1ng-Da-Chuy%C3%AAn-S%C3%A2u-D%C3%A0nh-Cho-M%E1%BB%8Di-Lo%E1%BA%A1i-Da-30ml-i.1469171260.28576819573%3FextraParams%3D%257B%22display_model_id%22%253A157690775767%252C%22model_selection_logic%22%253A3%257D%26rModelId%3D157690775767%26sp_atk%3D06b9747a-72a5-4753-b936-45c13bf9c4ea%26vItemId%3D40124065713%26vModelId%3D306953939591%26vShopId%3D1506174776%26xptdk%3D06b9747a-72a5-4753-b936-45c13bf9c4ea&sub1=sku&sub2=shopee&sub3=tool&sub4=mxd210"
   },
   {
     "name": "Combo Sữa tắm Dưỡng thể Dove 500g Da Mịn Hương Hoa 500g",
