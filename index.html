@@ -188,7 +188,8 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     /* Misc */
     .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%)}
     .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
-    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}
+    }
     .nav-link{ padding:8px 10px; border-radius:10px; color:var(--text); text-decoration:none; }
     .nav-link:hover{ background:rgba(255,106,0,.08) }
     .nav-link[aria-current="page"]{ background:#fff4ec; color:#b24900 }
@@ -418,8 +419,12 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       </ul>
     </section>
 
+    <!-- MTE deals mount point -->
+    <!-- MTE:DEALS-BLOCK -->
+
     <!-- SẢN PHẨM (affiliates.json) -->
     <h2 style="margin:16px 0 0">Sản phẩm mới</h2>
+    <!-- MTE:AB-CARD -->
     <div id="product-list" class="grid" aria-live="polite"></div>
     <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/assets/data/affiliates.json</code> (nguồn chuẩn) hoặc <code>/products.json</code> (fallback).</p>
     <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
@@ -612,6 +617,8 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   }
   </script>
 
+  <!-- MTE tracking mount -->
+  <!-- MTE:TRACKING -->
   <!-- MXD-ANCHOR:BODY-END -->
 </body>
 </html>
