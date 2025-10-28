@@ -128,18 +128,19 @@
           </a>
         </li>
         <li>
-  <a href="/store/my-pham.html" class="qnav-item">
-    <img src="/assets/img/categories/my-pham.webp" alt="Mỹ phẩm — MXD" width="28" height="28"
-         onerror="this.src='/assets/img/categories/placeholder.webp'"> Mỹ phẩm
-  </a>
-</li>
-
+          <a href="/store/my-pham.html" class="qnav-item">
+            <img src="/assets/img/categories/my-pham.webp" alt="Mỹ phẩm — MXD" width="28" height="28"
+                 onerror="this.src='/assets/img/categories/placeholder.webp'"> Mỹ phẩm
+          </a>
+        </li>
       </ul>
-      
     </section>
 
-    <!-- (ĐÃ BỎ) CATEGORY-GRID để tránh trùng hàng -->
+    <!-- MTE deals mount point -->
+    <!-- MTE:DEALS-BLOCK -->
 
+    <!-- Danh sách sản phẩm -->
+    <!-- MTE:AB-CARD -->
     <div id="product-list" class="grid" aria-live="polite"></div>
     <p id="empty" class="muted" style="display:none">Chưa có sản phẩm. Hãy thêm <code>/assets/data/affiliates.json</code> hoặc <code>/products.json</code>.</p>
     <noscript>Trang cần JavaScript để hiển thị danh sách sản phẩm.</noscript>
@@ -167,6 +168,9 @@
       navigator.serviceWorker.register('/sw.js?v=2025-09-30-mlz1');
     }
   </script>
+
+  <!-- MTE tracking mount -->
+  <!-- MTE:TRACKING -->
 </body>
 </html>
 <!-- /FILE -->
