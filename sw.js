@@ -11,7 +11,7 @@ FIND: MXD-CHECK v2025-10-06 [sw]
 */
 
 // sw.js — MXD PWA (2025-10-08)
-const VERSION = '2025-10-22-01'; // BUMP
+const VERSION = '2025-10-30-cong-cu-ops'; // BUMP
 
 
 const CACHE_PREFIX = 'mxd';
@@ -117,6 +117,13 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+
+  // ✅ MXD BYPASS: /cong-cu/* (hub công cụ) & /ops/* (API) → luôn network-only, không cache
+  if (url.origin === self.location.origin &&
+      (url.pathname.startsWith('/cong-cu/') || url.pathname.startsWith('/ops/'))) {
+    event.respondWith(fetch(req, { cache: 'no-store' }));
+    return;
+  }
 
   // ✅ BỎ QUA sitemap & robots: để trình duyệt/bot lấy trực tiếp từ network
   if (url.pathname.endsWith('.xml') || url.pathname === '/robots.txt') {
