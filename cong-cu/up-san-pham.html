@@ -1,0 +1,243 @@
+<!-- FILE:/cong-cu/up-san-pham.html -->
+<!-- MXD-CHECK v2025-10-30 [cong-cu/up-san-pham]
+- Canonical tuyệt đối; robots=noindex,nofollow
+- GA4 BEFORE /assets/mxd-affiliate.js
+- Form: repo, merchant, input links/CSV, upload CSV, upload ảnh .webp theo SKU, x-admin, API base
+- Flow: Preview → /ops/import ; Commit → /ops/commit
+- Bật gtag events: tools_upload_start/tools_upload_done/tools_error
+- SW đã bypass /cong-cu/* & /ops/* (network-only)
+FIND: MXD-ANCHOR:HEAD | MXD-ANCHOR:FORM | MXD-ANCHOR:SCRIPTS
+-->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Up sản phẩm | MXD</title>
+  <meta name="description" content="Dán link/CSV, chuẩn hóa theo affiliates.json, nhập ảnh .webp theo SKU, commit/PR vào repo.">
+  <link rel="canonical" href="https://mxd210.github.io/cong-cu/up-san-pham.html">
+  <meta name="robots" content="noindex,nofollow">
+
+  <!-- MXD-ANCHOR:HEAD -->
+  <link rel="stylesheet" href="/assets/site.css">
+  <!-- GA4 trước affiliate -->
+  <script defer src="/assets/analytics.js"></script>
+  <script defer src="/assets/mxd-affiliate.js"></script>
+
+  <style>
+    :root{ --border:#e5e7eb; --muted:#6b7280; --radius:12px }
+    body{ margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif; color:#111 }
+    header,footer{ border-bottom:1px solid var(--border); padding:12px 16px }
+    footer{ border-bottom:none;border-top:1px solid var(--border); margin-top:24px }
+    .container{ max-width:1040px; margin:0 auto; padding:0 16px }
+    h1{ font-size:24px; margin:12px 0 }
+    .muted{ color:var(--muted); font-size:13px }
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px }
+    @media (max-width:720px){ .grid{ grid-template-columns:1fr } }
+    label{ display:block; margin:10px 0 6px; font-weight:700 }
+    input[type=text],select,textarea{ width:100%; padding:10px; border:1px solid var(--border); border-radius:var(--radius) }
+    textarea{ min-height:160px }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 }
+    .btn{ padding:10px 14px; border-radius:12px; border:1px solid #111; background:#111; color:#fff; cursor:pointer }
+    .btn[disabled]{ opacity:.5; cursor:not-allowed }
+    .btn.outline{ background:#fff; color:#111 }
+    .chip{ display:inline-block; padding:6px 10px; border:1px solid var(--border); border-radius:999px; font-size:12px }
+    .table{ width:100%; border-collapse:collapse; margin:12px 0 }
+    .table th,.table td{ border:1px solid var(--border); padding:8px; font-size:14px; vertical-align:top }
+    .ok{ color:#059669 } .warn{ color:#d97706 } .err{ color:#dc2626 }
+    .back{ display:inline-block; margin:8px 0 10px; color:#ff6a00; text-decoration:none }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <a href="/cong-cu/" class="back">← Công cụ</a>
+      <strong>Up sản phẩm</strong>
+      <span class="muted">/cong-cu/up-san-pham.html (noindex)</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Up sản phẩm</h1>
+    <p class="muted">Luồng: dán Link/CSV → <b>Preview</b> (POST <code>/ops/import</code>) → <b>Commit</b> (POST <code>/ops/commit</code>). API chạy qua Worker, không lộ PAT.</p>
+
+    <!-- MXD-ANCHOR:FORM -->
+    <div class="grid">
+      <div>
+        <label>Repo đích</label>
+        <select id="repo">
+          <option value="mxd210/mxd210.github.io" selected>mxd210/mxd210.github.io</option>
+        </select>
+        <p class="muted">Nhập dạng <code>owner/repo</code> nếu dùng repo khác.</p>
+      </div>
+      <div>
+        <label>Merchant</label>
+        <select id="merchant">
+          <option value="shopee" selected>Shopee</option>
+          <option value="lazada">Lazada</option>
+          <option value="tiktok">TikTok</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Input (mỗi dòng 1 link, hoặc dán CSV đơn giản)</label>
+    <textarea id="input" placeholder="https://shopee.vn/product/... hoặc dán CSV cột: sku,name,price_vnd,merchant,origin_url"></textarea>
+
+    <div class="grid">
+      <div>
+        <label>Upload CSV (tùy chọn)</label>
+        <input type="file" id="csv" accept=".csv,text/csv"/>
+        <p class="muted">Nếu chọn file, nội dung sẽ tự đổ vào ô Input.</p>
+      </div>
+      <div>
+        <label>Ảnh sản phẩm (tùy chọn, .webp)</label>
+        <input type="file" id="images" accept=".webp" multiple/>
+        <p class="muted">Đặt tên <code>&lt;sku&gt;.webp</code> để mapping đúng chuẩn MXD.</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>Admin key (x-admin) — nếu Worker yêu cầu</label>
+        <input type="text" id="xadmin" placeholder="nhập khóa quản trị (nếu bật)"/>
+      </div>
+      <div>
+        <label>API base</label>
+        <input type="text" id="apibase" value="/ops"/>
+        <p class="muted">Mặc định gọi cùng origin: <code>/ops/import</code>, <code>/ops/commit</code>.</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn outline" id="btnPreview">Preview (parse)</button>
+      <button class="btn" id="btnCommit" disabled>Commit/PR</button>
+      <span id="status" class="chip">idle</span>
+    </div>
+
+    <div id="out"></div>
+  </main>
+
+  <footer>
+    <div class="container">© MXD — Up sản phẩm (noindex)</div>
+  </footer>
+
+  <!-- MXD-ANCHOR:SCRIPTS -->
+  <script>
+  const els = {
+    repo:    document.getElementById('repo'),
+    merch:   document.getElementById('merchant'),
+    input:   document.getElementById('input'),
+    csv:     document.getElementById('csv'),
+    images:  document.getElementById('images'),
+    xadmin:  document.getElementById('xadmin'),
+    apibase: document.getElementById('apibase'),
+    preview: document.getElementById('btnPreview'),
+    commit:  document.getElementById('btnCommit'),
+    out:     document.getElementById('out'),
+    status:  document.getElementById('status')
+  };
+
+  els.csv.addEventListener('change', async e=>{
+    const f = e.target.files?.[0]; if(!f) return;
+    const txt = await f.text();
+    els.input.value = txt.trim();
+  });
+
+  function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]))}
+  function table(rows){
+    if(!rows?.length) return '<p class="muted">Không có dữ liệu hiển thị.</p>';
+    const head = Object.keys(rows[0]||{});
+    return `<table class="table"><thead><tr>${
+      head.map(h=>`<th>${h}</th>`).join('')
+    }</tr></thead><tbody>${
+      rows.map(r=>`<tr>${head.map(h=>`<td>${escapeHtml(r[h])}</td>`).join('')}</tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  async function call(path, payload){
+    const url = (els.apibase.value.replace(/\/$/,'') + '/' + path.replace(/^\//,''));
+    const hdr = {'Content-Type':'application/json'};
+    if(els.xadmin.value) hdr['x-admin'] = els.xadmin.value;
+    const res = await fetch(url, {method:'POST', headers:hdr, body:JSON.stringify(payload)});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    return await res.json();
+  }
+
+  let lastPreview = null;
+
+  els.preview.addEventListener('click', async ()=>{
+    try{
+      els.status.textContent = 'parsing…';
+      const payload = {
+        repo: els.repo.value.trim(),
+        merchant: els.merch.value,
+        input: els.input.value.trim(),
+        options: { write:false, normalize:true }
+      };
+      try{ window.gtag && gtag('event','tools_upload_start',{repo:payload.repo,merchant:payload.merchant}); }catch(_){}
+      const data = await call('import', payload); // POST /ops/import
+      lastPreview = data;
+
+      const rows = (data.records||[]).map(x=>({
+        sku:x.sku, name:x.name, price_vnd:x.price_vnd, merchant:x.merchant,
+        origin_url:x.origin_url, image:x.image||(`/assets/img/products/${x.sku}.webp`),
+        preview:`/g.html?sku=${encodeURIComponent(x.sku)}`
+      }));
+      els.out.innerHTML = `<h2>Kết quả preview</h2>${table(rows)}
+        <p class="muted">Tổng: ${rows.length}. Kiểm tra SKU & ảnh trước khi commit.</p>`;
+      els.commit.disabled = !rows.length;
+      els.status.textContent = 'preview done';
+    }catch(err){
+      console.error(err);
+      els.status.textContent = 'error';
+      els.out.innerHTML = `<p class="err">Preview lỗi: ${escapeHtml(err.message||err)}.<br>Gợi ý: kiểm tra CORS của Worker (OPTIONS), và path <code>${escapeHtml(els.apibase.value)}/import</code>.</p>`;
+      try{ window.gtag && gtag('event','tools_error',{stage:'preview',msg:String(err)});}catch(_){}
+    }
+  });
+
+  els.commit.addEventListener('click', async ()=>{
+    if(!lastPreview?.records?.length) return;
+    try{
+      els.status.textContent = 'committing…';
+      const imgMap = {};
+      if(els.images.files?.length){
+        for(const f of els.images.files){
+          const sku = f.name.replace(/\.webp$/i,'');
+          const b64 = await fileToB64(f);
+          imgMap[sku] = { filename: f.name, content_b64: b64 };
+        }
+      }
+      const payload = {
+        repo: els.repo.value.trim(),
+        records: lastPreview.records,
+        images: imgMap,
+        options: { open_pr:true, message: "feat(store): import products via Up-san-pham tool" }
+      };
+      const data = await call('commit', payload); // POST /ops/commit
+      const rows = (data.results||[]).map(r=>({
+        sku:r.sku, status:r.status||'ok', pr:r.pr_url||'', view:`/g.html?sku=${encodeURIComponent(r.sku)}`
+      }));
+      els.out.innerHTML = `<h2>Commit/PR</h2>${table(rows)}
+        <p class="muted">Nếu Worker commit trực tiếp, cột PR có thể để trống.</p>`;
+      els.status.textContent = 'done';
+      try{ window.gtag && gtag('event','tools_upload_done',{repo:payload.repo,count:rows.length}); }catch(_){}
+    }catch(err){
+      console.error(err);
+      els.status.textContent = 'error';
+      els.out.innerHTML = `<p class="err">Commit lỗi: ${escapeHtml(err.message||err)}.<br>Gợi ý: xác nhận quyền ghi của Worker và cấu hình GitHub token.</p>`;
+      try{ window.gtag && gtag('event','tools_error',{stage:'commit',msg:String(err)});}catch(_){}
+    }
+  });
+
+  function fileToB64(file){
+    return new Promise((resolve,reject)=>{
+      const r = new FileReader();
+      r.onload = ()=> resolve(String(r.result).split(',').pop());
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+  </script>
+</body>
+</html>
+<!-- /FILE -->
