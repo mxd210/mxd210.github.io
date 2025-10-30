@@ -1,0 +1,32 @@
+name: mxdops-agent-v16
+
+on:
+  workflow_dispatch:
+    inputs:
+      links:
+        description: "Newline-separated product links"
+        required: false
+        default: ""
+  repository_dispatch:
+    types: [mxdops-queue]
+
+permissions:
+  contents: write
+  actions: read
+  pull-requests: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show inputs (debug)
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "--- LINKS FROM workflow_dispatch ---"
+          echo "${{ github.event.inputs.links }}"
+          echo "--- LINKS FROM repository_dispatch ---"
+          echo "${{ github.event.client_payload.links }}"
+          echo "Workflow online ✔"
