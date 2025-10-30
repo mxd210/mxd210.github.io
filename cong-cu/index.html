@@ -1,0 +1,89 @@
+<!-- FILE:/cong-cu/index.html -->
+<!-- MXD-CHECK v2025-10-30 [cong-cu/hub]
+- Canonical tuyệt đối; robots=noindex,nofollow
+- GA4 BEFORE /assets/mxd-affiliate.js (only once)
+- UI dạng lưới; Tile #1: Up sản phẩm → /cong-cu/up-san-pham.html
+- Bỏ SEO: không JSON-LD, không index
+- SW đã bypass /cong-cu/* (network-only)
+FIND: MXD-ANCHOR:HEAD | MXD-ANCHOR:TILES | MXD-ANCHOR:BODY-END
+-->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Công cụ | MXD</title>
+  <meta name="description" content="Khu vực Công cụ nội bộ của MXD: Up sản phẩm, Short Link, Price Tracker...">
+  <link rel="canonical" href="https://mxd210.github.io/cong-cu/">
+  <meta name="robots" content="noindex,nofollow">
+
+  <!-- MXD-ANCHOR:HEAD -->
+  <link rel="stylesheet" href="/assets/site.css">
+  <!-- GA4 trước affiliate -->
+  <script defer src="/assets/analytics.js"></script>
+  <script defer src="/assets/mxd-affiliate.js"></script>
+
+  <style>
+    :root{ --gap:18px; --border:#e5e7eb; --card:#fff; --muted:#6b7280; --radius:16px; }
+    body{ margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif; color:#111; }
+    header,footer{ border-bottom:1px solid var(--border); padding:12px 16px }
+    footer{ border-bottom:none;border-top:1px solid var(--border); margin-top:24px }
+    .container{ max-width:1040px; margin:0 auto; padding:0 16px; }
+    h1{ font-size:26px; margin:12px 0 }
+    .note{ color:var(--muted); font-size:13px; margin:6px 0 16px }
+    .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:var(--gap); margin:12px 0 24px }
+    .tile{ display:block; border:1px solid var(--border); border-radius:var(--radius); background:var(--card); padding:16px; text-decoration:none; color:#111 }
+    .tile:hover{ box-shadow:0 6px 20px rgba(0,0,0,.06); transform:translateY(-1px) }
+    .tile h3{ margin:0 0 8px; font-size:18px }
+    .tile p{ margin:0; color:var(--muted); line-height:1.5 }
+    .badge{ display:inline-block; font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid var(--border); margin-left:8px; color:#374151 }
+    .back{ display:inline-block; margin:6px 0 0; font-size:14px; color:#ff6a00; text-decoration:none }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <a href="/" class="brand" style="font-weight:900;font-size:20px;color:#111;text-decoration:none">MXD</a>
+      <span class="note">/cong-cu/ (noindex)</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Công cụ</h1>
+    <p class="note">Khu vực công cụ nội bộ. Một số tính năng cần <code>x-admin</code> và Cloudflare Worker để ghi dữ liệu.</p>
+
+    <!-- MXD-ANCHOR:TILES -->
+    <div class="grid" id="tools">
+      <a class="tile" href="/cong-cu/up-san-pham.html" data-tool="uploader">
+        <h3>Up sản phẩm</h3>
+        <p>Dán link/CSV → chuẩn hóa → preview → commit/PR vào repo đích. Hỗ trợ ảnh <code>.webp</code> theo SKU.</p>
+      </a>
+
+      <a class="tile" href="#" onclick="alert('Sắp ra mắt'); return false;">
+        <h3>Short Link <span class="badge">coming soon</span></h3>
+        <p>Rút gọn & gắn tham số tracking (sub1/sub2) chuẩn MXD, chống mất hoa hồng.</p>
+      </a>
+
+      <a class="tile" href="#" onclick="alert('Sắp ra mắt'); return false;">
+        <h3>Price Tracker <span class="badge">coming soon</span></h3>
+        <p>Thu thập giá theo cron, tạo <code>prices.json</code>, cảnh báo giảm giá.</p>
+      </a>
+    </div>
+
+    <a class="back" href="/">← Về trang chủ</a>
+  </main>
+
+  <footer>
+    <div class="container">© MXD — Khu vực Công cụ (noindex)</div>
+  </footer>
+
+  <!-- MXD-ANCHOR:BODY-END -->
+  <script>
+    // GA4: log mở tile
+    document.querySelectorAll('[data-tool]').forEach(el=>{
+      el.addEventListener('click', ()=>{ try{ window.gtag && gtag('event','tools_open',{tool:el.dataset.tool}); }catch(e){} });
+    });
+  </script>
+</body>
+</html>
+<!-- /FILE -->
