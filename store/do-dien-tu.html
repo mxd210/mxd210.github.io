@@ -105,4 +105,133 @@ FIND: MXD-CHECK v2025-11-02 [hub:/store/do-dien-tu.html]
     <section id="phu-kien">
       <h2>Phụ kiện</h2>
       <ul class="bullets">
-        <li>Sạc, cáp, pin
+        <li>Sạc, cáp, pin dự phòng, ốp lưng/film, giá đỡ, hub/adapter</li>
+      </ul>
+      <div class="product-grid" data-category="do-dien-tu" data-sub="phu-kien"></div>
+    </section>
+
+    <section id="smart-home">
+      <h2>Smart Home</h2>
+      <ul class="bullets">
+        <li>Camera Wi-Fi, cảm biến, công tắc/đèn thông minh, hub IoT</li>
+      </ul>
+      <div class="product-grid" data-category="do-dien-tu" data-sub="smart-home"></div>
+    </section>
+
+    <section id="gaming">
+      <h2>Gaming</h2>
+      <ul class="bullets">
+        <li>Console, tay cầm, bàn phím/chuột gaming, màn hình phụ</li>
+      </ul>
+      <div class="product-grid" data-category="do-dien-tu" data-sub="gaming"></div>
+    </section>
+  </main>
+
+  <footer class="container" style="margin-top:16px;border-top:1px solid var(--border,#eaeaea);padding:12px 0">
+    <p>Icon danh mục:
+      <img src="/assets/img/categories/do-dien-tu.webp" alt="Đồ điện tử — MXD" width="64" height="64" loading="lazy"
+           onerror="this.onerror=null;this.src='/assets/img/categories/placeholder.webp'"/>
+    </p>
+  </footer>
+
+  <!-- Guard + render -->
+  <script>
+    const ALLOW = /^do-dien-tu(-|$)/;
+    const SUBS = ['dien-thoai','may-tinh-bang','laptop','am-thanh','phu-kien','smart-home','gaming'];
+
+    function deaccent(str){ return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
+    function routeSub(p){
+      const s = deaccent((p.sku || p.name || '').toLowerCase());
+
+      if (/(iphone|galaxy|xiaomi|oppo|vivo|realme|pixel|dien[- ]?thoai|smartphone|phone)/.test(s)) return 'dien-thoai';
+      if (/(ipad|tablet|may[- ]?tinh[- ]?bang|tab)/.test(s)) return 'may-tinh-bang';
+      if (/(laptop|notebook|ultrabook|macbook|thinkpad|vivobook|ideapad)/.test(s)) return 'laptop';
+      if (/(tai[- ]?nghe|earbud|headphone|loa|bluetooth|dac|amp)/.test(s)) return 'am-thanh';
+      if (/(sac|adapter|cuong[- ]?luc|op[- ]?lung|case|cap|cable|power[- ]?bank|pin[- ]?du[- ]?phong|hub|dongle)/.test(s)) return 'phu-kien';
+      if (/(camera|wifi|zigbee|zwave|den[- ]?thong[- ]?minh|cong[- ]?tac|cam[- ]?bien|smart[- ]?home|iot)/.test(s)) return 'smart-home';
+      if (/(ps5|ps4|switch|xbox|console|tay[- ]?cam|gaming|chuot|ban[- ]?phim|mixer)/.test(s)) return 'gaming';
+
+      return 'dien-thoai';
+    }
+
+    function merchantFrom(u){
+      try{
+        const h = new URL(u).hostname;
+        if (h.includes('shopee')) return 'shopee';
+        if (h.includes('lazada')) return 'lazada';
+        if (h.includes('tiki'))   return 'tiki';
+        if (h.includes('tiktok')) return 'tiktok';
+      }catch(_){}
+      return '';
+    }
+
+    function escapeHTML(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;' }[m]))}
+    function escapeAttr(s){return String(s).replace(/"/g,'&quot;')}
+
+    function cardHTML(p){
+      const price = Number(p.price || 0);
+      const priceText = price ? price.toLocaleString('vi-VN') + '₫' : 'Liên hệ';
+      const url = p.origin || p.url || p.link || '#';
+      const name = escapeHTML(p.name || '');
+      const img = p.image || '/assets/img/products/placeholder.webp';
+      const m = merchantFrom(url);
+      const label = m ? `Mua ${m}` : 'Mua ngay';
+      return `
+      <article class="product-card" data-sku="${escapeAttr(p.sku||'')}" data-cat="${escapeAttr(p.category||'')}">
+        <a class="thumb" href="${url}" target="_blank" rel="nofollow sponsored noopener" data-origin="${url}" data-merchant="${m}">
+          <img loading="lazy" decoding="async"
+               src="${img}" alt="${name}"
+               onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+        </a>
+        <div class="body">
+          <h3 title="${name}"><a href="${url}" target="_blank" rel="nofollow sponsored noopener" data-origin="${url}" data-merchant="${m}">${name}</a></h3>
+          <div class="price">${priceText}</div>
+          <div class="actions">
+            <a class="btn" href="${url}" target="_blank" rel="nofollow sponsored noopener" data-origin="${url}" data-merchant="${m}">${label}</a>
+          </div>
+        </div>
+      </article>`;
+    }
+
+    async function renderCategory(){
+      const r = await fetch('/assets/data/affiliates.json',{cache:'no-store'}).catch(()=>null);
+      const raw = r && r.ok ? await r.json() : [];
+      const list0 = Array.isArray(raw) ? raw : (Array.isArray(raw.items) ? raw.items : []);
+
+      const valid = list0.filter(p => p && p.status !== false && p.category && ALLOW.test(String(p.category)));
+
+      const seen = new Set();
+      const list = valid.filter(p => {
+        const k = (p.sku||'').toLowerCase();
+        if (seen.has(k)) return false;
+        seen.add(k); return true;
+      });
+
+      const buckets = Object.fromEntries(SUBS.map(k => [k, []]));
+      for (const p of list){
+        const sub = routeSub(p);
+        if (buckets[sub]) buckets[sub].push(p);
+      }
+
+      document.querySelectorAll('.product-grid[data-category="do-dien-tu"]').forEach(grid=>{
+        const sub = grid.getAttribute('data-sub');
+        grid.innerHTML = (buckets[sub] || []).map(cardHTML).join('');
+      });
+
+      for (const sub of SUBS){
+        const grid = document.querySelector(`.product-grid[data-sub="${sub}"]`);
+        if (grid && !grid.children.length){
+          const pool = list.slice(0,8);
+          grid.innerHTML = pool.map(cardHTML).join('');
+        }
+      }
+
+      if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+      else if (window.MXD?.affRewrite) window.MXD.affRewrite();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => { renderCategory().catch(console.error); });
+  </script>
+</body>
+</html>
