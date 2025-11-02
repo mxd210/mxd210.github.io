@@ -1,0 +1,264 @@
+<!-- MXD-CHECK v2025-11-02 [hub:/store/do-gia-dung.html]
+- Canonical tuyệt đối; robots=index,follow; meta verify hiện diện
+- GA4 (/assets/analytics.js) TRƯỚC /assets/mxd-affiliate.js (duy nhất 1 lần)
+- OG: title/desc/url/image (≥1200×630 .webp) tuyệt đối
+- product-grid dùng data-category="do-gia-dung" (+ data-sub cho anchor)
+- Icon danh mục: /assets/img/categories/do-gia-dung.webp ; alt="Đồ gia dụng — MXD"
+- Không dán deep-link thủ công: luôn origin_url → affiliate script rewrite
+- SW: HTML network-first; assets SWR; bump sw.js nếu đổi asset
+FIND: MXD-CHECK v2025-11-02 [hub:/store/do-gia-dung.html]
+-->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Đồ gia dụng | MXD</title>
+  <meta name="description" content="Đồ gia dụng chọn lọc: nấu nướng, dọn vệ sinh, giặt sấy, nước uống & lọc không khí, điện gia dụng nhỏ — chuẩn MXD."/>
+  <link rel="canonical" href="https://mxd210.github.io/store/do-gia-dung.html"/>
+  <meta name="robots" content="index,follow"/>
+
+  <!-- VERIFY -->
+  <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o"/>
+
+  <!-- OG -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Đồ gia dụng | MXD"/>
+  <meta property="og:description" content="Nấu nướng, vệ sinh nhà cửa, giặt sấy, nước & không khí, điện gia dụng nhỏ — danh mục chuẩn MXD."/>
+  <meta property="og:url" content="https://mxd210.github.io/store/do-gia-dung.html"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/do-gia-dung-og.webp"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+
+  <link rel="stylesheet" href="/assets/site.css"/>
+
+  <!-- GA4 trước Affiliate (chuẩn MXD) -->
+  <script defer src="/assets/analytics.js"></script>
+
+  <!-- Aliases (nếu site dùng) -->
+  <script defer src="/assets/js/category-alias.js"></script>
+
+  <!-- Renderer sản phẩm -->
+  <script defer src="/assets/js/render-products.js"></script>
+
+  <!-- Affiliate luôn cuối cùng -->
+  <script defer src="/assets/mxd-affiliate.js"></script>
+
+  <style>
+    .container{max-width:1100px;margin:0 auto;padding:0 16px}
+    .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:8px 0 0}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border,#eaeaea);border-radius:12px;background:var(--card,#fff);text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.06);color:inherit}
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin:12px 0}
+    .product-card{display:flex;flex-direction:column;height:100%;border:1px solid var(--border,#eee);border-radius:12px;overflow:hidden;background:var(--card,#fff);box-shadow:0 6px 20px rgba(0,0,0,.04)}
+    .product-card .thumb{display:block;aspect-ratio:1/1;overflow:hidden;background:#fafafa}
+    .product-card img{width:100%;height:100%;object-fit:cover;display:block}
+    .product-card .body{padding:10px 10px 12px;display:flex;flex-direction:column;gap:6px}
+    .product-card h3{margin:0;font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
+    .product-card .price{font-weight:700}
+    .product-card .actions{margin-top:auto}
+    .product-card .btn{display:block;text-align:center;padding:8px 10px;border-radius:10px;background:#1746ff;color:#fff;text-decoration:none}
+    .bullets{padding-left:18px}
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="breadcrumb" style="padding:12px 0;border-bottom:1px solid var(--border,#eaeaea);margin-bottom:8px">
+      <a href="/">MXD</a> › <a href="/store.html">Cửa hàng</a> › <span>Đồ gia dụng</span>
+    </nav>
+    <h1>Đồ gia dụng</h1>
+    <p class="lead">Tập trung đồ dùng “đáng tiền” cho bếp núc, vệ sinh, giặt sấy, nước & không khí, và điện gia dụng nhỏ.</p>
+  </header>
+
+  <section class="container quick-nav">
+    <a href="#nau-nuong" class="chip">Nấu nướng</a>
+    <a href="#ve-sinh-nha-cua" class="chip">Vệ sinh nhà cửa</a>
+    <a href="#giat-say" class="chip">Giặt sấy</a>
+    <a href="#nuoc-khong-khi" class="chip">Nước &amp; không khí</a>
+    <a href="#dien-gia-dung-nho" class="chip">Điện gia dụng nhỏ</a>
+    <a href="#phu-kien" class="chip">Phụ kiện</a>
+  </section>
+
+  <main class="container">
+    <section id="nau-nuong">
+      <h2>Nấu nướng</h2>
+      <ul class="bullets">
+        <li>Nồi chiên không dầu, nồi cơm, lò nướng/vi sóng, bếp điện/điện từ</li>
+        <li>Nồi/chảo inox/nhôm đúc/chống dính; dao, thớt, dụng cụ sơ chế</li>
+      </ul>
+      <div class="product-grid" data-category="do-gia-dung" data-sub="nau-nuong"></div>
+    </section>
+
+    <section id="ve-sinh-nha-cua">
+      <h2>Vệ sinh nhà cửa</h2>
+      <ul class="bullets">
+        <li>Máy hút bụi, robot hút bụi/lau nhà, cây lau nhà, hoá chất vệ sinh</li>
+      </ul>
+      <div class="product-grid" data-category="do-gia-dung" data-sub="ve-sinh-nha-cua"></div>
+    </section>
+
+    <section id="giat-say">
+      <h2>Giặt sấy</h2>
+      <ul class="bullets">
+        <li>Máy giặt mini, máy sấy mini, bàn ủi/bàn là, dụng cụ phơi</li>
+      </ul>
+      <div class="product-grid" data-category="do-gia-dung" data-sub="giat-say"></div>
+    </section>
+
+    <section id="nuoc-khong-khi">
+      <h2>Nước &amp; không khí</h2>
+      <ul class="bullets">
+        <li>Máy lọc nước/bình lọc, máy lọc không khí, tạo ẩm, hút ẩm, quạt</li>
+      </ul>
+      <div class="product-grid" data-category="do-gia-dung" data-sub="nuoc-khong-khi"></div>
+    </section>
+
+    <section id="dien-gia-dung-nho">
+      <h2>Điện gia dụng nhỏ</h2>
+      <ul class="bullets">
+        <li>Ấm siêu tốc, máy xay sinh tố, ép chậm, máy sưởi, máy sấy tóc</li>
+      </ul>
+      <div class="product-grid" data-category="do-gia-dung" data-sub="dien-gia-dung-nho"></div>
+    </section>
+
+    <section id="phu-kien">
+      <h2>Phụ kiện</h2>
+      <ul class="bullets">
+        <li>Hộp đựng, khay/kệ, túi rác, bao tay, miếng bọt biển, khăn lau</li>
+      </ul>
+      <div class="product-grid" data-category="do-gia-dung" data-sub="phu-kien"></div>
+    </section>
+  </main>
+
+  <footer class="container" style="margin-top:16px;border-top:1px solid var(--border,#eaeaea);padding:12px 0">
+    <p>Icon danh mục:
+      <img src="/assets/img/categories/do-gia-dung.webp" alt="Đồ gia dụng — MXD" width="64" height="64" loading="lazy"
+           onerror="this.onerror=null;this.src='/assets/img/categories/placeholder.webp'"/>
+    </p>
+  </footer>
+
+  <!-- Guard + render -->
+  <script>
+    // Chỉ lấy các mục category bắt đầu bằng "do-gia-dung"
+    const ALLOW = /^do-gia-dung(-|$)/;
+    const SUBS = ['nau-nuong','ve-sinh-nha-cua','giat-say','nuoc-khong-khi','dien-gia-dung-nho','phu-kien'];
+
+    function deaccent(str){ return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
+    // Phân tuyến theo tên/sku bằng từ khoá VN/EN
+    function routeSub(p){
+      const s = deaccent((p.sku || p.name || '').toLowerCase());
+
+      // nấu nướng
+      if (/(noi|chao|noi-chien|air[- ]?fryer|noi-com|rice|lo-nuong|oven|vi-song|microwave|bep(-| )?(tu|dien)|induction)/.test(s))
+        return 'nau-nuong';
+
+      // vệ sinh
+      if (/(hut[- ]?bui|robot|lau[- ]?nha|cay[- ]?lau|nuoc[- ]?tay|ve[- ]?sinh|detergent|mop|vacuum)/.test(s))
+        return 've-sinh-nha-cua';
+
+      // giặt sấy
+      if (/(giat|may-giat|say|may-say|ban(-| )?ui|ban(-| )?la|iron|dryer)/.test(s))
+        return 'giat-say';
+
+      // nước & không khí
+      if (/(loc[- ]?nuoc|binh[- ]?loc|loc[- ]?khong[- ]?khi|tao[- ]?am|hut[- ]?am|quat|air|humid|dehumid|filter)/.test(s))
+        return 'nuoc-khong-khi';
+
+      // điện GD nhỏ
+      if (/(am[- ]?sieu[- ]?toc|kettle|xay|ep[- ]?cham|blender|heater|say[- ]?toc|hair[- ]?dryer|may[- ]?say[- ]?toc)/.test(s))
+        return 'dien-gia-dung-nho';
+
+      // phụ kiện
+      if (/(hop|khay|ke|tui[- ]?rac|gang[- ]?tay|bao[- ]?tay|mieng[- ]?bot[- ]?bien|khan)/.test(s))
+        return 'phu-kien';
+
+      // Mặc định: đổ vào "điện gia dụng nhỏ" để tránh lưới rỗng
+      return 'dien-gia-dung-nho';
+    }
+
+    function merchantFrom(u){
+      try{
+        const h = new URL(u).hostname;
+        if (h.includes('shopee')) return 'shopee';
+        if (h.includes('lazada')) return 'lazada';
+        if (h.includes('tiki'))   return 'tiki';
+        if (h.includes('tiktok')) return 'tiktok';
+      }catch(_){}
+      return '';
+    }
+
+    function escapeHTML(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;' }[m]))}
+    function escapeAttr(s){return String(s).replace(/"/g,'&quot;')}
+
+    function cardHTML(p){
+      const price = Number(p.price || 0);
+      const priceText = price ? price.toLocaleString('vi-VN') + '₫' : 'Liên hệ';
+      const url = p.origin || p.url || p.link || '#'; // origin trước, không deep-link tay
+      const name = escapeHTML(p.name || '');
+      const img = p.image || '/assets/img/products/placeholder.webp';
+      const m = merchantFrom(url);
+      const label = m ? `Mua ${m}` : 'Mua ngay';
+      return `
+      <article class="product-card" data-sku="${escapeAttr(p.sku||'')}" data-cat="${escapeAttr(p.category||'')}">
+        <a class="thumb" href="${url}" target="_blank" rel="nofollow sponsored noopener" data-origin="${url}" data-merchant="${m}">
+          <img loading="lazy" decoding="async"
+               src="${img}" alt="${name}"
+               onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+        </a>
+        <div class="body">
+          <h3 title="${name}"><a href="${url}" target="_blank" rel="nofollow sponsored noopener" data-origin="${url}" data-merchant="${m}">${name}</a></h3>
+          <div class="price">${priceText}</div>
+          <div class="actions">
+            <a class="btn" href="${url}" target="_blank" rel="nofollow sponsored noopener" data-origin="${url}" data-merchant="${m}">${label}</a>
+          </div>
+        </div>
+      </article>`;
+    }
+
+    async function renderCategory(){
+      const r = await fetch('/assets/data/affiliates.json',{cache:'no-store'}).catch(()=>null);
+      const raw = r && r.ok ? await r.json() : [];
+      const list0 = Array.isArray(raw) ? raw : (Array.isArray(raw.items) ? raw.items : []);
+
+      // Lọc đúng category
+      const valid = list0.filter(p => p && p.status !== false && p.category && ALLOW.test(String(p.category)));
+
+      // Khử trùng lặp theo sku (ưu tiên bản ghi đầu)
+      const seen = new Set();
+      const list = valid.filter(p => {
+        const k = (p.sku||'').toLowerCase();
+        if (seen.has(k)) return false;
+        seen.add(k); return true;
+      });
+
+      // Buckets theo SUBS
+      const buckets = Object.fromEntries(SUBS.map(k => [k, []]));
+      for (const p of list){
+        const sub = routeSub(p);
+        if (buckets[sub]) buckets[sub].push(p);
+      }
+
+      // Render
+      document.querySelectorAll('.product-grid[data-category="do-gia-dung"]').forEach(grid=>{
+        const sub = grid.getAttribute('data-sub');
+        grid.innerHTML = (buckets[sub] || []).map(cardHTML).join('');
+      });
+
+      // Fallback: nếu sub rỗng, đổ 6–8 item đầu
+      for (const sub of SUBS){
+        const grid = document.querySelector(`.product-grid[data-sub="${sub}"]`);
+        if (grid && !grid.children.length){
+          const pool = list.slice(0,8);
+          grid.innerHTML = pool.map(cardHTML).join('');
+        }
+      }
+
+      // Kích hoạt affiliate rewrite
+      if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+      else if (window.MXD?.affRewrite) window.MXD.affRewrite();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => { renderCategory().catch(console.error); });
+  </script>
+</body>
+</html>
