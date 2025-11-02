@@ -38,7 +38,13 @@ Policy:
   <changefreq>weekly</changefreq>
   <priority>0.9</priority>
 </url>
-
+<!-- INSERT into sitemap-store.xml -->
+<url>
+  <loc>https://mxd210.github.io/store/do-gia-dung.html</loc>
+  <lastmod>2025-11-02</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.85</priority>
+</url>
   <!-- Tool sẽ INSERT thêm các hub khác (may-cat, may-khoan-duc-vit, …) nếu thiếu -->
 
 </urlset>
