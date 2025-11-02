@@ -45,6 +45,12 @@ Policy:
   <changefreq>weekly</changefreq>
   <priority>0.85</priority>
 </url>
-  <!-- Tool sẽ INSERT thêm các hub khác (may-cat, may-khoan-duc-vit, …) nếu thiếu -->
+ <!-- INSERT -->
+<url>
+  <loc>https://mxd210.github.io/store/do-dien-tu.html</loc>
+  <lastmod>2025-11-02</lastmod>
+  <changefreq>weekly</changefreq>
+  <priority>0.86</priority>
+</url> <!-- Tool sẽ INSERT thêm các hub khác (may-cat, may-khoan-duc-vit, …) nếu thiếu -->
 
 </urlset>
