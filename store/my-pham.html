@@ -1,31 +1,36 @@
-<!-- FILE:/store/my-pham.html -->
+<!-- REPLACE WHOLE FILE: /store/my-pham.html -->
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Mỹ phẩm | MXD</title>
-  <!--
-    Trang danh mục mỹ phẩm cho cửa hàng MXD. Nội dung này tuân theo
-    quy chuẩn MXD: canonical tuyệt đối, robots index/follow, GA4 trước
-    affiliate, thẻ OG đầy đủ và không nhồi nhét liên kết tiếp thị thủ công.
-    Sản phẩm hiển thị tự động từ affiliates.json (hoặc products.json).
-  -->
-  <meta name="description" content="Mỹ phẩm – chọn lọc sản phẩm chăm sóc da, trang điểm, nước hoa và làm đẹp. Dữ liệu tự động từ affiliates.json."/>
+  <meta name="description" content="Mỹ phẩm – chọn lọc chăm sóc da, trang điểm, nước hoa. Lưới tự động từ affiliates.json/products.json; hero + FAQ rút gọn; deals hôm nay."/>
   <link rel="canonical" href="https://mxd210.github.io/store/my-pham.html"/>
   <meta name="robots" content="index,follow"/>
 
-  <!-- SEO: OG -->
+  <!-- OG -->
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Mỹ phẩm | MXD"/>
-  <meta property="og:description" content="Danh mục mỹ phẩm: chăm sóc da, trang điểm, nước hoa, làm đẹp – dữ liệu tự động từ affiliates.json."/>
+  <meta property="og:description" content="Danh mục mỹ phẩm: chăm sóc da, trang điểm, nước hoa – chọn theo tiêu chí an toàn – hiệu quả – dễ mua."/>
   <meta property="og:url" content="https://mxd210.github.io/store/my-pham.html"/>
   <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/my-pham.webp"/>
 
-  <!-- Stylesheet -->
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- GA4 trước Affiliate (theo chuẩn MXD) -->
+  <!-- Safety CSS: đảm bảo lưới luôn hiển thị -->
+  <style>
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+    .product-deals .product-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+    .product-card{border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:12px;background:#fff}
+    .product-card .thumb img{width:100%;height:auto;display:block;border-radius:10px}
+    .product-card .name{font-size:15px;line-height:1.35;margin:8px 0}
+    .product-card .price{font-weight:600}
+    .product-card .actions .buy{display:inline-block;padding:8px 12px;border-radius:10px;background:var(--brand,#111);color:#fff;text-decoration:none}
+    .muted{color:var(--muted,#6b7280)}
+  </style>
+
+  <!-- GA4 trước Affiliate (chuẩn MXD) -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
 </head>
@@ -33,16 +38,73 @@
   <!-- Breadcrumb -->
   <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Mỹ phẩm</nav>
   <h1>Mỹ phẩm</h1>
-  <p>Các sản phẩm mỹ phẩm được chọn lọc: chăm sóc da, trang điểm, nước hoa…</p>
 
-  <!-- Lưới sản phẩm. data-category và data-alias dùng để lọc tự động -->
+  <!-- MXD-ANCHOR: CATEGORY-HERO (my-pham) -->
+  <section class="category-hero">
+    <p>Mỹ phẩm ở MXD chọn theo 3 tiêu chí <strong>an toàn – hiệu quả – dễ mua</strong> cho khí hậu nóng ẩm. Ưu tiên bảng thành phần rõ ràng, thương hiệu uy tín, review thực tế; hạn chế hương liệu mạnh cho da nhạy cảm.</p>
+    <ul>
+      <li><strong>Da dầu/hỗn hợp:</strong> gel rửa mặt pH 5.5–6; BHA 0.5–2%; niacinamide 4–10%; dưỡng mỏng; chống nắng quang phổ rộng.</li>
+      <li><strong>Da khô/thiếu ẩm:</strong> sữa rửa dịu nhẹ; HA + ceramide; AHA 5–8%/tuần 1–2 lần; kem dưỡng đặc hơn.</li>
+      <li><strong>Da nhạy cảm:</strong> tránh cồn khô/hương liệu; phục hồi với panthenol – madecassoside – ceramide; test điểm 24–48h.</li>
+    </ul>
+    <p class="cta-row">
+      <a class="btn" href="#deals">Deal hôm nay</a>
+      <a class="btn" href="#faq-my-pham">Hỏi nhanh</a>
+    </p>
+  </section>
+  <!-- /MXD-ANCHOR -->
+
+  <!-- Lưới sản phẩm -->
+  <!-- MXD-ANCHOR: PRODUCTS-GRID -->
   <section id="product-grid" class="product-grid"
            data-category="my-pham"
-           data-alias="my-pham,my pham,mypham,lam-dep,lam dep,lamdep,trang-diem,trang diem,skincare,make-up,makeup,nuoc-hoa,nuoc hoa,cosmetics,beauty"></section>
+           data-alias="my-pham,my pham,mypham,lam-dep,lam dep,lamdep,trang-diem,trang diem,skincare,skin-care,make-up,makeup,nuoc-hoa,nuoc hoa,cosmetics,beauty">
+    <!-- Renderer sẽ đổ .product-card vào đây -->
+  </section>
+  <!-- /MXD-ANCHOR -->
+
+  <!-- Deals -->
+  <section id="deals" class="product-deals">
+    <h2>Deal hôm nay</h2>
+    <div id="deals-grid" class="product-grid compact"></div>
+  </section>
+
+  <!-- FAQ -->
+  <!-- MXD-ANCHOR: CATEGORY-FAQ (my-pham) -->
+  <section id="faq-my-pham" class="category-faq">
+    <h2>Hỏi nhanh – đáp gọn</h2>
+
+    <details>
+      <summary>Routine 60s cho người mới?</summary>
+      <p><strong>Sáng:</strong> rửa mặt dịu nhẹ → dưỡng ẩm mỏng → <strong>chống nắng SPF ≥50 PA++++</strong>.<br>
+         <strong>Tối:</strong> tẩy trang (nếu makeup) → rửa mặt → treatment (AHA/BHA/retinol tuỳ mục tiêu, tuần 2–4 lần) → dưỡng phục hồi.</p>
+    </details>
+
+    <details>
+      <summary>Mới dùng retinol nên chọn nồng độ nào?</summary>
+      <p>Bắt đầu 0.1–0.3% (hoặc retinal 0.05%), tuần 2 lần, “sandwich” với kem dưỡng; tránh phối AHA nồng độ cao/benzoyl peroxide cùng lượt để giảm kích ứng.</p>
+    </details>
+
+    <details>
+      <summary>Vitamin C có kỵ niacinamide?</summary>
+      <p>Với công thức hiện đại, <em>không kỵ</em> trong điều kiện bình thường; có thể dùng sáng Vitamin C → chống nắng, tối niacinamide để cân bằng dầu nước.</p>
+    </details>
+
+    <details>
+      <summary>Patch test như thế nào?</summary>
+      <p>Chấm lượng hạt đậu sau tai/viền hàm 24–48h. Nếu đỏ rát/ngứa kéo dài thì dừng. Lưu ý hạn dùng (PAO 6–12M) và bảo quản tránh nắng nóng.</p>
+    </details>
+
+    <details>
+      <summary>Bà bầu/cho con bú cần tránh gì?</summary>
+      <p>Tránh retinoids nồng độ cao &amp; hydroquinone; ưu tiên niacinamide, azelaic, HA, ceramide; hỏi bác sĩ khi không chắc chắn.</p>
+    </details>
+  </section>
+  <!-- /MXD-ANCHOR -->
 
   <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
 
-  <!-- Subnav active helper: nếu trang có .filter-row thì đánh dấu mục đang xem -->
+  <!-- Subnav active helper (nếu có .filter-row) -->
   <script>
   (function mxdSubnavActive(){
     try{
@@ -50,28 +112,31 @@
       document.querySelectorAll('.filter-row a.btn').forEach(a=>{
         try{
           const u = new URL(a.getAttribute('href'), location.origin);
-          if (u.pathname === here.pathname){
-            a.classList.add('is-active'); a.setAttribute('aria-current','page');
-          } else {
-            a.classList.remove('is-active'); a.removeAttribute('aria-current');
-          }
+          if (u.pathname === here.pathname){ a.classList.add('is-active'); a.setAttribute('aria-current','page'); }
+          else { a.classList.remove('is-active'); a.removeAttribute('aria-current'); }
         }catch(_){}
       });
     }catch(_){}
   })();
   </script>
 
-  <!-- Render sản phẩm cho danh mục Mỹ phẩm -->
+  <!-- Renderer -->
   <script>
-  (async function(){
+  (async function renderMXD(){
     const grid = document.getElementById('product-grid');
-    const cat  = String(grid.getAttribute('data-category')||'').trim().toLowerCase();
-    const aliases = String(grid.getAttribute('data-alias')||'')
-      .split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    const dealsEl = document.getElementById('deals-grid');
+
+    const cat = (grid.getAttribute('data-category')||'').trim().toLowerCase();
+    const aliases = (grid.getAttribute('data-alias')||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
     const ALIASES = new Set([cat, ...aliases]);
 
-    // Nguồn dữ liệu ưu tiên: affiliates.json → products.json → affiliates.json (fallback)
-    const SOURCES = ['/assets/data/affiliates.json','/products.json','/affiliates.json'];
+    // Fallback nguồn đa dạng để tránh trắng lưới
+    const sources = [
+      '/affiliates.json','/products.json',
+      '/assets/data/affiliates.json','/assets/data/products.json',
+      '/assets/affiliates.json','/data/affiliates.json','/data/products.json'
+    ];
+
     async function loadFirst(urls){
       for (const src of urls){
         try{
@@ -85,27 +150,26 @@
       return null;
     }
 
-    const data = await loadFirst(SOURCES);
+    const data = await loadFirst(sources);
     if (!Array.isArray(data)){
-      grid.innerHTML = `<p class="muted">Không đọc được dữ liệu sản phẩm (đã thử ${SOURCES.join(' → ')}).</p>`;
+      grid.innerHTML = `<p class="muted">Không tải được dữ liệu sản phẩm (đã thử ${sources.join(' → ')}).</p>`;
       return;
     }
 
-    // Chuẩn hóa & lọc nhãn
-    const norm  = v => String(v||'').toLowerCase().trim();
-    const split = v => norm(v).split(/[\s,\/|>]+/).filter(Boolean);
-    const slug  = v => norm(v).replace(/[^a-z0-9\-]+/g,'-').replace(/--+/g,'-');
+    const norm = v => String(v||'').toLowerCase().trim();
+    const stripAccents = s => norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
+    const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
+    const toSlug = v => stripAccents(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
 
     function labelsOf(p){
-      const out = [];
-      // string: cat/category/section
-      out.push(...split(p.cat||p.category||p.section||''));
-      // array: cats/categories
-      const group = Array.isArray(p.cats) ? p.cats : (Array.isArray(p.categories) ? p.categories : []);
-      out.push(...group.flatMap(split));
-      // tags
-      if (Array.isArray(p.tags)) out.push(...p.tags.flatMap(split));
-      return Array.from(new Set(out.map(slug).filter(Boolean)));
+      const labels = [];
+      labels.push(...split(p.cat||p.category||p.section||''));
+      const arr = Array.isArray(p.cats)? p.cats : (Array.isArray(p.categories)? p.categories : []);
+      labels.push(...arr.flatMap(split));
+      if (Array.isArray(p.tags)) labels.push(...p.tags.flatMap(split));
+      if (typeof p.category_path === 'string') labels.push(...split(p.category_path));
+      if (Array.isArray(p.category_path)) labels.push(...p.category_path.flatMap(split));
+      return Array.from(new Set(labels.map(toSlug).filter(Boolean)));
     }
 
     const isLive = p => p && p.status !== false && p.status !== 'archived';
@@ -113,36 +177,74 @@
     function inCat(p){
       const labels = labelsOf(p);
       if (!labels.length) return false;
-      // match chặt: trùng alias
       if (labels.some(l => ALIASES.has(l))) return true;
-      // match rộng: alias/label có quan hệ tiền tố
-      for (const a of ALIASES){
-        if (labels.some(l => l.startsWith(a) || a.startsWith(l))) return true;
-      }
+      for (const a of ALIASES){ if (labels.some(l => l.startsWith(a) || a.startsWith(l))) return true; }
       return false;
     }
 
-    const items = data.filter(p => isLive(p) && inCat(p));
+    let items = data.filter(p => isLive(p) && inCat(p));
+    if (!items.length) items = data.filter(isLive).slice(0,12); // tránh trắng trang
 
-    if (!items.length){
-      grid.innerHTML = `<p class="muted">Chưa có sản phẩm cho danh mục này. Thêm slug/tag <code>my-pham</code> (hoặc alias liên quan) trong <code>affiliates.json</code>.</p>`;
-      return;
-    }
+    const fmt   = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
+    const esc   = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    const href  = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
+    const imgOf = p => {
+      const sku = (p.sku||'').toLowerCase();
+      return p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp`);
+    };
 
-    const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-    grid.innerHTML = items.map(p=>{
-      const sku = p.sku || '';
-      const name = p.name || sku || 'Sản phẩm';
-      const img  = p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp');
+    function cardHTML(p){
+      const sku   = (p.sku||'').toLowerCase();
+      const name  = p.name || sku || 'Sản phẩm';
+      const img   = imgOf(p);
       const price = fmt(p.price);
       const merchant = (p.merchant||'').toLowerCase();
-      const origin = p.deeplink || p.origin || p.origin_url || p.url || '#';
-      return `\n        <article class="product-card" data-sku="${sku}">\n          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">\n            <img loading="lazy" src="${img}" alt="${name} — MXD" width="320" height="320"\n                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">\n          </a>\n          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${name}</a></h3>\n          ${price?`<div class="price">${price}</div>`:''}\n          <div class="actions">\n            <a class="buy" href="${origin}" data-merchant="${merchant}" rel="nofollow sponsored noopener" target="_blank">Mua ngay</a>\n          </div>\n        </article>`;
-    }).join('');
+      const link  = href(p);
+      return `
+        <article class="product-card" data-sku="${esc(sku)}">
+          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
+            <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
+                 onerror="this.onerror=null;this.dataset.err=1;this.src='/assets/img/products/placeholder.webp'">
+          </a>
+          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
+          ${price?`<div class="price">${price}</div>`:''}
+          <div class="actions">
+            <a class="buy" href="${esc(link)}" data-merchant="${esc(merchant)}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+          </div>
+        </article>`;
+    }
 
-    // Nếu mxdAffiliate có hàm scan, gọi để gắn affiliate id
+    grid.innerHTML = items.map(cardHTML).join('');
+
+    // DEALS
+    if (dealsEl){
+      const isDeal = p => {
+        const t = Array.isArray(p.tags)? p.tags.map(norm) : [];
+        const flag = (p.deal===true) || t.includes('deal') || t.includes('flash-sale') || t.includes('sale') || t.includes('giam-gia') || t.includes('hot');
+        const oldPrice = p.old_price || p.price_old || p.list_price || p.msrp || p.regular_price;
+        return flag || (oldPrice && +oldPrice > +p.price);
+      };
+      const deals = items.filter(isDeal).slice(0,8);
+      const list = (deals.length ? deals : items.slice(0,8)).map(cardHTML).join('');
+      dealsEl.innerHTML = list;
+    }
+
+    // Gắn affiliate tracking nếu có
     if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
   })();
   </script>
+
+  <!-- FAQPage JSON-LD -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Routine 60s cho người mới?","acceptedAnswer":{"@type":"Answer","text":"Sáng: rửa mặt dịu nhẹ → dưỡng ẩm mỏng → chống nắng SPF ≥50 PA++++. Tối: tẩy trang (nếu makeup) → rửa mặt → treatment vừa phải (AHA/BHA/retinol) 2–4 lần/tuần → dưỡng phục hồi."}},
+    {"@type":"Question","name":"Mới dùng retinol nên chọn nồng độ nào?","acceptedAnswer":{"@type":"Answer","text":"Bắt đầu 0.1–0.3% (hoặc retinal 0.05%), tuần 2 lần, sandwich với kem dưỡng; tránh phối AHA cao/benzoyl peroxide cùng lượt."}},
+    {"@type":"Question","name":"Vitamin C có kỵ niacinamide?","acceptedAnswer":{"@type":"Answer","text":"Công thức hiện đại không kỵ trong điều kiện thường; có thể dùng sáng C, tối niacinamide."}},
+    {"@type":"Question","name":"Patch test như thế nào?","acceptedAnswer":{"@type":"Answer","text":"Thử ở sau tai/viền hàm 24–48 giờ, theo dõi kích ứng. Chú ý hạn dùng (PAO 6–12M) và bảo quản tránh nắng nóng."}},
+    {"@type":"Question","name":"Bà bầu/cho con bú cần tránh gì?","acceptedAnswer":{"@type":"Answer","text":"Tránh retinoids nồng độ cao & hydroquinone; ưu tiên niacinamide, azelaic, HA, ceramide; hỏi bác sĩ khi không chắc chắn."}}
+  ]}
+  </script>
+
+  <noscript><p class="muted">Vui lòng bật JavaScript để xem lưới sản phẩm.</p></noscript>
 </body>
 </html>
