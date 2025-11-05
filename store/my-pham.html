@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Mỹ phẩm | MXD</title>
-  <meta name="description" content="Mỹ phẩm – chọn lọc chăm sóc da, trang điểm, nước hoa. Lưới tự động từ affiliates.json/products.json; hero + FAQ rút gọn; deals hôm nay."/>
+  <meta name="description" content="Mỹ phẩm – chọn lọc chăm sóc da, trang điểm, nước hoa. Lưới tự động từ affiliates.json/products.json; hero + FAQ; accordion 'Thông tin' trên từng sản phẩm; deals hôm nay."/>
   <link rel="canonical" href="https://mxd210.github.io/store/my-pham.html"/>
   <meta name="robots" content="index,follow"/>
 
@@ -18,16 +18,30 @@
 
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- Safety CSS: đảm bảo lưới luôn hiển thị -->
+  <!-- Safety CSS: đảm bảo lưới & accordion luôn hiển thị -->
   <style>
     .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
     .product-deals .product-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-    .product-card{border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:12px;background:#fff}
+    .product-card{position:relative;border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:12px;background:#fff;overflow:hidden}
     .product-card .thumb img{width:100%;height:auto;display:block;border-radius:10px}
     .product-card .name{font-size:15px;line-height:1.35;margin:8px 0}
     .product-card .price{font-weight:600}
     .product-card .actions .buy{display:inline-block;padding:8px 12px;border-radius:10px;background:var(--brand,#111);color:#fff;text-decoration:none}
     .muted{color:var(--muted,#6b7280)}
+
+    /* Hover brief (desktop) */
+    .hover-brief{position:absolute;inset:auto 12px 56px 12px;background:rgba(0,0,0,.7);color:#fff;border-radius:10px;padding:10px;line-height:1.35;font-size:12px;opacity:0;transform:translateY(8px);transition:.18s;pointer-events:none;max-height:92px;overflow:hidden}
+    @media (hover:hover){ .product-card:hover .hover-brief{opacity:1;transform:translateY(0)} }
+
+    /* Accordion trong thẻ */
+    .card-extra{margin-top:10px;border-top:1px dashed var(--line,#e5e7eb);padding-top:8px}
+    .card-extra>summary{cursor:pointer;list-style:none}
+    .card-extra>summary::-webkit-details-marker{display:none}
+    .card-extra>summary .toggle{display:inline-block;font-size:12px;padding:6px 10px;border-radius:999px;background:var(--chip,#f3f4f6);border:1px solid var(--line,#e5e7eb)}
+    .card-extra[open]>summary .toggle{background:#fff}
+    .card-extra .info{font-size:13px;line-height:1.4;margin-top:6px}
+    .card-extra .info ul{margin:6px 0 0 18px;padding:0}
+    .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--chip,#f3f4f6);border:1px solid var(--line,#e5e7eb);margin-right:6px;margin-top:4px}
   </style>
 
   <!-- GA4 trước Affiliate (chuẩn MXD) -->
@@ -161,6 +175,8 @@
     const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
     const toSlug = v => stripAccents(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
 
+    const SK_MAP = { 'dau':'Da dầu','hon-hop':'Da hỗn hợp','kho':'Da khô','nhay-cam':'Da nhạy cảm','thuong':'Da thường' };
+
     function labelsOf(p){
       const labels = [];
       labels.push(...split(p.cat||p.category||p.section||''));
@@ -193,6 +209,22 @@
       return p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp`);
     };
 
+    function asArray(val){
+      if (!val) return [];
+      if (Array.isArray(val)) return val.map(v=>String(v));
+      // tách theo dấu phẩy / chấm phẩy / gạch
+      return String(val).split(/[;,|/]+/).map(s=>s.trim()).filter(Boolean);
+    }
+
+    function skinBadges(p){
+      const raw = asArray(p.skin_types || p.skin || p.skin_type);
+      if (!raw.length) return '';
+      const normed = raw.map(x=>toSlug(x));
+      const labels = normed.map(k => SK_MAP[k] || xTitle(k));
+      function xTitle(s){ return s.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()); }
+      return labels.map(l=>`<span class="badge">${esc(l)}</span>`).join(' ');
+    }
+
     function cardHTML(p){
       const sku   = (p.sku||'').toLowerCase();
       const name  = p.name || sku || 'Sản phẩm';
@@ -200,17 +232,39 @@
       const price = fmt(p.price);
       const merchant = (p.merchant||'').toLowerCase();
       const link  = href(p);
+
+      const desc  = p.desc_short || p.short_desc || p.description_short || '';
+      const ings  = asArray(p.ingredients).slice(0,8);
+      const how   = p.how_to_use || p.usage || '';
+      const notes = p.notes || p.cautions || '';
+
+      const ingHtml = ings.length ? `<div><strong>Thành phần chính:</strong><ul>${ings.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>` : '';
+      const skinHtml = skinBadges(p) ? `<div><strong>Phù hợp da:</strong><div>${skinBadges(p)}</div></div>` : '';
+      const howHtml = how ? `<div><strong>Cách dùng:</strong> <span>${esc(how)}</span></div>` : '';
+      const noteHtml = notes ? `<div><strong>Lưu ý:</strong> <span>${esc(notes)}</span></div>` : '';
+
+      const infoBlock = (desc || ingHtml || skinHtml || howHtml || noteHtml) ? `
+        <details class="card-extra">
+          <summary><span class="toggle">ⓘ Thông tin</span></summary>
+          <div class="info">
+            ${desc ? `<div>${esc(desc)}</div>` : ''}
+            ${ingHtml}${skinHtml}${howHtml}${noteHtml}
+          </div>
+        </details>` : '';
+
       return `
         <article class="product-card" data-sku="${esc(sku)}">
           <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
             <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
                  onerror="this.onerror=null;this.dataset.err=1;this.src='/assets/img/products/placeholder.webp'">
           </a>
+          ${desc ? `<div class="hover-brief">${esc(desc.length>170?desc.slice(0,167)+'…':desc)}</div>` : ''}
           <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
           ${price?`<div class="price">${price}</div>`:''}
           <div class="actions">
             <a class="buy" href="${esc(link)}" data-merchant="${esc(merchant)}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
           </div>
+          ${infoBlock}
         </article>`;
     }
 
@@ -231,6 +285,26 @@
 
     // Gắn affiliate tracking nếu có
     if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+
+    // SEO: bơm ItemList JSON-LD cho 8–12 sản phẩm đầu
+    try{
+      const top = items.slice(0, Math.min(items.length, 12));
+      const itemList = {
+        "@context":"https://schema.org",
+        "@type":"ItemList",
+        "itemListElement": top.map((p,i)=>({
+          "@type":"ListItem",
+          "position": i+1,
+          "url": location.origin + "/g.html?sku=" + encodeURIComponent((p.sku||'').toLowerCase()),
+          "name": p.name || (p.sku||'').toLowerCase()
+        }))
+      };
+      const el = document.createElement('script');
+      el.type = 'application/ld+json';
+      el.id = 'mxd-itemlist';
+      el.textContent = JSON.stringify(itemList);
+      document.body.appendChild(el);
+    }catch(_){}
   })();
   </script>
 
