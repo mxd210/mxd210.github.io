@@ -1,4 +1,3 @@
-<!-- REPLACE WHOLE FILE: /tools/mxd-importer-v4.4.1.html -->
 <!doctype html>
 <html lang="vi">
 <head>
@@ -349,12 +348,12 @@ const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 function on(id, ev, fn){
   const el = document.getElementById(id);
-  if(!el){ try{ log(\`[bind] thiếu #\${id}\`); }catch(_){}; return false; }
+  if(!el){ try{ log(`[bind] thiếu #${id}`); }catch(_){}; return false; }
   el.addEventListener(ev, fn, {passive:true});
   return true;
 }
 function toast(msg,cls=''){ const t=$("#toast"); if(!t) return; t.textContent=msg; t.className='toast show '+cls; setTimeout(()=>{ if(t.classList.contains('show')) t.className='toast'; },4500); }
-function log(msg){ const d=$("#debugLog"); if(!d) return; const old=d.textContent && d.textContent!=='–' ? d.textContent + "\\n" : ""; d.textContent = old + msg; d.scrollTop = d.scrollHeight; }
+function log(msg){ const d=$("#debugLog"); if(!d) return; const old=d.textContent && d.textContent!=='–' ? d.textContent + "\n" : ""; d.textContent = old + msg; d.scrollTop = d.scrollHeight; }
 window.addEventListener('error', e => { log('[runtime] '+e.message); toast('Lỗi script: '+e.message, 'err'); });
 window.addEventListener('unhandledrejection', e => { log('[promise] '+(e.reason?.message||e.reason||'unknown')); });
 
@@ -421,7 +420,7 @@ function loadSettings(){
   const s=readSettings(); settingsToUi(s);
   if($("#tplShopee") && !$("#tplShopee").value) $("#tplShopee").value=DEFAULT_TPL_SHOPEE;
   if($("#tplLazada") && !$("#tplLazada").value) $("#tplLazada").value=DEFAULT_TPL_LAZADA;
-  if($("#tplTiki")   && !$("#tplTiki").value)   $("#tplTiki").value=DEFAULT_TPL_TIKI;
+  if($("#tplTiki")   && !($("#tplTiki").value))   $("#tplTiki").value=DEFAULT_TPL_TIKI;
   if($("#tplTiktok") && !$("#tplTiktok").value) $("#tplTiktok").value=DEFAULT_TPL_TIKTOK;
   if($("#settingsStatus")) $("#settingsStatus").textContent="Đã tải cài đặt.";
 }
@@ -482,7 +481,8 @@ on('btnTestUpload','click', async ()=>{
     const text=await r.text().catch(()=>'' );
     log(`[TEST UPLOAD] ${r.status} ${r.ok?'OK':'FAIL'} — ${text.slice(0,180)}`);
     toast(r.ok?'Test upload OK':'Test upload FAIL '+r.status, r.ok?'ok':'err');
-  }catch(e){ log("[TEST UPLOAD] Lỗi: "+e.message); toast("Test upload lỗi.","err"); }
+  }catch(e){ log("[TEST UPLOAD] Lỗi: "+e.message); toast("Test upload lỗi.","err");
+  }
 });
 
 /* Folder help */
@@ -734,7 +734,7 @@ function renderQueue(){
 }
 on('btnConvertAll','click', async ()=>{ for(const it of queue){ await queueProcess(it); } toast("Đã convert tất cả.","ok"); renderQueue(); });
 on('btnDownloadAll','click', ()=>{ for(const it of queue){ if(!it.outBlob) continue; const a=document.createElement('a'); a.href=URL.createObjectURL(it.outBlob); a.download=it.name+'.'+getExt(it.fmt||'webp'); a.click(); } });
-on('btnUploadAll','click', async ()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } for(const it of queue){ const row=document.querySelector(\`tr[data-id="\${it.id}"] .status\`); await uploadItem(it,row); } toast("Upload tất cả xong (xem trạng thái từng mục).","ok"); });
+on('btnUploadAll','click', async ()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } for(const it of queue){ const row=document.querySelector(`tr[data-id="${it.id}"] .status`); await uploadItem(it,row); } toast("Upload tất cả xong (xem trạng thái từng mục).","ok"); });
 on('btnClearQueue','click', ()=>{ queue.length=0; renderQueue(); });
 
 /* Upload */
@@ -1004,13 +1004,13 @@ on('btnClearAllFields','click', ()=>{
   toast("Đã xoá toàn bộ thông tin sản phẩm.","ok");
 });
 
-/* Clear buttons */
+/* Clear buttons (tự gắn cho input thường + GẮN LẠI cho clear-btn đã có sẵn trong .input-wrap) */
 function installClearers(){
   const sels=['#name','#sku','#price','#origin','#image','#category','#brand','#deeplink'];
   for(const sel of sels){
     const el=document.querySelector(sel); if(!el) continue;
     if(el.parentElement && el.parentElement.classList.contains('input-wrap')){
-      if(!el.parentElement.querySelector('.clear-btn')) addClearButton(el.parentElement, el);
+      bindExistingClearBtn(el.parentElement, el);
       continue;
     }
     const wrap=document.createElement('div'); wrap.className='input-wrap'+(el.tagName==='TEXTAREA'?' textarea':''); el.parentNode.insertBefore(wrap,el); wrap.appendChild(el); addClearButton(wrap, el);
@@ -1020,6 +1020,15 @@ function addClearButton(wrap, el){
   const b=document.createElement('button'); b.type='button'; b.className='clear-btn'; b.title='Xoá'; b.setAttribute('aria-label','Xoá'); b.textContent='×';
   b.onclick=(e)=>{ e.preventDefault(); el.value=''; el.dispatchEvent(new Event('input',{bubbles:true})); el.focus(); };
   wrap.appendChild(b);
+}
+function bindExistingClearBtn(wrap, el){
+  const b=wrap.querySelector('.clear-btn');
+  if(b && !b.dataset.bound){
+    b.dataset.bound='1';
+    b.addEventListener('click',(e)=>{ e.preventDefault(); el.value=''; el.dispatchEvent(new Event('input',{bubbles:true})); el.focus(); });
+  }else if(!b){
+    addClearButton(wrap, el);
+  }
 }
 installClearers();
 
