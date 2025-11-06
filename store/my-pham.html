@@ -26,6 +26,8 @@
     .product-card .thumb img{width:100%;height:auto;display:block;border-radius:10px}
     .product-card .name{font-size:15px;line-height:1.35;margin:8px 0}
     .product-card .price{font-weight:600}
+    .price-old{ text-decoration:line-through;color:var(--muted,#6b7280);font-size:13px;margin-top:2px }
+.off-badge{position:absolute;top:8px;left:8px;border-radius:8px;padding:2px 6px;font-size:12px;background:#f43f5e;color:#fff;font-weight:700}
     .product-card .actions .buy{display:inline-block;padding:8px 12px;border-radius:10px;background:var(--brand,#111);color:#fff;text-decoration:none}
     .muted{color:var(--muted,#6b7280)}
     .hover-brief{position:absolute;inset:auto 12px 56px 12px;background:rgba(0,0,0,.7);color:#fff;border-radius:10px;padding:10px;line-height:1.35;font-size:12px;opacity:0;transform:translateY(8px);transition:.18s;pointer-events:none;max-height:92px;overflow:hidden}
@@ -251,17 +253,57 @@
 
       grid.innerHTML = items.map(cardHTML).join('');
 
-      // Deals
-      if (dealsEl){
-        function isDeal(p){
-          const t = Array.isArray(p.tags)? p.tags.map(s=>String(s).toLowerCase()) : [];
-          const flag = (p.deal===true) || t.includes('deal') || t.includes('flash-sale') || t.includes('sale') || t.includes('giam-gia') || t.includes('hot');
-          const oldPrice = p.old_price || p.price_old || p.list_price || p.msrp || p.regular_price;
-          return flag || (oldPrice && +oldPrice > +p.price);
-        }
-        const deals = items.filter(isDeal).slice(0,8);
-        dealsEl.innerHTML = (deals.length?deals:items.slice(0,8)).map(cardHTML).join('');
-      }
+   // DEALS — lấp đầy #deals, có % giảm + giá cũ
+if (dealsEl){
+  const oldPriceOf = p => p.old_price ?? p.price_old ?? p.list_price ?? p.msrp ?? p.regular_price ?? null;
+  const discountOf = p => {
+    const pct = p.discount_percent ?? p.sale_percent ?? p.off_percent ?? null;
+    if (pct!=null && isFinite(+pct)) return Math.round(Math.abs(+pct));
+    const op = oldPriceOf(p);
+    if (op && p.price && +op > +p.price) return Math.round((1 - (+p.price/+op))*100);
+    return 0;
+  };
+  const isDeal = p => {
+    const t = Array.isArray(p.tags)? p.tags.map(s=>String(s).toLowerCase()) : [];
+    const flag = (p.deal===true) || t.includes('deal') || t.includes('flash-sale') || t.includes('sale') || t.includes('giam-gia') || t.includes('hot');
+    const op = oldPriceOf(p);
+    return flag || (op && +op > +p.price) || (discountOf(p) > 0);
+  };
+
+  function dealCardHTML(p){
+    const sku = String(p.sku||'').toLowerCase();
+    const name = p.name || sku || 'Sản phẩm';
+    const img  = imgOf(p);
+    const link = p.deeplink || p.origin_url || p.origin || p.url || '#';
+    const merchant = String(p.merchant||'').toLowerCase();
+    const priceNow = fmt(p.price);
+    const priceOld = oldPriceOf(p);
+    const pct = discountOf(p);
+
+    const desc = p.desc_short || p.short_desc || p.description_short || '';
+    return `
+      <article class="product-card" data-sku="${esc(sku)}">
+        ${pct?`<div class="off-badge">-${pct}%</div>`:''}
+        <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
+          <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
+               onerror="this.onerror=null;this.dataset.err=1;this.src='/assets/img/products/placeholder.webp'">
+        </a>
+        ${desc ? `<div class="hover-brief">${esc(desc.length>170?desc.slice(0,167)+'…':desc)}</div>` : ''}
+        <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
+        ${priceNow?`<div class="price">${priceNow}</div>`:''}
+        ${priceOld?`<div class="price-old">${fmt(priceOld)}</div>`:''}
+        <div class="actions">
+          <a class="buy" href="${esc(link)}" data-merchant="${esc(merchant)}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+        </div>
+      </article>`;
+  }
+
+  // Lọc deal trong danh mục, sắp xếp theo % giảm ↓ rồi lấy 8–12 món
+  let deals = items.filter(isDeal);
+  deals.sort((a,b) => (discountOf(b)||0) - (discountOf(a)||0) || (+a.price||0) - (+b.price||0));
+  const list = (deals.length ? deals : items).slice(0,12).map(dealCardHTML).join('');
+  dealsEl.innerHTML = list;
+}
 
       // Affiliate scan (không dùng optional chaining)
       try{
