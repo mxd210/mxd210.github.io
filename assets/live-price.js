@@ -1,7 +1,7 @@
 // REPLACE WHOLE FILE: /assets/live-price.js
 // MXD Live Price v1.0.0 — gọi mxd-price-proxy và cập nhật giá trên lưới
 (() => {
-  const PRICE_API = window.MXD_PRICE_API || "https://<YOUR-WORKER-SUBDOMAIN>.workers.dev";
+  const PRICE_API = window.MXD_PRICE_API || "https://mxd-price-proxy.mxd6686.workers.dev";
   const cards = Array.from(document.querySelectorAll(".product-card"));
 
   if (!cards.length) return;
