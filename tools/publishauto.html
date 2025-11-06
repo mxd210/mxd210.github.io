@@ -1,20 +1,22 @@
-<!-- REPLACE WHOLE FILE: /tool/mxd-importer-v4.4.1.html -->
+<!-- REPLACE WHOLE FILE: /importer.html (MXD Importer v4.4.1) -->
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>MXD Importer v4.4.1 — Multi-format + Size Presets + Auto-Compress + TikTok/Tiki + ClearAll + Shortlink</title>
   <meta name="robots" content="noindex,follow"/>
+  <!-- MXD-ANCHOR: IMPORTER V441 -->
   <style>
     :root{
       --bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--b:#152132;--accent:#7cc4ff;
-      --ok:#34d399;--warn:#f59e0b;--err:#ef4444;--toast-bottom: max(12px, env(safe-area-inset-bottom));
+      --ok:#34d399;--warn:#f59e0b;--err:#ef4444;--toast-bottom: 12px;
     }
     *{box-sizing:border-box}
-    html,body{margin:0}
-    body{background:var(--bg);color:var(--fg);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto}
-    h1,h2{margin:16px 0 8px} h1{font-size:20px} h2{font-size:16px;color:#cfe5ff}
+    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto}
+    h1,h2{margin:16px 0 8px}
+    h1{font-size:20px}
+    h2{font-size:16px;color:#cfe5ff}
     a{color:#7cc4ff}
     .wrap{max-width:1160px;margin:0 auto;padding:16px}
     .grid{display:grid;gap:12px}
@@ -22,16 +24,13 @@
     @media (max-width:900px){ .g2{grid-template-columns:1fr} }
     .card{background:var(--b);border:1px solid #223348;border-radius:12px;padding:14px}
     label{display:block;font-weight:700;margin:8px 0 6px;color:#cfe5ff}
-    input,select,textarea,button{width:100%;padding:12px;border-radius:12px;border:1px solid #2b3b52;background:#0f1622;color:var(--fg);min-height:44px}
-    textarea{min-height:84px;resize:vertical}
-    input[type=number]{-moz-appearance:textfield}
-    input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{ -webkit-appearance:none;margin:0 }
+    input,select,textarea,button{width:100%;padding:10px;border-radius:10px;border:1px solid #2b3b52;background:#0f1622;color:var(--fg)}
+    textarea{min-height:70px;resize:vertical}
     .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .row>*{flex:1}
     .small{font-size:12px;color:#a7b4c2}
-    .btn{cursor:pointer;border:1px solid #2b3b52;background:#102235;-webkit-tap-highlight-color:transparent}
+    .btn{cursor:pointer;border:1px solid #2b3b52;background:#102235}
     .btn:hover{background:#132a43}
-    .btn:active{transform:translateY(1px)}
     .btn.primary{background:#0b3a5e;border-color:#0b3a5e}
     .btn.primary:hover{background:#0d4570}
     .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #2a3b55;color:#a4bee8}
@@ -39,21 +38,17 @@
     .deeplink-box{border:2px dashed #2f4666;border-radius:12px;padding:10px;background:#0c1623}
     .deeplink-text{font-size:13px;font-weight:600}
     .sticky-actions{position:sticky;bottom:0;background:linear-gradient(0deg,#0b0f14 60%,#0b0f1400);padding:12px;border-top:1px solid #1b2a3f;z-index:9}
-    .sticky-actions .btn{flex:unset}
     .drop{border:2px dashed #3a5270;border-radius:12px;padding:16px;text-align:center;background:#0c1623}
     .drop.dragover{border-color:#8ab9ff;background:#0f1e32}
     .preview{display:flex;gap:12px;align-items:center}
     .preview img{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid #27405e}
     .toast{position:fixed;right:12px;bottom:var(--toast-bottom);display:none;max-width:520px;background:#122232;border:1px solid #2b425e;border-radius:12px;padding:12px;box-shadow:0 10px 30px #0008;z-index:99999;pointer-events:none}
     .toast.show{display:block}
-    .toast.ok{border-color:#1f4c3e}
-    .toast.warn{border-color:#5c4a1a}
-    .toast.err{border-color:#5c1a1a}
     code.inline{background:#0e1622;border:1px solid #223449;border-radius:6px;padding:2px 6px}
     .badge{display:inline-block;border:1px solid #2b3b52;border-radius:999px;padding:2px 8px;font-size:11px;color:#a4bee8}
 
     /* Batch queue */
-    table.queue{width:100%;border-collapse:separate;border-spacing:0 8px;min-width:760px}
+    table.queue{width:100%;border-collapse:separate;border-spacing:0 8px}
     table.queue th, table.queue td{font-size:13px;vertical-align:middle}
     table.queue th{color:#cfe5ff;text-align:left;padding:6px 8px}
     table.queue td{background:#0d1826;border:1px solid #23364b;padding:6px 8px}
@@ -61,44 +56,49 @@
     table.queue td:last-child{border-radius:0 10px 10px 0}
     .thumb{width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid #27405e;background:#0a1320}
     .mini{display:flex;gap:6px;align-items:center}
+    .w-auto{width:auto}
     .nowrap{white-space:nowrap}
-    .btn.sm{padding:8px 10px;border-radius:10px;min-height:38px}
+    .btn.sm{padding:6px 10px;border-radius:8px}
     .controls{display:flex;gap:6px;flex-wrap:wrap}
     .status{font-size:12px}
     .muted{color:#8fa5bd}
 
     /* Clear buttons */
     .input-wrap{position:relative;width:100%}
-    .input-wrap > input, .input-wrap > textarea{padding-right:44px}
+    .input-wrap > input, .input-wrap > textarea{padding-right:40px}
     .clear-btn{
       position:absolute; right:8px; top:50%; transform:translateY(-50%);
-      width:32px; height:32px; border-radius:10px;
+      width:28px; height:28px; border-radius:8px;
       border:1px solid #ff8585; background:#2b0f12; color:#ffd1d1;
       display:grid; place-items:center; font-weight:900; line-height:1;
       box-shadow:0 0 0 1px #590e0e inset;
     }
     .input-wrap.textarea .clear-btn{ top:10px; transform:none }
-    .helpbox{background:#0c1623;border:1px solid #2b3b52;border-radius:10px;padding:8px}
+
+    /* Image options */
     .opts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-    .opts .span2{grid-column:span 2} .opts .span4{grid-column:span 4}
-    @media (max-width:900px){ .opts{grid-template-columns:1fr 1fr} .opts .span4{grid-column:span 2} }
+    .opts .span2{grid-column:span 2}
+    .opts .span4{grid-column:span 4}
+    .range{display:flex;gap:8px;align-items:center}
+    .range input[type=range]{flex:1}
+    .helpbox{background:#0c1623;border:1px solid #2b3b52;border-radius:10px;padding:8px}
   </style>
 </head>
 <body>
 <div class="wrap">
   <h1>MXD Importer v4.4.1 <span class="pill">Multi-format</span> <span class="pill">Size Presets</span> <span class="pill">Auto-Compress</span> <span class="pill">TikTok/Tiki</span> <span class="pill">Shortlink</span></h1>
-  <div class="small">Gợi ý tiếng Việt cho thư mục; thêm ô “Link rút gọn”; sửa Convert/Nén để tái xử lý từ nguồn; fix Upload 400 cho OG 1200×630; khôi phục Gen commit. <b>v4.4.1-m1 (mobile)</b></div>
+  <div class="small">Không kèm sẵn template affiliate/Worker. Hỗ trợ di động đầy đủ; thêm Batch Queue + các nút Copy/Mở; toast cảnh báo rõ ràng khi thiếu cấu hình.</div>
 
   <div class="card">
     <h2>1) Cài đặt (lưu vào trình duyệt)</h2>
     <div class="grid g2">
-      <div><label>Worker Base URL</label><input id="workerUrl" placeholder="https://mxd210.mxd6686.workers.dev" inputmode="url"/></div>
+      <div><label>Worker Base URL</label><input id="workerUrl" placeholder="https://<worker>.workers.dev"/></div>
       <div><label>X-Key (header bảo vệ Worker)</label><input id="xKey" placeholder="Ví dụ: mxd210-secret-key"/></div>
 
-      <div><label>Shopee template</label><input id="tplShopee" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}" inputmode="url"/></div>
-      <div><label>Lazada template</label><input id="tplLazada" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}" inputmode="url"/></div>
-      <div><label>Tiki template</label><input id="tplTiki" placeholder="https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}" inputmode="url"/></div>
-      <div><label>TikTok template</label><input id="tplTiktok" placeholder="https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}" inputmode="url"/></div>
+      <div><label>Shopee template</label><input id="tplShopee" placeholder="https://go.isclix.com/deep_link/<uid>/<oid>?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}"/></div>
+      <div><label>Lazada template</label><input id="tplLazada" placeholder="https://go.isclix.com/deep_link/<uid>/<oid>?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}"/></div>
+      <div><label>Tiki template</label><input id="tplTiki" placeholder="https://go.isclix.com/deep_link/<uid>/<oid>?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}"/></div>
+      <div><label>TikTok template</label><input id="tplTiktok" placeholder="https://go.isclix.com/deep_link/<uid>/<oid>?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}"/></div>
     </div>
     <div class="row" style="margin-top:8px">
       <button class="btn" id="btnSaveSettings">💾 Lưu cài đặt</button>
@@ -142,25 +142,25 @@
         </div>
         <div>
           <label>Max side / Width</label>
-          <input id="optW" type="number" value="1200" min="64" max="4096" inputmode="numeric"/>
+          <input id="optW" type="number" value="1200" min="64" max="4096"/>
         </div>
         <div>
           <label>Height (nếu dùng W×H)</label>
-          <input id="optH" type="number" value="1200" min="64" max="4096" inputmode="numeric"/>
+          <input id="optH" type="number" value="1200" min="64" max="4096"/>
         </div>
 
         <div class="span2">
           <label>Chất lượng (0.4–0.95)</label>
-          <div class="row">
-            <input id="quality" type="range" min="0.4" max="0.95" step="0.01" value="0.82" style="padding:0;min-height:unset"/>
-            <input id="qualityNum" type="number" min="0.4" max="0.95" step="0.01" value="0.82" style="width:120px"/>
+          <div class="range">
+            <input id="quality" type="range" min="0.4" max="0.95" step="0.01" value="0.82"/>
+            <input id="qualityNum" type="number" min="0.4" max="0.95" step="0.01" value="0.82" style="width:110px"/>
           </div>
         </div>
         <div class="span2">
           <label>Auto-compress ≤ (KB, 0 = tắt)</label>
-          <div class="row">
-            <input id="targetKB" type="range" min="0" max="1024" step="8" value="0" style="padding:0;min-height:unset"/>
-            <input id="targetKBNum" type="number" min="0" max="2048" step="10" value="0" style="width:120px"/>
+          <div class="range">
+            <input id="targetKB" type="range" min="0" max="2048" step="8" value="0"/>
+            <input id="targetKBNum" type="number" min="0" max="2048" step="10" value="0" style="width:110px"/>
           </div>
         </div>
 
@@ -214,7 +214,7 @@
           <div><label>SKU (bắt buộc cho publish; có thể trống khi chỉ upload ảnh)</label><input id="sku" data-clear placeholder="dekton-dk-ag950s"/></div>
         </div>
         <div class="row">
-          <div><label>Giá (VND, không chấm)</label><input id="price" data-clear type="number" placeholder="399000" inputmode="numeric"/></div>
+          <div><label>Giá (VND, không chấm)</label><input id="price" data-clear type="number" placeholder="399000"/></div>
           <div>
             <label>Merchant</label>
             <select id="merchant">
@@ -225,7 +225,7 @@
             </select>
           </div>
         </div>
-        <div><label>Link gốc (origin)</label><input id="origin" data-clear placeholder="https://shopee.vn/… | https://tiki.vn/… | https://www.tiktok.com/…" inputmode="url"/></div>
+        <div><label>Link gốc (origin)</label><input id="origin" data-clear placeholder="https://shopee.vn/… | https://tiki.vn/… | https://www.tiktok.com/…"/></div>
         <div class="row">
           <div><label>Ảnh (đường dẫn)</label><input id="image" data-clear placeholder="/assets/img/products/dekton-dk-ag950s.webp"/></div>
           <div><label>Danh mục (category)</label><input id="category" data-clear placeholder="may-khoan-duc-vit / may-cat / phu-kien-may"/></div>
@@ -243,25 +243,21 @@
   </div>
 
   <div class="card">
-    <h2>2b) Hàng đợi xử lý ảnh (batch)</h2>
-    <div class="row" style="margin:6px 0 10px">
+    <h2>2b) Hàng đợi ảnh (Batch)</h2>
+    <div class="row" style="margin-bottom:8px">
       <button class="btn" id="btnConvertAll">Convert tất cả</button>
       <button class="btn" id="btnDownloadAll">Tải tất cả</button>
       <button class="btn" id="btnUploadAll">Upload tất cả</button>
-      <button class="btn" id="btnClearQueue">🗑 Xoá hàng đợi</button>
+      <button class="btn" id="btnClearQueue">🗑 Clear hàng đợi</button>
     </div>
-    <div style="overflow:auto;border:1px solid #223348;border-radius:12px">
-      <table class="queue">
-        <thead>
-          <tr>
-            <th>Ảnh</th><th>Tên</th><th>Thư mục</th><th>Định dạng</th><th>Đường dẫn</th><th>Kích thước</th><th>Trạng thái</th><th>Thao tác</th>
-          </tr>
-        </thead>
-        <tbody id="queueBody">
-          <tr><td colspan="8" class="muted">Chưa có gì trong hàng đợi.</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <table class="queue" aria-label="Hàng đợi ảnh">
+      <thead>
+        <tr>
+          <th>Thumb</th><th>Tên</th><th>Thư mục</th><th>Định dạng</th><th>Đường dẫn</th><th>Kích thước</th><th>Trạng thái</th><th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="queueBody"><tr><td colspan="8" class="muted">Chưa có gì trong hàng đợi.</td></tr></tbody>
+    </table>
   </div>
 
   <div class="card deeplink-box">
@@ -269,10 +265,7 @@
     <div class="grid g2">
       <div>
         <label>Origin (đã nhập)</label>
-        <div class="input-wrap textarea">
-          <textarea id="originOut" class="deeplink-text" readonly></textarea>
-          <button class="clear-btn" title="Xoá" aria-label="Xoá" type="button">×</button>
-        </div>
+        <textarea id="originOut" class="deeplink-text" readonly></textarea>
         <div class="row" style="margin-top:6px">
           <button class="btn" id="copyOrigin">Copy Origin</button>
           <button class="btn" id="openOrigin">Mở Origin</button>
@@ -286,18 +279,18 @@
         </div>
         <div class="row" style="margin-top:6px">
           <button class="btn" id="btnMakeDeeplink">Tạo từ template</button>
-          <button class="btn" id="copyDeeplink">Copy Deep-link</button>
+          <button class="btn" id="btnCopyDeeplink">Copy Deep-link</button>
           <button class="btn" id="btnOpenDeeplink">Mở Deep-link</button>
           <span id="dlCheck" class="badge">–</span>
         </div>
         <div style="margin-top:10px">
           <label>Link rút gọn (tuỳ nền tảng hoặc do Worker tạo)</label>
           <div class="row">
-            <input id="shortlink" placeholder="https://shope.ee/XXXX | https://s.lazada.vn/XXXX | do Worker trả về"/>
+            <input id="shortlink" placeholder="Ví dụ: https://shope.ee/XXXX | https://s.lazada.vn/XXXX | do Worker trả về"/>
             <button class="btn" id="btnMakeShort">Tạo link rút gọn (Worker)</button>
             <button class="btn" id="btnCopyShort">Copy Short-link</button>
           </div>
-          <div class="small muted">Ghi chú: tạo rút gọn gốc (shope.ee / s.lazada.vn / tiki / tiktok) cần Worker hỗ trợ API tương ứng. Nếu Worker chưa có, điền tay hoặc dùng shortlink của riêng bạn.</div>
+          <div class="small muted">Ghi chú: tạo rút gọn gốc (shope.ee / s.lazada.vn / tiki / tiktok) cần Worker hỗ trợ API tương ứng. Nếu Worker chưa có, điền tay.</div>
         </div>
       </div>
     </div>
@@ -335,37 +328,44 @@
 </div>
 
 <script>
-/* ========== BIND HELPERS + SAFE LOG/TOAST (mobile-ready) ========== */
+/* ===== Mobile-safety tweaks ===== */
+try{ document.documentElement.addEventListener('touchstart',()=>{}, {passive:true}); }catch(_){}
+
+/* ========== BIND HELPERS + SAFE LOG/TOAST ========== */
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 function on(id, ev, fn){
   const el = document.getElementById(id);
-  if(!el){ try{ log(\`[bind] thiếu #\${id}\`); }catch(_){}; return false; }
-  el.addEventListener(ev, fn, {passive: ev==='scroll' || ev==='touchstart'});
+  if(!el){ try{ log(`[bind] thiếu #${id}`); }catch(_){}; return false; }
+  el.addEventListener(ev, fn, {passive: ev==='touchstart'});
   return true;
 }
-function toast(msg,cls=''){ const t=$("#toast"); if(!t) return; t.textContent=msg; t.className='toast show '+cls; clearTimeout(t._t); t._t=setTimeout(()=>{ if(t.classList.contains('show')) t.className='toast'; },4500); }
+function toast(msg,cls=''){ const t=$("#toast"); if(!t) return; t.textContent=msg; t.className='toast show '+cls; setTimeout(()=>{ if(t.classList.contains('show')) t.className='toast'; },4500); }
 function log(msg){ const d=$("#debugLog"); if(!d) return; const old=d.textContent && d.textContent!=='–' ? d.textContent + "\\n" : ""; d.textContent = old + msg; d.scrollTop = d.scrollHeight; }
 window.addEventListener('error', e => { log('[runtime] '+e.message); toast('Lỗi script: '+e.message, 'err'); });
 
-async function copyToClipboard(text){
+/* Clipboard helpers (mobile-first) */
+async function copyText(val){
   try{
-    if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); toast('Đã copy.','ok'); return; }
-    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); ta.remove(); toast('Đã copy.','ok');
-  }catch(e){ toast('Copy lỗi: '+e.message,'err'); }
+    if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(val||''); toast('Đã copy.','ok'); return; }
+  }catch(_){}
+  const ta=document.createElement('textarea'); ta.value=val||''; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); toast('Đã copy.','ok'); }catch(e){ toast('Không copy được: '+e.message,'err'); }
+  document.body.removeChild(ta);
 }
 
 /* SETTINGS */
 const LS_KEY = 'MXD_IMPORTER_SETTINGS_V441';
 function readSettings(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'{}'); }catch(_){ return {}; } }
 function writeSettings(s){ localStorage.setItem(LS_KEY, JSON.stringify(s)); }
-const DEFAULT_TPL_SHOPEE='https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
-const DEFAULT_TPL_LAZADA='https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
-const DEFAULT_TPL_TIKI='https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
-const DEFAULT_TPL_TIKTOK='https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
+/* KHÔNG để sẵn template mặc định */
+const DEFAULT_TPL_SHOPEE='';
+const DEFAULT_TPL_LAZADA='';
+const DEFAULT_TPL_TIKI='';
+const DEFAULT_TPL_TIKTOK='';
 
 /* UTILS */
-const slugify = s => s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const slugify = s => s?.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || '';
 function cleanUrl(u){ return (u||'').trim().replace(/^[\"']+|[\"',]+$/g,''); }
 function sanitizeFolder(p){ if(!p) return '/assets/img/'; p=p.trim(); if(!p.startsWith('/')) p='/'+p; if(!p.endsWith('/')) p+='/'; return p; }
 function getExt(fmt){ return fmt==='jpg'?'jpg':(fmt==='png'?'png':'webp'); }
@@ -404,32 +404,28 @@ function settingsToUi(s){
   if($("#xKey")) $("#xKey").value=s.xKey||'';
   if($("#tplShopee")) $("#tplShopee").value=s.tplShopee||'';
   if($("#tplLazada")) $("#tplLazada").value=s.tplLazada||'';
-  if($("#tplTiki")) $("#tplTiki").value=s.tplTiki||'';
+  if($("#tplTiki"))   $("#tplTiki").value=s.tplTiki||'';
   if($("#tplTiktok")) $("#tplTiktok").value=s.tplTiktok||'';
 }
-function saveSettings(){ writeSettings(Object.assign(readSettings(), uiToSettings())); if($("#settingsStatus")) $("#settingsStatus").textContent="Đã lưu."; toast("Đã lưu cài đặt.","ok"); }
+function saveSettings(){ writeSettings(Object.assign(readSettings(), uiToSettings())); $("#settingsStatus") && ($("#settingsStatus").textContent="Đã lưu."); toast("Đã lưu cài đặt.","ok"); }
 function loadSettings(){
   const s=readSettings(); settingsToUi(s);
-  if($("#tplShopee") && !$("#tplShopee").value) $("#tplShopee").value=DEFAULT_TPL_SHOPEE;
-  if($("#tplLazada") && !$("#tplLazada").value) $("#tplLazada").value=DEFAULT_TPL_LAZADA;
-  if($("#tplTiki")   && !$("#tplTiki").value)   $("#tplTiki").value=DEFAULT_TPL_TIKI;
-  if($("#tplTiktok") && !$("#tplTiktok").value) $("#tplTiktok").value=DEFAULT_TPL_TIKTOK;
-  if($("#settingsStatus")) $("#settingsStatus").textContent="Đã tải cài đặt.";
+  $("#settingsStatus") && ($("#settingsStatus").textContent="Đã tải cài đặt.");
 }
 on('btnSaveSettings','click',saveSettings);
 on('btnLoadSettings','click',loadSettings);
-on('btnClearSettings','click',()=>{ localStorage.removeItem(LS_KEY); settingsToUi({}); if($("#settingsStatus")) $("#settingsStatus").textContent="Đã xóa."; toast("Đã xóa cài đặt.","ok"); });
+on('btnClearSettings','click',()=>{ localStorage.removeItem(LS_KEY); settingsToUi({}); $("#settingsStatus") && ($("#settingsStatus").textContent="Đã xóa."); toast("Đã xóa cài đặt.","ok"); });
 loadSettings();
 
 /* Worker checks */
 function hdr(){ const s=readSettings(); const h={}; if(s.xKey) h['x-key']=s.xKey; h['content-type']='application/json'; return h; }
 async function check(url){ try{ const r=await fetch(url,{mode:"cors",headers:hdr()}); const text=await r.text().catch(()=>'' ); return {ok:r.ok,status:r.status,text}; }catch(e){ return {ok:false,status:-1,text:String(e)}; } }
 on('btnCheckWorker','click', async ()=>{
-  const s=readSettings(); if(!s.workerUrl){ if($("#workerStatus")) $("#workerStatus").textContent="Chưa cấu hình Worker."; toast("Chưa cấu hình Worker.","warn"); return; }
+  const s=readSettings(); if(!s.workerUrl){ $("#workerStatus") && ($("#workerStatus").textContent="Chưa cấu hình Worker."); toast("Chưa cấu hình Worker.","warn"); return; }
   const u=s.workerUrl.replace(/\/$/,'')+"/health";
   const r=await check(u); state.workerOk=r.ok;
   const msg=r.ok?`Worker OK (health ${r.status})`:`Worker lỗi (${r.status}). ${r.text.slice(0,120)}`;
-  if($("#workerStatus")) $("#workerStatus").textContent=msg;
+  $("#workerStatus") && ($("#workerStatus").textContent=msg);
   log("[/health] "+msg); toast(r.ok?"Worker OK":"Worker lỗi "+r.status, r.ok?"ok":"err");
 });
 on('btnCheckAuth','click', async ()=>{
@@ -465,7 +461,7 @@ on('btnProbePublish','click', async ()=>{
 on('btnTestUpload','click', async ()=>{
   const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; }
   const c=document.createElement('canvas'); c.width=1; c.height=1;
-  const blob=await new Promise(res=>c.toBlob?c.toBlob(res,'image/webp',0.5):res(dataURLToBlob(c.toDataURL('image/webp',0.5))));
+  const blob=await new Promise(res=>c.toBlob(res,'image/webp',0.5));
   const b64=await blobToBase64(blob);
   const path='/assets/img/test/ping.webp';
   try{
@@ -519,18 +515,6 @@ function updateSingleUploadCta(){
   const b=$("#btnUploadImg"); if(b) b.textContent=`Upload ảnh → ${folder}${slugify(sku)}.${ext}`;
 }
 
-/* Dual bind range <-> number (mobile friendly) */
-function bindPair(rangeId, numId, cb){
-  const r=$("#"+rangeId), n=$("#"+numId);
-  if(!r||!n) return;
-  const syncToN=()=>{ n.value=r.value; cb&&cb(); };
-  const syncToR=()=>{ r.value=n.value; cb&&cb(); };
-  r.addEventListener('input', syncToN, {passive:true});
-  n.addEventListener('input', syncToR);
-}
-bindPair('quality','qualityNum',()=>updateSingleUploadCta());
-bindPair('targetKB','targetKBNum',()=>updateSingleUploadCta());
-
 /* Resize & encode */
 function getImageOpts(){
   const preset = $("#sizePreset")?.value;
@@ -540,7 +524,7 @@ function getImageOpts(){
   if(preset==='icon400'){ w=400; h=400; }
   if(preset==='og'){ w=1200; h=630; }
   const fmt=getSelectedFmt();
-  const q=Number($("#qualityNum")?.value||$("#quality")?.value||0.82);
+  const q=Number($("#quality")?.value||0.82);
   const targetKB=Number($("#targetKBNum")?.value||0);
   return { preset, w, h, fmt, q, targetKB };
 }
@@ -563,18 +547,18 @@ async function resizeContainToBlob(img, opts){
   ctx.drawImage(img,dx,dy,outW,outH);
   const mime = opts.fmt==='jpg'?'image/jpeg':(opts.fmt==='png'?'image/png':'image/webp');
   let q = opts.fmt==='png'?1.0:opts.q;
-  let blob = await new Promise(res=>c.toBlob?c.toBlob(res,mime,q):res(dataURLToBlob(c.toDataURL(mime,q))));
+  let blob = await new Promise(res=>c.toBlob(res,mime,q));
   if(opts.targetKB>0 && blob && blob.size/1024>opts.targetKB && mime!=='image/png'){
     let step=0; while(blob.size/1024>opts.targetKB && q>0.4 && step<10){
       q = Math.max(0.4, q-0.06); step++;
-      blob = await new Promise(res=>c.toBlob?c.toBlob(res,mime,q):res(dataURLToBlob(c.toDataURL(mime,q))));
+      blob = await new Promise(res=>c.toBlob(res,mime,q));
       if(!blob) break;
     }
   }
   return { blob, w:canvasW, h:canvasH };
 }
 
-/* Drag & drop + picker */
+/* Drag & drop (safe) */
 const drop=$("#drop"), file=$("#file"), thumb=$("#thumb"), imgName=$("#imgName"), imgInfo=$("#imgInfo");
 drop?.addEventListener('click', ()=>file?.click());
 on('btnSelectImg','click', ()=>file?.click());
@@ -736,14 +720,13 @@ function renderQueue(){
 }
 on('btnConvertAll','click', async ()=>{ for(const it of queue){ await queueProcess(it); } toast("Đã convert tất cả.","ok"); renderQueue(); });
 on('btnDownloadAll','click', ()=>{ for(const it of queue){ if(!it.outBlob) continue; const a=document.createElement('a'); a.href=URL.createObjectURL(it.outBlob); a.download=it.name+'.'+getExt(it.fmt||'webp'); a.click(); } });
-on('btnUploadAll','click', async ()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } for(const it of queue){ const row=document.querySelector(\`tr[data-id="\${it.id}"] .status\`); await uploadItem(it,row); } toast("Upload tất cả xong (xem trạng thái từng mục).","ok"); });
+on('btnUploadAll','click', async ()=>{ const s=readSettings(); if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; } for(const it of queue){ const row=document.querySelector(`tr[data-id="${it.id}"] .status`); await uploadItem(it,row); } toast("Upload tất cả xong (xem trạng thái từng mục).","ok"); });
 on('btnClearQueue','click', ()=>{ queue.length=0; renderQueue(); });
 
 /* Upload */
 function splitDataUrl(d){ const m = String(d||'').match(/^data:([^;]+);base64,(.+)$/); return m ? { mime:m[1], base64:m[2] } : { mime:'', base64:d||'' }; }
 async function blobToBase64(blob){ return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(blob); }); }
-function dataURLToBlob(dataURL){ const arr=dataURL.split(','), mime=arr[0].match(/:(.*?);/)[1]; const bstr=atob(arr[1]); let n=bstr.length; const u8=new Uint8Array(n); while(n--) u8[n]=bstr.charCodeAt(n); return new Blob([u8],{type:mime}); }
-async function convertBlobToWebp(blob, w, h){ const url=URL.createObjectURL(blob); const img=new Image(); await new Promise(r=>{ img.onload=r; img.src=url; }); const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); return await new Promise(res=>c.toBlob?c.toBlob(res,'image/webp',0.82):res(dataURLToBlob(c.toDataURL('image/webp',0.82)))); }
+async function convertBlobToWebp(blob, w, h){ const url=URL.createObjectURL(blob); const img=new Image(); await new Promise(r=>{ img.onload=r; img.src=url; }); const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); return await new Promise(res=>c.toBlob(res,'image/webp',0.82)); }
 async function uploadItem(it, statusEl){
   let path=pathFor(it);
   try{
@@ -812,20 +795,27 @@ function activeTplFor(merchant){
   const s=readSettings();
   const map={ shopee:s.tplShopee, lazada:s.tplLazada, tiki:s.tplTiki, tiktok:s.tplTiktok };
   let raw=(map[merchant]||'').trim();
-  if(raw) return raw;
-  if(merchant==='shopee') return DEFAULT_TPL_SHOPEE;
-  if(merchant==='lazada') return DEFAULT_TPL_LAZADA;
-  if(merchant==='tiki')   return DEFAULT_TPL_TIKI;
-  if(merchant==='tiktok') return DEFAULT_TPL_TIKTOK;
-  return DEFAULT_TPL_SHOPEE;
+  return raw;
 }
 function computeSubs(sku, merchant){ return { sub1: sku||'sku', sub2:(merchant||'merchant').toLowerCase(), sub3:'tool', sub4:'mxd210' }; }
 function ensureSubsInUrl(u, subs){ const has = k => new RegExp(`[?&]${k}=`,`i`).test(u); const qs=[]; for(const k of ['sub1','sub2','sub3','sub4']) if(!has(k)) qs.push(`${k}=${encodeURIComponent(subs[k])}`); return qs.length?(u+(u.includes('?')?'&':'?')+qs.join('&')):u; }
-function makeDeeplink(){ const origin=cleanUrl($("#origin")?.value.trim()); const sku=$("#sku")?.value.trim(); const merchant=$("#merchant")?.value; if(!origin){ toast("Thiếu Origin.","warn"); return; } const tpl=activeTplFor(merchant); const subs=computeSubs(sku,merchant); let link=tpl.replace(/\{url\}/g,encodeURIComponent(origin)).replace(/\{sku\}/g,sku||'sku').replace(/\{sub1\}/g,subs.sub1).replace(/\{sub2\}/g,subs.sub2).replace(/\{sub3\}/g,subs.sub3).replace(/\{sub4\}/g,subs.sub4); link=ensureSubsInUrl(link,subs); if($("#deeplink")) $("#deeplink").value=link; validateDeeplink(); }
+function makeDeeplink(){
+  const origin=cleanUrl($("#origin")?.value.trim());
+  const sku=$("#sku")?.value.trim();
+  const merchant=$("#merchant")?.value;
+  if(!origin){ toast("Thiếu Origin.","warn"); return; }
+  const tpl=activeTplFor(merchant);
+  if(!tpl){ toast("Chưa cấu hình template cho "+merchant.toUpperCase()+".","warn"); return; }
+  const subs=computeSubs(sku,merchant);
+  let link=tpl.replace(/\{url\}/g,encodeURIComponent(origin)).replace(/\{sku\}/g,sku||'sku').replace(/\{sub1\}/g,subs.sub1).replace(/\{sub2\}/g,subs.sub2).replace(/\{sub3\}/g,subs.sub3).replace(/\{sub4\}/g,subs.sub4);
+  link=ensureSubsInUrl(link,subs);
+  if($("#deeplink")) $("#deeplink").value=link;
+  validateDeeplink();
+}
 on('btnMakeDeeplink','click', makeDeeplink);
 ['origin','sku','merchant','tplShopee','tplLazada','tplTiki','tplTiktok','defaultFolder','defaultCustomPath'].forEach(id=>{
   const el=document.getElementById(id);
-  if(el) el.addEventListener('input', ()=>{ if($("#origin")?.value.trim()) makeDeeplink(); updateSingleUploadCta(); runDiag(); saveSettings(); });
+  if(el) el.addEventListener('input', ()=>{ if($("#origin")?.value.trim()) validateDeeplink(); updateSingleUploadCta(); saveSettings(); runDiag(); });
 });
 if(document.getElementById('deeplink')) document.getElementById('deeplink').addEventListener('input', validateDeeplink);
 function validateDeeplink(){
@@ -844,8 +834,7 @@ function validateDeeplink(){
   badge.textContent="KHÔNG qua affiliate"; badge.className='badge';
 }
 
-/* Shortlink + Copy/Open buttons */
-function openExternal(u){ const url = /^https?:\/\//i.test(u)?u:('https://'+u); window.open(url,'_blank'); }
+/* Shortlink via Worker (optional) */
 on('btnMakeShort','click', async ()=>{
   const s=readSettings(); const base=(s.workerUrl||'').replace(/\/$/,'');
   const url=$("#deeplink")?.value.trim()||$("#origin")?.value.trim();
@@ -859,11 +848,7 @@ on('btnMakeShort','click', async ()=>{
     else { toast("Worker không hỗ trợ /shorten hoặc lỗi.", "warn"); }
   }catch(e){ toast("Shorten lỗi: "+e.message, "err"); }
 });
-on('btnCopyShort','click', ()=>{ const t=$("#shortlink"); if(!t) return; copyToClipboard(t.value||''); });
-on('copyOrigin','click', ()=>copyToClipboard($("#originOut")?.value||''));
-on('openOrigin','click', ()=>{ const u=$("#originOut")?.value.trim(); if(!u){ toast("Chưa có Origin.","warn"); return; } openExternal(u); });
-on('copyDeeplink','click', ()=>copyToClipboard($("#deeplink")?.value||''));
-on('btnOpenDeeplink','click', ()=>{ const u=$("#deeplink")?.value.trim(); if(!u){ toast("Chưa có Deep-link.","warn"); return; } openExternal(u); });
+on('btnCopyShort','click', ()=> copyText($("#shortlink")?.value||'') );
 
 /* Gen commit */
 on('btnGenCommit','click', ()=>{
@@ -934,7 +919,7 @@ function buildJson(){
   return obj;
 }
 on('btnToJson','click', buildJson);
-on('btnCopyJson','click', ()=>{ const el=$("#jsonOut"); if(!el) return; copyToClipboard(el.value||''); });
+on('btnCopyJson','click', ()=> copyText($("#jsonOut")?.value||'') );
 on('btnDownloadJson','click', ()=>{ if(!$("#jsonOut")?.value) buildJson(); const blob=new Blob([$("#jsonOut").value],{type:"application/json"}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='affiliates.append.json'; a.click(); });
 on('btnPublish','click', ()=>doPublish(false));
 on('btnPublishFeatured','click', ()=>doPublish(true));
@@ -961,7 +946,19 @@ async function doPublish(forceFeatured){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='affiliates.append.json'; a.click();
 }
 
-/* Form helpers */
+/* Form helpers + buttons còn thiếu */
+on('copyOrigin','click', ()=> copyText($("#originOut")?.value||'') );
+on('openOrigin','click', ()=>{
+  const u=cleanUrl($("#originOut")?.value||'');
+  if(/^https?:\/\//i.test(u)) window.open(u,'_blank'); else toast("Origin không hợp lệ.","warn");
+});
+on('btnCopyDeeplink','click', ()=> copyText($("#deeplink")?.value||'') );
+on('btnOpenDeeplink','click', ()=>{
+  const u=cleanUrl($("#deeplink")?.value||'');
+  if(/^https?:\/\//i.test(u)) window.open(u,'_blank'); else toast("Deep-link không hợp lệ.","warn");
+});
+
+/* Diag + auto */
 function runDiag(){
   const sku=$("#sku")?.value.trim();
   const img=$("#image")?.value.trim();
@@ -973,9 +970,9 @@ function runDiag(){
   if(!sku) msgs.push("• Thiếu SKU (bắt buộc cho publish).");
   if(img && !img.startsWith(`${expectedFolder}${sku||'...'}`)) msgs.push("• Ảnh nên là "+expectedFolder+(sku||'&lt;sku&gt;')+"."+ext);
   if(origin && !/shopee\.vn|lazada\.vn|tiki\.vn|tiktok\.com/i.test(origin)) msgs.push("• Origin không phải Shopee/Lazada/Tiki/TikTok.");
-  msgs.push("• Merchant: "+merchant);
-  if($("#diag")) $("#diag").innerHTML=msgs.length?msgs.map(x=>`<div>${x}</div>`).join(""):'<span class="ok">Tạm ổn.</span>';
-  if($("#originOut")) $("#originOut").value=origin;
+  msgs.push("• Merchant: "+merchant.toUpperCase());
+  $("#diag") && ($("#diag").innerHTML=msgs.length?msgs.map(x=>`<div>${x}</div>`).join(""):'<span class="ok">Tạm ổn.</span>');
+  $("#originOut") && ($("#originOut").value=origin);
 }
 on('btnAuto','click', ()=>{
   const name=$("#name")?.value.trim(); const skuNow=$("#sku")?.value.trim();
@@ -983,7 +980,7 @@ on('btnAuto','click', ()=>{
   const folder=getSelectedFolder();
   const baseSku=$("#sku")?.value.trim()||'...';
   if($("#sku")?.value && !$("#image")?.value && $("#image")) $("#image").value=`${folder}${slugify(baseSku)}.`+getExt(getSelectedFmt());
-  if($("#originOut")) $("#originOut").value=cleanUrl($("#origin")?.value.trim());
+  $("#originOut") && ($("#originOut").value=cleanUrl($("#origin")?.value.trim()));
   const g=autoCategory(`${name} ${$("#brand")?.value} ${$("#origin")?.value}`);
   if(g && !$("#category")?.value.trim() && $("#category")) $("#category").value=g;
   runDiag(); updateSingleUploadCta();
@@ -1012,9 +1009,29 @@ function addClearButton(wrap, el){
 }
 installClearers();
 
+/* Pair controls sync (mobile-friendly) */
+function syncPair(idA,idB, clamp=[0.4,0.95], step=0.01){
+  const a=document.getElementById(idA), b=document.getElementById(idB); if(!a||!b) return;
+  a.addEventListener('input', ()=>{ b.value=a.value; });
+  b.addEventListener('input', ()=>{
+    let v=parseFloat(b.value); if(isNaN(v)) v=clamp[0];
+    v=Math.min(clamp[1],Math.max(clamp[0],v));
+    v = Math.round(v/step)*step;
+    b.value=v; a.value=v;
+  });
+}
+syncPair('quality','qualityNum',[0.4,0.95],0.01);
+(function(){
+  const a=document.getElementById('targetKB'), b=document.getElementById('targetKBNum'); if(!a||!b) return;
+  a.addEventListener('input', ()=>{ b.value=a.value; });
+  b.addEventListener('input', ()=>{
+    let v=parseInt(b.value||'0',10); if(isNaN(v)||v<0) v=0; if(v>2048) v=2048; b.value=v; a.value=v;
+  });
+})();
+
 /* Init */
-function updateOriginMirror(){ if($("#originOut")) $("#originOut").value=cleanUrl($("#origin")?.value); }
-function updateAfterPreset(){ const p=$("#sizePreset")?.value; if(p==='og'){ if($("#optW")) $("#optW").value=1200; if($("#optH")) $("#optH").value=630; } }
+function updateOriginMirror(){ $("#originOut") && ($("#originOut").value=cleanUrl($("#origin")?.value)); }
+function updateAfterPreset(){ const p=$("#sizePreset")?.value; if(p==='og'){ $("#optW") && ($("#optW").value=1200); $("#optH") && ($("#optH").value=630); } }
 $("#sizePreset")?.addEventListener('change', ()=>{ updateAfterPreset(); });
 ["quality","qualityNum","targetKB","targetKBNum","defaultCustomPath"].forEach(id=>{
   const el=document.getElementById(id); if(el) el.addEventListener('input', ()=>{ updateSingleUploadCta(); });
