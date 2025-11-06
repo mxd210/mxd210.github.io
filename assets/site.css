@@ -202,4 +202,9 @@ body.has-fixed-cta .floating-contacts{ bottom:112px; }
 /* ====== DỰ PHÒNG 404/LỖI ẢNH (ẩn card) ====== */
 .product-grid .product-card[data-broken],
 .product-grid .product-card[data-img-missing="1"]{ display:none !important; }
+/* Live Price discount badge */
+.badge-deal{
+  margin-left:6px; padding:2px 6px; border-radius:6px; font-size:11px;
+  background:#fee2e2; color:#991b1b; border:1px solid #fecaca
+}
 /* === /MXD PATCH === */
