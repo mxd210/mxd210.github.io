@@ -1,75 +1,301 @@
-<script>
-(function(){
-  const PAGE = location.pathname.endsWith('/store.html') ? 'store'
-              : location.pathname.endsWith('/g.html')    ? 'g'
-              : 'index';
+<!-- REPLACE WHOLE FILE: /g.html -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Chi tiết sản phẩm | MXD</title>
+  <meta name="description" content="Trang chi tiết sản phẩm từ affiliates.json — hiển thị ảnh, giá, ưu đãi mới nhất và nút Mua ngay.">
+  <link id="canonical" rel="canonical" href="https://mxd210.github.io/g.html"/>
+  <meta name="robots" content="index,follow"/>
 
-  // Vùng card để quan sát theo từng trang
-  const SELECTORS = PAGE === 'g'
-    ? ['main .card']                                       // 1 card
-    : ['#product-list .card', '#updated-list .card', '.mte-deals .card']; // lưới
+  <!-- OG (sẽ được cập nhật động theo SKU) -->
+  <meta property="og:type" content="product"/>
+  <meta property="og:title" content="Chi tiết sản phẩm | MXD"/>
+  <meta property="og:description" content="Xem thông tin, giá sống và ưu đãi mới nhất."/>
+  <meta property="og:url" content="https://mxd210.github.io/g.html"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/og/default-og.webp"/>
 
-  const seen = new WeakSet();
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/site.css"/>
+  <!-- Safety CSS: bảo đảm bố cục & badge giảm giá hoạt động ngay cả khi thiếu style -->
+  <style>
+    .pdp{max-width:1160px;margin:0 auto;padding:16px}
+    .pdp-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+    .product-gallery img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line,#e5e7eb)}
+    .product-info h1{margin:0 0 8px 0;font-size:22px;line-height:1.25}
+    .price-row{display:flex;align-items:baseline;gap:12px;margin:8px 0 12px}
+    .price-now{font-weight:800;font-size:20px}
+    .price-old{color:var(--muted,#6b7280);text-decoration:line-through}
+    .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--chip,#f3f4f6);border:1px solid var(--line,#e5e7eb);margin-right:6px}
+    .badge-deal{margin-left:6px;padding:2px 6px;border-radius:6px;font-size:11px;background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+    .actions .buy,.actions .buy-btn{display:inline-block;padding:10px 14px;border-radius:10px;background:var(--brand,#111);color:#fff;text-decoration:none}
+    .muted{color:var(--muted,#6b7280)}
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+    .product-card{border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:12px;background:#fff}
+    .product-card .thumb img{width:100%;height:auto;border-radius:10px;display:block}
+    .product-card .name{font-size:15px;line-height:1.35;margin:8px 0}
+    .product-card .price{font-weight:600}
+    /* Accordion trong thẻ */
+    .card-extra{margin-top:12px;border-top:1px dashed var(--line,#e5e7eb);padding-top:8px}
+    .card-extra>summary{cursor:pointer;list-style:none}
+    .card-extra>summary::-webkit-details-marker{display:none}
+    .card-extra>summary .toggle{display:inline-block;font-size:12px;padding:6px 10px;border-radius:999px;background:var(--chip,#f3f4f6);border:1px solid var(--line,#e5e7eb)}
+    .card-extra[open]>summary .toggle{background:#fff}
+    .card-extra .info{font-size:13px;line-height:1.45;margin-top:6px}
+    .card-extra .info ul{margin:6px 0 0 18px;padding:0}
+    @media (max-width:860px){ .pdp-grid{grid-template-columns:1fr} }
+  </style>
 
-  function skuFromCard(card){
-    const meta = card.querySelector('.product-meta,[data-sku]');
-    if (meta && meta.getAttribute('data-sku')) return meta.getAttribute('data-sku');
-    const link = card.querySelector('a[href*="g.html?sku="]');
-    if (link){
-      try { return new URL(link.href, location.origin).searchParams.get('sku') || ''; }
-      catch(_){}
+  <!-- GA4 trước affiliate (chuẩn MXD) -->
+  <script defer src="/assets/analytics.js"></script>
+  <script defer src="/assets/mxd-affiliate.js"></script>
+
+  <!-- Live Price: cấu hình Worker + script -->
+  <script>window.MXD_PRICE_API="https://mxd6686.workers.dev"</script>
+  <script defer src="/assets/live-price.js"></script>
+</head>
+<body>
+  <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Chi tiết</nav>
+
+  <main id="pdp" class="pdp">
+    <!-- MXD-ANCHOR: PDP-CARD -->
+    <article class="product-card pdp-card" data-sku="">
+      <div class="pdp-grid">
+        <div class="product-gallery">
+          <img id="pdp-img" src="/assets/img/products/placeholder.webp" alt="Sản phẩm — MXD" width="640" height="640"
+               onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+        </div>
+        <div class="product-info">
+          <h1 id="pdp-name">Sản phẩm</h1>
+          <div class="price-row">
+            <span class="price-now" id="pdp-price" data-price=""></span>
+            <del class="price-old" id="pdp-old" hidden></del>
+          </div>
+          <div class="meta">
+            <span id="pdp-merchant" class="badge" hidden></span>
+            <span id="pdp-brand" class="badge" hidden></span>
+          </div>
+          <div class="actions">
+            <a id="pdp-buy" class="buy buy-btn" href="#" data-merchant="" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+          </div>
+          <p id="pdp-desc" class="muted"></p>
+
+          <!-- Accordion khối thông tin -->
+          <details class="card-extra" id="blk-features" hidden>
+            <summary><span class="toggle">Đặc điểm nổi bật</span></summary>
+            <div class="info" id="features-body"></div>
+          </details>
+
+          <details class="card-extra" id="blk-specs" hidden>
+            <summary><span class="toggle">Thông số / Quy cách</span></summary>
+            <div class="info"><ul id="specs-list"></ul></div>
+          </details>
+
+          <details class="card-extra" id="blk-ingredients" hidden>
+            <summary><span class="toggle">Thành phần</span></summary>
+            <div class="info"><ul id="ing-list"></ul></div>
+          </details>
+
+          <details class="card-extra" id="blk-usage" hidden>
+            <summary><span class="toggle">Hướng dẫn sử dụng</span></summary>
+            <div class="info" id="usage-body"></div>
+          </details>
+
+          <details class="card-extra" id="blk-notes" hidden>
+            <summary><span class="toggle">Lưu ý / Bảo hành</span></summary>
+            <div class="info" id="notes-body"></div>
+          </details>
+        </div>
+      </div>
+    </article>
+    <!-- /MXD-ANCHOR -->
+
+    <!-- MXD-ANCHOR: RELATED -->
+    <section id="related" class="related">
+      <h2>Sản phẩm liên quan</h2>
+      <div id="related-grid" class="product-grid compact"></div>
+    </section>
+    <!-- /MXD-ANCHOR -->
+  </main>
+
+  <noscript><p class="muted">Vui lòng bật JavaScript để xem nội dung sản phẩm.</p></noscript>
+
+  <!-- Renderer: nạp từ affiliates.json/products.json theo SKU -->
+  <script>
+  (async function renderPDP(){
+    const qs  = new URLSearchParams(location.search);
+    const sku = (qs.get('sku')||'').toLowerCase().trim();
+    const card = document.querySelector('.pdp-card');
+    if (!sku){ card.outerHTML = '<p class="muted">Thiếu tham số <code>sku</code>.</p>'; return; }
+
+    const SOURCES = [
+      '/assets/data/affiliates.json','/products.json','/affiliates.json',
+      '/assets/data/products.json','/assets/affiliates.json','/data/affiliates.json','/data/products.json'
+    ];
+
+    async function loadFirst(urls){
+      for (const src of urls){
+        try{
+          const r = await fetch(src, { cache:'no-store' });
+          if (!r.ok) continue;
+          const j = await r.json();
+          if (Array.isArray(j)) return j;
+          if (j && Array.isArray(j.items)) return j.items;
+        }catch(_){}
+      }
+      return null;
     }
-    return '';
-  }
 
-  function send(type, payload){
-    const url = '/log'; // Tap 2 sẽ triển khai endpoint này trong Worker MTE
-    const data = JSON.stringify({ type, page: PAGE, ts: Date.now(), ...payload });
-    try {
-      if (navigator.sendBeacon){
-        const b = new Blob([data], { type: 'application/json' });
-        navigator.sendBeacon(url, b);
-        return;
-      }
-    } catch(_) {}
-    fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: data, keepalive: true })
-      .catch(()=>{});
-  }
+    const data = await loadFirst(SOURCES);
+    if (!Array.isArray(data)){ card.outerHTML = '<p class="muted">Không tải được dữ liệu sản phẩm.</p>'; return; }
 
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if (e.isIntersecting && e.intersectionRatio > 0.35 && !seen.has(e.target)){
-        seen.add(e.target);
-        const sku  = skuFromCard(e.target);
-        const slot = e.target.getAttribute('data-slot') || '';
-        send('imp', { sku, slot });
-      }
-    });
-  }, { root: null, threshold: [0, 0.35, 0.66, 1] });
+    const p = data.find(x => String(x.sku||'').toLowerCase() === sku);
+    if (!p){ card.outerHTML = '<p class="muted">Không tìm thấy sản phẩm với SKU <code>'+sku+'</code>.</p>'; return; }
 
-  function mount(){
-    let idx = 0;
-    SELECTORS.forEach(sel=>{
-      document.querySelectorAll(sel).forEach(card=>{
-        if (!card.getAttribute('data-slot')) card.setAttribute('data-slot', String(++idx));
-        io.observe(card);
+    // ===== Fill PDP =====
+    const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
+    const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    const imgOf = p => p.image || (p.sku? `/assets/img/products/${String(p.sku).toLowerCase()}.webp` : '/assets/img/products/placeholder.webp');
+    const href = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
+    const asArr = v => !v ? [] : Array.isArray(v) ? v : String(v).split(/[;,|/]+/).map(s=>s.trim()).filter(Boolean);
+
+    // Elements
+    card.setAttribute('data-sku', sku);
+    const elName = document.getElementById('pdp-name');
+    const elPrice= document.getElementById('pdp-price');
+    const elOld  = document.getElementById('pdp-old');
+    const elImg  = document.getElementById('pdp-img');
+    const elBuy  = document.getElementById('pdp-buy');
+    const elDesc = document.getElementById('pdp-desc');
+    const elMer  = document.getElementById('pdp-merchant');
+    const elBrand= document.getElementById('pdp-brand');
+
+    const name = p.name || p.sku || 'Sản phẩm';
+    elName.textContent = name;
+    if (p.price!=null){ elPrice.textContent = fmt(p.price); elPrice.setAttribute('data-price', p.price); }
+    const oldPrice = p.old_price || p.price_old || p.list_price || p.msrp || p.regular_price;
+    if (oldPrice && +oldPrice > +p.price){ elOld.textContent = fmt(oldPrice); elOld.hidden=false; }
+
+    elImg.src = imgOf(p); elImg.alt = name+' — MXD';
+    elBuy.href = href(p);
+    if (p.merchant){ elBuy.setAttribute('data-merchant', String(p.merchant).toLowerCase()); elMer.textContent = 'Nền tảng: '+p.merchant; elMer.hidden=false; }
+    if (p.brand){ elBrand.textContent = 'Thương hiệu: '+p.brand; elBrand.hidden=false; }
+    if (p.description || p.desc || p.short_desc){ elDesc.textContent = p.description || p.desc || p.short_desc; }
+
+    // Accordion blocks (ẩn/hiện theo dữ liệu)
+    const features = asArr(p.features || p.highlights);
+    if (features.length){
+      document.getElementById('blk-features').hidden = false;
+      document.getElementById('features-body').innerHTML = '<ul>'+features.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+    }
+
+    const specs = p.specs && typeof p.specs === 'object' ? p.specs : null;
+    if (specs){
+      document.getElementById('blk-specs').hidden = false;
+      const ul = document.getElementById('specs-list');
+      Object.keys(specs).forEach(k => {
+        const li = document.createElement('li'); li.textContent = k+': '+specs[k]; ul.appendChild(li);
       });
-    });
-  }
+    }
 
-  // Click tracking (capture sớm)
-  document.addEventListener('click', function(ev){
-    const a = ev.target.closest && ev.target.closest('a');
-    if (!a) return;
-    const card = ev.target.closest('.card');
-    const sku  = card ? skuFromCard(card) : (()=>{
-      try { return new URL(a.href, location.origin).searchParams.get('sku') || ''; } catch(_) { return ''; }
-    })();
-    const slot = card ? (card.getAttribute('data-slot') || '') : '';
-    const merchant = a.getAttribute('data-merchant') || '';
-    send('clk', { sku, slot, merchant, href: a.href });
-  }, { capture: true, passive: true });
+    const ings = asArr(p.ingredients);
+    if (ings.length){
+      document.getElementById('blk-ingredients').hidden = false;
+      document.getElementById('ing-list').innerHTML = ings.map(x=>'<li>'+esc(x)+'</li>').join('');
+    }
 
-  window.addEventListener('DOMContentLoaded', mount);
-})();
-</script>
+    if (p.how_to_use || p.usage){
+      document.getElementById('blk-usage').hidden = false;
+      document.getElementById('usage-body').textContent = p.how_to_use || p.usage;
+    }
+
+    if (p.notes || p.cautions || p.warranty){
+      document.getElementById('blk-notes').hidden = false;
+      document.getElementById('notes-body').textContent = p.notes || p.cautions || ('Bảo hành: '+p.warranty);
+    }
+
+    // ===== Related (cùng nhãn) =====
+    const norm = v => String(v||'').toLowerCase().trim();
+    const strip = s => norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
+    const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
+    const slug  = v => strip(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+
+    function labelsOf(it){
+      const labels = [];
+      labels.push(...split(it.cat||it.category||it.section||''));
+      const arr = Array.isArray(it.cats)? it.cats : (Array.isArray(it.categories)? it.categories : []);
+      labels.push(...arr.flatMap(split));
+      if (Array.isArray(it.tags)) labels.push(...it.tags.flatMap(split));
+      if (typeof it.category_path === 'string') labels.push(...split(it.category_path));
+      if (Array.isArray(it.category_path)) labels.push(...it.category_path.flatMap(split));
+      return Array.from(new Set(labels.map(slug).filter(Boolean)));
+    }
+
+    const baseLabels = labelsOf(p);
+    const rel = data.filter(x => x!==p && labelsOf(x).some(t => baseLabels.includes(t))).slice(0,8);
+
+    const relGrid = document.getElementById('related-grid');
+    const cardHTML = (q)=>{
+      const qSku = String(q.sku||'').toLowerCase();
+      const name = q.name || qSku || 'Sản phẩm';
+      const img  = imgOf(q);
+      const price= q.price!=null ? fmt(q.price) : '';
+      const link = href(q);
+      const mer  = (q.merchant||'').toLowerCase();
+      return `
+        <article class="product-card" data-sku="${esc(qSku)}">
+          <a class="thumb" href="/g.html?sku=${encodeURIComponent(qSku)}">
+            <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
+                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+          </a>
+          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(qSku)}">${esc(name)}</a></h3>
+          ${price?`<div class="price" data-price="${esc(String(q.price||''))}">${price}</div>`:''}
+          <div class="actions">
+            <a class="buy" href="${esc(link)}" data-merchant="${esc(mer)}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+          </div>
+        </article>`;
+    };
+    relGrid.innerHTML = (rel.length?rel:data.filter(x=>x!==p).slice(0,8)).map(cardHTML).join('');
+
+    // ===== Canonical/OG động =====
+    const abs = location.origin + location.pathname + '?sku=' + encodeURIComponent(sku);
+    const img = imgOf(p);
+    document.getElementById('canonical').setAttribute('href', abs);
+    setOg('og:url', abs);
+    setOg('og:title', name + ' | MXD');
+    setOg('og:image', location.origin + img);
+
+    // ===== JSON-LD Product =====
+    try{
+      const ld = {
+        "@context":"https://schema.org",
+        "@type":"Product",
+        "name": name,
+        "sku": sku,
+        "image": location.origin + img,
+        "brand": p.brand || undefined,
+        "description": p.description || p.desc || p.short_desc || undefined,
+        "offers": {
+          "@type":"Offer",
+          "priceCurrency":"VND",
+          "price": String(p.price || ''),
+          "url": abs,
+          "availability":"https://schema.org/InStock"
+        }
+      };
+      const s = document.createElement('script');
+      s.type = 'application/ld+json'; s.id = 'ld-product';
+      s.textContent = JSON.stringify(ld);
+      document.head.appendChild(s);
+    }catch(_){}
+
+    function setOg(prop, val){
+      let m = document.querySelector(`meta[property="${prop}"]`);
+      if (!m){ m = document.createElement('meta'); m.setAttribute('property', prop); document.head.appendChild(m); }
+      m.setAttribute('content', val);
+    }
+  })();
+  </script>
+</body>
+</html>
