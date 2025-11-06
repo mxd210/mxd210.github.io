@@ -18,7 +18,7 @@
 
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- Safety CSS: đảm bảo lưới & accordion luôn hiển thị -->
+  <!-- Safety CSS -->
   <style>
     .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
     .product-deals .product-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
@@ -28,12 +28,8 @@
     .product-card .price{font-weight:600}
     .product-card .actions .buy{display:inline-block;padding:8px 12px;border-radius:10px;background:var(--brand,#111);color:#fff;text-decoration:none}
     .muted{color:var(--muted,#6b7280)}
-
-    /* Hover brief (desktop) */
     .hover-brief{position:absolute;inset:auto 12px 56px 12px;background:rgba(0,0,0,.7);color:#fff;border-radius:10px;padding:10px;line-height:1.35;font-size:12px;opacity:0;transform:translateY(8px);transition:.18s;pointer-events:none;max-height:92px;overflow:hidden}
     @media (hover:hover){ .product-card:hover .hover-brief{opacity:1;transform:translateY(0)} }
-
-    /* Accordion trong thẻ */
     .card-extra{margin-top:10px;border-top:1px dashed var(--line,#e5e7eb);padding-top:8px}
     .card-extra>summary{cursor:pointer;list-style:none}
     .card-extra>summary::-webkit-details-marker{display:none}
@@ -44,16 +40,15 @@
     .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--chip,#f3f4f6);border:1px solid var(--line,#e5e7eb);margin-right:6px;margin-top:4px}
   </style>
 
-  <!-- GA4 trước Affiliate (chuẩn MXD) -->
+  <!-- GA4 trước Affiliate -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
 </head>
 <body>
-  <!-- Breadcrumb -->
   <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Mỹ phẩm</nav>
   <h1>Mỹ phẩm</h1>
 
-  <!-- MXD-ANCHOR: CATEGORY-HERO (my-pham) -->
+  <!-- HERO -->
   <section class="category-hero">
     <p>Mỹ phẩm ở MXD chọn theo 3 tiêu chí <strong>an toàn – hiệu quả – dễ mua</strong> cho khí hậu nóng ẩm. Ưu tiên bảng thành phần rõ ràng, thương hiệu uy tín, review thực tế; hạn chế hương liệu mạnh cho da nhạy cảm.</p>
     <ul>
@@ -66,245 +61,240 @@
       <a class="btn" href="#faq-my-pham">Hỏi nhanh</a>
     </p>
   </section>
-  <!-- /MXD-ANCHOR -->
 
-  <!-- Lưới sản phẩm -->
-  <!-- MXD-ANCHOR: PRODUCTS-GRID -->
+  <!-- GRID -->
   <section id="product-grid" class="product-grid"
            data-category="my-pham"
            data-alias="my-pham,my pham,mypham,lam-dep,lam dep,lamdep,trang-diem,trang diem,skincare,skin-care,make-up,makeup,nuoc-hoa,nuoc hoa,cosmetics,beauty">
-    <!-- Renderer sẽ đổ .product-card vào đây -->
   </section>
-  <!-- /MXD-ANCHOR -->
 
-  <!-- Deals -->
+  <!-- DEALS -->
   <section id="deals" class="product-deals">
     <h2>Deal hôm nay</h2>
     <div id="deals-grid" class="product-grid compact"></div>
   </section>
 
   <!-- FAQ -->
-  <!-- MXD-ANCHOR: CATEGORY-FAQ (my-pham) -->
   <section id="faq-my-pham" class="category-faq">
     <h2>Hỏi nhanh – đáp gọn</h2>
-
-    <details>
-      <summary>Routine 60s cho người mới?</summary>
+    <details><summary>Routine 60s cho người mới?</summary>
       <p><strong>Sáng:</strong> rửa mặt dịu nhẹ → dưỡng ẩm mỏng → <strong>chống nắng SPF ≥50 PA++++</strong>.<br>
          <strong>Tối:</strong> tẩy trang (nếu makeup) → rửa mặt → treatment (AHA/BHA/retinol tuỳ mục tiêu, tuần 2–4 lần) → dưỡng phục hồi.</p>
     </details>
-
-    <details>
-      <summary>Mới dùng retinol nên chọn nồng độ nào?</summary>
-      <p>Bắt đầu 0.1–0.3% (hoặc retinal 0.05%), tuần 2 lần, “sandwich” với kem dưỡng; tránh phối AHA nồng độ cao/benzoyl peroxide cùng lượt để giảm kích ứng.</p>
+    <details><summary>Mới dùng retinol nên chọn nồng độ nào?</summary>
+      <p>0.1–0.3% (hoặc retinal 0.05%), tuần 2 lần, “sandwich” với kem dưỡng; tránh phối AHA cao/benzoyl peroxide cùng lượt.</p>
     </details>
-
-    <details>
-      <summary>Vitamin C có kỵ niacinamide?</summary>
-      <p>Với công thức hiện đại, <em>không kỵ</em> trong điều kiện bình thường; có thể dùng sáng Vitamin C → chống nắng, tối niacinamide để cân bằng dầu nước.</p>
+    <details><summary>Vitamin C có kỵ niacinamide?</summary>
+      <p>Với công thức hiện đại, <em>không kỵ</em> trong điều kiện bình thường; có thể dùng sáng Vitamin C → chống nắng, tối niacinamide.</p>
     </details>
-
-    <details>
-      <summary>Patch test như thế nào?</summary>
+    <details><summary>Patch test như thế nào?</summary>
       <p>Chấm lượng hạt đậu sau tai/viền hàm 24–48h. Nếu đỏ rát/ngứa kéo dài thì dừng. Lưu ý hạn dùng (PAO 6–12M) và bảo quản tránh nắng nóng.</p>
     </details>
-
-    <details>
-      <summary>Bà bầu/cho con bú cần tránh gì?</summary>
+    <details><summary>Bà bầu/cho con bú cần tránh gì?</summary>
       <p>Tránh retinoids nồng độ cao &amp; hydroquinone; ưu tiên niacinamide, azelaic, HA, ceramide; hỏi bác sĩ khi không chắc chắn.</p>
     </details>
   </section>
-  <!-- /MXD-ANCHOR -->
 
   <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
 
-  <!-- Subnav active helper (nếu có .filter-row) -->
+  <!-- Subnav helper -->
   <script>
-  (function mxdSubnavActive(){
+  (function(){
     try{
       const here = new URL(location.href);
-      document.querySelectorAll('.filter-row a.btn').forEach(a=>{
+      const els = document.querySelectorAll('.filter-row a.btn');
+      for (const a of els){
         try{
           const u = new URL(a.getAttribute('href'), location.origin);
           if (u.pathname === here.pathname){ a.classList.add('is-active'); a.setAttribute('aria-current','page'); }
           else { a.classList.remove('is-active'); a.removeAttribute('aria-current'); }
         }catch(_){}
-      });
+      }
     }catch(_){}
   })();
   </script>
 
   <!-- Renderer -->
   <script>
-  (async function renderMXD(){
-    const grid = document.getElementById('product-grid');
-    const dealsEl = document.getElementById('deals-grid');
+  (function(){
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
 
-    const cat = (grid.getAttribute('data-category')||'').trim().toLowerCase();
-    const aliases = (grid.getAttribute('data-alias')||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-    const ALIASES = new Set([cat, ...aliases]);
-
-    // Fallback nguồn đa dạng để tránh trắng lưới
-    const sources = [
-      '/affiliates.json','/products.json',
-      '/assets/data/affiliates.json','/assets/data/products.json',
-      '/assets/affiliates.json','/data/affiliates.json','/data/products.json'
-    ];
-
-    async function loadFirst(urls){
-      for (const src of urls){
-        try{
-          const r = await fetch(src, { cache:'no-store' });
-          if (!r.ok) continue;
-          const json = await r.json();
-          if (Array.isArray(json)) return json;
-          if (json && Array.isArray(json.items)) return json.items;
-        }catch(e){}
-      }
-      return null;
+    function toSlugRaw(v){
+      const s = String(v||'').toLowerCase().trim();
+      return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
     }
-
-    const data = await loadFirst(sources);
-    if (!Array.isArray(data)){
-      grid.innerHTML = `<p class="muted">Không tải được dữ liệu sản phẩm (đã thử ${sources.join(' → ')}).</p>`;
-      return;
-    }
-
-    const norm = v => String(v||'').toLowerCase().trim();
-    const stripAccents = s => norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
-    const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
-    const toSlug = v => stripAccents(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+    function splitWords(v){ return String(v||'').toLowerCase().trim().split(/[,\s/|>]+/).filter(Boolean); }
 
     const SK_MAP = { 'dau':'Da dầu','hon-hop':'Da hỗn hợp','kho':'Da khô','nhay-cam':'Da nhạy cảm','thuong':'Da thường' };
 
-    function labelsOf(p){
-      const labels = [];
-      labels.push(...split(p.cat||p.category||p.section||''));
-      const arr = Array.isArray(p.cats)? p.cats : (Array.isArray(p.categories)? p.categories : []);
-      labels.push(...arr.flatMap(split));
-      if (Array.isArray(p.tags)) labels.push(...p.tags.flatMap(split));
-      if (typeof p.category_path === 'string') labels.push(...split(p.category_path));
-      if (Array.isArray(p.category_path)) labels.push(...p.category_path.flatMap(split));
-      return Array.from(new Set(labels.map(toSlug).filter(Boolean)));
-    }
-
-    const isLive = p => p && p.status !== false && p.status !== 'archived';
-
-    function inCat(p){
-      const labels = labelsOf(p);
-      if (!labels.length) return false;
-      if (labels.some(l => ALIASES.has(l))) return true;
-      for (const a of ALIASES){ if (labels.some(l => l.startsWith(a) || a.startsWith(l))) return true; }
-      return false;
-    }
-
-    let items = data.filter(p => isLive(p) && inCat(p));
-    if (!items.length) items = data.filter(isLive).slice(0,12); // tránh trắng trang
-
-    const fmt   = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-    const esc   = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-    const href  = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
-    const imgOf = p => {
-      const sku = (p.sku||'').toLowerCase();
-      return p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp`);
-    };
-
     function asArray(val){
       if (!val) return [];
-      if (Array.isArray(val)) return val.map(v=>String(v));
-      // tách theo dấu phẩy / chấm phẩy / gạch
+      if (Array.isArray(val)) return val.map(String);
       return String(val).split(/[;,|/]+/).map(s=>s.trim()).filter(Boolean);
+    }
+
+    function imgOf(p){
+      const cand = (
+        p.image || p.image_url || p.imageUrl || p.img || p.thumb || p.thumbnail || p.picture || p.pic ||
+        (Array.isArray(p.images) ? p.images[0] : null)
+      );
+      if (cand) return String(cand);
+      const sku = String(p.sku||'').toLowerCase();
+      return sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp';
     }
 
     function skinBadges(p){
       const raw = asArray(p.skin_types || p.skin || p.skin_type);
       if (!raw.length) return '';
-      const normed = raw.map(x=>toSlug(x));
-      const labels = normed.map(k => SK_MAP[k] || xTitle(k));
-      function xTitle(s){ return s.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()); }
-      return labels.map(l=>`<span class="badge">${esc(l)}</span>`).join(' ');
+      const names = raw.map(x=>SK_MAP[toSlugRaw(x)] || x.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()));
+      return names.map(l=>`<span class="badge">${esc(l)}</span>`).join(' ');
     }
 
-    function cardHTML(p){
-      const sku   = (p.sku||'').toLowerCase();
-      const name  = p.name || sku || 'Sản phẩm';
-      const img   = imgOf(p);
-      const price = fmt(p.price);
-      const merchant = (p.merchant||'').toLowerCase();
-      const link  = href(p);
-
-      const desc  = p.desc_short || p.short_desc || p.description_short || '';
-      const ings  = asArray(p.ingredients).slice(0,8);
-      const how   = p.how_to_use || p.usage || '';
-      const notes = p.notes || p.cautions || '';
-
-      const ingHtml = ings.length ? `<div><strong>Thành phần chính:</strong><ul>${ings.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>` : '';
-      const skinHtml = skinBadges(p) ? `<div><strong>Phù hợp da:</strong><div>${skinBadges(p)}</div></div>` : '';
-      const howHtml = how ? `<div><strong>Cách dùng:</strong> <span>${esc(how)}</span></div>` : '';
-      const noteHtml = notes ? `<div><strong>Lưu ý:</strong> <span>${esc(notes)}</span></div>` : '';
-
-      const infoBlock = (desc || ingHtml || skinHtml || howHtml || noteHtml) ? `
-        <details class="card-extra">
-          <summary><span class="toggle">ⓘ Thông tin</span></summary>
-          <div class="info">
-            ${desc ? `<div>${esc(desc)}</div>` : ''}
-            ${ingHtml}${skinHtml}${howHtml}${noteHtml}
-          </div>
-        </details>` : '';
-
-      return `
-        <article class="product-card" data-sku="${esc(sku)}">
-          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
-            <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
-                 onerror="this.onerror=null;this.dataset.err=1;this.src='/assets/img/products/placeholder.webp'">
-          </a>
-          ${desc ? `<div class="hover-brief">${esc(desc.length>170?desc.slice(0,167)+'…':desc)}</div>` : ''}
-          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
-          ${price?`<div class="price">${price}</div>`:''}
-          <div class="actions">
-            <a class="buy" href="${esc(link)}" data-merchant="${esc(merchant)}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
-          </div>
-          ${infoBlock}
-        </article>`;
+    function labelsOf(p){
+      const out = [];
+      out.push(...splitWords(p.cat||p.category||p.section||''));
+      const arr = Array.isArray(p.cats)? p.cats : (Array.isArray(p.categories)? p.categories : []);
+      out.push(...arr.flatMap(splitWords));
+      if (Array.isArray(p.tags)) out.push(...p.tags.flatMap(splitWords));
+      if (typeof p.category_path === 'string') out.push(...splitWords(p.category_path));
+      if (Array.isArray(p.category_path)) out.push(...p.category_path.flatMap(splitWords));
+      return Array.from(new Set(out.map(toSlugRaw).filter(Boolean)));
     }
 
-    grid.innerHTML = items.map(cardHTML).join('');
-
-    // DEALS
-    if (dealsEl){
-      const isDeal = p => {
-        const t = Array.isArray(p.tags)? p.tags.map(norm) : [];
-        const flag = (p.deal===true) || t.includes('deal') || t.includes('flash-sale') || t.includes('sale') || t.includes('giam-gia') || t.includes('hot');
-        const oldPrice = p.old_price || p.price_old || p.list_price || p.msrp || p.regular_price;
-        return flag || (oldPrice && +oldPrice > +p.price);
-      };
-      const deals = items.filter(isDeal).slice(0,8);
-      const list = (deals.length ? deals : items.slice(0,8)).map(cardHTML).join('');
-      dealsEl.innerHTML = list;
+    async function loadFirst(urls){
+      for (const src of urls){
+        try{
+          const r = await fetch(src,{cache:'no-store'});
+          if (!r.ok) continue;
+          const j = await r.json();
+          if (Array.isArray(j)) return j;
+          if (j && Array.isArray(j.items)) return j.items;
+        }catch(e){}
+      }
+      return null;
     }
 
-    // Gắn affiliate tracking nếu có
-    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+    async function run(){
+      const grid = document.getElementById('product-grid');
+      const dealsEl = document.getElementById('deals-grid');
+      const cat = (grid.getAttribute('data-category')||'').trim().toLowerCase();
+      const aliases = (grid.getAttribute('data-alias')||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+      const ALIASES = new Set([cat, ...aliases]);
 
-    // SEO: bơm ItemList JSON-LD cho 8–12 sản phẩm đầu
-    try{
-      const top = items.slice(0, Math.min(items.length, 12));
-      const itemList = {
-        "@context":"https://schema.org",
-        "@type":"ItemList",
-        "itemListElement": top.map((p,i)=>({
-          "@type":"ListItem",
-          "position": i+1,
-          "url": location.origin + "/g.html?sku=" + encodeURIComponent((p.sku||'').toLowerCase()),
-          "name": p.name || (p.sku||'').toLowerCase()
-        }))
-      };
-      const el = document.createElement('script');
-      el.type = 'application/ld+json';
-      el.id = 'mxd-itemlist';
-      el.textContent = JSON.stringify(itemList);
-      document.body.appendChild(el);
-    }catch(_){}
+      const sources = [
+        '/affiliates.json','/products.json',
+        '/assets/data/affiliates.json','/assets/data/products.json',
+        '/assets/affiliates.json','/data/affiliates.json','/data/products.json'
+      ];
+
+      const data = await loadFirst(sources);
+      if (!Array.isArray(data)){
+        grid.innerHTML = `<p class="muted">Không tải được dữ liệu sản phẩm (đã thử ${sources.join(' → ')}).</p>`;
+        return;
+      }
+
+      function isLive(p){ return p && p.status !== false && p.status !== 'archived'; }
+      function inCat(p){
+        const labels = labelsOf(p);
+        if (!labels.length) return false;
+        if (labels.some(l=>ALIASES.has(l))) return true;
+        for (const a of ALIASES){ if (labels.some(l => l.startsWith(a) || a.startsWith(l))) return true; }
+        return false;
+      }
+
+      let items = data.filter(p => isLive(p) && inCat(p));
+      if (!items.length) items = data.filter(isLive).slice(0,12); // tránh trắng trang
+
+      function cardHTML(p){
+        const sku = String(p.sku||'').toLowerCase();
+        const name = p.name || sku || 'Sản phẩm';
+        const img  = imgOf(p);
+        const price = fmt(p.price);
+        const merchant = String(p.merchant||'').toLowerCase();
+        const link = p.deeplink || p.origin_url || p.origin || p.url || '#';
+
+        const desc  = p.desc_short || p.short_desc || p.description_short || '';
+        const ings  = asArray(p.ingredients).slice(0,8);
+        const how   = p.how_to_use || p.usage || '';
+        const notes = p.notes || p.cautions || '';
+
+        const ingHtml  = ings.length ? `<div><strong>Thành phần chính:</strong><ul>${ings.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>` : '';
+        const skinHtml = skinBadges(p) ? `<div><strong>Phù hợp da:</strong><div>${skinBadges(p)}</div></div>` : '';
+        const howHtml  = how ? `<div><strong>Cách dùng:</strong> <span>${esc(how)}</span></div>` : '';
+        const noteHtml = notes ? `<div><strong>Lưu ý:</strong> <span>${esc(notes)}</span></div>` : '';
+
+        const infoBlock = (desc||ingHtml||skinHtml||howHtml||noteHtml) ? `
+          <details class="card-extra">
+            <summary><span class="toggle">ⓘ Thông tin</span></summary>
+            <div class="info">
+              ${desc?`<div>${esc(desc)}</div>`:''}
+              ${ingHtml}${skinHtml}${howHtml}${noteHtml}
+            </div>
+          </details>` : '';
+
+        return `
+          <article class="product-card" data-sku="${esc(sku)}">
+            <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
+              <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
+                   onerror="this.onerror=null;this.dataset.err=1;this.src='/assets/img/products/placeholder.webp'">
+            </a>
+            ${desc ? `<div class="hover-brief">${esc(desc.length>170?desc.slice(0,167)+'…':desc)}</div>` : ''}
+            <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
+            ${price?`<div class="price">${price}</div>`:''}
+            <div class="actions">
+              <a class="buy" href="${esc(link)}" data-merchant="${esc(merchant)}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+            </div>
+            ${infoBlock}
+          </article>`;
+      }
+
+      grid.innerHTML = items.map(cardHTML).join('');
+
+      // Deals
+      if (dealsEl){
+        function isDeal(p){
+          const t = Array.isArray(p.tags)? p.tags.map(s=>String(s).toLowerCase()) : [];
+          const flag = (p.deal===true) || t.includes('deal') || t.includes('flash-sale') || t.includes('sale') || t.includes('giam-gia') || t.includes('hot');
+          const oldPrice = p.old_price || p.price_old || p.list_price || p.msrp || p.regular_price;
+          return flag || (oldPrice && +oldPrice > +p.price);
+        }
+        const deals = items.filter(isDeal).slice(0,8);
+        dealsEl.innerHTML = (deals.length?deals:items.slice(0,8)).map(cardHTML).join('');
+      }
+
+      // Affiliate scan (không dùng optional chaining)
+      try{
+        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function'){
+          window.mxdAffiliate.scan();
+        }
+      }catch(_){}
+
+      // ItemList JSON-LD
+      try{
+        const top = items.slice(0, Math.min(items.length, 12));
+        const itemList = {
+          "@context":"https://schema.org",
+          "@type":"ItemList",
+          "itemListElement": top.map((p,i)=>({
+            "@type":"ListItem",
+            "position": i+1,
+            "url": location.origin + "/g.html?sku=" + encodeURIComponent((String(p.sku||'').toLowerCase())),
+            "name": p.name || (String(p.sku||'').toLowerCase())
+          }))
+        };
+        const el = document.createElement('script');
+        el.type = 'application/ld+json';
+        el.id = 'mxd-itemlist';
+        el.textContent = JSON.stringify(itemList);
+        document.body.appendChild(el);
+      }catch(_){}
+    }
+
+    run().catch(()=>{ 
+      const grid = document.getElementById('product-grid');
+      if (grid) grid.innerHTML = '<p class="muted">Không thể hiển thị lưới do lỗi runtime.</p>';
+    });
   })();
   </script>
 
@@ -314,7 +304,7 @@
     {"@type":"Question","name":"Routine 60s cho người mới?","acceptedAnswer":{"@type":"Answer","text":"Sáng: rửa mặt dịu nhẹ → dưỡng ẩm mỏng → chống nắng SPF ≥50 PA++++. Tối: tẩy trang (nếu makeup) → rửa mặt → treatment vừa phải (AHA/BHA/retinol) 2–4 lần/tuần → dưỡng phục hồi."}},
     {"@type":"Question","name":"Mới dùng retinol nên chọn nồng độ nào?","acceptedAnswer":{"@type":"Answer","text":"Bắt đầu 0.1–0.3% (hoặc retinal 0.05%), tuần 2 lần, sandwich với kem dưỡng; tránh phối AHA cao/benzoyl peroxide cùng lượt."}},
     {"@type":"Question","name":"Vitamin C có kỵ niacinamide?","acceptedAnswer":{"@type":"Answer","text":"Công thức hiện đại không kỵ trong điều kiện thường; có thể dùng sáng C, tối niacinamide."}},
-    {"@type":"Question","name":"Patch test như thế nào?","acceptedAnswer":{"@type":"Answer","text":"Thử ở sau tai/viền hàm 24–48 giờ, theo dõi kích ứng. Chú ý hạn dùng (PAO 6–12M) và bảo quản tránh nắng nóng."}},
+    {"@type":"Question","name":"Patch test như thế nào?","acceptedAnswer":{"@type":"Answer","text":"Thử ở sau tai/viền hàm 24–48 giờ; theo dõi kích ứng. Chú ý hạn dùng (PAO 6–12M) và bảo quản tránh nắng nóng."}},
     {"@type":"Question","name":"Bà bầu/cho con bú cần tránh gì?","acceptedAnswer":{"@type":"Answer","text":"Tránh retinoids nồng độ cao & hydroquinone; ưu tiên niacinamide, azelaic, HA, ceramide; hỏi bác sĩ khi không chắc chắn."}}
   ]}
   </script>
