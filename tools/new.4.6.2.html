@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
-<title>MXD Importer v4.6.1 — Classic Mobile</title>
+<title>MXD Importer v4.6.2 — Classic Mobile + Inline Editor</title>
 <meta name="robots" content="noindex,follow"/>
 <style>
 :root{--bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--b:#223043;--accent:#7cc4ff;
@@ -44,7 +44,7 @@ td img{max-height:50px;display:block;margin:0 auto}td input{width:100%}
 <body>
 <header>
   <div class="wrap">
-    <h1>MXD Importer v4.6.1</h1>
+    <h1>MXD Importer v4.6.2</h1>
     <span class="badge">Classic • Mobile-first</span>
     <span class="badge">GA4 trước Affiliate</span>
     <span style="margin-left:auto"></span>
@@ -55,16 +55,16 @@ td img{max-height:50px;display:block;margin:0 auto}td input{width:100%}
 
 <main>
 
-  <!-- 0) PRESET (chuẩn MXD) -->
+  <!-- 0) PRESET -->
   <section class="panel">
     <h2>0) Preset (chuẩn MXD)</h2>
     <div class="body stack">
       <div class="row">
-        <input id="workerUrl" type="url" placeholder="Worker URL (ví dụ: https://mxd210.mxd6686.workers.dev)"/>
+        <input id="workerUrl" type="url" placeholder="Worker URL (vd: https://mxd210.mxd6686.workers.dev)"/>
         <input id="workerKey" type="text" placeholder="X-Key (SECRET_KEY/ADMIN_KEY)"/>
       </div>
       <div class="row">
-        <input id="imgFolder" type="text" placeholder="Thư mục đích ảnh (vd: /assets/img/products/)" value="/assets/img/products/"/>
+        <input id="imgFolder" type="text" placeholder="Thư mục ảnh (vd: /assets/img/products/)" value="/assets/img/products/"/>
         <input id="branch" type="text" placeholder="Branch (tuỳ worker; để trống nếu không dùng)"/>
       </div>
       <div class="row">
@@ -73,11 +73,11 @@ td img{max-height:50px;display:block;margin:0 auto}td input{width:100%}
         <button class="btn" id="btnHealthW">Kiểm tra Worker</button>
         <button class="btn" id="btnStatus">Status</button>
       </div>
-      <div class="small">Worker khuyến nghị hỗ trợ <code>/ops/upload-lite</code> (FormData: <i>path,file,message,branch,remote_url?</i>). Fallback: <code>/upload</code> (JSON).</div>
+      <div class="small">Worker nên hỗ trợ <code>/ops/upload-lite</code> (FormData: path,file,message,branch,remote_url?).</div>
     </div>
   </section>
 
-  <!-- 1) ẢNH — đơn & batch -->
+  <!-- 1) ẢNH -->
   <section class="panel">
     <h2>1) Ảnh — đơn &amp; batch</h2>
     <div class="body stack">
@@ -120,10 +120,56 @@ https://example.com/2.webp"></textarea>
     </div>
   </section>
 
-  <!-- 2) DỮ LIỆU SẢN PHẨM -->
+  <!-- 2) BẢNG DỮ LIỆU + Inline Editor -->
   <section class="panel">
     <h2>2) Bảng dữ liệu</h2>
     <div class="body stack">
+      <!-- Inline editor giống 4.3.8 -->
+      <div class="stack" style="border:1px dashed var(--b);border-radius:10px;padding:10px">
+        <div class="row">
+          <input id="fiName" placeholder="Tên sản phẩm"/>
+          <input id="fiPrice" type="number" placeholder="Giá (VND)"/>
+        </div>
+        <div class="row">
+          <select id="fiMerchant">
+            <option value="">auto</option>
+            <option value="shopee">shopee</option>
+            <option value="lazada">lazada</option>
+            <option value="tiki">tiki</option>
+          </select>
+          <input id="fiOrigin" type="url" placeholder="Link gốc (origin)"/>
+        </div>
+        <div class="row">
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="fiSku" placeholder="SKU (lowercase-kebab)"/>
+            <button class="btn" id="btnFormSkuFromName">SKU ← Tên</button>
+          </div>
+          <input id="fiImage" placeholder="Ảnh (auto: /assets/img/products/&lt;sku&gt;.webp)" readonly/>
+        </div>
+        <div class="row">
+          <input id="fiBrand" placeholder="Brand (tuỳ chọn)"/>
+          <input id="fiCategory" placeholder="Category (để trống = lấy từ ô 'Slug danh mục')"/>
+        </div>
+        <div class="row">
+          <select id="fiStatus">
+            <option value="active">active</option>
+            <option value="draft">draft</option>
+            <option value="archived">archived</option>
+          </select>
+          <label class="small" style="display:flex;align-items:center;gap:8px">
+            <input type="checkbox" id="fiFeatured"/><span>Nổi bật (featured)</span>
+          </label>
+        </div>
+        <div class="row">
+          <textarea id="fiNotes" rows="2" placeholder="Ghi chú (tuỳ chọn)"></textarea>
+        </div>
+        <div class="row">
+          <button class="btn ok" id="btnAddViaForm">Thêm sản phẩm</button>
+          <button class="btn" id="btnUpdateSelected">Cập nhật dòng đang chọn</button>
+          <button class="btn" id="btnFillFromLink">Điền từ link</button>
+        </div>
+      </div>
+
       <label>Dán danh sách (mỗi dòng: <code>Tên | giá | link</code> hoặc chỉ <code>link</code>)</label>
       <textarea id="inputList" rows="5" placeholder="Tên sản phẩm | 199000 | https://shopee.vn/..."></textarea>
       <div class="small">Dòng hiện có: <span id="lineCount">0</span></div>
@@ -146,7 +192,7 @@ https://example.com/2.webp"></textarea>
           <tbody id="tbody"></tbody>
         </table>
       </div>
-      <div id="tip" class="small">Mẹo: chạm vào 1 dòng để “bắt” SKU/Origin cho panel Ảnh & Deep-link. SKU luôn lowercase-kebab.</div>
+      <div id="tip" class="small">Mẹo: chạm vào 1 dòng để “bắt” vào form, panel Ảnh & Deep-link. SKU luôn lowercase-kebab.</div>
       <div id="kpi" class="small"></div>
       <div class="row">
         <button class="btn bad" id="btnDelete">Xoá SELECT</button>
@@ -174,7 +220,7 @@ https://example.com/2.webp"></textarea>
     </div>
   </section>
 
-  <!-- 4) DEEP-LINK (mục đã chọn) -->
+  <!-- 4) DEEP-LINK -->
   <section class="panel">
     <h2>4) Deep-link (mục đang chọn)</h2>
     <div class="body stack">
@@ -194,7 +240,7 @@ https://example.com/2.webp"></textarea>
     </div>
   </section>
 
-  <!-- 5) WORKER HÀNG ĐỢI / PUBLISH -->
+  <!-- 5) WORKER -->
   <section class="panel">
     <h2>5) Worker — Hàng đợi &amp; Xuất bản</h2>
     <div class="body stack">
@@ -234,7 +280,7 @@ const el=(tag,attrs={})=>{const e=document.createElement(tag);Object.assign(e,at
 
 /* ========= CONFIG ========= */
 const defaults={tplShopee:'',tplLazada:'',workerUrl:'',workerKey:'',imgFolder:'/assets/img/products/',branch:'',lang:'vi',sub2:'',sub3:'store',sub4:'oneatweb'};
-const storeKey='mxd-importer-v461-classic';
+const storeKey='mxd-importer-v462-classic';
 const loadCfg=()=>{try{return JSON.parse(localStorage.getItem(storeKey))||{}}catch(e){return{}}};
 let cfg=Object.assign({},defaults,loadCfg());
 const saveCfg=()=>localStorage.setItem(storeKey,JSON.stringify(cfg));
@@ -263,13 +309,13 @@ const detect=(url)=>{try{const h=(new URL(url)).hostname;if(h.includes('shopee')
 const guessNameFromUrl=(url)=>{try{const u=new URL(url);let p=u.pathname.replace(/\.html.*/,'');const ix=p.indexOf('-i.');if(ix!==-1){const s=p.substring(1,ix);return decodeURIComponent(s).replace(/-/g,' ')}const li=p.lastIndexOf('-i');if(li!==-1){const s=p.substring(p.lastIndexOf('/')+1,li);return decodeURIComponent(s).replace(/-/g,' ')}const last=p.substring(p.lastIndexOf('/')+1);if(last)return decodeURIComponent(last).replace(/-/g,' ')}catch(e){}return''};
 const nowVNISO=()=>new Date().toLocaleString('sv-SE',{timeZone:'Asia/Ho_Chi_Minh',hour12:false}).replace(' ','T')+'+07:00';
 
-const updateKpi=()=>{const sum=data.reduce((a,b)=>a+(Number(b.price)||0),0);const byM=data.reduce((m,r)=>{const k=r.merchant||'auto';m[k]=(m[k]||0)+1;return m},{});const merchants=Object.entries(byM).map(([k,v])=>`${k}:${v}`).join(' · ');const sel=data.filter(r=>r.selected).length;$("#kpi").innerHTML=`<span>Hàng: <b>${data.length}</b></span> <span>Tổng giá: <b>${sum.toLocaleString('vi-VN')}</b></span> <span>Merchant: ${merchants}</span> <span>Đã chọn: <b id="selCount">${sel}</b></span>`};
-
 const createDeepLink=(r)=>{if(!r.merchant)return'';const tpl=r.merchant==='shopee'?($("#tplShopee").value.trim()||cfg.tplShopee): (r.merchant==='lazada'?($("#tplLazada").value.trim()||cfg.tplLazada):'');if(!tpl)return'';const enc=(s)=>encodeURIComponent(s||'');return tpl.replace('{url}',enc(r.origin)).replace('{sub1}',enc(r.sku)).replace('{sub2}',enc(cfg.sub2)).replace('{sub3}',enc(cfg.sub3)).replace('{sub4}',enc(cfg.sub4))};
 
 const createAffObject=(r)=>({name:(r.name||'').trim(),price:Number(r.price)||0,origin:(r.origin||'').trim(),merchant:r.merchant||'',sku:r.sku,image:`${cfg.imgFolder.replace(/\/$/,'')}/${r.sku}.webp`,category:r.category||$("#category").value.trim(),brand:r.brand||'',featured:!!r.featured,status:r.status||'active',updated_at:nowVNISO(),sub1:r.sku,notes:r.notes||''});
 
-/* ========= RENDER TABLE ========= */
+/* ========= TABLE RENDER ========= */
+const updateKpi=()=>{const sum=data.reduce((a,b)=>a+(Number(b.price)||0),0);const byM=data.reduce((m,r)=>{const k=r.merchant||'auto';m[k]=(m[k]||0)+1;return m},{});const merchants=Object.entries(byM).map(([k,v])=>`${k}:${v}`).join(' · ');const sel=data.filter(r=>r.selected).length;$("#kpi").innerHTML=`<span>Hàng: <b>${data.length}</b></span> <span>Tổng giá: <b>${sum.toLocaleString('vi-VN')}</b></span> <span>Merchant: ${merchants}</span> <span>Đã chọn: <b id="selCount">${sel}</b></span>`};
+
 const renderTable=()=>{const tbody=$("#tbody");tbody.textContent='';data.forEach((r,i)=>{const tr=el('tr');
 const tdSel=el('td',{className:'sel'});const cb=el('input',{type:'checkbox'});cb.checked=!!r.selected;cb.onchange=()=>{r.selected=cb.checked;const sc=$("#selCount");if(sc)sc.textContent=data.filter(x=>x.selected).length};tdSel.appendChild(cb);tr.appendChild(tdSel);
 const tdNum=el('td');tdNum.textContent=i+1;tr.appendChild(tdNum);
@@ -277,15 +323,38 @@ const tdName=el('td');const inpName=el('input');inpName.value=r.name||'';inpName
 const tdPrice=el('td');const inpPrice=el('input');inpPrice.type='number';inpPrice.value=r.price?Number(r.price):'';inpPrice.onblur=()=>{r.price=Number(inpPrice.value)||0;updateKpi()};tdPrice.appendChild(inpPrice);tr.appendChild(tdPrice);
 const tdMerc=el('td');tdMerc.textContent=r.merchant||'';tr.appendChild(tdMerc);
 const tdBrand=el('td');const inpBrand=el('input');inpBrand.value=r.brand||'';inpBrand.onblur=()=>{r.brand=inpBrand.value.trim()};tdBrand.appendChild(inpBrand);tr.appendChild(tdBrand);
-const tdSku=el('td');const inpSku=el('input');inpSku.value=r.sku;inpSku.onblur=()=>{const ns=slugify(inpSku.value||r.sku);if(ns!==r.sku){if(imagesSet.has(r.sku)){imagesSet.delete(r.sku);imagesSet.add(ns);imagePreviewMap[ns]=imagePreviewMap[r.sku];imageBlobMap[ns]=imageBlobMap[r.sku];delete imagePreviewMap[r.sku];delete imageBlobMap[r.sku]}r.sku=ns;inpSku.value=ns}};tdSku.appendChild(inpSku);tr.appendChild(tdSku);
+const tdSku=el('td');const inpSku=el('input');inpSku.value=r.sku;inpSku.onblur=()=>{const ns=slugify(inpSku.value||r.sku);if(ns!==r.sku){if(imagesSet.has(r.sku)){imagesSet.delete(r.sku);imagesSet.add(ns);imagePreviewMap[ns]=imagePreviewMap[r.sku];imageBlobMap[ns]=imageBlobMap[r.sku];delete imagePreviewMap[r.sku];delete imageBlobMap[r.sku]}r.sku=ns;inpSku.value=ns;syncSelectedToPanels(r)}};tdSku.appendChild(inpSku);tr.appendChild(tdSku);
 const tdImg=el('td'); if(imagesSet.has(r.sku) && imagePreviewMap[r.sku]){const im=el('img');im.src=imagePreviewMap[r.sku];im.alt=r.sku;tdImg.appendChild(im)} else {tdImg.innerHTML='<span class="missing">✘</span>'} tr.appendChild(tdImg);
 const tdOrigin=el('td');const inpOrigin=el('input');inpOrigin.value=r.origin||'';tdOrigin.appendChild(inpOrigin);tr.appendChild(tdOrigin);
 const tdDeep=el('td');const inpDeep=el('input');inpDeep.readOnly=true;inpDeep.value=r.deep||'';tdDeep.appendChild(inpDeep);tr.appendChild(tdDeep);
 inpOrigin.onblur=()=>{r.origin=inpOrigin.value.trim();r.merchant=detect(r.origin)||'';tdMerc.textContent=r.merchant;r.deep=createDeepLink(r);inpDeep.value=r.deep||'';if(cb.checked){syncSelectedToPanels(r)}};
-tr.onclick=()=>{$$('#tbody tr').forEach(x=>x.style.outline='none');tr.style.outline='1px dashed var(--accent)';cb.checked=true;r.selected=true;const sc=$("#selCount");if(sc)sc.textContent=data.filter(x=>x.selected).length;syncSelectedToPanels(r)};
+tr.onclick=()=>{$$('#tbody tr').forEach(x=>x.style.outline='none');tr.style.outline='1px dashed var(--accent)';cb.checked=true;r.selected=true;const sc=$("#selCount");if(sc)sc.textContent=data.filter(x=>x.selected).length;syncSelectedToPanels(r);fillForm(r)};
 tbody.appendChild(tr);});};
 
+/* ========= FORM (Inline Editor) ========= */
+const fi=()=>({
+  name: $("#fiName").value.trim(),
+  price: Number($("#fiPrice").value.trim())||0,
+  merchant: $("#fiMerchant").value.trim(),
+  origin: $("#fiOrigin").value.trim(),
+  sku: slugify($("#fiSku").value.trim()),
+  image: ($("#fiImage").value.trim()),
+  brand: $("#fiBrand").value.trim(),
+  category: $("#fiCategory").value.trim() || $("#category").value.trim(),
+  status: $("#fiStatus").value,
+  featured: $("#fiFeatured").checked,
+  notes: $("#fiNotes").value.trim()
+});
+const fillForm=(r)=>{ $("#fiName").value=r.name||''; $("#fiPrice").value=r.price||''; $("#fiMerchant").value=r.merchant||''; $("#fiOrigin").value=r.origin||''; $("#fiSku").value=r.sku||''; $("#fiBrand").value=r.brand||''; $("#fiCategory").value=r.category||''; $("#fiStatus").value=r.status||'active'; $("#fiFeatured").checked=!!r.featured; $("#fiNotes").value=r.notes||''; $("#fiImage").value=(cfg.imgFolder.replace(/\/$/,'')+'/'+(r.sku||'')+'.webp') };
 const syncSelectedToPanels=(r)=>{ $("#imgSku").value=r.sku; $("#imgOutPath").value=(cfg.imgFolder.replace(/\/$/,'')+'/'+r.sku+'.webp'); $("#curOrigin").value=r.origin||''; $("#curDeep").value=r.deep||createDeepLink(r) };
+
+$("#btnFormSkuFromName").onclick=()=>{ const base=slugify($("#fiName").value.trim()||$("#fiSku").value.trim()||'item'); let newSku=base,i=2; while(data.some(x=>x.sku===newSku)) newSku=base+'-'+(i++); $("#fiSku").value=newSku; $("#fiImage").value=(cfg.imgFolder.replace(/\/$/,'')+'/'+newSku+'.webp'); toast('Đã đặt SKU theo tên') };
+
+$("#btnFillFromLink").onclick=()=>{ const link=$("#fiOrigin").value.trim(); if(!link){toast('Thiếu link gốc');return} const m=detect(link); const guessed=guessNameFromUrl(link)||''; if(!$("#fiName").value.trim()&&guessed) $("#fiName").value=guessed; if(!$("#fiSku").value.trim()){ let sku=slugify($("#fiName").value)||''; if(!sku&&m){ if(m==='shopee'&&/-i\.\d+\.\d+/.test(link)){const id=link.match(/-i\.\d+\.(\d+)/); if(id) sku='sp-'+id[1]} if(m==='lazada'&&/-i\d+/.test(link)){const id=link.match(/-i(\d+)/); if(id) sku='lz-'+id[1]} } if(!sku) sku='item-'+Math.random().toString(36).slice(2,8); $("#fiSku").value=sku; $("#fiImage").value=(cfg.imgFolder.replace(/\/$/,'')+'/'+sku+'.webp') } $("#fiMerchant").value=m; toast('Đã điền từ link') };
+
+$("#btnAddViaForm").onclick=()=>{ const f=fi(); if(!f.name||!f.origin){toast('Cần Tên + Link gốc');return} let sku=f.sku||slugify(f.name)||('item-'+Math.random().toString(36).slice(2,8)); const base=sku; let k=2; while(data.some(x=>x.sku===sku)) sku=base+'-'+k++; const prod={name:f.name,price:f.price,origin:f.origin,merchant:f.merchant||detect(f.origin)||'',sku,brand:f.brand,category:f.category,featured:!!f.featured,status:f.status||'active',notes:f.notes,selected:false}; prod.deep=createDeepLink(prod); data.push(prod); renderTable(); updateKpi(); toast('Đã thêm sản phẩm'); };
+
+$("#btnUpdateSelected").onclick=()=>{ const sel=data.find(r=>r.selected); if(!sel){toast('Chưa chọn dòng');return} const f=fi(); const oldSku=sel.sku; sel.name=f.name||sel.name; sel.price=f.price||sel.price; sel.origin=f.origin||sel.origin; sel.merchant=(f.merchant||detect(sel.origin)||''); sel.brand=f.brand; sel.category=f.category; sel.status=f.status; sel.featured=!!f.featured; sel.notes=f.notes; if(f.sku && f.sku!==oldSku){ const ns=f.sku; if(imagesSet.has(oldSku)){imagesSet.delete(oldSku);imagesSet.add(ns);imagePreviewMap[ns]=imagePreviewMap[oldSku];imageBlobMap[ns]=imageBlobMap[oldSku];delete imagePreviewMap[oldSku];delete imageBlobMap[oldSku]} sel.sku=ns } sel.deep=createDeepLink(sel); renderTable(); toast('Đã cập nhật dòng đang chọn') };
 
 /* ========= INPUT LIST ========= */
 $("#inputList").oninput=()=>{const lines=$("#inputList").value.split(/\r?\n/).filter(l=>l.trim());$("#lineCount").textContent=lines.length};
@@ -331,7 +400,7 @@ const toWebp=(file)=>new Promise((resolve,reject)=>{const img=new Image(); img.o
 $("#btnToWebp").onclick=async()=>{if(!currentFile){toast('Chọn ảnh trước đã');return} try{const blob= await toWebp(currentFile); setPreview(blob,currentFile.name.replace(/\.[^.]+$/i,'.webp')); const sku=$("#imgSku").value.trim(); if(sku){ imagesSet.add(sku); imagePreviewMap[sku]=URL.createObjectURL(blob); imageBlobMap[sku]=blob; renderTable()} }catch(e){toast('Nén .webp lỗi')}};
 $("#btnDownloadWebp").onclick=()=>{if(!currentWebpBlob){toast('Chưa có file .webp');return} const sku=$("#imgSku").value.trim()||'mxd'; const a=el('a',{href:URL.createObjectURL(currentWebpBlob)}); a.download=sku+'.webp'; document.body.appendChild(a); a.click(); document.body.removeChild(a)};
 
-/* === SKU ← Tên (mục đang chọn) === */
+/* === SKU ← Tên (panel Ảnh) === */
 $("#btnSkuFromName").onclick=()=>{const sel=data.find(r=>r.selected)||data[0]; if(!sel){toast('Chưa chọn dòng');return}
   const base=slugify(sel.name||sel.sku||'item'); if(!base){toast('Tên sản phẩm trống');return}
   let newSku=base, i=2; while(data.some(x=>x!==sel && x.sku===newSku)) newSku=base+'-'+(i++);
@@ -345,7 +414,7 @@ const hdr=()=>{const h={}; const key=$("#workerKey").value.trim()||cfg.workerKey
 
 async function uploadBlobToWorker(blob,outPath,commitMsg){
   const base=ensureBase(); if(!base) return 'ERR: no-worker';
-  // Try /ops/upload-lite (FormData)
+  // Try /ops/upload-lite
   try{
     const fd=new FormData();
     fd.append('path', outPath);
@@ -375,7 +444,7 @@ $("#btnUploadOne").onclick=async()=>{
   $("#outUpload").textContent=res||'(no response)';
 };
 
-/* === Batch URL → Worker (remote fetch) === */
+/* === Batch URL → Worker === */
 $("#btnUploadAll").onclick=async()=>{
   const txt=$("#batchUrls").value.trim();
   if(!txt){toast('Chưa có URL');return}
@@ -430,7 +499,7 @@ $("#btnPublishFeatured").onclick=()=>publishChannel('featured');
 
 $("#btnGenMsg").onclick=()=>{const n=selectedItems().length||data.length; const slug=$("#category").value.trim()||'<slug>'; $("#commitMsg").value=`feat(data): add ${n} product${n>1?'s':''} (category: ${slug})`};
 
-/* ========= DROPZONE HOOK ========= */
+/* ========= DROPZONE ========= */
 const dz=$("#dropZone");
 const chooser=el('input',{type:'file',accept:'image/*',style:'display:none'});
 document.body.appendChild(chooser);
