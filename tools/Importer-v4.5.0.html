@@ -1,996 +1,1002 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MXD Importer v4.5.0</title>
-  <style>
-    body { font-family: sans-serif; font-size: 14px; margin: 1em; }
-    h1 { font-size: 1.3em; margin-bottom: 0.5em; }
-    h2 { font-size: 1.1em; margin: 1em 0 0.5em; }
-    section { margin-bottom: 2em; }
-    /* Form fields */
-    form input, form select, form textarea { 
-      margin: 0.2em 0; 
-      padding: 0.3em; 
-      font: inherit;
-      box-sizing: border-box;
-    }
-    form input[type="text"], form input[type="url"], form textarea {
-      width: 100%;
-      max-width: 400px;
-    }
-    form label { font-weight: bold; margin-top: 0.5em; display: block; }
-    /* Buttons */
-    button { margin: 0.2em 0; padding: 0.4em 0.8em; font: inherit; cursor: pointer; }
-    /* Language toggle button */
-    #lang-toggle { float: right; font-size: 0.9em; }
-    /* Bulk import textarea */
-    #bulk-input { width: 100%; max-width: 600px; height: 5em; }
-    /* CSV file input can use default styling */
-    /* Image drop zone */
-    #drop-zone {
-      display: inline-block;
-      border: 2px dashed #aaa;
-      border-radius: 4px;
-      padding: 1em;
-      color: #777;
-      text-align: center;
-      cursor: pointer;
-      max-width: 400px;
-      width: 100%;
-    }
-    #drop-zone.hover { background-color: #f0f0f0; }
-    #file-input { display: none; }
-    /* Image preview list */
-    #image-list { list-style: none; padding: 0; margin: 0.5em 0 0; display: flex; flex-wrap: wrap; gap: 0.5em; }
-    #image-list li { border: 1px solid #ccc; padding: 0.3em; border-radius: 4px;
-                     display: flex; align-items: center; background: #fafafa; }
-    #image-list img { max-width: 50px; max-height: 50px; margin-right: 0.5em; border: 1px solid #ddd; }
-    #image-list span.filename { margin-right: 0.5em; }
-    #image-list button.remove-img { background: #e53935; color: #fff; border: none; 
-                                    font-size: 0.9em; padding: 0 0.4em; cursor: pointer; border-radius: 3px; }
-    #image-list li.unmatched img { opacity: 0.5; }
-    #image-list li.unmatched span.filename { color: #d32f2f; font-weight: bold; }
-    /* Product table */
-    .table-container { overflow-x: auto; }
-    table { border-collapse: collapse; width: 100%; min-width: 800px; }
-    th, td { border: 1px solid #ccc; padding: 0.4em 0.6em; text-align: left; }
-    th { background: #f8f8f8; }
-    td { background: #fff; }
-    td.center { text-align: center; }
-    /* Validation result / output */
-    #validation-result { color: red; margin: 0.5em 0; }
-    #output, #push-response { background: #f8f8f8; padding: 0.5em; white-space: pre; overflow-x: auto; }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MXD Importer v4.5.0</title>
+<meta name="robots" content="noindex,follow"/>
+<style>
+:root{
+  --bg:#0b0f14; --fg:#e8f0fb; --muted:#a7b4c2; --b:#223043; --accent:#7cc4ff;
+  --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --card:#121821; --card2:#0f1520;
+  --input:#121a28; --chip:#0b1220;
+}
+* { box-sizing: border-box; }
+html, body { height:100%; }
+body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.5 system-ui, Segoe UI, Roboto; }
+header { position:sticky; top:0; z-index:10; background:linear-gradient(180deg, var(--bg), rgba(11,15,20,0.85)); border-bottom:1px solid var(--b); }
+header .wrap { display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:10px 14px; }
+h1 { margin:0; font-size:18px; }
+.badge { padding:2px 8px; border:1px solid var(--b); border-radius:999px; background:#162132; }
+.small { font-size:12px; color:var(--muted); }
+main { padding:14px; max-width:1440px; margin:auto; }
+.panel { margin-bottom:16px; border:1px solid var(--b); border-radius:10px; background:var(--card); overflow:hidden; }
+.panel h2 { margin:0; padding:10px 12px; background:var(--card2); border-bottom:1px solid var(--b); font-size:15px; }
+.panel .body { padding:12px; }
+.stack { display:flex; flex-direction:column; gap:8px; }
+.row { display:grid; grid-template-columns: 1fr 1fr; gap:8px; align-items:center; }
+.row > *:nth-child(3) { grid-column: span 2; }
+.btn { display:inline-flex; align-items:center; gap:6px; background:#1a2330; border:1px solid var(--b); color:var(--fg); padding:8px 10px; border-radius:10px; cursor:pointer; user-select:none; }
+.btn.primary { background:#12263f; border-color:#223a5e; color:#a7c8e8; }
+.btn.ok { background:#0f2b17; border-color:#134e26; color:#aff5c4; }
+.btn.warn { background:#3a2a08; border-color:#5f420c; color:#ffe1a3; }
+.btn.bad { background:#3f0e0e; border-color:#7a1f1f; color:#ffb3b3; }
+.btn:active { transform:scale(0.97); }
+.btn[disabled] { opacity:0.5; pointer-events:none; }
+table { width:100%; border-collapse:collapse; font-size:13px; table-layout:fixed; }
+th, td { border-bottom:1px solid var(--b); padding:6px 8px; vertical-align:top; }
+th { position:sticky; top:0; background:var(--card2); z-index:1; text-align:left; }
+th.sel, td.sel { width:36px; text-align:center; }
+.w90 { width:90px; }
+.w120 { width:120px; }
+.w160 { width:160px; }
+.w360 { width:360px; }
+td img { max-height:50px; display:block; margin:0 auto; }
+.missing { color: var(--bad); font-weight:bold; }
+.out { min-height:120px; background:var(--chip); border:1px dashed var(--b); padding:8px; border-radius:10px; white-space:pre-wrap; word-break:break-word; }
+#toast { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:#fff; padding:8px 12px; border-radius:6px; font-size:13px; opacity:0; transition:opacity 0.3s; pointer-events:none; }
+#toast.show { opacity:1; }
+</style>
 </head>
 <body>
-  <h1>MXD Importer v4.5.0 <button id="lang-toggle">EN</button></h1>
-
-  <!-- Bulk import section -->
-  <section>
-    <h2 data-i18n="bulk_import_heading">Nhập danh sách sản phẩm</h2>
-    <textarea id="bulk-input" placeholder="Mỗi dòng: Tên | Giá | Link | Danh mục | Thương hiệu | Trạng thái | Nổi bật | Ghi chú" 
-              data-i18n-placeholder="bulk_input_placeholder"></textarea><br/>
-    <input type="file" id="csv-file-input" accept=".csv" />
-    <button id="bulk-add-btn" data-i18n="btn_import_list">Nhập danh sách</button>
-    <p id="bulk-note" data-i18n="bulk_note_example">Ví dụ dòng dữ liệu: Tên sản phẩm | 199000 | https://shopee.vn/... | danh-muc | Hãng | active | true</p>
-  </section>
-
-  <!-- Single product form section -->
-  <section>
-    <h2 data-i18n="single_add_heading">Thêm từng sản phẩm</h2>
-    <form id="single-form">
-      <label data-i18n="label_name">Tên sản phẩm:</label>
-      <input type="text" id="name" required placeholder="Nhập tên sản phẩm" data-i18n-placeholder="ph_name" />
-      
-      <label data-i18n="label_price">Giá (VND):</label>
-      <input type="text" id="price" placeholder="Ví dụ: 199000" data-i18n-placeholder="ph_price" />
-      
-      <label data-i18n="label_origin">Link gốc (URL):</label>
-      <input type="url" id="origin" required placeholder="https://shopee.vn/..." data-i18n-placeholder="ph_origin" />
-      
-      <label data-i18n="label_category">Danh mục:</label>
-      <input type="text" id="category" required placeholder="slug danh mục (vd: dien-thoai)" data-i18n-placeholder="ph_category" />
-      
-      <label data-i18n="label_brand">Thương hiệu:</label>
-      <input type="text" id="brand" placeholder="Ví dụ: Samsung" data-i18n-placeholder="ph_brand" />
-      
-      <label data-i18n="label_status">Trạng thái:</label>
-      <select id="status">
-        <option value="active" data-i18n="opt_active">Đang bán (active)</option>
-        <option value="draft" data-i18n="opt_draft">Ẩn (draft)</option>
-        <option value="archived" data-i18n="opt_archived">Ngừng bán (archived)</option>
-      </select>
-      
-      <label><input type="checkbox" id="featured" /> <span data-i18n="label_featured">Nổi bật (featured)</span></label>
-      
-      <label data-i18n="label_sku">SKU (nếu có):</label>
-      <input type="text" id="sku" placeholder="để trống sẽ tự tạo từ tên" data-i18n-placeholder="ph_sku" />
-      
-      <label data-i18n="label_notes">Ghi chú:</label>
-      <textarea id="notes" placeholder="Thông tin nội bộ, không hiển thị" data-i18n-placeholder="ph_notes"></textarea>
-      
-      <br/>
-      <button type="submit" id="add-product-btn" data-i18n="btn_add_product">Thêm sản phẩm</button>
-    </form>
-  </section>
-
-  <!-- Images section -->
-  <section>
-    <h2 data-i18n="images_heading">Hình ảnh sản phẩm</h2>
-    <label id="drop-zone" for="file-input" data-i18n="drop_zone_text">
-      Kéo-thả hoặc bấm để chọn ảnh (.webp)
-      <input type="file" id="file-input" multiple accept="image/*" />
-    </label>
-    <ul id="image-list"></ul>
-  </section>
-
-  <!-- Product list table section -->
-  <section>
-    <h2 data-i18n="product_list_heading">Danh sách sản phẩm</h2>
-    <div class="table-container">
-      <table id="product-table">
-        <thead>
-          <tr>
-            <th data-i18n="col_name">Tên sản phẩm</th>
-            <th data-i18n="col_price">Giá (VND)</th>
-            <th data-i18n="col_origin">Link gốc</th>
-            <th data-i18n="col_category">Danh mục</th>
-            <th data-i18n="col_brand">Thương hiệu</th>
-            <th data-i18n="col_featured">Nổi bật</th>
-            <th data-i18n="col_status">Trạng thái</th>
-            <th data-i18n="col_image">Ảnh</th>
-            <th data-i18n="col_actions">Thao tác</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+<header>
+  <div class="wrap">
+    <h1>MXD Importer v4.5.0</h1>
+    <span class="badge">drop-in / 1 file</span>
+    <span class="badge">GA4 trước Affiliate</span>
+    <span style="margin-left:auto;"></span>
+    <span id="cfgbadge" class="small">CFG: dùng mặc định</span>
+    <button id="btnLang" class="badge">EN</button>
+  </div>
+</header>
+<main>
+  <section class="panel">
+    <h2 id="sec1Title">Nhập dữ liệu &amp; cấu hình</h2>
+    <div class="body stack">
+      <label for="inputList" id="listLabel">Dán danh sách (mỗi dòng: <code>Tên | giá | link</code> hoặc chỉ <code>link</code>)</label>
+      <textarea id="inputList" rows="5" placeholder="Tên sản phẩm | giá | link..."></textarea>
+      <div class="small">Dòng hiện có: <span id="lineCount">0</span></div>
+      <div class="row">
+        <button class="btn primary" id="btnParse">1) Parse</button>
+        <button class="btn" id="btnSample">Dán ví dụ</button>
+      </div>
+      <div class="row">
+        <div id="dropZone" class="dropzone"></div>
+      </div>
+      <div class="row">
+        <input id="category" type="text" placeholder="Slug danh mục" required>
+      </div>
+      <div class="row">
+        <input id="singleName" type="text" placeholder="Tên sản phẩm">
+      </div>
+      <div class="row">
+        <input id="singlePrice" type="number" placeholder="Giá (VND)">
+        <input id="singleBrand" type="text" placeholder="Brand (tùy chọn)">
+      </div>
+      <div class="row">
+        <input id="singleLink" type="url" placeholder="Link gốc sản phẩm">
+      </div>
+      <div class="row">
+        <select id="singleStatus">
+          <option value="active">active</option>
+          <option value="draft">draft</option>
+          <option value="archived">archived</option>
+        </select>
+        <button class="btn" id="btnAddSingle">Thêm sản phẩm</button>
+      </div>
+      <div class="row">
+        <input id="tplShopee" type="url" placeholder="Template Shopee (dùng {url},{sub1..4})">
+      </div>
+      <div class="row">
+        <input id="tplLazada" type="url" placeholder="Template Lazada">
+      </div>
+      <div class="row">
+        <button class="btn" id="btnSaveCfg">Lưu cấu hình</button>
+        <button class="btn" id="btnResetCfg">Xóa cấu hình</button>
+      </div>
     </div>
   </section>
-
-  <!-- Output and push section -->
-  <section>
-    <h2 data-i18n="output_heading">Xuất dữ liệu / Đẩy lên Repo</h2>
-    <div>
-      <button id="export-json-btn" data-i18n="btn_export_json">Xuất JSON</button>
-      <button id="export-html-btn" data-i18n="btn_export_html">Xuất HTML</button>
+  <section class="panel">
+    <h2 id="sec2Title">2) Bảng dữ liệu</h2>
+    <div class="body stack">
+      <div style="overflow:auto">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th class="sel"><input type="checkbox" id="selAll"></th>
+              <th>#</th>
+              <th class="w160">Tên</th>
+              <th class="w90">Giá</th>
+              <th class="w120">Merchant</th>
+              <th class="w120">Brand</th>
+              <th class="w120">SKU</th>
+              <th class="w160">Ảnh</th>
+              <th class="w360">Link gốc</th>
+              <th class="w360">Deep link</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div id="tip" class="small">Mẹo: sửa nhanh bằng Tab/Enter. SKU lowercase-kebab. Chọn dòng (checkbox) để đẩy SELECT.</div>
+      <div id="kpi" class="small"></div>
+      <div class="row">
+        <button class="btn bad" id="btnDelete">Xóa SELECT</button>
+      </div>
     </div>
-    <!-- Validation errors or status -->
-    <div id="validation-result"></div>
-    <!-- Output text (JSON or HTML snippet) -->
-    <pre id="output"></pre>
-    <h3 data-i18n="push_heading">Đẩy dữ liệu lên repo</h3>
-    <input type="url" id="worker-url" placeholder="URL Worker" size="30" />
-    <input type="text" id="x-key" placeholder="X-Key" size="15" />
-    <br/>
-    <input type="text" id="commit-msg" placeholder="feat(data): add ... products (category: ...)" size="40" />
-    <button id="suggest-commit-btn" data-i18n="btn_suggest_commit">Gợi ý commit</button>
-    <button id="push-btn" data-i18n="btn_push">Push</button>
-    <pre id="push-response"></pre>
   </section>
-
+  <section class="panel">
+    <h2 id="sec3Title">3) Health-check &amp; Xuất JSON</h2>
+    <div class="body stack">
+      <div class="row">
+        <button class="btn ok" id="btnHealth">Chạy kiểm tra</button>
+        <button class="btn" id="btnFixSku">Sửa SKU lỗi</button>
+      </div>
+      <div class="out" id="outHealth"></div>
+      <div class="row">
+        <button class="btn primary" id="btnJson">Tạo JSON</button>
+        <button class="btn" id="btnSnippet">Tạo Snippet</button>
+        <button class="btn" id="btnDownload">Tải xuống</button>
+        <button class="btn" id="btnCopy">Copy</button>
+      </div>
+      <div class="out" id="outJson"></div>
+    </div>
+  </section>
+  <section class="panel">
+    <h2 id="sec4Title">4) Worker tích hợp — hàng đợi &amp; xuất bản</h2>
+    <div class="body stack">
+      <div class="row">
+        <input id="workerUrl" type="url" placeholder="Worker URL">
+        <input id="workerKey" type="text" placeholder="X-Key (SECRET_KEY/ADMIN_KEY)">
+      </div>
+      <div class="row">
+        <button class="btn" id="btnHealthW">Kiểm tra Worker</button>
+        <button class="btn" id="btnDiag">Chẩn đoán</button>
+        <button class="btn" id="btnStatus">Status</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnPushStoreSel">Đẩy SELECT → Store</button>
+        <button class="btn warn" id="btnPushFeaturedSel">Đẩy SELECT → Nổi bật</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnPushStoreAll">Đẩy TẤT CẢ → Store</button>
+        <button class="btn warn" id="btnPushFeaturedAll">Đẩy TẤT CẢ → Nổi bật</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnPublishStore">Publish ngay → Store</button>
+        <button class="btn warn" id="btnPublishFeatured">Publish ngay → Nổi bật</button>
+      </div>
+      <div class="row">
+        <textarea id="commitMsg" rows="2" placeholder="commit message (vd: feat(data): add 3 products (category: may-cat))"></textarea>
+        <button class="btn" id="btnGenMsg">Tạo message</button>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="autoPublish"> Tự động Publish sau khi Đẩy</label>
+      </div>
+      <div class="out" id="outPublish"></div>
+      <div class="small">/queue nhận {channel,items}. /publish phát hành thẳng (POST JSON; nếu 404/405 fallback GET ?channel=...).</div>
+    </div>
+  </section>
+</main>
+<div id="toast"></div>
 <script>
 (function(){
-  "use strict";
-
-  // Localization strings for Vietnamese (vi) and English (en)
-  const i18n = {
-    vi: {
-      bulk_import_heading: "Nhập danh sách sản phẩm",
-      bulk_input_placeholder: "Mỗi dòng: Tên | Giá | Link | Danh mục | Thương hiệu | Trạng thái | Nổi bật | Ghi chú",
-      btn_import_list: "Nhập danh sách",
-      bulk_note_example: "Ví dụ dòng dữ liệu: Tên sản phẩm | 199000 | https://shopee.vn/... | danh-muc | Hãng | active | true",
-      single_add_heading: "Thêm từng sản phẩm",
-      label_name: "Tên sản phẩm:",
-      ph_name: "Nhập tên sản phẩm",
-      label_price: "Giá (VND):",
-      ph_price: "Ví dụ: 199000",
-      label_origin: "Link gốc (URL):",
-      ph_origin: "https://shopee.vn/...",
-      label_category: "Danh mục:",
-      ph_category: "slug danh mục (vd: dien-thoai)",
-      label_brand: "Thương hiệu:",
-      ph_brand: "Ví dụ: Samsung",
-      label_status: "Trạng thái:",
-      opt_active: "Đang bán (active)",
-      opt_draft: "Ẩn (draft)",
-      opt_archived: "Ngừng bán (archived)",
-      label_featured: "Nổi bật (featured)",
-      label_sku: "SKU (nếu có):",
-      ph_sku: "để trống sẽ tự tạo từ tên",
-      label_notes: "Ghi chú:",
-      ph_notes: "Thông tin nội bộ, không hiển thị",
-      btn_add_product: "Thêm sản phẩm",
-      images_heading: "Hình ảnh sản phẩm",
-      drop_zone_text: "Kéo-thả hoặc bấm để chọn ảnh (.webp)",
-      product_list_heading: "Danh sách sản phẩm",
-      col_name: "Tên sản phẩm",
-      col_price: "Giá (VND)",
-      col_origin: "Link gốc",
-      col_category: "Danh mục",
-      col_brand: "Thương hiệu",
-      col_featured: "Nổi bật",
-      col_status: "Trạng thái",
-      col_image: "Ảnh",
-      col_actions: "Thao tác",
-      output_heading: "Xuất dữ liệu / Đẩy lên Repo",
-      btn_export_json: "Xuất JSON",
-      btn_export_html: "Xuất HTML",
-      push_heading: "Đẩy dữ liệu lên repo",
-      btn_suggest_commit: "Gợi ý commit",
-      btn_push: "Push",
-      // Validation messages (constructed dynamically, but basic template here if needed)
+  'use strict';
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+  const toast = (msg) => {
+    const t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 1500);
+  };
+  const el = (tag, attrs = {}) => {
+    const element = document.createElement(tag);
+    Object.assign(element, attrs);
+    return element;
+  };
+  const defaults = {
+    tplShopee: 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}',
+    tplLazada: 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}',
+    affId: '',
+    sub1: '', sub2: '', sub3: 'store', sub4: 'oneatweb',
+    workerUrl: '',
+    workerKey: '',
+    lang: 'vi'
+  };
+  const store = {
+    key: 'mxd-importer-v450',
+    load() {
+      try {
+        return JSON.parse(localStorage.getItem(this.key)) || {};
+      } catch(e) {
+        return {};
+      }
     },
-    en: {
-      bulk_import_heading: "Bulk Import Products",
-      bulk_input_placeholder: "Each line: Name | Price | URL | Category | Brand | Status | Featured | Notes",
-      btn_import_list: "Import List",
-      bulk_note_example: "Example: Product Name | 199000 | https://shopee.vn/... | category-slug | Brand | active | true",
-      single_add_heading: "Add Single Product",
-      label_name: "Product Name:",
-      ph_name: "Enter product name",
-      label_price: "Price (VND):",
-      ph_price: "e.g. 199000",
-      label_origin: "Origin URL:",
-      ph_origin: "https://shopee.vn/...",
-      label_category: "Category:",
-      ph_category: "category slug (e.g. dien-thoai)",
-      label_brand: "Brand:",
-      ph_brand: "e.g. Samsung",
-      label_status: "Status:",
-      opt_active: "Active",
-      opt_draft: "Draft",
-      opt_archived: "Archived",
-      label_featured: "Featured",
-      label_sku: "SKU (if any):",
-      ph_sku: "leave blank to auto-generate",
-      label_notes: "Notes:",
-      ph_notes: "Internal notes, not displayed",
-      btn_add_product: "Add Product",
-      images_heading: "Product Images",
-      drop_zone_text: "Drag & drop or click to select images (.webp)",
-      product_list_heading: "Product List",
-      col_name: "Name",
-      col_price: "Price (VND)",
-      col_origin: "Origin URL",
-      col_category: "Category",
-      col_brand: "Brand",
-      col_featured: "Featured",
-      col_status: "Status",
-      col_image: "Image",
-      col_actions: "Actions",
-      output_heading: "Export / Publish Data",
-      btn_export_json: "Export JSON",
-      btn_export_html: "Export HTML",
-      push_heading: "Push data to repo",
-      btn_suggest_commit: "Suggest Commit",
-      btn_push: "Push",
+    save(cfg) {
+      try {
+        localStorage.setItem(this.key, JSON.stringify(cfg));
+      } catch(e) {
+        console.error('Cannot save to localStorage', e);
+      }
+    },
+    clear() {
+      localStorage.removeItem(this.key);
     }
   };
-  let currentLang = "vi";
-
-  // Helper: apply translations to all elements with data-i18n or placeholders
-  function applyTranslations() {
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const key = el.getAttribute("data-i18n");
-      if (i18n[currentLang] && i18n[currentLang][key] !== undefined) {
-        if (el.tagName.toLowerCase() === "input" || el.tagName.toLowerCase() === "textarea" || el.tagName.toLowerCase() === "select") {
-          // For select options or input placeholders
-          if (el.tagName.toLowerCase() === "select") {
-            // Update options text if any
-            for (let opt of el.options) {
-              const optKey = opt.getAttribute("data-i18n");
-              if (optKey && i18n[currentLang][optKey] !== undefined) {
-                opt.textContent = i18n[currentLang][optKey];
-              }
-            }
+  const loadedCfg = store.load();
+  let cfg = Object.assign({}, defaults, loadedCfg);
+  // Apply loaded config to fields:
+  if(cfg.tplShopee) $("#tplShopee").value = cfg.tplShopee;
+  if(cfg.tplLazada) $("#tplLazada").value = cfg.tplLazada;
+  if(cfg.workerUrl) $("#workerUrl").value = cfg.workerUrl;
+  if(cfg.workerKey) $("#workerKey").value = cfg.workerKey;
+  // Set initial config badge text
+  if(Object.keys(loadedCfg).length) {
+    $("#cfgbadge").textContent = (cfg.lang === 'en' ? 'CFG: loaded' : 'CFG: đã tải');
+  } else {
+    $("#cfgbadge").textContent = (cfg.lang === 'en' ? 'CFG: default' : 'CFG: dùng mặc định');
+  }
+  // Language setup:
+  let currentLang = cfg.lang || 'vi';
+  const langText = {
+    vi: {
+      sec1Title: "Nhập dữ liệu & cấu hình",
+      sec2Title: "2) Bảng dữ liệu",
+      sec3Title: "3) Health-check & Xuất JSON",
+      sec4Title: "4) Worker tích hợp — hàng đợi & xuất bản",
+      listLabel: "Dán danh sách (mỗi dòng: Tên | giá | link hoặc chỉ link)",
+      btnParse: "1) Parse",
+      btnSample: "Dán ví dụ",
+      dropZone: "📦 Kéo & thả ảnh (.webp) hoặc bấm để chọn",
+      categoryPlaceholder: "Slug danh mục",
+      singleName: "Tên sản phẩm",
+      singlePrice: "Giá (VND)",
+      singleBrand: "Brand (tùy chọn)",
+      singleLink: "Link gốc sản phẩm",
+      singleStatusOptions: {"active":"active","draft":"draft","archived":"archived"},
+      btnAddSingle: "Thêm sản phẩm",
+      tplShopee: "Template Shopee (dùng {url},{sub1..4})",
+      tplLazada: "Template Lazada",
+      btnSaveCfg: "Lưu cấu hình",
+      btnResetCfg: "Xóa cấu hình",
+      sec2Tip: "Mẹo: sửa nhanh bằng Tab/Enter. SKU lowercase-kebab. Chọn dòng (checkbox) để đẩy SELECT.",
+      btnDelete: "Xóa SELECT",
+      btnHealth: "Chạy kiểm tra",
+      btnFixSku: "Sửa SKU lỗi",
+      btnJson: "Tạo JSON",
+      btnSnippet: "Tạo Snippet",
+      btnDownload: "Tải xuống",
+      btnCopy: "Copy",
+      btnHealthW: "Kiểm tra Worker",
+      btnDiag: "Chẩn đoán",
+      btnStatus: "Status",
+      btnPushStoreSel: "Đẩy SELECT → Store",
+      btnPushFeaturedSel: "Đẩy SELECT → Nổi bật",
+      btnPushStoreAll: "Đẩy TẤT CẢ → Store",
+      btnPushFeaturedAll: "Đẩy TẤT CẢ → Nổi bật",
+      btnPublishStore: "Publish ngay → Store",
+      btnPublishFeatured: "Publish ngay → Nổi bật",
+      commitPlaceholder: "commit message (vd: feat(data): add 3 products (category: may-cat))",
+      btnGenMsg: "Tạo message",
+      autoPublishLabel: " Tự động Publish sau khi Đẩy",
+      cfgbadge_default: "CFG: dùng mặc định",
+      cfgbadge_loaded: "CFG: đã tải",
+      toastSaved: "Đã lưu cấu hình",
+      toastCleared: "Đã xóa cấu hình"
+    },
+    en: {
+      sec1Title: "Input data & config",
+      sec2Title: "2) Data table",
+      sec3Title: "3) Health-check & Export JSON",
+      sec4Title: "4) Worker integration — queue & publish",
+      listLabel: "Paste list (each line: Name | price | link, or link only)",
+      btnParse: "1) Parse",
+      btnSample: "Paste example",
+      dropZone: "📦 Drop product images (.webp) or click to select",
+      categoryPlaceholder: "Category slug",
+      singleName: "Product name",
+      singlePrice: "Price (VND)",
+      singleBrand: "Brand (optional)",
+      singleLink: "Original product link",
+      singleStatusOptions: {"active":"active","draft":"draft","archived":"archived"},
+      btnAddSingle: "Add product",
+      tplShopee: "Template Shopee (use {url},{sub1..4})",
+      tplLazada: "Template Lazada",
+      btnSaveCfg: "Save config",
+      btnResetCfg: "Reset config",
+      sec2Tip: "Tip: quick edit with Tab/Enter. SKU in lowercase-kebab. Select rows (checkbox) to push SELECT.",
+      btnDelete: "Delete SELECT",
+      btnHealth: "Run check",
+      btnFixSku: "Fix SKU issues",
+      btnJson: "Generate JSON",
+      btnSnippet: "Generate Snippet",
+      btnDownload: "Download",
+      btnCopy: "Copy",
+      btnHealthW: "Check Worker",
+      btnDiag: "Diagnose",
+      btnStatus: "Status",
+      btnPushStoreSel: "Push SELECT → Store",
+      btnPushFeaturedSel: "Push SELECT → Featured",
+      btnPushStoreAll: "Push ALL → Store",
+      btnPushFeaturedAll: "Push ALL → Featured",
+      btnPublishStore: "Publish now → Store",
+      btnPublishFeatured: "Publish now → Featured",
+      commitPlaceholder: "commit message (e.g.: feat(data): add 3 products (category: may-cat))",
+      btnGenMsg: "Generate message",
+      autoPublishLabel: " Auto Publish after Push",
+      cfgbadge_default: "CFG: default",
+      cfgbadge_loaded: "CFG: loaded",
+      toastSaved: "Config saved",
+      toastCleared: "Config cleared"
+    }
+  };
+  const applyLanguage = (lang) => {
+    const t = langText[lang];
+    $("#sec1Title").textContent = t.sec1Title;
+    $("#sec2Title").textContent = t.sec2Title;
+    $("#sec3Title").textContent = t.sec3Title;
+    $("#sec4Title").textContent = t.sec4Title;
+    $("#listLabel").textContent = t.listLabel;
+    $("#btnParse").textContent = t.btnParse;
+    $("#btnSample").textContent = t.btnSample;
+    $("#dropZone").innerHTML = t.dropZone;
+    $("#category").placeholder = t.categoryPlaceholder;
+    $("#singleName").placeholder = t.singleName;
+    $("#singlePrice").placeholder = t.singlePrice;
+    $("#singleBrand").placeholder = t.singleBrand;
+    $("#singleLink").placeholder = t.singleLink;
+    const statusSelect = $("#singleStatus");
+    statusSelect.options[0].textContent = t.singleStatusOptions["active"];
+    statusSelect.options[1].textContent = t.singleStatusOptions["draft"];
+    statusSelect.options[2].textContent = t.singleStatusOptions["archived"];
+    $("#btnAddSingle").textContent = t.btnAddSingle;
+    $("#tplShopee").placeholder = t.tplShopee;
+    $("#tplLazada").placeholder = t.tplLazada;
+    $("#btnSaveCfg").textContent = t.btnSaveCfg;
+    $("#btnResetCfg").textContent = t.btnResetCfg;
+    $("#tip").textContent = t.sec2Tip;
+    $("#btnDelete").textContent = t.btnDelete;
+    $("#btnHealth").textContent = t.btnHealth;
+    $("#btnFixSku").textContent = t.btnFixSku;
+    $("#btnJson").textContent = t.btnJson;
+    $("#btnSnippet").textContent = t.btnSnippet;
+    $("#btnDownload").textContent = t.btnDownload;
+    $("#btnCopy").textContent = t.btnCopy;
+    $("#btnHealthW").textContent = t.btnHealthW;
+    $("#btnDiag").textContent = t.btnDiag;
+    $("#btnStatus").textContent = t.btnStatus;
+    $("#btnPushStoreSel").textContent = t.btnPushStoreSel;
+    $("#btnPushFeaturedSel").textContent = t.btnPushFeaturedSel;
+    $("#btnPushStoreAll").textContent = t.btnPushStoreAll;
+    $("#btnPushFeaturedAll").textContent = t.btnPushFeaturedAll;
+    $("#btnPublishStore").textContent = t.btnPublishStore;
+    $("#btnPublishFeatured").textContent = t.btnPublishFeatured;
+    $("#commitMsg").placeholder = t.commitPlaceholder;
+    $("#btnGenMsg").textContent = t.btnGenMsg;
+    $("#autoPublish").nextSibling.textContent = t.autoPublishLabel;
+  };
+  applyLanguage(currentLang);
+  if(currentLang === 'en') {
+    $("#btnLang").textContent = 'VI';
+  }
+  $("#btnLang").onclick = () => {
+    const newLang = (currentLang === 'vi' ? 'en' : 'vi');
+    applyLanguage(newLang);
+    currentLang = newLang;
+    cfg.lang = newLang;
+    $("#btnLang").textContent = (newLang === 'vi' ? 'EN' : 'VI');
+  };
+  let data = [];
+  const imagesSet = new Set();
+  const imagePreviewMap = {};
+  const slugify = (str) => {
+    let x = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    x = x.replace(/đ/g, "d").replace(/Đ/g, "D");
+    return x.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  };
+  const detect = (url) => {
+    try {
+      const h = (new URL(url)).hostname;
+      if(h.includes("shopee")) return "shopee";
+      if(h.includes("lazada")) return "lazada";
+      if(h.includes("tiki")) return "tiki";
+    } catch(e) {}
+    return "";
+  };
+  const guessNameFromUrl = (url) => {
+    try {
+      const u = new URL(url);
+      let path = u.pathname;
+      path = path.replace(/\.html.*/, "");
+      const idx = path.indexOf("-i.");
+      if(idx !== -1) {
+        const slugPart = path.substring(1, idx);
+        return decodeURIComponent(slugPart).replace(/-/g, " ");
+      }
+      const li = path.lastIndexOf("-i");
+      if(li !== -1) {
+        const slugPart = path.substring(path.lastIndexOf("/")+1, li);
+        return decodeURIComponent(slugPart).replace(/-/g, " ");
+      }
+      const lastSeg = path.substring(path.lastIndexOf("/")+1);
+      if(lastSeg) {
+        return decodeURIComponent(lastSeg).replace(/-/g, " ");
+      }
+    } catch(e) {}
+    return "";
+  };
+  const updateKpi = () => {
+    const sum = data.reduce((a, b) => a + (Number(b.price) || 0), 0);
+    const byM = data.reduce((m, r) => {
+      const key = r.merchant || "auto";
+      m[key] = (m[key] || 0) + 1;
+      return m;
+    }, {});
+    const merchants = Object.entries(byM).map(([k, v]) => `${k}:${v}`).join(" · ");
+    const selCount = data.filter(r => r.selected).length;
+    const prodLabel = currentLang === 'vi' ? 'Hàng' : 'Items';
+    const priceLabel = currentLang === 'vi' ? 'Tổng giá' : 'Total';
+    const merchantLabel = currentLang === 'vi' ? 'Merchant' : 'Merchants';
+    const selectedLabel = currentLang === 'vi' ? 'Đã chọn' : 'Selected';
+    $("#kpi").innerHTML = `<span>${prodLabel}: <b>${data.length}</b></span><span>${priceLabel}: <b>${sum.toLocaleString("vi-VN")}</b></span><span>${merchantLabel}: ${merchants}</span><span>${selectedLabel}: <b id="selCount">${selCount}</b></span>`;
+  };
+  const renderTable = () => {
+    const tbody = $("#tbody");
+    tbody.textContent = "";
+    data.forEach((r, i) => {
+      const tr = el("tr");
+      const tdSel = el("td");
+      tdSel.className = "sel";
+      const cb = el("input");
+      cb.type = "checkbox";
+      cb.checked = !!r.selected;
+      cb.onclick = () => {
+        r.selected = cb.checked;
+        $("#selCount").textContent = data.filter(x => x.selected).length;
+      };
+      tdSel.appendChild(cb);
+      tr.appendChild(tdSel);
+      const tdNum = el("td");
+      tdNum.textContent = i + 1;
+      tr.appendChild(tdNum);
+      const tdName = el("td");
+      const inpName = el("input");
+      inpName.value = r.name;
+      inpName.onblur = () => {
+        r.name = inpName.value.trim();
+      };
+      tdName.appendChild(inpName);
+      tr.appendChild(tdName);
+      const tdPrice = el("td");
+      const inpPrice = el("input");
+      inpPrice.type = "number";
+      inpPrice.value = r.price ? r.price : "";
+      inpPrice.onblur = () => {
+        r.price = Number(inpPrice.value) || 0;
+        updateKpi();
+      };
+      tdPrice.appendChild(inpPrice);
+      tr.appendChild(tdPrice);
+      const tdMerchant = el("td");
+      tdMerchant.textContent = r.merchant || "";
+      tr.appendChild(tdMerchant);
+      const tdBrand = el("td");
+      const inpBrand = el("input");
+      inpBrand.value = r.brand || "";
+      inpBrand.onblur = () => {
+        r.brand = inpBrand.value.trim();
+      };
+      tdBrand.appendChild(inpBrand);
+      tr.appendChild(tdBrand);
+      const tdSku = el("td");
+      const inpSku = el("input");
+      inpSku.value = r.sku;
+      inpSku.onblur = () => {
+        const newSlug = slugify(inpSku.value);
+        if(newSlug !== r.sku) {
+          if(imagesSet.has(r.sku)) {
+            const oldSku = r.sku;
+            imagesSet.delete(oldSku);
+            imagesSet.add(newSlug);
+            imagePreviewMap[newSlug] = imagePreviewMap[oldSku];
+            delete imagePreviewMap[oldSku];
           }
-          if (el.hasAttribute("placeholder")) {
-            const phKey = el.getAttribute("data-i18n-placeholder");
-            if (phKey && i18n[currentLang][phKey] !== undefined) {
-              el.placeholder = i18n[currentLang][phKey];
-            }
-          }
-          // Labels (if we set data-i18n on a label tag itself)
-          if (el.tagName.toLowerCase() !== "select" && !el.hasAttribute("placeholder")) {
-            el.textContent = i18n[currentLang][key];
-          }
-        } else {
-          // Regular text content elements (h2, button spans, etc.)
-          el.textContent = i18n[currentLang][key];
+          r.sku = newSlug;
+          r.image = `/assets/img/products/${newSlug}.webp`;
+          inpSku.value = newSlug;
         }
-      }
-    });
-    // Update placeholder translations for inputs with data-i18n-placeholder if the above missed any
-    document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-      const phKey = el.getAttribute("data-i18n-placeholder");
-      if (i18n[currentLang][phKey] !== undefined) {
-        el.placeholder = i18n[currentLang][phKey];
-      }
-    });
-    // Update the language toggle button text (shows the target language code)
-    document.getElementById("lang-toggle").textContent = currentLang === "vi" ? "EN" : "VI";
-  }
-
-  // Helper: slugify a string to lowercase kebab-case (remove accents, special chars)
-  function slugify(str) {
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-              .replace(/đ/g, 'd').replace(/Đ/g, 'd')
-              .toLowerCase().replace(/[^0-9a-z\s-]/g, '')
-              .trim().replace(/\s+/g, '-').replace(/-+/g, '-')
-              .replace(/^-|-$/g, '');
-  }
-
-  // Data structures for products and images
-  let products = [];        // array of product objects
-  const skuSet = new Set(); // track SKUs in current list for quick duplicate checking
-  let unmatchedImages = {}; // map sku -> { file, element } for images without matching product yet
-
-  // Add a product to the table (and to data list)
-  function addProductToTable(product) {
-    const tbody = document.querySelector("#product-table tbody");
-    const tr = document.createElement("tr");
-    tr.id = "row-" + product.sku;
-    // Create cells for each column
-    function createCell(text, isCenter=false) {
-      const td = document.createElement("td");
-      if (isCenter) td.className = "center";
-      td.textContent = text;
-      return td;
-    }
-    // Name
-    tr.appendChild(createCell(product.name));
-    // Price (as number)
-    tr.appendChild(createCell(product.price.toString()));
-    // Origin link (could make it clickable but plain text to avoid deep-link issues in copy)
-    tr.appendChild(createCell(product.origin));
-    // Category
-    tr.appendChild(createCell(product.category));
-    // Brand
-    tr.appendChild(createCell(product.brand));
-    // Featured (yes/no or checkmark)
-    tr.appendChild(createCell(product.featured ? "✓" : "", true));
-    // Status
-    tr.appendChild(createCell(product.status));
-    // Image (check if image attached)
-    tr.appendChild(createCell(product.image && product.image !== "" && !product.image.includes("placeholder.webp") ? "✓" : "", true));
-    // Actions (delete button)
-    const actionTd = document.createElement("td");
-    actionTd.className = "center";
-    const delBtn = document.createElement("button");
-    delBtn.textContent = currentLang === "vi" ? "Xóa" : "Delete";
-    delBtn.setAttribute("data-sku", product.sku);
-    delBtn.onclick = function() {
-      removeProduct(product.sku);
-    };
-    actionTd.appendChild(delBtn);
-    tr.appendChild(actionTd);
-    tbody.appendChild(tr);
-  }
-
-  // Remove product by SKU (from list and table)
-  function removeProduct(sku) {
-    // Remove from products array
-    products = products.filter(p => p.sku !== sku);
-    // Remove from set
-    skuSet.delete(sku);
-    // Remove table row
-    const row = document.getElementById("row-" + sku);
-    if (row) row.remove();
-    // If an image was attached to this product, keep it preview? 
-    // Actually, if product is removed, we likely should also remove its image preview, as it's no longer relevant.
-    // The user can re-add product or choose new images.
-    // We'll remove any matched image preview for this SKU (and its file from unmatched if present).
-    if (unmatchedImages[sku]) {
-      // If the image was unmatched (which means product removed before matching, or matched now removed? Actually if matched, we wouldn't keep in unmatchedImages)
-      // But just in case:
-      const entry = unmatchedImages[sku];
-      if (entry && entry.element) {
-        entry.element.remove();
-      }
-      delete unmatchedImages[sku];
-    } else {
-      // If image was matched (not in unmatchedImages), find it in the image list by data-sku and remove it.
-      const li = document.querySelector(`#image-list li[data-sku="${sku}"]`);
-      if (li) li.remove();
-    }
-  }
-
-  // Parse bulk input (textarea or CSV text) into product objects
-  function parseBulkInput(text) {
-    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
-    const errors = [];
-    if (!lines.length) return { products: [], errors: [] };
-    // Determine delimiter: priority |, then tab, then comma
-    let delimiter;
-    if (lines.some(l => l.includes("|"))) delimiter = "|";
-    else if (lines.some(l => l.includes("\t"))) delimiter = "\t";
-    else delimiter = ",";  // default to comma
-    // Check header
-    let header = null;
-    const firstFields = lines[0].split(delimiter).map(f => f.trim().toLowerCase());
-    if (firstFields.includes("name") || firstFields.includes("tên") || firstFields.includes("price") || firstFields.includes("giá")) {
-      header = lines[0].split(delimiter).map(h => h.trim());
-      lines.shift();
-    }
-    const parsedProducts = [];
-    lines.forEach((line, idx) => {
-      if (!line) return;
-      const parts = line.split(delimiter).map(p => p.trim());
-      if (header) {
-        // Use header mapping
-        var data = {};
-        header.forEach((head, i) => {
-          const key = head.toLowerCase();
-          if (key) {
-            data[key] = parts[i] !== undefined ? parts[i] : "";
-          }
-        });
+      };
+      tdSku.appendChild(inpSku);
+      tr.appendChild(tdSku);
+      const tdImg = el("td");
+      if(imagesSet.has(r.sku) && imagePreviewMap[r.sku]) {
+        const imgElem = el("img");
+        imgElem.src = imagePreviewMap[r.sku];
+        imgElem.alt = r.sku;
+        tdImg.appendChild(imgElem);
       } else {
-        // No header, assume fixed order
-        if (parts.length < 3) {
-          errors.push(`${currentLang === "vi" ? "Dòng" : "Line"} ${idx+1}: ${currentLang === "vi" ? "thiếu dữ liệu bắt buộc" : "not enough fields"}`);
-          return;
-        }
-        // Order: name, price, origin, category, brand, status, featured, notes
-        data = {
-          name: parts[0] || "",
-          price: parts[1] || "",
-          origin: parts[2] || "",
-          category: parts[3] || "",
-          brand: parts[4] || "",
-          status: parts[5] || "",
-          featured: parts[6] || "",
-          notes: parts[7] || ""
-        };
+        tdImg.innerHTML = '<span class="missing">✘</span>';
       }
-      // Basic required check
-      if (!data.name || !data.price || !data.origin) {
-        errors.push(`${currentLang === "vi" ? "Dòng" : "Line"} ${idx+1}: ${currentLang === "vi" ? "thiếu Tên/Giá/Link" : "missing required field(s)"}`);
-        return;
-      }
-      // Clean and normalize fields
-      // Price: remove currency symbols and thousand separators
-      let priceStr = data.price.toString();
-      priceStr = priceStr.replace(/[^\d\.,]/g, ""); // keep digits, comma, dot
-      if (priceStr.indexOf(",") !== -1) {
-        // If comma used, remove all commas (assuming they are thousand seps)
-        priceStr = priceStr.split(",").join("");
-      }
-      if (priceStr.indexOf(".") !== -1) {
-        // If dot used, and appears to be thousand sep (e.g. 1.000), remove it. If it looks like decimal, we'll handle by parseFloat
-        const partsDot = priceStr.split(".");
-        if (partsDot.length > 1 && partsDot[partsDot.length-1].length === 3) {
-          // last part has 3 digits -> likely thousand group
-          priceStr = partsDot.join("");
-        }
-      }
-      let priceVal = parseFloat(priceStr);
-      if (isNaN(priceVal)) {
-        errors.push(`${currentLang === "vi" ? "Dòng" : "Line"} ${idx+1}: ${currentLang === "vi" ? "giá không hợp lệ" : "invalid price"} '${data.price}'`);
-        return;
-      }
-      priceVal = Math.round(priceVal); // ensure integer (VND has no cents)
-      data.price = priceVal;
-      // Category: slugify
-      data.category = data.category ? slugify(data.category) : "";
-      // Brand: keep as is (trim)
-      data.brand = data.brand ? data.brand.trim() : "";
-      // Status: default active if not provided or invalid
-      let status = data.status ? data.status.toLowerCase() : "";
-      if (!["active", "draft", "archived"].includes(status)) status = "active";
-      data.status = status;
-      // Featured: interpret truthy values
-      let featuredVal = false;
-      if (typeof data.featured === "string") {
-        const f = data.featured.toLowerCase();
-        if (["true","1","yes","x","có","y"].includes(f)) {
-          featuredVal = true;
-        }
-      } else if (typeof data.featured === "boolean") {
-        featuredVal = data.featured;
-      }
-      data.featured = featuredVal;
-      // Notes:
-      data.notes = data.notes || "";
-      // We will determine merchant from origin and generate SKU later in finalize step
-      parsedProducts.push(data);
+      tr.appendChild(tdImg);
+      const tdOrigin = el("td");
+      const inpOrigin = el("input");
+      inpOrigin.value = r.origin;
+      inpOrigin.onblur = () => {
+        r.origin = inpOrigin.value.trim();
+        const newMerc = detect(r.origin);
+        r.merchant = newMerc || "";
+        tdMerchant.textContent = r.merchant;
+        r.deep = createDeepLink(r);
+        inpDeep.value = r.deep || "";
+      };
+      tdOrigin.appendChild(inpOrigin);
+      tr.appendChild(tdOrigin);
+      const tdDeep = el("td");
+      const inpDeep = el("input");
+      inpDeep.value = r.deep || "";
+      inpDeep.readOnly = true;
+      tdDeep.appendChild(inpDeep);
+      tr.appendChild(tdDeep);
+      tbody.appendChild(tr);
     });
-    return { products: parsedProducts, errors: errors };
-  }
-
-  // Finalize and add product objects to the list (shared by both single-add and bulk-add)
-  function finalizeAndAddProducts(newProducts) {
-    const validationErrors = [];
-    newProducts.forEach(data => {
-      // Determine merchant from origin if possible
-      let origin = data.origin;
-      if (origin && !origin.startsWith("http")) {
-        origin = "https://" + origin; // prepend scheme if missing
+  };
+  const createAffObject = (r) => {
+    const nowVN = new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh', hour12: false }).replace(' ', 'T');
+    return {
+      name: r.name.trim(),
+      price: Number(r.price) || 0,
+      origin: r.origin.trim(),
+      merchant: r.merchant || "",
+      sku: r.sku,
+      image: `/assets/img/products/${r.sku}.webp`,
+      category: r.category || $("#category").value.trim(),
+      brand: r.brand || "",
+      featured: !!r.featured,
+      status: r.status || "active",
+      updated_at: nowVN + "+07:00",
+      sub1: r.sku,
+      notes: r.notes || ""
+    };
+  };
+  const createDeepLink = (r) => {
+    if(!r.merchant) return "";
+    const baseTpl = (r.merchant === "shopee" ? $("#tplShopee").value.trim() : (r.merchant === "lazada" ? $("#tplLazada").value.trim() : ""));
+    if(!baseTpl) return "";
+    const urlEnc = encodeURIComponent(r.origin);
+    const sub1val = encodeURIComponent(r.sku);
+    const sub2val = encodeURIComponent(cfg.sub2 || "");
+    const sub3val = encodeURIComponent(cfg.sub3 || "");
+    const sub4val = encodeURIComponent(cfg.sub4 || "");
+    return baseTpl.replace("{url}", urlEnc).replace("{sub1}", sub1val).replace("{sub2}", sub2val).replace("{sub3}", sub3val).replace("{sub4}", sub4val);
+  };
+  $("#inputList").oninput = () => {
+    const lines = $("#inputList").value.split(/\r?\n/).filter(line => line.trim());
+    $("#lineCount").textContent = lines.length;
+  };
+  $("#btnSample").onclick = () => {
+    const example = "Sản phẩm A | 199000 | https://shopee.vn/Example-Product-A-i.123456.654321\nSản phẩm B | 299000 | https://www.lazada.vn/products/example-product-b-i123456789.html\nhttps://shopee.vn/Another-Product-i.111222.333444";
+    $("#inputList").value = example;
+    $("#lineCount").textContent = example.split(/\n/).length;
+  };
+  $("#btnParse").onclick = () => {
+    const text = $("#inputList").value.trim();
+    if(!text) return;
+    const lines = text.split(/\r?\n/);
+    lines.forEach(line => {
+      if(!(line = line.trim())) return;
+      let name = "", priceNum = "", link = "";
+      if(line.includes("|")) {
+        const parts = line.split("|").map(p => p.trim());
+        if(parts.length >= 3) {
+          name = parts[0];
+          priceNum = parts[1].replace(/[^0-9]/g, "");
+          link = parts[2];
+        } else if(parts.length == 2) {
+          name = parts[0];
+          priceNum = "";
+          link = parts[1];
+        }
+      } else {
+        link = line;
       }
-      const originLower = origin.toLowerCase();
-      let merchant = "";
-      if (originLower.includes("shopee")) merchant = "shopee";
-      else if (originLower.includes("lazada")) merchant = "lazada";
-      else if (originLower.includes("tiki")) merchant = "tiki";
-      else merchant = "other";
-      // Generate or clean up SKU
-      let sku = data.sku ? slugify(data.sku) : "";
-      if (!sku) {
-        // if not provided or empty after slugify, generate from name
-        sku = slugify(data.name);
+      const merchant = detect(link);
+      let guessedName = "";
+      if(name === "" && link) {
+        guessedName = guessNameFromUrl(link);
+        name = guessedName;
       }
-      if (!sku) {
-        // if still empty (name might be all invalid chars?), assign a fallback
-        sku = "product-" + Date.now();
+      const skuBase = name ? slugify(name) : (guessedName ? slugify(guessedName) : "");
+      let sku = skuBase;
+      if(sku === "" && merchant) {
+        if(merchant === "shopee" && link.includes("-i.")) {
+          const idMatch = link.match(/-i\.\d+\.(\d+)/);
+          if(idMatch) sku = "sp-" + idMatch[1];
+        }
+        if(merchant === "lazada" && link.includes("-i")) {
+          const idMatch = link.match(/-i(\d+)/);
+          if(idMatch) sku = "lz-" + idMatch[1];
+        }
+        if(!sku) {
+          sku = "item-" + Math.random().toString(36).slice(2,8);
+        }
       }
-      // Ensure SKU uniqueness in current list
-      let baseSku = sku;
-      let counter = 2;
-      while (skuSet.has(sku)) {
-        sku = baseSku + "-" + counter;
-        counter++;
+      let origSku = sku;
+      let count = 2;
+      while(data.some(item => item.sku === sku)) {
+        sku = origSku + "-" + count++;
       }
-      if (sku !== baseSku && counter > 2) {
-        // If we had to adjust due to duplicate, notify but still add
-        validationErrors.push(`${currentLang === "vi" ? "SKU trùng, đã đổi thành" : "Duplicate SKU, renamed to"} '${sku}'`);
-      }
-      // Now SKU is unique, add to set
-      skuSet.add(sku);
-      // Prepare full product object
-      const product = {
-        name: data.name.trim(),
-        price: Number(data.price),
-        origin: origin.trim(),
-        merchant: merchant,
+      const prod = {
+        name: name || "",
+        price: priceNum ? Number(priceNum) : 0,
+        origin: link || "",
+        merchant: merchant || "",
         sku: sku,
-        image: "", // will set if image file is matched
-        category: data.category.trim(),
-        brand: data.brand.trim(),
-        featured: !!data.featured,
-        status: data.status.trim() || "active",
-        updated_at: "", // set below
-        sub1: "",       // set below
-        notes: data.notes.trim()
+        image: `/assets/img/products/${sku}.webp`,
+        category: $("#category").value.trim(),
+        brand: "",
+        featured: false,
+        status: "active",
+        updated_at: "",
+        sub1: "",
+        notes: "",
+        selected: false
       };
-      // Set updated_at to now in ISO+07:00
-      const now = new Date();
-      // Format ISO with timezone offset (+07:00 or current locale offset)
-      const tzOffset = -now.getTimezoneOffset(); // in minutes
-      const sign = tzOffset >= 0 ? "+" : "-";
-      const tzHours = String(Math.floor(Math.abs(tzOffset) / 60)).padStart(2, '0');
-      const tzMinutes = String(Math.abs(tzOffset) % 60).padStart(2, '0');
-      const isoLocal = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0') +
-                       "T" + String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0') +
-                       sign + tzHours + ":" + tzMinutes;
-      product.updated_at = isoLocal;
-      // sub1 defaults to SKU
-      product.sub1 = product.sku;
-      // Ensure required fields are present
-      if (!product.name || isNaN(product.price) || !product.origin) {
-        // This shouldn't happen because we checked earlier
-        validationErrors.push(`Product '${product.name}' ${currentLang === "vi" ? "thiếu trường bắt buộc" : "missing required field"}`);
-      }
-      // If merchant is "other", warn (unknown merchant)
-      if (product.merchant === "other") {
-        validationErrors.push(`${currentLang === "vi" ? "Không xác định merchant cho" : "Unrecognized merchant for"} SKU '${product.sku}'`);
-      }
-      // Add product to list and table
-      products.push(product);
-      addProductToTable(product);
-      // Check if there was an unmatched image waiting for this SKU
-      if (unmatchedImages[product.sku]) {
-        // We have an image file for this SKU from earlier
-        product.image = "/assets/img/products/" + product.sku + ".webp";
-        // Mark the preview as matched (remove "unmatched" indication)
-        const liElem = unmatchedImages[product.sku].element;
-        if (liElem) {
-          liElem.classList.remove("unmatched");
-        }
-        delete unmatchedImages[product.sku];
+      prod.deep = createDeepLink(prod);
+      data.push(prod);
+    });
+    $("#inputList").value = "";
+    $("#lineCount").textContent = "0";
+    renderTable();
+    updateKpi();
+    toast("Đã nhập " + data.length + " sản phẩm.");
+  };
+  $("#btnAddSingle").onclick = () => {
+    const name = $("#singleName").value.trim();
+    const priceStr = $("#singlePrice").value.trim().replace(/[^0-9]/g, "");
+    const link = $("#singleLink").value.trim();
+    if(!name || !link) {
+      toast("Vui lòng nhập tên và link");
+      return;
+    }
+    const merchant = detect(link);
+    let skuBase = slugify(name);
+    if(!skuBase) {
+      skuBase = "item-" + Math.random().toString(36).slice(2,8);
+    }
+    let sku = skuBase;
+    let count = 2;
+    while(data.some(item => item.sku === sku)) {
+      sku = skuBase + "-" + count++;
+    }
+    const prod = {
+      name: name,
+      price: priceStr ? Number(priceStr) : 0,
+      origin: link,
+      merchant: merchant || "",
+      sku: sku,
+      image: `/assets/img/products/${sku}.webp`,
+      category: $("#category").value.trim(),
+      brand: $("#singleBrand").value.trim() || "",
+      featured: false,
+      status: $("#singleStatus").value,
+      updated_at: "",
+      sub1: "",
+      notes: "",
+      selected: false
+    };
+    prod.deep = createDeepLink(prod);
+    data.push(prod);
+    $("#singleName").value = "";
+    $("#singlePrice").value = "";
+    $("#singleLink").value = "";
+    $("#singleBrand").value = "";
+    $("#singleStatus").value = "active";
+    renderTable();
+    updateKpi();
+    toast("Đã thêm sản phẩm.");
+  };
+  $("#btnSaveCfg").onclick = () => {
+    cfg.tplShopee = $("#tplShopee").value.trim();
+    cfg.tplLazada = $("#tplLazada").value.trim();
+    cfg.workerUrl = $("#workerUrl").value.trim();
+    cfg.workerKey = $("#workerKey").value.trim();
+    store.save(cfg);
+    $("#cfgbadge").textContent = (currentLang === 'vi' ? "CFG: đã lưu " : "CFG: saved ") + new Date().toLocaleTimeString();
+    toast(currentLang === 'vi' ? "Đã lưu cấu hình" : "Config saved");
+  };
+  $("#btnResetCfg").onclick = () => {
+    store.clear();
+    cfg = Object.assign({}, defaults);
+    $("#tplShopee").value = cfg.tplShopee;
+    $("#tplLazada").value = cfg.tplLazada;
+    $("#workerUrl").value = cfg.workerUrl;
+    $("#workerKey").value = cfg.workerKey;
+    if(currentLang !== 'vi') {
+      applyLanguage('vi');
+      currentLang = 'vi';
+      $("#btnLang").textContent = 'EN';
+    }
+    $("#cfgbadge").textContent = (currentLang === 'vi' ? "CFG: dùng mặc định" : "CFG: default");
+    toast(currentLang === 'vi' ? "Đã xóa cấu hình" : "Config cleared");
+  };
+  const fileInput = el("input");
+  fileInput.type = "file";
+  fileInput.accept = ".webp";
+  fileInput.multiple = true;
+  fileInput.style.display = "none";
+  fileInput.onchange = () => {
+    const files = Array.from(fileInput.files || []);
+    files.forEach(file => {
+      if(!file.name.toLowerCase().endsWith(".webp")) return;
+      const sku = file.name.replace(/\.webp$/i, "").toLowerCase();
+      if(!data.some(item => item.sku === sku)) {
+        toast("Ảnh " + file.name + " không khớp SKU nào");
+      } else {
+        imagesSet.add(sku);
+        const url = URL.createObjectURL(file);
+        imagePreviewMap[sku] = url;
       }
     });
-    return validationErrors;
-  }
-
-  // Attach event listeners
-  // Bulk import via textarea/CSV
-  document.getElementById("bulk-add-btn").addEventListener("click", () => {
-    const text = document.getElementById("bulk-input").value;
-    if (!text.trim()) return;
-    const result = parseBulkInput(text);
-    const { products: parsedProds, errors: parseErrors } = result;
-    let allErrors = [...parseErrors];
-    if (parsedProds.length > 0) {
-      const valErrors = finalizeAndAddProducts(parsedProds);
-      allErrors = allErrors.concat(valErrors);
-    }
-    // Show parse/validation errors if any
-    showValidationErrors(allErrors);
-    // Clear the bulk textarea and file input after import
-    if (parsedProds.length > 0) {
-      document.getElementById("bulk-input").value = "";
-      document.getElementById("csv-file-input").value = "";
-    }
-  });
-
-  // CSV file input change
-  document.getElementById("csv-file-input").addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const content = e.target.result;
-      const result = parseBulkInput(content);
-      const { products: parsedProds, errors: parseErrors } = result;
-      let allErrors = [...parseErrors];
-      if (parsedProds.length > 0) {
-        const valErrors = finalizeAndAddProducts(parsedProds);
-        allErrors = allErrors.concat(valErrors);
-      }
-      showValidationErrors(allErrors);
-    };
-    reader.readAsText(file, "UTF-8");
-    // Reset file input so same file can be selected again if needed
-    event.target.value = "";
-  });
-
-  // Single product form submit
-  document.getElementById("single-form").addEventListener("submit", (event) => {
-    event.preventDefault();
-    // Gather form values
-    const data = {
-      name: document.getElementById("name").value,
-      price: document.getElementById("price").value,
-      origin: document.getElementById("origin").value,
-      category: document.getElementById("category").value,
-      brand: document.getElementById("brand").value,
-      status: document.getElementById("status").value,
-      featured: document.getElementById("featured").checked,
-      sku: document.getElementById("sku").value,
-      notes: document.getElementById("notes").value
-    };
-    // Basic validation
-    if (!data.name || !data.price || !data.origin) {
-      alert(currentLang === "vi" ? "Vui lòng điền Tên, Giá và Link gốc." : "Please provide Name, Price, and Origin URL.");
-      return;
-    }
-    // Try converting price to number
-    let priceNum = parseFloat(data.price.toString().replace(/[^\d\.,]/g, "").replace(/,/g, ""));
-    if (isNaN(priceNum)) {
-      alert(currentLang === "vi" ? "Giá không hợp lệ." : "Invalid price format.");
-      return;
-    }
-    priceNum = Math.round(priceNum);
-    data.price = priceNum;
-    // Slugify category
-    data.category = data.category ? slugify(data.category) : "";
-    // Status already selected
-    data.status = data.status || "active";
-    // featured already boolean
-    // We will finalize similarly to bulk finalize
-    const valErrors = finalizeAndAddProducts([data]);
-    showValidationErrors(valErrors);
-    // Reset form fields (except perhaps keep category/brand if adding many in same category? But we'll clear all to avoid confusion)
-    document.getElementById("single-form").reset();
-  });
-
-  // Drag and drop image events
-  const dropZone = document.getElementById("drop-zone");
-  dropZone.addEventListener("dragover", (e) => {
+    renderTable();
+  };
+  document.body.appendChild(fileInput);
+  $("#dropZone").onclick = () => fileInput.click();
+  $("#dropZone").ondragover = (e) => {
     e.preventDefault();
-    dropZone.classList.add("hover");
-  });
-  dropZone.addEventListener("dragleave", (e) => {
-    dropZone.classList.remove("hover");
-  });
-  dropZone.addEventListener("drop", (e) => {
+    $("#dropZone").classList.add("hover");
+  };
+  $("#dropZone").ondragleave = (e) => {
+    $("#dropZone").classList.remove("hover");
+  };
+  $("#dropZone").ondrop = (e) => {
     e.preventDefault();
-    dropZone.classList.remove("hover");
-    const dt = e.dataTransfer;
-    if (!dt) return;
-    if (dt.files && dt.files.length) {
-      handleImageFiles(dt.files);
-    }
-  });
-  // Handle file input (click-select)
-  document.getElementById("file-input").addEventListener("change", (e) => {
-    const files = e.target.files;
-    if (files && files.length) {
-      handleImageFiles(files);
-    }
-    // Reset file input to allow re-selecting same file if needed
-    e.target.value = "";
-  });
-
-  // Process selected image files
-  function handleImageFiles(fileList) {
-    const imgList = document.getElementById("image-list");
-    for (let file of fileList) {
-      if (!file.name) continue;
-      // Only accept .webp images per convention (but some might select jpg; we can still preview but warn if not .webp extension)
-      const fileName = file.name;
-      const skuName = fileName.replace(/\.[^/.]+$/, "").toLowerCase(); // name without extension
-      // Create list item for preview
-      const li = document.createElement("li");
-      li.setAttribute("data-sku", skuName);
-      // Create image element preview
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      img.alt = fileName;
-      // Create filename text
-      const nameSpan = document.createElement("span");
-      nameSpan.className = "filename";
-      nameSpan.textContent = fileName;
-      // Remove button
-      const removeBtn = document.createElement("button");
-      removeBtn.className = "remove-img";
-      removeBtn.textContent = "✕";
-      removeBtn.title = currentLang === "vi" ? "Xóa ảnh" : "Remove image";
-      removeBtn.onclick = function() {
-        // Revoke object URL to free memory
-        URL.revokeObjectURL(img.src);
-        // If this image was matched to a product, clear that product's image field
-        const sku = skuName;
-        const prod = products.find(p => p.sku === sku);
-        if (prod) {
-          prod.image = "";
-          // Update table image column (find the row and blank out the image cell)
-          const cell = document.querySelector(`#row-${sku} td:nth-child(8)`); // 8th cell is image column (1-indexed th, so likely nth-child(8) for image if table columns fixed)
-          if (cell) cell.textContent = "";
-        }
-        // Remove from unmatchedImages if present
-        if (unmatchedImages[sku]) {
-          delete unmatchedImages[sku];
-        }
-        // Remove the preview list item
-        li.remove();
-      };
-      // Append elements
-      li.appendChild(img);
-      li.appendChild(nameSpan);
-      li.appendChild(removeBtn);
-      // Determine if there's a matching product for this SKU
-      const product = products.find(p => p.sku === skuName);
-      if (product) {
-        // Match found
-        product.image = "/assets/img/products/" + skuName + ".webp";
-        // Mark image in list as matched (no special class needed, just not marking unmatched)
+    $("#dropZone").classList.remove("hover");
+    const files = Array.from(e.dataTransfer.files || []);
+    files.forEach(file => {
+      if(!file.name.toLowerCase().endsWith(".webp")) return;
+      const sku = file.name.replace(/\.webp$/i, "").toLowerCase();
+      if(!data.some(item => item.sku === sku)) {
+        toast("Ảnh " + file.name + " không khớp SKU nào");
       } else {
-        // No match yet
-        li.classList.add("unmatched");
-        // Store it in unmatchedImages for later matching when product is added
-        unmatchedImages[skuName] = { file: file, element: li };
+        imagesSet.add(sku);
+        const url = URL.createObjectURL(file);
+        imagePreviewMap[sku] = url;
       }
-      // Append to UI list
-      imgList.appendChild(li);
-    }
-  }
-
-  // Show validation errors (array of error messages) or clear if none
-  function showValidationErrors(errors) {
-    const valDiv = document.getElementById("validation-result");
-    if (errors && errors.length > 0) {
-      // Deduplicate errors for clarity
-      const uniqueErrors = [...new Set(errors)];
-      valDiv.innerHTML = uniqueErrors.map(err => `<div>${err}</div>`).join("");
+    });
+    renderTable();
+  };
+  $("#btnHealth").onclick = () => {
+    let issues = [];
+    const missingImgs = data.filter(r => !imagesSet.has(r.sku)).map(r => r.sku);
+    if(missingImgs.length) issues.push("⚠️ Thiếu ảnh: " + missingImgs.join(", "));
+    const skuCounts = data.reduce((acc, r) => {
+      acc[r.sku] = (acc[r.sku] || 0) + 1;
+      return acc;
+    }, {});
+    const dupSku = Object.entries(skuCounts).filter(([sku, count]) => count > 1).map(([sku]) => sku);
+    if(dupSku.length) issues.push("⚠️ Trùng SKU: " + dupSku.join(", "));
+    const originCounts = data.reduce((acc, r) => {
+      const key = r.origin.trim();
+      if(key) acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+    const dupOri = Object.entries(originCounts).filter(([url, count]) => count > 1).map(([url]) => url);
+    if(dupOri.length) issues.push("⚠️ Trùng link gốc: " + dupOri.join(", "));
+    const invalidLinks = data.filter(r => {
+      const merc = detect(r.origin);
+      if(!merc || (merc !== "shopee" && merc !== "lazada")) return true;
+      const h = (() => { try{ return (new URL(r.origin)).hostname; } catch(e){return "";} })();
+      return h.includes("isclix") || h.includes("accesstrade") || h.includes("go.") || h.includes("ir-");
+    }).map(r => r.sku);
+    if(invalidLinks.length) issues.push("⚠️ Link gốc không hợp lệ (hoặc deep-link): " + invalidLinks.join(", "));
+    const missingNames = data.filter(r => !r.name.trim()).map(r => r.sku);
+    if(missingNames.length) issues.push("⚠️ Thiếu tên sản phẩm: " + missingNames.join(", "));
+    const missingPrices = data.filter(r => !r.price).map(r => r.sku);
+    if(missingPrices.length) issues.push("⚠️ Thiếu giá: " + missingPrices.join(", "));
+    if(issues.length === 0) {
+      $("#outHealth").textContent = "✅ Không có vấn đề.";
     } else {
-      valDiv.textContent = "";
+      $("#outHealth").innerHTML = issues.join("\n");
     }
-  }
-
-  // Export JSON button
-  document.getElementById("export-json-btn").addEventListener("click", () => {
-    // Validate before exporting
-    const errors = validateProducts();
-    if (errors.length > 0) {
-      showValidationErrors(errors);
-      document.getElementById("output").textContent = ""; // clear any previous output
-      return;
-    }
-    // Construct JSON array of products (ensuring fields order consistent with spec)
-    const exportData = products.map(p => {
-      return {
-        name: p.name,
-        price: p.price,
-        origin: p.origin,
-        merchant: p.merchant,
-        sku: p.sku,
-        image: p.image ? p.image : `/assets/img/products/placeholder.webp`,
-        category: p.category,
-        brand: p.brand,
-        featured: p.featured,
-        status: p.status,
-        updated_at: p.updated_at,
-        sub1: p.sub1,
-        notes: p.notes
-      };
-    });
-    const jsonStr = JSON.stringify(exportData, null, 2);
-    document.getElementById("output").textContent = jsonStr;
-    showValidationErrors([]); // clear any existing validation messages
-  });
-
-  // Export HTML snippet button
-  document.getElementById("export-html-btn").addEventListener("click", () => {
-    // We can allow snippet export even if some fields (like missing images) are not present,
-    // but still run validate for major issues
-    const errors = validateProducts(true); // true to allow missing image placeholder
-    if (errors.length > 0) {
-      showValidationErrors(errors);
-      document.getElementById("output").textContent = "";
-      return;
-    }
-    let snippetText = "";
-    products.forEach(product => {
-      // Use placeholder image path if no image set
-      const imgPath = product.image ? product.image : `/assets/img/products/${product.sku}.webp`;
-      // Choose "Buy on X" text based on current lang and merchant
-      let buyText = "";
-      if (currentLang === "vi") {
-        buyText = "Mua tại ";
+  };
+  $("#btnFixSku").onclick = () => {
+    const seen = {};
+    data.forEach(r => {
+      let base = r.name ? slugify(r.name) : slugify(r.sku);
+      if(!base) base = "item";
+      let newSku = base;
+      if(seen[base] !== undefined) {
+        seen[base]++;
+        newSku = base + "-" + seen[base];
       } else {
-        buyText = "Buy on ";
+        seen[base] = 1;
       }
-      // Capitalize merchant name for display (or use domain if 'other')
-      let merchantName = product.merchant;
-      if (merchantName === "other") {
-        try {
-          const url = new URL(product.origin);
-          merchantName = url.hostname;
-        } catch {
-          merchantName = "website";
+      while(data.some(x => x !== r && x.sku === newSku)) {
+        seen[base]++;
+        newSku = base + "-" + seen[base];
+      }
+      if(newSku !== r.sku) {
+        if(imagesSet.has(r.sku)) {
+          imagesSet.delete(r.sku);
+          imagesSet.add(newSku);
+          imagePreviewMap[newSku] = imagePreviewMap[r.sku];
+          delete imagePreviewMap[r.sku];
         }
+        r.sku = newSku;
+        r.image = `/assets/img/products/${newSku}.webp`;
       }
-      // Capitalize first letter
-      merchantName = merchantName.charAt(0).toUpperCase() + merchantName.slice(1);
-      buyText += merchantName;
-      snippetText += `<a class="product-meta" href="${product.origin}" data-merchant="${product.merchant}" data-sku="${product.sku}" data-img="${imgPath}" data-price="${product.price}">${product.name}</a>\n`;
-      snippetText += `<a class="buy" href="${product.origin}">${buyText}</a>\n\n`;
+      r.sku = slugify(r.sku);
+      r.image = `/assets/img/products/${r.sku}.webp`;
     });
-    document.getElementById("output").textContent = snippetText.trim();
-    showValidationErrors([]);
-  });
-
-  // Suggest commit message button
-  document.getElementById("suggest-commit-btn").addEventListener("click", () => {
-    if (products.length === 0) return;
-    const n = products.length;
-    // Determine category part: if all products share one category, use it; if multiple categories, note multiple
-    const categories = new Set(products.map(p => p.category || ""));
-    let categoryNote;
-    if (categories.size === 1) {
-      const singleCat = categories.values().next().value || "";
-      categoryNote = singleCat ? singleCat : "misc";
-    } else if (categories.size <= 3) {
-      categoryNote = Array.from(categories).filter(c => c).join(",") || "multiple";
+    renderTable();
+    toast("Đã sửa SKU trùng/lỗi.");
+  };
+  const finalizeEdits = () => {
+    if(document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
+  };
+  $("#btnJson").onclick = () => {
+    finalizeEdits();
+    const outputArr = data.map(r => createAffObject(r));
+    $("#outJson").textContent = JSON.stringify(outputArr, null, 2);
+  };
+  $("#btnSnippet").onclick = () => {
+    finalizeEdits();
+    let snippetLines = [];
+    data.forEach(r => {
+      const origin = r.origin.trim();
+      const merchant = r.merchant || detect(r.origin) || "";
+      const name = r.name.trim() || "(no name)";
+      const price = Number(r.price) || 0;
+      snippetLines.push(`<a class="product-meta" href="${origin}" data-merchant="${merchant}" data-sku="${r.sku}" data-img="/assets/img/products/${r.sku}.webp" data-price="${price}">${name}</a>`);
+      snippetLines.push(`<a class="buy" href="${origin}">Mua tại ${merchant.charAt(0).toUpperCase() + merchant.slice(1)}</a>`);
+      snippetLines.push("");
+    });
+    $("#outJson").textContent = snippetLines.join("\n");
+  };
+  $("#btnCopy").onclick = async () => {
+    try {
+      const text = $("#outJson").textContent;
+      await navigator.clipboard.writeText(text);
+      toast(currentLang === 'vi' ? "Đã copy vào clipboard" : "Copied to clipboard");
+    } catch(e) {
+      console.error(e);
+      toast("Copy failed");
+    }
+  };
+  $("#btnDownload").onclick = () => {
+    const text = $("#outJson").textContent;
+    if(!text) return;
+    let blob;
+    let filename;
+    if(text.trim().startsWith("[")) {
+      blob = new Blob([text], { type: "application/json" });
+      filename = "affiliates.json";
     } else {
-      categoryNote = "multiple";
+      blob = new Blob([text], { type: "text/html" });
+      filename = "snippet.html";
     }
-    const commitMsg = `feat(data): add ${n} products (category: ${categoryNote})`;
-    document.getElementById("commit-msg").value = commitMsg;
-  });
-
-  // Push button
-  document.getElementById("push-btn").addEventListener("click", () => {
-    const workerUrl = document.getElementById("worker-url").value.trim();
-    const xKey = document.getElementById("x-key").value.trim();
-    const commitMsg = document.getElementById("commit-msg").value.trim();
-    if (!workerUrl || !xKey) {
-      alert(currentLang === "vi" ? "Vui lòng nhập URL Worker và X-Key." : "Please enter Worker URL and X-Key.");
+    const a = el("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  };
+  const selectedItems = () => data.filter(r => r.selected);
+  const allItems = () => data.slice();
+  const hdr = () => {
+    const headers = { "Content-Type": "application/json" };
+    const key = $("#workerKey").value.trim() || cfg.workerKey;
+    if(key) headers["X-Key"] = key;
+    return headers;
+  };
+  $("#btnHealthW").onclick = async () => {
+    try {
+      const r = await fetch($("#workerUrl").value.trim() + "/health", { headers: hdr() });
+      const text = await r.text();
+      $("#outPublish").textContent = text;
+    } catch(e) {
+      $("#outPublish").textContent = "Error: " + e;
+    }
+  };
+  $("#btnDiag").onclick = async () => {
+    try {
+      const base = $("#workerUrl").value.trim();
+      const [rs, rf] = await Promise.all([
+        fetch(base + "/queue?channel=store", { headers: hdr() }),
+        fetch(base + "/queue?channel=featured", { headers: hdr() })
+      ]);
+      const ts = await rs.text();
+      const tf = await rf.text();
+      $("#outPublish").textContent = "QUEUE (store): " + ts + "\nQUEUE (featured): " + tf;
+    } catch(e) {
+      $("#outPublish").textContent = "Error: " + e;
+    }
+  };
+  $("#btnStatus").onclick = async () => {
+    try {
+      const r = await fetch($("#workerUrl").value.trim() + "/status", { headers: hdr() });
+      const text = await r.text();
+      $("#outPublish").textContent = text;
+    } catch(e) {
+      $("#outPublish").textContent = "Error: " + e;
+    }
+  };
+  const queueItems = async (channel, items) => {
+    if(!items || items.length === 0) {
+      toast(currentLang === 'vi' ? "Chưa chọn sản phẩm nào" : "No products selected");
       return;
     }
-    // Validate products one more time
-    const errors = validateProducts();
-    if (errors.length > 0) {
-      showValidationErrors(errors);
-      return;
+    try {
+      const payload = { channel: channel, items: items.map(it => createAffObject(it)) };
+      let r = await fetch($("#workerUrl").value.trim() + "/queue", {
+        method: "POST",
+        headers: hdr(),
+        body: JSON.stringify(payload)
+      });
+      const resText = await r.text();
+      $("#outPublish").textContent = resText;
+      if($("#autoPublish").checked) {
+        await publishChannel(channel);
+      }
+    } catch(e) {
+      $("#outPublish").textContent = "Error: " + e;
     }
-    // Prepare payload
-    const payload = {
-      products: products.map(p => {
-        return {
-          name: p.name,
-          price: p.price,
-          origin: p.origin,
-          merchant: p.merchant,
-          sku: p.sku,
-          image: p.image ? p.image : `/assets/img/products/placeholder.webp`,
-          category: p.category,
-          brand: p.brand,
-          featured: p.featured,
-          status: p.status,
-          updated_at: p.updated_at,
-          sub1: p.sub1,
-          notes: p.notes
-        };
-      }),
-      commit: commitMsg || undefined
-    };
-    // Push via fetch
-    fetch(workerUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Key": xKey
-      },
-      body: JSON.stringify(payload)
-    })
-    .then(response => response.text())
-    .then(text => {
-      document.getElementById("push-response").textContent = text;
-      showValidationErrors([]); // clear validation errors if any shown
-    })
-    .catch(err => {
-      document.getElementById("push-response").textContent = "Error: " + err;
-    });
-  });
-
-  // Validate products against schema rules. If allowMissingImage is true, don't error on missing image.
-  function validateProducts(allowMissingImage=false) {
-    const errors = [];
-    // Basic checks for each product
-    const seenSkus = new Set();
-    const seenOrigins = new Set();
-    products.forEach(p => {
-      if (!p.name || p.name.trim() === "") {
-        errors.push(`${currentLang === "vi" ? "Thiếu tên cho SKU" : "Missing name for SKU"} '${p.sku}'`);
+  };
+  const publishChannel = async (channel) => {
+    try {
+      let r = await fetch($("#workerUrl").value.trim() + "/publish", {
+        method: "POST",
+        headers: hdr(),
+        body: JSON.stringify({ channel: channel })
+      });
+      if(r.status === 404 || r.status === 405) {
+        r = await fetch($("#workerUrl").value.trim() + "/publish?channel=" + channel, { headers: hdr() });
       }
-      if (p.price === null || p.price === undefined || isNaN(p.price)) {
-        errors.push(`${currentLang === "vi" ? "Giá không hợp lệ cho SKU" : "Invalid price for SKU"} '${p.sku}'`);
-      }
-      if (!p.origin || p.origin.trim() === "") {
-        errors.push(`${currentLang === "vi" ? "Thiếu link gốc cho SKU" : "Missing origin URL for SKU"} '${p.sku}'`);
-      }
-      if (!p.category || p.category.trim() === "") {
-        errors.push(`${currentLang === "vi" ? "Thiếu danh mục cho SKU" : "Missing category for SKU"} '${p.sku}'`);
-      }
-      if (!p.merchant || p.merchant.trim() === "") {
-        errors.push(`${currentLang === "vi" ? "Thiếu merchant cho SKU" : "Missing merchant for SKU"} '${p.sku}'`);
-      } else if (!["shopee","lazada","tiki","other"].includes(p.merchant)) {
-        errors.push(`${currentLang === "vi" ? "Merchant không hợp lệ cho SKU" : "Invalid merchant for SKU"} '${p.sku}'`);
-      }
-      if (!allowMissingImage) {
-        // If image missing and not allowed
-        if (!p.image || p.image.trim() === "") {
-          errors.push(`${currentLang === "vi" ? "SKU" : "SKU"} '${p.sku}' ${currentLang === "vi" ? "chưa có ảnh" : "has no image"}`);
-        }
-      }
-      if (!["active","draft","archived"].includes(p.status)) {
-        errors.push(`${currentLang === "vi" ? "Trạng thái không hợp lệ cho SKU" : "Invalid status for SKU"} '${p.sku}'`);
-      }
-      // Duplicate checks
-      if (seenSkus.has(p.sku)) {
-        errors.push(`${currentLang === "vi" ? "Trùng SKU" : "Duplicate SKU"} '${p.sku}'`);
-      } else {
-        seenSkus.add(p.sku);
-      }
-      if (seenOrigins.has(p.origin)) {
-        errors.push(`${currentLang === "vi" ? "Trùng link gốc" : "Duplicate origin URL"} '${p.origin}'`);
-      } else {
-        seenOrigins.add(p.origin);
-      }
-    });
-    return errors;
-  }
-
-  // Language toggle event
-  document.getElementById("lang-toggle").addEventListener("click", () => {
-    currentLang = (currentLang === "vi") ? "en" : "vi";
-    applyTranslations();
-    // Update existing table action buttons text (since those were set at creation time)
-    document.querySelectorAll('#product-table button[data-sku]').forEach(btn => {
-      btn.textContent = currentLang === "vi" ? "Xóa" : "Delete";
-    });
-    // Update remove image button title if needed (they are just X symbol, but title attribute for hover)
-    document.querySelectorAll('#image-list button.remove-img').forEach(btn => {
-      btn.title = currentLang === "vi" ? "Xóa ảnh" : "Remove image";
-    });
-  });
-
-  // Initial translation application (for placeholders etc.)
-  applyTranslations();
+      const text = await r.text();
+      $("#outPublish").textContent += "\n" + text;
+    } catch(e) {
+      $("#outPublish").textContent += "\nError: " + e;
+    }
+  };
+  $("#btnPushStoreSel").onclick = () => {
+    queueItems("store", selectedItems());
+  };
+  $("#btnPushFeaturedSel").onclick = () => {
+    queueItems("featured", selectedItems().map(it => { const copy = Object.assign({}, it); copy.featured = true; return copy; }));
+  };
+  $("#btnPushStoreAll").onclick = () => {
+    queueItems("store", data.slice());
+  };
+  $("#btnPushFeaturedAll").onclick = () => {
+    queueItems("featured", data.map(it => { const copy = Object.assign({}, it); copy.featured = true; return copy; }));
+  };
+  $("#btnPublishStore").onclick = async () => {
+    await publishChannel("store");
+  };
+  $("#btnPublishFeatured").onclick = async () => {
+    await publishChannel("featured");
+  };
+  $("#btnGenMsg").onclick = () => {
+    const count = data.filter(r => r.selected).length || data.length;
+    const slug = $("#category").value.trim() || "<slug>";
+    const msg = `feat(data): add ${count} product${count > 1 ? "s" : ""} (category: ${slug})`;
+    $("#commitMsg").value = msg;
+  };
 })();
 </script>
 </body>
