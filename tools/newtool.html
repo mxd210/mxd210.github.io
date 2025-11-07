@@ -1,0 +1,450 @@
+<!-- REPLACE WHOLE FILE: /tools/Importerv4.5.0.html -->
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
+<title>MXD Importer v4.5.0 — CSV + Form + Ảnh preview + Upload Worker</title>
+<meta name="robots" content="noindex,follow"/>
+<style>
+:root{
+  --bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--b:#223043;--accent:#7cc4ff;
+  --ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--card:#121821;--card2:#0f1520;
+  --chip:#0b1220;--ink:#dbe8f7
+}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,Segoe UI,Roboto}
+h1{font-size:18px;margin:0} header{position:sticky;top:0;background:linear-gradient(180deg,#0b0f14,#0b0f1485);border-bottom:1px solid var(--b);z-index:10}
+header .wrap{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 14px}
+.badge{padding:2px 8px;border:1px solid var(--b);border-radius:999px;background:#162132}
+main{padding:14px;max-width:1200px;margin:auto}
+.panel{border:1px solid var(--b);border-radius:12px;overflow:hidden;background:var(--card);margin:12px 0}
+.panel>h2{margin:0;padding:10px 12px;background:var(--card2);border-bottom:1px solid var(--b);font-size:15px}
+.panel>.body{padding:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.stack{display:flex;flex-direction:column;gap:8px}
+input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--b);background:#0d1520;color:var(--ink)}
+textarea{min-height:90px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:10px;border:1px solid var(--b);background:#162132;color:var(--fg);cursor:pointer}
+.btn:active{transform:scale(.98)} .btn[disabled]{opacity:.55;pointer-events:none}
+.btn.primary{background:#12263f;border-color:#223a5e;color:#a7c8e8}
+.btn.ok{background:#0f2b17;border-color:#134e26;color:#aff5c4}
+.btn.warn{background:#3a2a08;border-color:#5f420c;color:#ffe1a3}
+.btn.bad{background:#3f0e0e;border-color:#7a1f1f;color:#ffb3b3}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+th,td{border-bottom:1px solid var(--b);padding:6px 8px;vertical-align:top}
+th{position:sticky;top:0;background:var(--card2);z-index:1;text-align:left}
+th.sel,td.sel{width:36px;text-align:center}
+.scroll{overflow:auto}
+.small{color:var(--muted);font-size:12px}
+.missing{color:var(--bad);font-weight:700}
+.kpi{display:flex;gap:12px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.thumb{border:1px solid var(--b);border-radius:10px;overflow:hidden;background:#0b1320}
+.thumb .ph{aspect-ratio:1/1;background:#0f1624;display:flex;align-items:center;justify-content:center}
+.thumb img{max-width:100%;max-height:100%;display:block}
+.thumb .meta{padding:6px 8px;font-size:12px;display:flex;flex-direction:column;gap:4px}
+.thumb .act{display:flex;gap:6px}
+#toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#000c;padding:8px 12px;border-radius:8px;font-size:13px;opacity:0;transition:.25s;pointer-events:none}
+#toast.show{opacity:1}
+@media(max-width:720px){
+  .row,.row-3{grid-template-columns:1fr}
+  th,td{padding:8px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>MXD Importer v4.5.0</h1>
+    <span class="badge">drop-in / 1 file</span>
+    <span class="badge">GA4 trước Affiliate</span>
+    <span id="cfg" class="badge" style="margin-left:auto">CFG: default</span>
+    <button id="btnLang" class="badge">EN</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1) INPUT + CONFIG -->
+  <section class="panel">
+    <h2>1) Nhập dữ liệu & cấu hình</h2>
+    <div class="body stack">
+
+      <label class="small">Dán danh sách (mỗi dòng: <code>Tên | Giá | Link</code> hoặc chỉ <code>Link</code>)</label>
+      <textarea id="ta" placeholder="Tên sản phẩm | 199000 | https://shopee.vn/..."></textarea>
+      <div class="row">
+        <button class="btn primary" id="btnParse">1) Parse</button>
+        <button class="btn" id="btnSample">Dán ví dụ</button>
+      </div>
+
+      <div class="row-3">
+        <input id="cat" placeholder="Slug danh mục (vd: thoi-trang)"/>
+        <input id="tplShopee" placeholder="Template Shopee (dùng {url},{sub1..4})"/>
+        <input id="tplLazada" placeholder="Template Lazada (dùng {url},{sub1..4})"/>
+      </div>
+
+      <!-- mini form như 4.3.8 -->
+      <div class="row-3">
+        <input id="fName" placeholder="Tên sản phẩm"/>
+        <input id="fPrice" type="number" inputmode="numeric" placeholder="Giá (VND)"/>
+        <input id="fBrand" placeholder="Brand (tùy chọn)"/>
+      </div>
+      <div class="row-3">
+        <input id="fLink" placeholder="Link gốc sản phẩm"/>
+        <select id="fStatus">
+          <option value="active">active</option>
+          <option value="draft">draft</option>
+          <option value="archived">archived</option>
+        </select>
+        <button class="btn" id="btnAddOne">Thêm sản phẩm</button>
+      </div>
+
+      <!-- IMAGE AREA -->
+      <div class="panel" style="margin:0">
+        <h2>Ảnh (.webp) — kéo & thả hoặc bấm để chọn</h2>
+        <div class="body stack">
+          <div class="row-3">
+            <button class="btn" id="btnPickImg">Chọn ảnh</button>
+            <select id="imgTarget">
+              <option value="/assets/img/products/">/assets/img/products/</option>
+              <option value="/assets/img/categories/">/assets/img/categories/</option>
+              <option value="/assets/og/">/assets/og/</option>
+            </select>
+            <div class="kpi small" id="imgKpi">0 ảnh</div>
+          </div>
+          <div class="grid" id="imgGrid"></div>
+          <div class="row">
+            <button class="btn bad" id="btnClearImgs">Xóa tất cả ảnh</button>
+            <button class="btn ok" id="btnUploadImgs">Upload ảnh → Worker</button>
+          </div>
+          <div class="small">Ảnh > 600KB sẽ cảnh báo. Tên file = <code>&lt;sku&gt;.webp</code> để khớp sản phẩm.</div>
+        </div>
+      </div>
+
+      <!-- SAVE CFG -->
+      <div class="row">
+        <input id="workerUrl" placeholder="Worker URL (vd: https://mxd210.mxd6686.workers.dev)"/>
+        <input id="workerKey" placeholder="X-Key (SECRET_KEY/ADMIN_KEY)"/>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnSave">Lưu cấu hình</button>
+        <button class="btn" id="btnReset">Xóa cấu hình</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 2) TABLE -->
+  <section class="panel">
+    <h2>2) Bảng dữ liệu</h2>
+    <div class="body stack">
+      <div class="scroll">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th class="sel"><input type="checkbox" id="selAll"/></th>
+              <th>#</th>
+              <th>Tên</th>
+              <th>Giá</th>
+              <th>Merchant</th>
+              <th>Brand</th>
+              <th>SKU</th>
+              <th>Ảnh</th>
+              <th>Link gốc</th>
+              <th>Deep-link</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="small">Mẹo: sửa nhanh bằng Tab/Enter. SKU lowercase-kebab. Tick chọn để PUSH SELECT.</div>
+      <div id="kpi" class="kpi small"></div>
+      <button class="btn bad" id="btnDelSel">Xóa SELECT</button>
+    </div>
+  </section>
+
+  <!-- 3) HEALTH + JSON -->
+  <section class="panel">
+    <h2>3) Health-check & Xuất JSON</h2>
+    <div class="body stack">
+      <div class="row">
+        <button class="btn ok" id="btnHealth">Chạy kiểm tra</button>
+        <button class="btn" id="btnFixSku">Sửa SKU lỗi</button>
+      </div>
+      <pre class="small" id="outHealth" style="white-space:pre-wrap"></pre>
+      <div class="row">
+        <button class="btn primary" id="btnMakeJson">Tạo JSON</button>
+        <button class="btn" id="btnSnippet">Tạo Snippet</button>
+        <button class="btn" id="btnCopy">Copy</button>
+        <button class="btn" id="btnDownload">Tải xuống</button>
+      </div>
+      <pre id="outJson" class="small" style="white-space:pre-wrap"></pre>
+    </div>
+  </section>
+
+  <!-- 4) WORKER -->
+  <section class="panel">
+    <h2>4) Worker tích hợp — Hàng đợi & Publish</h2>
+    <div class="body stack">
+      <div class="row">
+        <button class="btn" id="btnHealthW">Kiểm tra Worker</button>
+        <button class="btn" id="btnDiag">Chẩn đoán Queue</button>
+        <button class="btn" id="btnStatus">Status</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="pushSel">Đẩy SELECT → Store</button>
+        <button class="btn warn" id="pushSelF">Đẩy SELECT → Nổi bật</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="pushAll">Đẩy TẤT CẢ → Store</button>
+        <button class="btn warn" id="pushAllF">Đẩy TẤT CẢ → Nổi bật</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="pubStore">Publish ngay → Store</button>
+        <button class="btn warn" id="pubFeatured">Publish ngay → Nổi bật</button>
+      </div>
+      <div class="row">
+        <textarea id="commit" rows="2" placeholder="feat(data): add N products (category: ...)"></textarea>
+        <button class="btn" id="genCommit">Gợi ý commit</button>
+      </div>
+      <label class="small"><input type="checkbox" id="autoPub" checked/> Tự động Publish sau khi Đẩy</label>
+      <pre id="outPub" class="small" style="white-space:pre-wrap"></pre>
+      <div class="small">Worker cần các endpoint: <code>/health</code>, <code>/ops/upload-lite</code> (multipart, fields: files[], dir), <code>/queue</code> (POST {channel,items}), <code>/publish</code> (POST {channel})</div>
+    </div>
+  </section>
+
+</main>
+<div id="toast"></div>
+
+<script>
+(()=>{ 'use strict';
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const toast=m=>{const t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500)};
+
+// CFG
+const defaults={
+  tplShopee:"", tplLazada:"",
+  workerUrl:"", workerKey:"",
+  sub1:"", sub2:"", sub3:"store", sub4:"oneatweb",
+  lang:"vi"
+};
+const LSKEY="mxd-importer-v450";
+let cfg=Object.assign({},defaults,JSON.parse(localStorage.getItem(LSKEY)||"{}"));
+function saveCfg(){ localStorage.setItem(LSKEY,JSON.stringify(cfg)); $("#cfg").textContent="CFG: saved"; toast("Đã lưu cấu hình"); }
+function resetCfg(){ localStorage.removeItem(LSKEY); cfg=Object.assign({},defaults); applyCfg(); $("#cfg").textContent="CFG: default"; toast("Đã xóa cấu hình"); }
+function applyCfg(){
+  $("#tplShopee").value=cfg.tplShopee||"";
+  $("#tplLazada").value=cfg.tplLazada||"";
+  $("#workerUrl").value=cfg.workerUrl||"";
+  $("#workerKey").value=cfg.workerKey||"";
+}
+applyCfg();
+$("#btnSave").onclick=()=>{ cfg.tplShopee=$("#tplShopee").value.trim(); cfg.tplLazada=$("#tplLazada").value.trim();
+  cfg.workerUrl=$("#workerUrl").value.trim(); cfg.workerKey=$("#workerKey").value.trim(); saveCfg(); };
+$("#btnReset").onclick=resetCfg;
+
+// Language (VI/EN)
+let lang=cfg.lang||"vi"; const tr={vi:{sample:`Áo thun nam | 199000 | https://shopee.vn/ao-thun-nam-basic-i.1234.5678
+https://www.lazada.vn/products/ao-khoac-cardigan-i987654.html`},
+en:{sample:`Product A | 199000 | https://shopee.vn/...
+https://www.lazada.vn/products/abc-i123.html`}};
+$("#btnLang").onclick=()=>{ lang=lang==='vi'?'en':'vi'; $("#btnLang").textContent=lang==='vi'?'EN':'VI'; cfg.lang=lang; saveCfg(); };
+
+// Helpers
+const slug = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d").replace(/Đ/g,"D")
+  .toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+const detect=u=>{ try{const h=new URL(u).hostname; if(h.includes("shopee"))return"shopee"; if(h.includes("lazada"))return"lazada"; if(h.includes("tiki"))return"tiki";}catch(e){} return""; };
+const guessName=u=>{ try{const p=new URL(u).pathname; const seg=p.split("/").pop().replace(/\.html.*/,""); return decodeURIComponent(seg).replace(/-/g," "); }catch(e){return"";} };
+const hdr=()=>{ const h={"Content-Type":"application/json"}; if($("#workerKey").value.trim()) h["X-Key"]=$("#workerKey").value.trim(); return h; };
+
+// DATA
+let rows=[];
+const imgFiles=new Map(); // key: filename => File
+const imgPreview=new Map(); // key: filename => objectURL
+
+function renderTable(){
+  const tb=$("#tbody"); tb.innerHTML="";
+  rows.forEach((r,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td class="sel"><input type="checkbox" ${r.selected?"checked":""}></td>
+      <td>${i+1}</td>
+      <td><input value="${r.name||""}"/></td>
+      <td><input type="number" value="${r.price||0}"/></td>
+      <td>${r.merchant||""}</td>
+      <td><input value="${r.brand||""}"/></td>
+      <td><input value="${r.sku}"/></td>
+      <td class="w120">${imgPreview.has(r.sku+".webp")?`<img alt="${r.sku}" src="${imgPreview.get(r.sku+".webp")}">`:`<span class="missing">✘</span>`}</td>
+      <td><input value="${r.origin||""}"/></td>
+      <td><input readonly value="${r.deep||""}"/></td>`;
+    const [cb,inpName,inpPrice,,inpBrand,inpSku, ,inpOrigin,inpDeep]=
+      [tr.children[0].firstChild,tr.children[2].firstChild,tr.children[3].firstChild, tr.children[5].firstChild,tr.children[6].firstChild, tr.children[8].firstChild,tr.children[9].firstChild];
+    cb.onchange=()=>{r.selected=cb.checked};
+    inpName.onblur=()=>{r.name=inpName.value.trim()};
+    inpBrand.onblur=()=>{r.brand=inpBrand.value.trim()};
+    inpPrice.onblur=()=>{r.price=+inpPrice.value||0};
+    inpSku.onblur=()=>{ const news=slug(inpSku.value); if(news!==r.sku){ r.sku=news; } inpSku.value=r.sku; renderTable(); };
+    inpOrigin.onblur=()=>{ r.origin=inpOrigin.value.trim(); r.merchant=detect(r.origin); r.deep=makeDeep(r); inpDeep.value=r.deep||""; tr.children[4].textContent=r.merchant||""; };
+    tb.appendChild(tr);
+  });
+  $("#kpi").textContent=`Hàng: ${rows.length} · Đã chọn: ${rows.filter(x=>x.selected).length}`;
+}
+function updateSelAll(){ $("#selAll").onchange=()=>{ const on=$("#selAll").checked; rows.forEach(r=>r.selected=on); renderTable(); }; }
+updateSelAll();
+
+function makeDeep(r){
+  if(!r.merchant) return "";
+  const base=(r.merchant==="shopee"?$("#tplShopee").value.trim():r.merchant==="lazada"?$("#tplLazada").value.trim():"");
+  if(!base) return "";
+  const u=encodeURIComponent(r.origin||"");
+  return base.replace("{url}",u).replace("{sub1}",encodeURIComponent(r.sku)).replace("{sub2}",encodeURIComponent(cfg.sub2||"")).replace("{sub3}",encodeURIComponent(cfg.sub3||"")).replace("{sub4}",encodeURIComponent(cfg.sub4||""));
+}
+
+// Parse
+$("#btnSample").onclick=()=>{ $("#ta").value=tr[lang].sample; };
+$("#btnParse").onclick=()=>{
+  const cat=$("#cat").value.trim();
+  const lines=$("#ta").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  lines.forEach(line=>{
+    let name="",price=0,link="";
+    if(line.includes("|")){ const p=line.split("|").map(x=>x.trim()); name=p[0]||""; price=+(p[1]||"0".replace(/\D/g,""))||0; link=p[p.length-1]||""; }
+    else{ link=line; name=guessName(link); }
+    const m=detect(link);
+    let s=slug(name)||"item-"+Math.random().toString(36).slice(2,7);
+    let base=s,c=2; while(rows.some(r=>r.sku===s)) s=base+"-"+(c++);
+    const r={name:name,price,origin:link,merchant:m,brand:"",sku:s,image:`/assets/img/products/${s}.webp`,category:cat,status:"active",featured:false,selected:false};
+    r.deep=makeDeep(r);
+    rows.push(r);
+  });
+  $("#ta").value="";
+  renderTable();
+};
+
+$("#btnAddOne").onclick=()=>{
+  const cat=$("#cat").value.trim(), n=$("#fName").value.trim(), p=+($("#fPrice").value||0), l=$("#fLink").value.trim();
+  if(!n||!l){ toast("Nhập tên + link"); return; }
+  const m=detect(l); let s=slug(n)||"item-"+Math.random().toString(36).slice(2,7);
+  let base=s,c=2; while(rows.some(r=>r.sku===s)) s=base+"-"+(c++);
+  const r={name:n,price:p,origin:l,merchant:m,brand:$("#fBrand").value.trim(),sku:s,image:`/assets/img/products/${s}.webp`,category:cat,status:$("#fStatus").value,featured:false,selected:false};
+  r.deep=makeDeep(r); rows.push(r);
+  $("#fName").value=$("#fPrice").value=$("#fLink").value=$("#fBrand").value=""; $("#fStatus").value="active";
+  renderTable();
+};
+
+// Image pick/preview
+const picker=document.createElement("input"); picker.type="file"; picker.accept=".webp"; picker.multiple=true;
+picker.onchange=e=>addImages(Array.from(picker.files||[]));
+$("#btnPickImg").onclick=()=>picker.click();
+
+function addImages(files){
+  files.forEach(f=>{
+    if(!f.name.toLowerCase().endsWith(".webp")) return;
+    imgFiles.set(f.name,f);
+    const url=URL.createObjectURL(f); imgPreview.set(f.name,url);
+  });
+  renderImgs();
+  renderTable();
+}
+function renderImgs(){
+  const grid=$("#imgGrid"); grid.innerHTML="";
+  const entries=[...imgFiles.entries()];
+  entries.forEach(([name,file])=>{
+    const url=imgPreview.get(name);
+    const kb=(file.size/1024)|0; const warn=kb>600;
+    const div=document.createElement("div"); div.className="thumb";
+    div.innerHTML=`<div class="ph">${url?`<img alt="${name}" src="${url}">`:""}</div>
+      <div class="meta"><div title="${name}">${name}</div>
+        <div class="small ${warn?'missing':''}">${kb} KB ${warn?'(>600KB)':''}</div>
+        <div class="act"><button class="btn bad" style="padding:6px 8px">Xóa</button></div></div>`;
+    div.querySelector(".btn.bad").onclick=()=>{ imgFiles.delete(name); URL.revokeObjectURL(url); imgPreview.delete(name); renderImgs(); renderTable(); };
+    grid.appendChild(div);
+  });
+  $("#imgKpi").textContent=`${entries.length} ảnh · đích: ${$("#imgTarget").value}`;
+}
+$("#btnClearImgs").onclick=()=>{ [...imgPreview.values()].forEach(URL.revokeObjectURL); imgFiles.clear(); imgPreview.clear(); renderImgs(); renderTable(); };
+
+// Upload images → Worker
+$("#btnUploadImgs").onclick=async()=>{
+  const base=$("#workerUrl").value.trim(), key=$("#workerKey").value.trim();
+  if(!base||imgFiles.size===0){ toast("Thiếu Worker URL hoặc không có ảnh"); return; }
+  const dir=$("#imgTarget").value; const fd=new FormData();
+  for(const f of imgFiles.values()) fd.append("files[]",f,f.name);
+  fd.append("dir",dir);
+  try{
+    const res=await fetch(base+"/ops/upload-lite",{method:"POST",headers:key?{"X-Key":key}:{},body:fd});
+    const txt=await res.text(); $("#outPub").textContent="Upload ảnh: "+txt;
+    toast("Đã gửi ảnh lên Worker");
+  }catch(e){ $("#outPub").textContent="Upload lỗi: "+e; }
+};
+
+// Health
+$("#btnHealth").onclick=()=>{
+  const issues=[];
+  const miss=rows.filter(r=>!imgPreview.has(r.sku+".webp")).map(r=>r.sku);
+  if(miss.length) issues.push("⚠️ Thiếu ảnh cho SKU: "+miss.join(", "));
+  const dupSku=Object.entries(rows.reduce((m,r)=>(m[r.sku]=(m[r.sku]||0)+1,m),{})).filter(([k,v])=>v>1).map(([k])=>k);
+  if(dupSku.length) issues.push("⚠️ Trùng SKU: "+dupSku.join(", "));
+  const badLink=rows.filter(r=>{const h=(()=>{try{return new URL(r.origin).hostname}catch(e){return""}})();return !h || h.includes("isclix")||h.includes("go.")||h.includes("accesstrade")}).map(r=>r.sku);
+  if(badLink.length) issues.push("⚠️ Link gốc không hợp lệ/deep-link: "+badLink.join(", "));
+  $("#outHealth").textContent=issues.length?issues.join("\n"):"✅ Không có vấn đề.";
+};
+$("#btnFixSku").onclick=()=>{
+  const seen={}; rows.forEach(r=>{ let b=slug(r.name)||"item"; if(!seen[b]) seen[b]=0; let s=b; while(rows.some(x=>x!==r&&x.sku===s)) s=b+"-"+(++seen[b]); r.sku=s; r.image="/assets/img/products/"+s+".webp"; });
+  renderTable(); toast("Đã sửa SKU.");
+};
+
+// JSON / snippet
+function affObj(r){
+  const now=new Date(); const iso=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().replace('Z','+00:00');
+  return {name:r.name,price:+r.price||0,origin:r.origin,merchant:r.merchant||"",sku:r.sku,image:`/assets/img/products/${r.sku}.webp`,
+          category:r.category||$("#cat").value.trim(),brand:r.brand||"",featured:!!r.featured,status:r.status||"active",updated_at:iso,sub1:r.sku,notes:r.notes||""};
+}
+$("#btnMakeJson").onclick=()=>{ $("#outJson").textContent=JSON.stringify(rows.map(affObj),null,2); };
+$("#btnSnippet").onclick=()=>{
+  const out=rows.map(r=>`<a class="product-meta" href="${r.origin}" data-merchant="${r.merchant}" data-sku="${r.sku}" data-img="/assets/img/products/${r.sku}.webp" data-price="${+r.price||0}">${r.name}</a>
+<a class="buy" href="${r.origin}">Mua tại ${r.merchant}</a>`).join("\n");
+  $("#outJson").textContent=out;
+};
+$("#btnCopy").onclick=async()=>{ await navigator.clipboard.writeText($("#outJson").textContent||""); toast("Đã copy"); };
+$("#btnDownload").onclick=()=>{
+  const text=$("#outJson").textContent||""; if(!text) return;
+  const isJSON=text.trim().startsWith("["); const blob=new Blob([text],{type:isJSON?"application/json":"text/html"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=isJSON?"affiliates.json":"snippet.html"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500);
+};
+
+// Delete select
+$("#btnDelSel").onclick=()=>{ rows=rows.filter(r=>!r.selected); renderTable(); };
+
+// Worker queue/publish
+async function queue(channel, items){
+  if(items.length===0){ toast("Chưa chọn sản phẩm"); return; }
+  const base=$("#workerUrl").value.trim(); if(!base){ toast("Thiếu Worker URL"); return; }
+  try{
+    const res=await fetch(base+"/queue",{method:"POST",headers:hdr(),body:JSON.stringify({channel,items:items.map(affObj)})});
+    const txt=await res.text(); $("#outPub").textContent="Queue "+channel+": "+txt;
+    if($("#autoPub").checked) await publish(channel);
+  }catch(e){ $("#outPub").textContent="Queue lỗi: "+e; }
+}
+async function publish(channel){
+  const base=$("#workerUrl").value.trim(); try{
+    let r=await fetch(base+"/publish",{method:"POST",headers:hdr(),body:JSON.stringify({channel})});
+    if(r.status===404||r.status===405) r=await fetch(base+`/publish?channel=${channel}`,{headers:hdr()});
+    $("#outPub").textContent+="\nPublish "+channel+": "+(await r.text());
+  }catch(e){ $("#outPub").textContent+="\nPublish lỗi: "+e; }
+}
+$("#pushSel").onclick =()=>queue("store",rows.filter(r=>r.selected));
+$("#pushSelF").onclick=()=>queue("featured",rows.filter(r=>r.selected).map(x=>({...x,featured:true})));
+$("#pushAll").onclick =()=>queue("store",rows);
+$("#pushAllF").onclick=()=>queue("featured",rows.map(x=>({...x,featured:true})));
+$("#pubStore").onclick=()=>publish("store");
+$("#pubFeatured").onclick=()=>publish("featured");
+$("#genCommit").onclick=()=>{ const n=rows.filter(r=>r.selected).length||rows.length; const cat=$("#cat").value.trim()||"<slug>"; $("#commit").value=`feat(data): add ${n} products (category: ${cat})`; };
+
+// Health Worker buttons
+$("#btnHealthW").onclick=async()=>{ try{ const r=await fetch($("#workerUrl").value.trim()+"/health",{headers:hdr()}); $("#outPub").textContent=await r.text(); }catch(e){ $("#outPub").textContent="Health lỗi: "+e; } };
+$("#btnDiag").onclick=async()=>{ try{ const u=$("#workerUrl").value.trim(); const [a,b]=await Promise.all([fetch(u+"/queue?channel=store",{headers:hdr()}), fetch(u+"/queue?channel=featured",{headers:hdr()})]); $("#outPub").textContent="store: "+await a.text()+"\nfeatured: "+await b.text(); }catch(e){ $("#outPub").textContent="Diag lỗi: "+e; } };
+$("#btnStatus").onclick=async()=>{ try{ const r=await fetch($("#workerUrl").value.trim()+"/status",{headers:hdr()}); $("#outPub").textContent=await r.text(); }catch(e){ $("#outPub").textContent="Status lỗi: "+e; } };
+})();
+</script>
+</body>
+</html>
