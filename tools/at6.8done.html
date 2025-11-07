@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
-  <title>MXD Importer v6.8 — Classic + Mobile-safe + GA4 trước Affiliate</title>
+  <title>MXD Importer v6.8 (r2) — Classic + Mobile-safe + GA4 trước Affiliate</title>
   <meta name="robots" content="noindex,follow"/>
   <style>
     :root{--bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--b:#152132;--accent:#7cc4ff;--ok:#34d399;--warn:#f59e0b;--err:#ef4444;--toast-bottom:14px}
@@ -35,18 +35,16 @@
     .xwrap .xbtn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:8px;border:1px solid #2b3b52;background:#0f1622;color:#9fb7d7;cursor:pointer}
     .switch{display:inline-flex;gap:8px;align-items:center}
     .switch input{width:auto}
-    /* giữ input file thật, chỉ đẩy ra off-screen để Android vẫn hiển thị picker */
     .hidden-file{position:fixed;left:-9999px;top:-9999px;width:0;height:0;opacity:0;pointer-events:none}
     @media (max-width:820px){ .g2{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>MXD Importer v6.8 <span class="pill">Mobile-safe</span></h1>
+  <h1>MXD Importer v6.8 <span class="pill">r2 · Mobile-safe</span></h1>
   <div class="small">
-    Giữ bố cục 4.3.8; vá upload ảnh di động. Ảnh sẽ tự thử nhiều “payload shape” (JSON: <code>file</code>/<code>content</code>/<code>base64</code>, kèm cả path có/không dấu <code>/</code> đầu) và cuối cùng là <b>multipart/form-data</b>. 
-    <b>/publish</b> luôn JSON chuẩn. <b>GA4 luôn trước Affiliate</b>.
-    <span class="badge">MXD-ANCHOR: TOP</span>
+    Vá up ảnh di động: auto né preflight, thử nhiều payload (JSON <code>file</code>/<code>content</code>/<code>base64</code> + <code>pathRel</code>, cuối cùng <b>multipart/form-data</b>). 
+    JSON <code>/publish</code> giữ nguyên. <b>GA4 trước Affiliate</b>. <span class="badge">MXD-ANCHOR: TOP</span>
   </div>
 
   <!-- 1) CÀI ĐẶT -->
@@ -92,12 +90,8 @@
     </div>
 
     <div class="row" style="margin-top:8px">
-      <div class="switch">
-        <input type="checkbox" id="noPreflight"/><label for="noPreflight">No-preflight cho upload ảnh (đưa <code>xk</code> vào query; <code>Content-Type: text/plain</code>)</label>
-      </div>
-      <div class="switch">
-        <input type="checkbox" id="mobileLimit" checked/><label for="mobileLimit">Giới hạn ảnh &le; 1.8MB khi upload</label>
-      </div>
+      <div class="switch"><input type="checkbox" id="noPreflight"/><label for="noPreflight">Ưu tiên no-preflight khi upload ảnh</label></div>
+      <div class="switch"><input type="checkbox" id="mobileLimit" checked/><label for="mobileLimit">Giới hạn ảnh &le; 1.8MB</label></div>
     </div>
 
     <div class="row" style="margin-top:8px">
@@ -316,9 +310,8 @@ const $=s=>document.querySelector(s);
 const LS_KEY='MXD_IMPORTER_SETTINGS_V465';
 const slugify=s=>s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 const stripDataURL=b64=>(b64||'').replace(/^data:[^;]+;base64,/,'');
-const normPath=p=>('/'+String(p||'').replace(/^\/+/,'')).replace(/\/+/g,'/');        // /assets/… luôn có slash đầu
-const relPath=p=>String(p||'').replace(/^\/+/,'');                                    // assets/…
-
+const normPath=p=>('/'+String(p||'').replace(/^\/+/,'')).replace(/\/+/g,'/');
+const relPath=p=>String(p||'').replace(/^\/+/,'');
 function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4500); }
 function updateToastOffset(){ const bar=document.querySelector('.sticky-actions'); const bottom=bar?(bar.offsetHeight+16):14; document.documentElement.style.setProperty('--toast-bottom', bottom+'px'); }
 addEventListener('load',updateToastOffset); addEventListener('resize',updateToastOffset);
@@ -339,7 +332,7 @@ function saveSettings(){ settings.write(uiToSettings()); $("#settingsStatus").te
 function loadSettings(){ const s=settings.read(); settingsToUi(s); $("#settingsStatus").textContent='Đã tải cài đặt.'; }
 $("#btnSaveSettings").onclick=saveSettings; $("#btnLoadSettings").onclick=loadSettings; $("#btnClearSettings").onclick=()=>{ localStorage.removeItem(LS_KEY); settingsToUi({}); $("#settingsStatus").textContent='Đã xoá.'; }; loadSettings();
 
-/* ===== mfetch chung (JSON) ===== */
+/* ===== mfetch (JSON APIs) ===== */
 function withTimeout(ms,signal){ return new Promise((_,rej)=>{ const id=setTimeout(()=>{const e=new Error('timeout'); e.name='AbortError'; rej(e);},ms); if(signal) signal.addEventListener('abort',()=>clearTimeout(id));}); }
 function buildJsonHeaders(xKey){ const h={'accept':'application/json','content-type':'application/json'}; if(xKey) h['x-key']=xKey; return h; }
 async function mfetch(path,{method='GET',json=null,headers={}}={}){
@@ -347,73 +340,80 @@ async function mfetch(path,{method='GET',json=null,headers={}}={}){
   const base=s.workerUrl.replace(/\/$/,''); const url=new URL(path,base);
   const body=json==null?undefined: (typeof json==='string'?json:JSON.stringify(json));
   const ac=new AbortController();
-  const opt={method,mode:'cors',keepalive:true,signal:ac.signal,headers:Object.assign(buildJsonHeaders(s.xKey),headers),body};
+  const opt={method,mode:'cors',keepalive:false,credentials:'omit',signal:ac.signal,headers:Object.assign(buildJsonHeaders(s.xKey),headers),body};
   const ms=method==='GET'?15000:25000;
   const r=await Promise.race([fetch(url,opt),withTimeout(ms,ac.signal)]);
   if(!r || !r.ok) throw new Error('HTTP '+(r?r.status:0));
   return r;
 }
 
-/* ===== Upload ảnh “đa hình dạng” v6.8 =====
-   Tự thử theo thứ tự:
-   1) JSON no-preflight {path, file} (xk ở query)
-   2) JSON header      {path, file}
-   3) JSON header      {path, content}
-   4) JSON header      {path, base64}
-   5) JSON header      {path, file, pathRel}
-   6) multipart/form-data header (path + file Blob) */
+/* ===== Upload ảnh: auto né preflight + đa payload ===== */
 async function uploadImageSmart({path, blob}){
   const s=settings.read(); if(!s.workerUrl) throw new Error('Chưa cấu hình Worker');
   const base=s.workerUrl.replace(/\/$/,''); const ep='/upload-image';
   const pAbs=normPath(path), pRel=relPath(path);
-  // chuẩn bị dữ liệu
   const dataUrl=await new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.readAsDataURL(blob); });
   const b64=stripDataURL(dataUrl);
 
-  // hàm thử 1 lần với JSON
-  const tryJson=async(payload,{noPreflight=false})=>{
-    const u=new URL(ep,base); const h={'accept':'application/json'};
-    if(noPreflight){ u.searchParams.set('xk', s.xKey||''); h['content-type']='text/plain'; }
-    else{ h['content-type']='application/json'; if(s.xKey) h['x-key']=s.xKey; }
+  // Helper: JSON POST (no-preflight or normal)
+  const tryJson=async(payload,{noPreflight=false,label=''}={})=>{
+    const u=new URL(ep,base);
+    const h={'accept':'application/json'};
+    if(noPreflight){
+      if(s.xKey) u.searchParams.set('xk', s.xKey); // key qua query
+      h['content-type']='text/plain';               // tránh OPTIONS
+    }else{
+      h['content-type']='application/json';
+      if(s.xKey) h['x-key']=s.xKey;                // có thể gây OPTIONS
+    }
     const ac=new AbortController();
-    const r=await Promise.race([fetch(u,{method:'POST',mode:'cors',keepalive:true,signal:ac.signal,headers:h,body:JSON.stringify(payload)}),withTimeout(25000,ac.signal)]);
-    return r;
+    try{
+      const r=await Promise.race([fetch(u,{
+        method:'POST',mode:'cors',keepalive:false,credentials:'omit',signal:ac.signal,headers:h,body:JSON.stringify(payload)
+      }),withTimeout(25000,ac.signal)]);
+      if(r && r.ok) return {ok:true,res:r,phase:label};
+      return {ok:false,res:r,phase:label};
+    }catch(e){ return {ok:false,res:null,phase:label,err:e}; }
   };
 
-  // 1) JSON no-preflight {path, file}
-  if(s.noPreflight){
-    const r1=await tryJson({path:pAbs,file:b64},{noPreflight:true});
-    if(r1 && r1.ok) return r1;
-    // nếu lỗi cú pháp/auth, sẽ rẽ nhánh tiếp
+  // 0) luôn thử no-preflight trước (dù checkbox on/off)
+  let step = await tryJson({path:pAbs,file:b64},{noPreflight:true,label:'JSON no-preflight {file}'});
+  if(step.ok) return step.res;
+
+  // 1) nếu user bật no-preflight, thử thêm biến thể {content}
+  if(!step.ok && (s.noPreflight===true)){
+    step = await tryJson({path:pAbs,content:b64},{noPreflight:true,label:'JSON no-preflight {content}'});
+    if(step.ok) return step.res;
   }
 
-  // 2) JSON header {path, file}
-  let r=await tryJson({path:pAbs,file:b64},{noPreflight:false});
-  if(r && r.ok) return r;
+  // 2) JSON tiêu chuẩn header
+  step = await tryJson({path:pAbs,file:b64},{noPreflight:false,label:'JSON header {file}'});
+  if(step.ok) return step.res;
 
-  // 3) JSON header {path, content}
-  r=await tryJson({path:pAbs,content:b64},{noPreflight:false});
-  if(r && r.ok) return r;
+  step = await tryJson({path:pAbs,content:b64},{noPreflight:false,label:'JSON header {content}'});
+  if(step.ok) return step.res;
 
-  // 4) JSON header {path, base64}
-  r=await tryJson({path:pAbs,base64:b64},{noPreflight:false});
-  if(r && r.ok) return r;
+  step = await tryJson({path:pAbs,base64:b64},{noPreflight:false,label:'JSON header {base64}'});
+  if(step.ok) return step.res;
 
-  // 5) JSON header {path, file, pathRel}
-  r=await tryJson({path:pAbs,pathRel:pRel,file:b64},{noPreflight:false});
-  if(r && r.ok) return r;
+  step = await tryJson({path:pAbs,pathRel:pRel,file:b64},{noPreflight:false,label:'JSON header {file+pathRel}'});
+  if(step.ok) return step.res;
 
-  // 6) multipart/form-data (header mode)
+  // 3) multipart/form-data (không set content-type để browser tự thêm boundary)
   const fd=new FormData();
   fd.append('path', pAbs);
   fd.append('file', blob, pAbs.split('/').pop()||'image.webp');
   const u6=new URL(ep,base);
-  const h6={'accept':'application/json'}; if(s.xKey) h6['x-key']=s.xKey; // KHÔNG set content-type để browser tự thêm boundary
-  const ac6=new AbortController();
-  r=await Promise.race([fetch(u6,{method:'POST',mode:'cors',signal:ac6.signal,headers:h6,body:fd}),withTimeout(25000,ac6.signal)]);
-  if(r && r.ok) return r;
+  if(s.xKey) u6.searchParams.set('xk', s.xKey); // cũng đẩy key qua query để tránh custom header
+  try{
+    const r=await fetch(u6,{method:'POST',mode:'cors',keepalive:false,credentials:'omit',body:fd});
+    if(r && r.ok) return r;
+  }catch(_){ /* fallthrough */ }
 
-  throw new Error('HTTP '+(r?r.status:400));
+  // Nếu đến đây vẫn fail ⇒ nhiều khả năng CORS route /upload-image không trả headers cho POST/OPTIONS
+  const err=new Error('Failed to upload (CORS/OPTIONS on Worker).');
+  err.name='CorsError';
+  throw err;
 }
 
 /* ===== Worker checks ===== */
@@ -527,7 +527,7 @@ $("#btnUploadImg").onclick=async()=>{
     const r=await uploadImageSmart({path, blob:state.imgBlob});
     if(!r.ok) throw new Error('HTTP '+r.status);
     toast('Đã upload ảnh (đơn).','ok');
-  }catch(e){ toast('Upload ảnh lỗi: '+e.message,'err'); }
+  }catch(e){ toast('Upload ảnh lỗi: '+(e.message||e),'err'); }
 };
 
 /* Batch */
