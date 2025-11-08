@@ -1,4 +1,3 @@
-<!-- REPLACE WHOLE FILE: /g.html -->
 <!doctype html>
 <html lang="vi">
 <head>
@@ -49,10 +48,13 @@
     .price-now{font-weight:800;font-size:20px}
     .price-old{color:var(--muted,#6b7280);text-decoration:line-through}
 
-    /* BUY GROUP: nhiều nút theo sàn */
-    .buy-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-    .buy-group .buy{display:inline-block;padding:10px 14px;border-radius:10px;text-decoration:none}
-    /* Không override màu .buy để giữ màu cam toàn site */
+    /* CTA */
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .actions .buy,.actions .buy-btn{display:inline-block;padding:10px 14px;border-radius:10px;background:var(--brand,#111);color:#fff;text-decoration:none}
+    .buy[data-merchant="shopee"]{ background:#ee4d2d; border-color:#ee4d2d }
+    .buy[data-merchant="lazada"]{ background:#0f146d; border-color:#0f146d }
+    .buy[data-merchant="tiki"]  { background:#1a94ff; border-color:#1a94ff }
+    .buy[data-merchant="tiktok"]{ background:#000;    border-color:#000 }
 
     /* Card & related */
     .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
@@ -125,12 +127,14 @@
           <div id="pdp-tags" class="meta-rows" hidden></div>
           <div id="pdp-categories" class="meta-rows" hidden></div>
 
-          <!-- Nhiều nút mua theo sàn -->
-          <div class="buy-group" id="buy-group">
-            <!-- sẽ được render bằng JS -->
+          <!-- Single CTA (fallback) -->
+          <div class="actions">
+            <a id="pdp-buy" class="buy buy-btn" href="#" data-merchant="" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
           </div>
+          <!-- Multi-CTA (nếu có nhiều sàn) -->
+          <div id="pdp-buy-group" class="actions" hidden></div>
 
-          <p id="pdp-desc" class="muted small-note"></p>
+          <p id="pdp-desc" class="muted small-note" style="margin-top:10px"></p>
 
           <!-- Accordion khối thông tin -->
           <details class="card-extra" id="blk-features" hidden>
@@ -208,90 +212,39 @@
     const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
     const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
     const imgOf = p => p.image || (p.sku? `/assets/img/products/${String(p.sku).toLowerCase()}.webp` : '/assets/img/products/placeholder.webp');
+    const href = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
     const asArr = v => !v ? [] : Array.isArray(v) ? v : String(v).split(/[;,|/]+/).map(s=>s.trim()).filter(Boolean);
     const norm = v => String(v||'').toLowerCase().trim();
     const strip = s => norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
     const slug  = v => strip(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
-
-    // URL tuyệt đối + nhận diện sàn
-    function ensureAbsolute(u){
-      if(!u || u==='#') return '#';
-      const s = String(u).trim();
-      if(/^https?:\/\//i.test(s)) return s;
-      if(s.startsWith('//')) return 'https:'+s;
-      if(/^[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(s)) return 'https://'+s.replace(/^\/+/, '');
-      return s;
-    }
-    function inferMerchant(link, fallback){
-      const h = (link||'').toLowerCase();
-      if (h.includes('shopee')) return 'shopee';
-      if (h.includes('lazada')) return 'lazada';
-      if (h.includes('tiki'))   return 'tiki';
-      if (h.includes('tiktok')) return 'tiktok';
-      return (fallback||'').toLowerCase();
-    }
-    const LABEL = {shopee:'Mua Shopee',lazada:'Mua Lazada',tiki:'Mua Tiki',tiktok:'Mua TikTok'};
-
-    // Gom các link mua từ nhiều schema khác nhau
-    function collectLinks(p){
-      const out = [];
-      const push = (url, mHint) => {
-        const u = ensureAbsolute(url);
-        if(!u || u==='#') return;
-        const m = inferMerchant(u, mHint);
-        out.push({merchant:m||'other', url:u});
-      };
-
-      // 1) Trường phổ biến
-      push(p.deeplink || p.origin_url || p.origin || p.url, p.merchant);
-
-      // 2) Object/Array links
-      if (Array.isArray(p.links)){
-        p.links.forEach(it=>{
-          if (typeof it === 'string'){
-            const [m,u] = it.split('|');
-            push(u||it, m);
-          } else if (it && (it.deeplink||it.url||it.origin_url)){
-            push(it.deeplink||it.url||it.origin_url, it.merchant||it.label);
-          }
-        });
-      }
-      if (p.deeplinks && typeof p.deeplinks==='object'){
-        Object.entries(p.deeplinks).forEach(([k,v])=> push(v,k));
-      }
-
-      // 3) Các key quen thuộc theo sàn
-      const keys = [
-        ['shopee','shopee_url','shopee_link','deeplink_shopee'],
-        ['lazada','lazada_url','lazada_link','deeplink_lazada'],
-        ['tiki','tiki_url','tiki_link','deeplink_tiki'],
-        ['tiktok','tiktok_url','tiktok_link','deeplink_tiktok']
-      ];
-      keys.forEach(([m,...arr])=>{
-        arr.forEach(k=>{ if (p[k]) push(p[k], m); });
-        if (p[m] && typeof p[m]==='string') push(p[m], m);
-      });
-
-      // dedupe theo (merchant,url)
-      const seen = new Set();
-      return out.filter(x=>{
-        const id = (x.merchant||'')+'|'+x.url;
-        if (seen.has(id)) return false;
-        seen.add(id); return true;
-      });
-    }
+    const hostMerch = (u) => {
+      try{
+        const h = new URL(u, location.href).hostname.toLowerCase();
+        if (h.includes('shopee')) return 'shopee';
+        if (h==='lzd.co' || h.endsWith('.lzd.co') || h.includes('lazada')) return 'lazada';
+        if (h.includes('tiki')) return 'tiki';
+        if (h.includes('tiktok')) return 'tiktok';
+      }catch(_){}
+      return '';
+    };
 
     // ===== Elements =====
+    card.setAttribute('data-sku', sku);
+    const elPrice= document.getElementById('pdp-price');
+    elPrice.setAttribute('data-sku', sku);
+
     const elName = document.getElementById('pdp-name');
     const elOld  = document.getElementById('pdp-old');
+    const elBuy  = document.getElementById('pdp-buy');
+    const elBuyGroup = document.getElementById('pdp-buy-group');
     const elDesc = document.getElementById('pdp-desc');
     const elMer  = document.getElementById('pdp-merchant');
     const elBrand= document.getElementById('pdp-brand');
     const elUpdated = document.getElementById('pdp-updated');
     const tagWrap = document.getElementById('pdp-tags');
     const catWrap = document.getElementById('pdp-categories');
-    const elPrice= document.getElementById('pdp-price');
-    elPrice.setAttribute('data-sku', sku);
+
+    const LABELS={shopee:'Mua Shopee',lazada:'Mua Lazada',tiki:'Mua Tiki',tiktok:'Mua TikTok'};
 
     // ===== Price & badges =====
     const name = p.name || p.sku || 'Sản phẩm';
@@ -334,39 +287,52 @@
       setMain(images[0]);
       galleryBox.hidden=false;
     } else {
+      // fallback 1 ảnh
       const elImg  = document.getElementById('pdp-img');
       elImg.src = imgOf(p); elImg.alt = name+' — MXD';
     }
 
-    // ===== BUY BUTTONS (nhiều sàn) =====
-    const buyWrap = document.getElementById('buy-group');
-    function makeBtn(m,u){
-      const a = document.createElement('a');
-      a.className = 'buy';
-      a.href = u;
-      a.target = '_blank';
-      a.rel = 'nofollow sponsored noopener';
-      a.dataset.merchant = m || 'other';
-      a.dataset.sku = sku;
-      a.dataset.img = imgOf(p);
-      a.textContent = LABEL[m] || 'Mua ngay';
-      return a;
+    // ===== Build multi-CTA if có nhiều sàn =====
+    const multi = [];
+    const add = (url, m) => { if (url && /^https?:\/\//i.test(url)) multi.push({url, m}); };
+
+    // hỗ trợ nhiều kiểu schema
+    add(p.deeplink_shopee, 'shopee');
+    add(p.deeplink_lazada, 'lazada');
+    add(p.deeplink_tiki,   'tiki');
+    add(p.deeplink_tiktok, 'tiktok');
+    if (p.deeplinks && typeof p.deeplinks==='object'){
+      add(p.deeplinks.shopee,'shopee'); add(p.deeplinks.lazada,'lazada');
+      add(p.deeplinks.tiki,'tiki');     add(p.deeplinks.tiktok,'tiktok');
     }
-    const links = collectLinks(p);
-    buyWrap.innerHTML = '';
-    if (links.length){
-      links.forEach(({merchant,url})=> buyWrap.appendChild(makeBtn(merchant,url)));
-      // Thông tin sàn đầu tiên (nếu có) để hiển thị nhãn
-      const firstM = links[0].merchant;
-      if (firstM){ elMer.textContent = 'Nền tảng: '+(firstM[0].toUpperCase()+firstM.slice(1)); elMer.hidden = false; }
+    if (p.links && typeof p.links==='object'){
+      add(p.links.shopee,'shopee'); add(p.links.lazada,'lazada');
+      add(p.links.tiki,'tiki');     add(p.links.tiktok,'tiktok');
+    }
+    if (Array.isArray(p.buy)){
+      p.buy.forEach(x=>add(x?.url, (x?.merchant||'').toLowerCase()));
+    }
+
+    if (multi.length > 1){
+      // Hiển thị nhóm nhiều nút
+      elBuy.closest('.actions').style.display='none';
+      elBuyGroup.hidden = false;
+      elBuyGroup.innerHTML = multi.map(x =>
+        `<a class="buy buy-btn" href="${esc(x.url)}" data-merchant="${esc(x.m)}" target="_blank" rel="nofollow sponsored noopener">${LABELS[x.m]||'Mua ngay'}</a>`
+      ).join('');
+    } else {
+      // 1 nút: lấy url tốt nhất và dán label theo merchant
+      const best = multi[0]?.url || href(p);
+      const merch = (p.merchant ? String(p.merchant).toLowerCase() : '') || hostMerch(best);
+      elBuy.href = best || '#';
+      if (merch) elBuy.setAttribute('data-merchant', merch);
+      if (merch) elBuy.textContent = LABELS[merch] || 'Mua ngay';
+      if (p.merchant){ elMer.textContent = 'Nền tảng: '+p.merchant; elMer.hidden=false; }
     }
 
     if (p.brand){ elBrand.textContent = 'Thương hiệu: '+p.brand; elBrand.hidden=false; }
     if (p.updated_at){ try{ const d=new Date(p.updated_at); if(!isNaN(d)){ elUpdated.textContent='Cập nhật: '+d.toLocaleString('vi-VN'); elUpdated.hidden=false; } }catch(_){} }
     if (p.description || p.desc || p.short_desc){ elDesc.textContent = p.description || p.desc || p.short_desc; }
-
-    // Khi render xong, gọi affiliate scan để rewrite tất cả .buy
-    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
 
     // ===== Tags =====
     const tags = asArr(p.tags);
@@ -389,12 +355,13 @@
       });
     }
 
-    // ===== Accordion blocks =====
+    // ===== Accordion blocks (ẩn/hiện theo dữ liệu) =====
     const features = asArr(p.features || p.highlights);
     if (features.length){
       document.getElementById('blk-features').hidden = false;
       document.getElementById('features-body').innerHTML = '<ul>'+features.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
     }
+
     const specs = p.specs && typeof p.specs === 'object' ? p.specs : null;
     if (specs){
       document.getElementById('blk-specs').hidden = false;
@@ -403,15 +370,18 @@
         const li = document.createElement('li'); li.textContent = k+': '+specs[k]; ul.appendChild(li);
       });
     }
+
     const ings = asArr(p.ingredients);
     if (ings.length){
       document.getElementById('blk-ingredients').hidden = false;
       document.getElementById('ing-list').innerHTML = ings.map(x=>'<li>'+esc(x)+'</li>').join('');
     }
+
     if (p.how_to_use || p.usage){
       document.getElementById('blk-usage').hidden = false;
       document.getElementById('usage-body').textContent = p.how_to_use || p.usage;
     }
+
     if (p.notes || p.cautions || p.warranty){
       document.getElementById('blk-notes').hidden = false;
       document.getElementById('notes-body').textContent = p.notes || p.cautions || ('Bảo hành: '+p.warranty);
@@ -427,6 +397,7 @@
       if (Array.isArray(it.tags)) out.push(...it.tags.flatMap(split));
       if (typeof it.category_path === 'string') out.push(...split(it.category_path));
       if (Array.isArray(it.category_path)) out.push(...it.category_path.flatMap(split));
+      // unique slugs
       return Array.from(new Set(out.map(v=>slug(v)).filter(Boolean)));
     }
     const baseLabels = labelsOf(p);
@@ -438,10 +409,8 @@
       const qName = q.name || qSku || 'Sản phẩm';
       const qImg  = q.image || (qSku? `/assets/img/products/${qSku}.webp` : '/assets/img/products/placeholder.webp');
       const qPrice= q.price!=null ? fmt(q.price) : '';
-      // label theo sàn
-      const tmpLinks = collectLinks(q);
-      const first = tmpLinks[0] || {merchant: inferMerchant(q.deeplink||q.origin_url||q.origin||q.url, q.merchant), url: ensureAbsolute(q.deeplink||q.origin_url||q.origin||q.url)};
-      const btnLabel = (first && first.merchant) ? (LABEL[first.merchant] || 'Mua ngay') : 'Mua ngay';
+      const qLink = href(q);
+      const mer  = (q.merchant||'').toLowerCase() || hostMerch(qLink);
       return `
         <article class="product-card" data-sku="${esc(qSku)}">
           <a class="thumb" href="/g.html?sku=${encodeURIComponent(qSku)}">
@@ -451,8 +420,7 @@
           <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(qSku)}">${esc(qName)}</a></h3>
           ${qPrice?`<div class="price" data-price="${esc(String(q.price||''))}">${qPrice}</div>`:''}
           <div class="actions">
-            <a class="buy" href="${esc(first.url)}" data-merchant="${esc(first.merchant||'other')}" data-sku="${esc(qSku)}" data-img="${esc(qImg)}"
-               target="_blank" rel="nofollow sponsored noopener">${esc(btnLabel)}</a>
+            <a class="buy" href="${esc(qLink)}" data-merchant="${esc(mer)}" target="_blank" rel="nofollow sponsored noopener">${LABELS[mer]||'Mua ngay'}</a>
           </div>
         </article>`;
     };
@@ -498,7 +466,7 @@
       document.head.appendChild(s);
     }catch(_){}
 
-    // Trigger affiliate rewrite cho tất cả .buy
+    // Trigger affiliate rewrite cho mọi CTA
     if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
 
     function setOg(prop, val){
