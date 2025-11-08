@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Affiliate JSON Generator</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: 30px auto; padding: 20px; background: #f5f5f5; border-radius: 10px; }
+    h2 { text-align: center; color: #444; }
+    textarea, input { width: 100%; padding: 10px; margin-top: 10px; font-size: 14px; }
+    button { padding: 10px 20px; margin-top: 15px; font-size: 16px; cursor: pointer; background: #1976d2; color: white; border: none; border-radius: 5px; }
+    .output { margin-top: 20px; background: #fff; padding: 15px; border-radius: 5px; font-size: 13px; white-space: pre-wrap; }
+    .highlight { color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Smart Affiliate JSON Generator v1</h2>
+  <input id="productUrl" placeholder="Dán link sản phẩm Shopee vào đây..." />
+  <button onclick="fetchShopee()">Lấy dữ liệu</button>
+  <div class="output" id="jsonOutput">JSON sẽ hiện tại đây...</div>
+  <button onclick="copyJSON()">📋 Copy JSON</button>
+
+  <script>
+    async function fetchShopee() {
+      const url = document.getElementById("productUrl").value.trim();
+      if (!url.includes("shopee")) {
+        alert("Hiện tại chỉ hỗ trợ link Shopee.");
+        return;
+      }
+
+      try {
+        const proxy = "https://api.allorigins.win/raw?url=";
+        const res = await fetch(proxy + encodeURIComponent(url));
+        const html = await res.text();
+
+        // Trích tiêu đề
+        const title = html.match(/<title>(.*?)<\/title>/i)?.[1]?.replace(" | Shopee Việt Nam", "").trim() || "Không rõ";
+
+        // Giá (dự đoán theo định dạng JSON trong trang)
+        const priceMatch = html.match(/"price":(\d+)/);
+        const oldPriceMatch = html.match(/"original_price":(\d+)/);
+
+        const price = priceMatch ? parseInt(priceMatch[1]) / 100000 : 0;
+        const old_price = oldPriceMatch ? parseInt(oldPriceMatch[1]) / 100000 : price;
+
+        // Giảm %
+        const discount = old_price && old_price > price ? Math.round((1 - price / old_price) * 100) : 0;
+
+        // Ảnh
+        const imageMatch = html.match(/https:\/\/cf\.shopee\.vn\/file\/[a-zA-Z0-9]+/g);
+        const images = [...new Set(imageMatch || [])].slice(0, 4);
+
+        // Slug từ tên
+        const slug = title.toLowerCase().replace(/[^\w\s\-]/gi, '').replace(/\s+/g, '-');
+
+        // Sinh JSON
+        const product = {
+          slug,
+          title,
+          merchant: "shopee",
+          price: Math.round(price * 1000),
+          old_price: Math.round(old_price * 1000),
+          discount_percent: discount,
+          origin: url,
+          images,
+          desc: "",
+          tags: [],
+          seo: {
+            description: ""
+          }
+        };
+
+        document.getElementById("jsonOutput").textContent = JSON.stringify(product, null, 2);
+      } catch (e) {
+        alert("Không lấy được dữ liệu. Có thể Shopee chặn trình duyệt.");
+        console.error(e);
+      }
+    }
+
+    function copyJSON() {
+      const json = document.getElementById("jsonOutput").textContent;
+      navigator.clipboard.writeText(json);
+      alert("Đã copy JSON!");
+    }
+  </script>
+</body>
+</html>
