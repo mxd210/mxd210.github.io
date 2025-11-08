@@ -1,31 +1,32 @@
-// /assets/mxd-affiliate.js — MXD-AFF v2025-10-11
-// Chuẩn: GA4 (/assets/analytics.js) phải load TRƯỚC file này (defer)
+// REPLACE WHOLE FILE: /assets/mxd-affiliate.js
+// MXD-AFF v2025-11-08
+// Chuẩn MXD: GA4 (/assets/analytics.js) phải load TRƯỚC file này (defer)
+//
 // Tính năng:
-// - Origin-only rewrite: href gốc -> deeplink theo merchant (Shopee/Lazada/Tiki/TikTok)
-// - Compat deeplink cũ: nếu href hiện tại đã là deeplink (isclix...) => chỉ bồi sub1..sub4
-//   *Nếu meta <mxd-allow-aff-deeplink content="false|"> (mặc định) => cố gắng rút origin từ param url= rồi tạo deeplink mới từ origin
-// - Idempotent: không double-rewrite; click-fallback đảm bảo rewrite kể cả khi scan chưa kịp
-// - Debug overlay: ?dev=1 hoặc <meta name="mxd-aff-debug" content="true"> để hiện deeplink dưới nút
-// - Bỏ qua khi a.buy có data-no-aff="1"
+// - Origin-only rewrite: href gốc -> deeplink AccessTrade theo merchant (Shopee/Lazada/Tiki/TikTok)
+// - Tương thích deeplink sẵn có (isclix...): nếu <meta name="mxd-allow-aff-deeplink" content="true"> thì bồi sub1..sub4;
+//   ngược lại cố rút origin từ param (url|deeplink|u) để tạo deeplink mới (tránh double-hop).
+// - Bỏ qua a.buy[data-no-aff="1"]
+// - Idempotent & click-fallback: đảm bảo rewrite kể cả khi scan chưa kịp
+// - Debug overlay: ?dev=1 hoặc <meta name="mxd-aff-debug" content="true">
 // - Public API: window.mxdAffiliate.scan(scope?), window.mxdAffiliate.rewriteOne(a)
 
 (function () {
-  // Tránh nạp lại nhiều lần
   if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === "function") return;
 
   // ====== Cấu hình & Flags ======
-  const qs = new URLSearchParams(location.search);
-  const getMeta = (n) => document.querySelector(`meta[name="${n}"]`)?.content || "";
-  const PAGE = location.pathname.includes("/store") ? "store" : (location.pathname.includes("/g") ? "g" : "page");
+  const qs     = new URLSearchParams(location.search);
+  const getMeta= (n) => document.querySelector(`meta[name="${n}"]`)?.content || "";
+  const PAGE   = location.pathname.includes("/store") ? "store" : (location.pathname.includes("/g") ? "g" : "page");
 
-  const AFF_DEBUG = qs.get("dev") === "1" || /^true$/i.test(getMeta("mxd-aff-debug"));
-  const ALLOW_AFF_DEEPLINK = /^true$/i.test(getMeta("mxd-allow-aff-deeplink")); // default: false
-  const CAMPAIGN = getMeta("at:sub4") || "mxd210";
+  const AFF_DEBUG            = qs.get("dev") === "1" || /^true$/i.test(getMeta("mxd-aff-debug"));
+  const ALLOW_AFF_DEEPLINK   = /^true$/i.test(getMeta("mxd-allow-aff-deeplink")); // default: false
+  const CAMPAIGN             = getMeta("at:sub4") || "mxd210";
 
-  // Domains deeplink (AccessTrade, v.v.)
-  const DEEP_HOSTS = ['isclix.com', 'go.isclix.com', 'deeplink', 'deep_link'];
+  // Chỉ coi là "deeplink" với host isclix (AccessTrade). Tránh bắt nhầm.
+  const DEEP_HOSTS = ["isclix.com", "go.isclix.com"];
 
-  // ====== Templates AccessTrade (giữ nguyên ID của bạn) ======
+  // ====== Templates AccessTrade (ID của mxd210 – giữ nguyên) ======
   const TPL = {
     shopee: (url, s1 = "", s2 = "", s3 = "", s4 = "") =>
       `https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=${encodeURIComponent(url)}&sub1=${encodeURIComponent(s1)}&sub2=${encodeURIComponent(s2)}&sub3=${encodeURIComponent(s3)}&sub4=${encodeURIComponent(s4)}`,
@@ -39,19 +40,26 @@
 
   // ====== Helpers ======
   const isDeep = (u) => {
-    try { const h = new URL(u, location.href).hostname; return DEEP_HOSTS.some(d => h.includes(d)); }
-    catch { return false; }
+    try {
+      const h = new URL(u, location.href).hostname;
+      return DEEP_HOSTS.some(d => h.endsWith(d) || h.includes(d));
+    } catch { return false; }
   };
+
   const slugify = (s) => (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
   function getMerchant(u, dataAttr) {
     let m = (dataAttr || "").toLowerCase();
     if (m) return m;
     try {
-      const h = new URL(u, location.href).hostname;
+      const h = new URL(u, location.href).hostname.toLowerCase();
+      // Shopee
       if (h.includes("shopee")) return "shopee";
-      if (h.includes("lazada")) return "lazada";
+      // Lazada: đủ mọi biến thể (lzd.co, s.lazada.vn, lazada.vn/sg/…)
+      if (h === "lzd.co" || h.endsWith(".lzd.co") || h.includes("lazada")) return "lazada";
+      // Tiki
       if (h.includes("tiki")) return "tiki";
+      // TikTok shop
       if (h.includes("tiktok")) return "tiktok";
     } catch (_) {}
     return "";
@@ -80,8 +88,8 @@
   function extractOriginFromDeep(u='') {
     try {
       const x = new URL(u, location.href);
-      // Các nhà mạng thường dùng ?url= hoặc ?deeplink=
-      const inner = x.searchParams.get('url') || x.searchParams.get('deeplink');
+      // Nhiều hệ thống dùng url=, deeplink=, u=
+      const inner = x.searchParams.get('url') || x.searchParams.get('deeplink') || x.searchParams.get('u');
       return inner ? decodeURIComponent(inner) : '';
     } catch { return ''; }
   }
@@ -110,34 +118,25 @@
     if (!a || a.dataset.noAff === '1') return;
 
     let hrefNow = a.getAttribute("href") || "";
-    if (!hrefNow || !/^https?:\/\//i.test(hrefNow)) return; // bỏ qua rỗng/relative
+    if (!hrefNow || !/^https?:\/\//i.test(hrefNow)) return;
 
     const merchant = getMerchant(hrefNow, a.dataset.merchant);
     if (!merchant || !TPL[merchant]) return;
 
-    // SKU: ưu tiên data-sku, sau đó node cha hoặc text
-    let sku = a.dataset.sku || a.closest("[data-sku]")?.dataset.sku || slugify(a.textContent);
+    let sku  = a.dataset.sku || a.closest("[data-sku]")?.dataset.sku || slugify(a.textContent);
     const subs = buildSubs(a, sku, merchant);
 
     let finalUrl = hrefNow;
 
     if (isDeep(hrefNow)) {
-      // Đã là deeplink:
       if (ALLOW_AFF_DEEPLINK) {
-        // Giữ deeplink, chỉ bồi sub thiếu
         finalUrl = ensureSubsInDeep(hrefNow, subs);
       } else {
-        // Cố gắng rút origin từ param để tạo deeplink mới từ origin
         const origin = extractOriginFromDeep(hrefNow);
-        if (origin) {
-          finalUrl = TPL[merchant](origin, subs.sub1, subs.sub2, subs.sub3, subs.sub4);
-        } else {
-          // Không rút được -> tối thiểu bồi sub để không mất tracking
-          finalUrl = ensureSubsInDeep(hrefNow, subs);
-        }
+        if (origin) finalUrl = TPL[merchant](origin, subs.sub1, subs.sub2, subs.sub3, subs.sub4);
+        else finalUrl = ensureSubsInDeep(hrefNow, subs);
       }
     } else {
-      // Chưa deep -> tạo deeplink từ origin
       finalUrl = TPL[merchant](hrefNow, subs.sub1, subs.sub2, subs.sub3, subs.sub4);
     }
 
@@ -147,10 +146,9 @@
   }
 
   function scan(scope = document) {
-    scope.querySelectorAll('a.buy[href^="http"]').forEach(rewriteOne);
+    scope.querySelectorAll('a.buy[href^="http"], a.buy-btn[href^="http"]').forEach(rewriteOne);
   }
 
-  // Quan sát DOM động
   const mo = new MutationObserver((muts) => {
     muts.forEach((m) => m.addedNodes.forEach((n) => { if (n.nodeType === 1) scan(n); }));
   });
@@ -158,16 +156,16 @@
 
   document.addEventListener("DOMContentLoaded", () => scan());
 
-  // Fallback: ÉP rewrite ngay lúc click (kể cả scan chưa kịp)
+  // Click fallback
   document.addEventListener("click", function (e) {
-    const a = e.target.closest("a.buy");
+    const a = e.target.closest && e.target.closest("a.buy, a.buy-btn");
     if (!a) return;
 
     let hrefNow = a.getAttribute("href") || "";
     if (!/^https?:\/\//i.test(hrefNow) || a.dataset.noAff === '1') return;
 
     const before = hrefNow;
-    rewriteOne(a); // sẽ cập nhật a.href nếu cần
+    rewriteOne(a);
     const after = a.getAttribute("href") || before;
 
     if (after !== before) {
@@ -176,6 +174,5 @@
     }
   }, true);
 
-  // Public API
   window.mxdAffiliate = { scan, rewriteOne };
 })();
