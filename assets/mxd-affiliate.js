@@ -171,3 +171,13 @@
 
   window.mxdAffiliate = { scan, rewriteOne };
 })();
+// Auto-load Buy script cho toàn site (chỉ nạp 1 lần)
+(() => {
+  if (!window.__mxd_buy_loaded) {
+    const s = document.createElement('script');
+    s.defer = true;
+    s.src = '/assets/mxd-buy.js?v=1';
+    document.head.appendChild(s);
+    window.__mxd_buy_loaded = true;
+  }
+})();
