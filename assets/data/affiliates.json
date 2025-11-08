@@ -14,6 +14,48 @@
     "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2F%25C3%2581O-Kho%25C3%25A1c-Cadigan-%25C3%2581o-len-cadigan-si%25C3%25AAu-xinh-c%25E1%25BB%25B1c-hot-m%25E1%25BA%25ABu-m%25E1%25BB%259Bi-2025-%25C3%25A1o-kho%25C3%25A1c-len-bomber-cadigan-th%25C3%25B4m-si%25C3%25AAu-xinh-2025-i.562119848.27360944564%3FextraParams%3D%257B%2522display_model_id%2522%253A166719522362%252C%2522model_selection_logic%2522%253A3%257D%26xptdk%3Dae12187e-c220-4c2f-a6ad-24817302b794&sub1=sku&sub2=shopee&sub3=tool&sub4=mxd210"
   },
   {
+  "sku": "lazada-ao-khoac-gio-nam-chong-nuoc-nhe",
+  "name": "Áo khoác gió nam chống nước nhẹ",
+  "price": 199000,
+  "old_price": 289000,
+  "merchant": "lazada",
+  "origin_url": "https://www.lazada.vn/products/ao-khoac-gio-nam-chong-nuoc-nhe-i123456789.html",
+  "image": "/assets/img/products/lazada-ao-khoac-gio-nam-chong-nuoc-nhe.webp",
+  "brand": "NoBrand",
+  "categories": ["thoi-trang","thoi-trang-nam","ao-khoac"],
+  "tags": ["deal","chong-nuoc","giam-gia"],
+  "status": true,
+  "updated_at": "2025-11-08T10:30:00.000Z"
+},
+{
+  "sku": "lazada-son-duong-co-mau-spf",
+  "name": "Son dưỡng có màu SPF – ẩm mượt tự nhiên",
+  "price": 89000,
+  "old_price": 129000,
+  "merchant": "lazada",
+  "origin_url": "https://www.lazada.vn/products/son-duong-co-mau-spf-i987654321.html",
+  "image": "/assets/img/products/lazada-son-duong-co-mau-spf.webp",
+  "brand": "Care+",
+  "categories": ["my-pham","trang-diem","son-duong"],
+  "tags": ["deal","skincare","lip-care"],
+  "status": true,
+  "updated_at": "2025-11-08T10:30:00.000Z"
+},
+{
+  "sku": "lazada-dep-the-thao-eva-nhe-chan",
+  "name": "Dép thể thao EVA nhẹ chân",
+  "price": 69000,
+  "old_price": 99000,
+  "merchant": "lazada",
+  "origin_url": "https://www.lazada.vn/products/dep-the-thao-eva-nhe-chan-i192837465.html",
+  "image": "/assets/img/products/lazada-dep-the-thao-eva-nhe-chan.webp",
+  "brand": "LightStep",
+  "categories": ["thoi-trang","phu-kien","giay-dep"],
+  "tags": ["deal","flash-sale"],
+  "status": true,
+  "updated_at": "2025-11-08T10:30:00.000Z"
+},
+  {
     "name": "Áo croptop ba lỗ nữ TOPTIFY",
     "price": 99000,
     "origin": "https://shopee.vn/%C3%81o-croptop-ba-l%E1%BB%97-n%E1%BB%AF-TOPTIFY-c%E1%BB%95-l%E1%BB%8D-tr%C6%A1n-s%C3%A1t-n%C3%A1ch-thun-bo-g%C3%A2n-co-gi%C3%A3n-form-basic-Trip-Away-Top-AC221-TTF023-i.408175384.11370273132?sp_atk=00f330f5-6016-46bd-984a-0120c7a353c6&xptdk=00f330f5-6016-46bd-984a-0120c7a353c6",
