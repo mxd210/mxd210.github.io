@@ -1,10 +1,9 @@
-<!-- REPLACE WHOLE FILE: /tools/mxd-importer-v4.7.0.html -->
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
-  <title>MXD Importer v4.7.0 — Classic + Mobile-safe + Multi-images + Old/New price + Tags/Categories</title>
+  <title>MXD Importer v4.7.0 — Classic + Mobile-safe + Multi-images + Old/New price + Tags/Categories + SEO/Desc</title>
   <meta name="robots" content="noindex,follow"/>
   <style>
     :root{--bg:#0b0f14;--fg:#e8f0fb;--muted:#a7b4c2;--b:#152132;--accent:#7cc4ff;--ok:#34d399;--warn:#f59e0b;--err:#ef4444;--toast-bottom:14px}
@@ -42,7 +41,7 @@
 <body>
 <div class="wrap">
   <h1>MXD Importer v4.7.0 <span class="pill">Mobile-safe</span> <span class="pill">Full features</span></h1>
-  <div class="small">Giữ bố cục & tính năng bản 4.3.8/4.6.5 + bổ sung: <b>old_price</b>, <b>sale_percent</b>, <b>tags</b>, <b>categories</b>, <b>images[]</b> (multi-ảnh/1 sản phẩm). <b>GA4 luôn trước Affiliate</b>. <span class="badge">MXD-ANCHOR: TOP</span></div>
+  <div class="small">Giữ bố cục & tính năng bản 4.3.8/4.6.5 + bổ sung: <b>old_price</b>, <b>sale_percent</b>, <b>tags</b>, <b>categories</b>, <b>images[]</b>, <b>SEO/Desc</b> (short_desc, description, features, specs, usage, notes, rating, keywords, og_image). <span class="badge">MXD-ANCHOR: TOP</span></div>
 
   <!-- ========== 1) CÀI ĐẶT ========== -->
   <div class="card">
@@ -186,7 +185,7 @@ https://example.com/image2.png"></textarea>
       </table>
     </div>
 
-    <!-- ========== 3) THÔNG TIN SẢN PHẨM (đã thêm old_price/sale_percent/tags/categories/images/deal) ========== -->
+    <!-- ========== 3) THÔNG TIN SẢN PHẨM (cơ bản) ========== -->
     <div class="card">
       <h2>3) Thông tin sản phẩm</h2>
       <div class="grid">
@@ -240,6 +239,85 @@ https://example.com/image2.png"></textarea>
           <button class="btn" id="btnAddImagesFromBatch">Thêm ảnh SP từ batch</button>
         </div>
         <div id="diag" class="small"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 3B) MÔ TẢ & SEO (mới thêm) — MXD-ANCHOR: SEO ==========
+       Dữ liệu hỗ trợ g.html + index/store (hiển thị excerpt/SEO tốt hơn) -->
+  <div class="card">
+    <h2>3b) Mô tả & SEO</h2>
+    <div class="grid g2">
+      <div class="xwrap">
+        <label>Tóm tắt ngắn (short_desc)</label>
+        <input id="shortDesc" placeholder="1 câu ngắn để hiển thị thẻ sản phẩm trên index"/>
+        <button class="xbtn" data-clear="#shortDesc">×</button>
+      </div>
+      <div class="xwrap">
+        <label>SEO Title (seo_title)</label>
+        <input id="seoTitle" placeholder="Tên tối ưu SEO (tuỳ chọn)"/>
+        <button class="xbtn" data-clear="#seoTitle">×</button>
+      </div>
+      <div class="xwrap">
+        <label>SEO Description (seo_description)</label>
+        <input id="seoDesc" placeholder="Mô tả SEO 120–160 ký tự (tuỳ chọn)"/>
+        <button class="xbtn" data-clear="#seoDesc">×</button>
+      </div>
+      <div class="xwrap">
+        <label>Từ khoá (keywords — phẩy ,)</label>
+        <input id="keywords" placeholder="máy cắt, bosch, cưa đĩa"/>
+        <button class="xbtn" data-clear="#keywords">×</button>
+      </div>
+      <div class="xwrap">
+        <label>OG Image (og_image — tuỳ chọn)</label>
+        <input id="ogImage" placeholder="/assets/img/products/sku.webp hoặc URL đầy đủ"/>
+        <button class="xbtn" data-clear="#ogImage">×</button>
+      </div>
+      <div class="xwrap">
+        <label>Điểm đánh giá (rating_value)</label>
+        <input id="ratingValue" type="number" step="0.1" placeholder="4.8"/>
+        <button class="xbtn" data-clear="#ratingValue">×</button>
+      </div>
+      <div class="xwrap">
+        <label>Lượt đánh giá (rating_count)</label>
+        <input id="ratingCount" type="number" placeholder="123"/>
+        <button class="xbtn" data-clear="#ratingCount">×</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="xwrap">
+        <label>Mô tả chi tiết (description)</label>
+        <textarea id="description" placeholder="Mô tả dài để hiển thị ở trang chi tiết (g.html)"></textarea>
+        <button class="xbtn" data-clear="#description">×</button>
+      </div>
+
+      <div class="xwrap">
+        <label>Đặc điểm nổi bật (features — mỗi dòng 1 ý)</label>
+        <textarea id="featuresLines" placeholder="Công suất 950W
+Tản nhiệt lớn
+Vỏ nhám chắc tay"></textarea>
+        <button class="xbtn" data-clear="#featuresLines">×</button>
+      </div>
+
+      <div class="xwrap">
+        <label>Thông số (specs — mỗi dòng key: value)</label>
+        <textarea id="specsLines" placeholder="Công suất: 950W
+Đường kính đá: 100mm
+Khối lượng: 1.6kg"></textarea>
+        <button class="xbtn" data-clear="#specsLines">×</button>
+      </div>
+
+      <div class="xwrap">
+        <label>Hướng dẫn sử dụng (how_to_use)</label>
+        <textarea id="usage" placeholder="Các bước dùng an toàn..."></textarea>
+        <button class="xbtn" data-clear="#usage">×</button>
+      </div>
+
+      <div class="xwrap">
+        <label>Lưu ý / Bảo hành (notes)</label>
+        <textarea id="notes" placeholder="Bảo hành 12 tháng chính hãng..."></textarea>
+        <button class="xbtn" data-clear="#notes">×</button>
       </div>
     </div>
   </div>
@@ -409,19 +487,22 @@ $("#openOrigin").onclick=()=>{ const u=$("#originOut").value.trim(); if(u) windo
 /* ========= Auto fill ========= */
 $("#btnSkuFromName").onclick=()=>{ const n=$("#name").value.trim(); if(n) $("#sku").value=slugify(n); syncImgPath(); runDiag(); };
 $("#btnAuto").onclick=()=>{ const n=$("#name").value.trim(); if(n && !$("#sku").value.trim()) $("#sku").value=slugify(n); syncImgPath(); const g=autoCategory(`${n} ${$("#brand").value} ${$("#origin").value}`); if(g && !$("#category").value.trim()) $("#category").value=g; $("#originOut").value=cleanUrl($("#origin").value.trim()); runDiag(); };
-["name","sku","origin","image","merchant","oldPrice","price","salePercent","tags","categories","images"].forEach(id=>$("#"+id).addEventListener('input', runDiag));
+["name","sku","origin","image","merchant","oldPrice","price","salePercent","tags","categories","images","shortDesc","description","featuresLines","specsLines","usage","notes","seoTitle","seoDesc","keywords","ogImage","ratingValue","ratingCount"].forEach(id=>$("#"+id).addEventListener('input', runDiag));
 function syncImgPath(){ const sku=$("#sku").value.trim(); if(sku && !$("#image").value.trim()) $("#image").value=`/assets/img/products/${sku}.webp`; }
 
 /* ========= Diagnostics ========= */
 function runDiag(){
   const sku=$("#sku").value.trim(); const img=$("#image").value.trim(); const origin=cleanUrl($("#origin").value.trim()); const merch=$("#merchant").value;
   const price=Number($("#price").value||0), oldp=Number($("#oldPrice").value||0), sp=Number($("#salePercent").value||0);
+  const shortDesc=$("#shortDesc").value.trim(); const seoDesc=$("#seoDesc").value.trim();
   const msgs=[];
   if(!sku) msgs.push("• Thiếu SKU.");
   if(img && sku && !img.startsWith(`/assets/img/products/${sku}`)) msgs.push("• Ảnh chính nên là /assets/img/products/"+sku+".webp");
   if(origin && !/shopee\.vn|lazada\.vn|tiki\.vn|tiktok\.com/i.test(origin)) msgs.push("• Origin không phải sàn đã hỗ trợ.");
   if(oldp>0 && price>0 && oldp<=price) msgs.push("• old_price ≤ price — không có giảm.");
   if(!isNaN(sp) && sp>0 && (oldp>0 && Math.round((1-price/oldp)*100)!==sp)) msgs.push("• sale_percent ≈ tính lại từ old_price/price.");
+  if(shortDesc.length>160) msgs.push("• short_desc > 160 ký tự (nên rút gọn).");
+  if(seoDesc.length>170) msgs.push("• seo_description > 170 ký tự (nên ~120–160).");
   msgs.push("• Merchant: "+merch);
   $("#diag").innerHTML = msgs.length? msgs.map(x=>`<div>${x}</div>`).join("") : '<span class="ok">Tạm ổn.</span>';
   $("#originOut").value=origin;
@@ -498,8 +579,18 @@ $("#btnDownloadBatch").onclick=async()=>{ if(!batch.length) return toast('Danh s
 /* ========= Gắn ảnh batch vào images[] của sản phẩm ========= */
 $("#btnAddImagesFromBatch").onclick=()=>{ if(!batch.length) return toast('Chưa có ảnh trong batch.','warn'); const folder=getTargetFolder(); const sku=($("#sku").value.trim()||'').toLowerCase(); const list=batch.map((it,i)=> (folder+ (it.name||`${sku}-${String(i+1).padStart(2,'0')}.webp`)).replace(/\/+/g,'/').replace(/^(?!\/)/,'/')); const prev=$("#images").value.trim(); const joined=(prev?prev.replace(/\s*,\s*$/,'')+', ':'')+list.join(', '); $("#images").value=joined; if(!$("#image").value.trim() && list.length) $("#image").value=list[0]; toast('Đã thêm '+list.length+' ảnh vào images[].','ok'); };
 
-/* ========= JSON (đơn) & Publish ========= */
+/* ========= Parsers for SEO/Desc ========= */
 function parseListInput(v){ if(!v) return []; return v.split(/\r?\n|,/).map(s=>s.trim()).filter(Boolean); }
+function parseLines(v){ if(!v) return []; return v.split(/\r?\n/).map(s=>s.trim()).filter(Boolean); }
+function parseKVLines(v){
+  const out={}; if(!v) return out;
+  v.split(/\r?\n/).forEach(line=>{
+    const m=line.split(/[:=]/); if(m.length>=2){ const k=m.shift().trim(); const val=m.join(':').trim(); if(k){ out[k]=val; } }
+  });
+  return out;
+}
+
+/* ========= JSON (đơn) & Publish ========= */
 function buildObj(){
   if(!$("#category").value.trim()){ const guess=autoCategory(`${$("#name").value} ${$("#brand").value} ${$("#origin").value}`); if(guess) $("#category").value=guess; }
   $("#category").value=normCategory($("#category").value);
@@ -513,6 +604,20 @@ function buildObj(){
   const cats=parseListInput($("#categories").value).map(x=>x);
   const tags=parseListInput($("#tags").value).map(x=>x);
   const imgs=parseListInput($("#images").value).map(x=>x);
+
+  // New SEO/Desc fields
+  const shortDesc=$("#shortDesc").value.trim();
+  const description=$("#description").value.trim();
+  const features=parseLines($("#featuresLines").value);
+  const specs=parseKVLines($("#specsLines").value);
+  const usage=$("#usage").value.trim();
+  const notes=$("#notes").value.trim();
+  const ratingValue=Number($("#ratingValue").value||0);
+  const ratingCount=Number($("#ratingCount").value||0);
+  const seoTitle=$("#seoTitle").value.trim();
+  const seoDesc=$("#seoDesc").value.trim();
+  const keywords=parseListInput($("#keywords").value);
+  const ogImage=$("#ogImage").value.trim();
 
   const obj={
     name:$("#name").value.trim(),
@@ -531,10 +636,23 @@ function buildObj(){
     deal: $("#deal").checked || undefined,
     featured:$("#featured").checked,
     status:$("#status").checked,
+    // SEO/Desc pack
+    short_desc: shortDesc||undefined,
+    description: description||undefined,
+    features: features.length?features:undefined,
+    specs: Object.keys(specs).length?specs:undefined,
+    how_to_use: usage||undefined,
+    notes: notes||undefined,
+    rating_value: isFinite(ratingValue)&&ratingValue>0?ratingValue:undefined,
+    rating_count: isFinite(ratingCount)&&ratingCount>0?ratingCount:undefined,
+    seo_title: seoTitle||undefined,
+    seo_description: seoDesc||undefined,
+    keywords: keywords.length?keywords:undefined,
+    og_image: ogImage||undefined,
+
     updated_at:now
   };
   const dl=$("#deeplink").value.trim(); if(dl) obj.deeplink=dl;
-  // dọn undefined cho gọn JSON
   Object.keys(obj).forEach(k=>obj[k]===undefined && delete obj[k]);
   return obj;
 }
@@ -548,7 +666,7 @@ $("#btnUploadJson").onclick=async()=>{
   }catch(e){ toast('Upload JSON lỗi: '+e.message,'err'); }
 };
 
-$("#btnGenCommit").onclick=()=>{ const sku=$("#sku").value.trim()||'sku'; $("#commitMsg").value=`feat(data): add/update ${sku} (+images, tags, categories, prices) via importer 4.7.0`; };
+$("#btnGenCommit").onclick=()=>{ const sku=$("#sku").value.trim()||'sku'; $("#commitMsg").value=`feat(data): add/update ${sku} (+images, tags, categories, prices, seo/desc) via importer 4.7.0`; };
 $("#btnPublish").onclick=()=>doPublish(false);
 $("#btnPublishFeatured").onclick=()=>doPublish(true);
 async function doPublish(forceFeatured){
@@ -601,7 +719,7 @@ $("#btnParseOrigins").onclick=()=>{
       featured:!!$("#batchFeatured").checked,status:true,updated_at:new Date().toISOString(),deeplink
     });
   });
-  renderOriginTable(); $("#jsonOut").value=JSON.stringify(originBatch,null,2); toast(`Đã phân tích ${originBatch.length} URL.`,'ok');
+  renderOriginTable(); $("#jsonOut").value=JSON.stringify(originBatch,null,2); toast(`Đã phân tích ${originBatch.length} URL.`,`ok`);
 };
 $("#btnGenJsonFromOrigins").onclick=()=>{ if(!originBatch.length) return toast('Chưa có dữ liệu batch.','warn'); $("#jsonOut").value=JSON.stringify(originBatch,null,2); toast('Đã tạo JSON từ danh sách.','ok'); };
 $("#btnPublishOrigins").onclick=async()=>{
