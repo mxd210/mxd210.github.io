@@ -1,4 +1,3 @@
-<!-- REPLACE WHOLE FILE: /store.html -->
 <!doctype html>
 <html lang="vi">
 <head>
@@ -194,42 +193,6 @@
 
   <!-- Render (ưu tiên renderer MXD, có fallback an toàn) -->
   <script>
-    // === MXD: detect merchant & label (dùng cho cả renderer chính & fallback) ===
-    function merchantFromDeepLink(url) {
-      try {
-        const u = new URL(url, location.origin);
-        let host = u.hostname;
-        if (host.includes('go.isclix.com')) {
-          const inner = u.searchParams.get('url');
-          if (inner) host = new URL(inner).hostname;
-        }
-        if (/shopee/i.test(host)) return 'shopee';
-        if (/lazada/i.test(host)) return 'lazada';
-        if (/tiki/i.test(host))   return 'tiki';
-        if (/tiktok/i.test(host)) return 'tiktok';
-      } catch(_) {}
-      return '';
-    }
-    function detectMerchant(p, link) {
-      const m = String(p?.merchant||'').toLowerCase().trim();
-      if (m) return m;
-      return merchantFromDeepLink(link);
-    }
-    const BTN_LABEL = {
-      shopee: 'Mua Shopee',
-      lazada: 'Mua Lazada',
-      tiki:   'Mua Tiki',
-      tiktok: 'Mua TikTok'
-    };
-    function labelCTA(root=document){
-      root.querySelectorAll('a.buy').forEach(a=>{
-        let m = (a.dataset.merchant||'').toLowerCase().trim();
-        if (!m) m = merchantFromDeepLink(a.getAttribute('href')||'');
-        if (m) a.dataset.merchant = m;
-        a.textContent = BTN_LABEL[m] || 'Mua ngay';
-      });
-    }
-
     window.addEventListener('DOMContentLoaded', async () => {
       const qs = new URLSearchParams(location.search);
       const lim = qs.has('limit') ? Number(qs.get('limit')) : undefined;
@@ -241,10 +204,6 @@
       } else {
         await fallbackRender(limit);
       }
-
-      // Sau khi render (bất kể renderer nào) => gắn nhãn CTA theo merchant
-      try { labelCTA(document); } catch(_) {}
-      if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
 
       // DEDUPE floating contacts nếu script ngoài có inject trùng
       const fcs = document.querySelectorAll('#floating-contacts,.floating-contacts,.fc');
@@ -284,33 +243,28 @@
         const sku = (p.sku||'').toLowerCase();
         const name = p.name || sku || 'Sản phẩm';
         const origin = p.origin_url || p.origin || p.url || p.link || '#';
-        const merch = detectMerchant(p, origin);
-        const label = BTN_LABEL[merch] || 'Mua ngay';
+        const merchant = (p.merchant||'').toLowerCase();
         const priceAttr = (p.price!=null && p.price!=='') ? `data-price="${p.price}"` : '';
         const priceHtml = (p.price!=null && p.price!=='') ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>` : '';
         return `
           <article class="card" data-sku="${esc(sku)}">
             <!-- meta link cho Affiliate rewriter -->
             <a class="product-meta sr-only"
-               href="${esc(origin)}" data-merchant="${esc(merch||'')}"
+               href="${esc(origin)}" data-merchant="${esc(merchant)}"
                data-sku="${esc(sku)}" data-img="/assets/img/products/${esc(sku)}.webp"
                ${priceAttr}>${esc(name)}</a>
 
             <a href="/g.html?sku=${encodeURIComponent(sku)}" aria-label="Xem chi tiết ${esc(name)}">
               <img loading="lazy" decoding="async"
                    src="/assets/img/products/${esc(sku)}.webp"
-                   alt="${esc(name)} — MXD"
+                   alt="${esc(name)}"
                    onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
             </a>
             <div class="body">
               <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
               ${priceHtml}
               <div class="actions">
-                <a class="buy buy-btn buy--${esc(merch||'default')}"
-                   href="${esc(origin)}"
-                   data-merchant="${esc(merch||'')}"
-                   target="_blank" rel="nofollow sponsored noopener"
-                   title="${esc(label)}">${esc(label)}</a>
+                <a class="buy" href="${esc(origin)}" data-merchant="${esc(merchant)}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
               </div>
             </div>
           </article>`;
@@ -319,6 +273,14 @@
       // Gắn label CTA theo sàn + chạy rewriter nếu có
       labelCTA(document);
       if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+    }
+
+    function labelCTA(root=document){
+      const LABELS = {shopee:'Mua Shopee', lazada:'Mua Lazada', tiki:'Mua Tiki', tiktok:'Mua TikTok'};
+      root.querySelectorAll('a.buy[data-merchant]').forEach(a=>{
+        const m=(a.dataset.merchant||'').toLowerCase();
+        a.textContent = LABELS[m] || 'Mua ngay';
+      });
     }
   </script>
 
