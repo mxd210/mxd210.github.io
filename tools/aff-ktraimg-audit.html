@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
-<title>MXD Image Audit v2 — orphan/invalid/duplicate · Delete & Build JSON stubs</title>
+<title>MXD Image Audit v2.1 — Orphan/Invalid/Duplicate · Delete & Build JSON stubs</title>
 <meta name="robots" content="noindex,follow"/>
 <style>
   :root{--bg:#0b0f14;--fg:#e8f0fb;--muted:#9fb0c3;--b:#142031;--ok:#34d399;--warn:#f59e0b;--err:#ef4444;--card:#0f1926}
@@ -48,7 +48,7 @@
 <body>
 <header>
   <div class="row">
-    <strong>MXD — Image Audit v2</strong>
+    <strong>MXD — Image Audit v2.1</strong>
     <span class="muted">• Quét ảnh thừa/sai chuẩn/trùng · Xoá lựa chọn · Tạo JSON/CSV stubs từ ảnh thừa</span>
   </div>
 </header>
@@ -61,10 +61,17 @@
       <label>Repo <input id="repo" value="mxd210.github.io"></label>
       <label>Branch <input id="branch" value="main"></label>
       <label>Token <input id="token" type="password" placeholder="ghp_xxx (scope public_repo / repo)"></label>
-      <label>Scan path <input id="scanPath" value="/assets/img"></label>
-      <label class="right"><button class="btn" id="run">Scan</button></label>
+      <label>Scan path <input id="scanPath" value="/assets/img/products"></label>
     </div>
-    <div class="small muted" style="margin-top:6px">Token chỉ lưu tạm trong <code>localStorage</code> của trình duyệt. Không gửi đi nơi khác.</div>
+    <div class="f" style="margin-top:8px">
+      <label>Data JSON <input id="dataUrl" value="/assets/data/affiliates.json" style="min-width:320px"></label>
+      <label><input type="checkbox" id="useRaw" checked> Đọc từ <span class="mono">raw.githubusercontent.com</span> (bỏ qua SW/cache)</label>
+      <button class="btn" id="run">Scan</button>
+      <span class="right small muted">Token chỉ lưu tạm trong <code>localStorage</code>.</span>
+    </div>
+    <div class="small muted" style="margin-top:6px">
+      Dữ liệu: <b id="k-skus">0</b> SKU · nguồn: <code id="k-src">—</code>
+    </div>
   </div>
 
   <!-- ACTION BAR -->
@@ -106,18 +113,17 @@
         <button class="btn success" id="buildCsv">Tạo CSV (download)</button>
       </div>
       <p class="small muted" style="margin-top:6px">
-        JSON stub theo chuẩn MXD (mỗi ảnh → 1 item tối thiểu). Bạn có thể mở file, điền thêm
-        <code>merchant</code>, <code>origin_url</code>/<code>deeplink</code>, <code>price</code>, <code>tags</code>, <code>category</code>…
+        JSON stub theo chuẩn MXD (mỗi ảnh → 1 item tối thiểu). Có thể điền thêm <code>merchant</code>, <code>origin_url</code>/<code>deeplink</code>, <code>price</code>, <code>tags</code>, <code>category</code>…
       </p>
     </div>
 
     <div class="card">
       <b>Commit stubs vào repo</b>
       <div class="f" style="margin-top:8px">
-        <label>Path JSON <input id="stubPath" value="/assets/data/stubs/stubs-YYYYMMDD-HHMM.json"></label>
+        <label>Path JSON <input id="stubPath" value="/assets/data/stubs/stubs-YYYYMMDD-HHMM.json" style="min-width:360px"></label>
         <button class="btn success" id="commitStubs">Commit stubs đã tạo</button>
       </div>
-      <p class="small muted">Dùng GitHub API <code>PUT /contents</code>. Nội dung lấy từ lần “Tạo JSON stubs” gần nhất trên trang.</p>
+      <p class="small muted">Dùng GitHub API <code>PUT /contents</code>. Nội dung lấy từ lần “Tạo JSON stubs” gần nhất.</p>
     </div>
   </div>
 
@@ -129,12 +135,11 @@
     <details>
       <summary><b>Quy tắc kiểm tra</b></summary>
       <ul>
-        <li><b>Đường dẫn</b>: chỉ audit dưới <code>/assets/img/**</code>. Nhóm: <code>products/</code>, <code>categories/</code>, <code>og/</code>, <code>brand/</code>, <code>favicon/</code>.</li>
-        <li><b>Định dạng</b>: <code>products/</code>, <code>categories/</code>, <code>og/</code> dùng <code>.webp</code>; <code>brand/</code> cho phép <code>.svg</code>/<code>.webp</code>; <code>favicon/</code> cho phép <code>.ico</code>/<code>.png</code>/<code>.svg</code>.</li>
-        <li><b>Orphan</b>: ảnh trong <code>products/</code> nhưng <code>sku</code> **không có** trong <code>/assets/data/affiliates.json</code> (fallback <code>/affiliates.json</code>/<code>/products.json</code>).</li>
-        <li><b>Đặt tên</b>: bắt buộc chữ thường–số–gạch ngang, trùng <code>sku</code> (VD: <code>abc-123.webp</code>).</li>
-        <li><b>Kích thước</b>: cảnh báo nếu &gt; 600KB hoặc chiều nào &gt; 1600px.</li>
-        <li><b>Trùng nội dung</b>: cùng <code>git blob sha</code> (trùng file).</li>
+        <li>Chỉ audit dưới <code>/assets/img/**</code>. Nhóm chính: <code>products/</code>, <code>categories/</code>, <code>og/</code>, <code>brand/</code>, <code>favicon/</code>.</li>
+        <li><code>products/</code>, <code>categories/</code>, <code>og/</code> dùng <code>.webp</code>. <code>brand/</code> cho phép <code>.svg</code>/<code>.webp</code>. <code>favicon/</code> cho phép <code>.ico</code>/<code>.png</code>/<code>.svg</code>.</li>
+        <li><b>Orphan</b>: ảnh trong <code>products/</code> nhưng <code>sku</code> không có trong file dữ liệu.</li>
+        <li>Đặt tên: chữ thường–số–gạch ngang, trùng <code>sku</code> (VD: <code>abc-123.webp</code>).</li>
+        <li>Cảnh báo kích thước nếu &gt; 600KB hoặc chiều nào &gt; 1600px; gắn cờ trùng nội dung theo blob <code>sha</code>.</li>
       </ul>
     </details>
   </div>
@@ -143,56 +148,37 @@
 <script>
 (function(){
   "use strict";
-  // ---------- helpers ----------
   const $ = s=>document.querySelector(s);
   const esc = s => String(s||"").replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   const human = n => (n>=1024)?(n>=1048576? (n/1048576).toFixed(1)+'MB' : (n/1024).toFixed(0)+'KB') : (n+'B');
-  function norm(v){ return String(v||"").trim(); }
-  function toLower(v){ return norm(v).toLowerCase(); }
-  function isWebp(p){ return /\.webp$/i.test(p); }
-  function isSvg(p){ return /\.svg$/i.test(p); }
-  function isPng(p){ return /\.png$/i.test(p); }
-  function isIco(p){ return /\.ico$/i.test(p); }
   function slugOk(name){ return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name); }
   function fileName(path){ const m=String(path).split('/').pop(); return m||path; }
   function baseName(path){ const f=fileName(path); const i=f.lastIndexOf('.'); return i>0?f.slice(0,i):f; }
   function extName(path){ const f=fileName(path); const i=f.lastIndexOf('.'); return i>0?f.slice(i+1).toLowerCase():''; }
-  function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
-  function todaySlug(){
-    const d=new Date();
-    const pad=n=>String(n).padStart(2,'0');
-    return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes());
-  }
-  function download(name, text, mime='application/json'){
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([text],{type:mime}));
-    a.download=name; a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  }
-  function jsonB64(obj){
-    const s = (typeof obj==='string') ? obj : JSON.stringify(obj,null,2);
-    return btoa(unescape(encodeURIComponent(s))); // base64 utf-8
-  }
+  const delay = ms => new Promise(r=>setTimeout(r,ms));
 
-  // ---------- state ----------
+  // state
   const st = {
     owner: localStorage.getItem('imgAudit.owner') || 'mxd210',
     repo:  localStorage.getItem('imgAudit.repo')  || 'mxd210.github.io',
     branch:localStorage.getItem('imgAudit.branch')|| 'main',
     token: localStorage.getItem('imgAudit.token') || '',
-    scanPath: localStorage.getItem('imgAudit.scanPath') || '/assets/img',
+    scanPath: localStorage.getItem('imgAudit.scanPath') || '/assets/img/products',
+    dataUrl: localStorage.getItem('imgAudit.dataUrl') || '/assets/data/affiliates.json',
+    useRaw: (localStorage.getItem('imgAudit.useRaw')||'1')==='1',
     rows: [],
     usedSkus: new Set(),
     lastStubArray: null
   };
 
-  // ---------- bind inputs ----------
+  // bind inputs
   $('#owner').value = st.owner;
   $('#repo').value  = st.repo;
   $('#branch').value= st.branch;
   $('#token').value = st.token;
   $('#scanPath').value=st.scanPath;
-  $('#stubPath').value = `/assets/data/stubs/stubs-${todaySlug()}.json`;
+  $('#dataUrl').value=st.dataUrl;
+  $('#useRaw').checked=st.useRaw;
 
   function saveInputs(){
     st.owner = $('#owner').value.trim();
@@ -200,50 +186,67 @@
     st.branch= $('#branch').value.trim();
     st.token = $('#token').value;
     st.scanPath=$('#scanPath').value.trim().replace(/\/+$/,'');
+    st.dataUrl = $('#dataUrl').value.trim();
+    st.useRaw = $('#useRaw').checked;
     localStorage.setItem('imgAudit.owner',st.owner);
     localStorage.setItem('imgAudit.repo',st.repo);
     localStorage.setItem('imgAudit.branch',st.branch);
     localStorage.setItem('imgAudit.token',st.token);
     localStorage.setItem('imgAudit.scanPath',st.scanPath);
+    localStorage.setItem('imgAudit.dataUrl',st.dataUrl);
+    localStorage.setItem('imgAudit.useRaw',st.useRaw?'1':'0');
   }
 
-  // ---------- GitHub API ----------
-  function gh(url, opts={}){
-    const h = { 'Accept':'application/vnd.github+json' };
-    if (st.token) h['Authorization'] = 'Bearer '+st.token;
-    return fetch(url,{...opts,headers:{...h,...(opts.headers||{})}});
-  }
-  function ghApi(p){ return `https://api.github.com${p}`; }
-  function ghRaw(path){ return `https://raw.githubusercontent.com/${st.owner}/${st.repo}/${st.branch}${path.startsWith('/')?path:('/'+path)}`; }
+  // GitHub API helpers
+  function gh(url, opts={}){ const h={ 'Accept':'application/vnd.github+json' }; if(st.token) h['Authorization']='Bearer '+st.token; return fetch(url,{...opts,headers:{...h,...(opts.headers||{})}}); }
+  const ghApi = p => `https://api.github.com${p}`;
+  const rawFrom = p => `https://raw.githubusercontent.com/${st.owner}/${st.repo}/${st.branch}${p.startsWith('/')?p:('/'+p)}`;
 
   async function ghTreeRecursive(){
     const r1 = await gh(ghApi(`/repos/${st.owner}/${st.repo}/git/trees/${encodeURIComponent(st.branch)}?recursive=1`));
-    if (!r1.ok){ throw new Error('Cannot load git tree'); }
+    if (!r1.ok) throw new Error('Cannot load git tree');
     const j = await r1.json();
     return (j.tree||[]).filter(x=>x.type==='blob');
   }
 
+  // load SKUs with RAW fallback (bypass SW/cache)
   async function loadAffProducts(){
-    const cand = ['/assets/data/affiliates.json','/affiliates.json','/products.json'];
-    for (const p of cand){
+    const baseCandidates = [st.dataUrl, '/affiliates.json', '/products.json'];
+    const now = Date.now();
+    const urls = [];
+
+    for (const p of baseCandidates){
+      // pages path
+      urls.push(p + (p.includes('?')?'&':'?') + 'bust=' + now);
+      // raw github path
+      urls.push(rawFrom(p) + (p.includes('?')?'&':'?') + 'bust=' + now);
+    }
+
+    let src = '';
+    for (const u of urls){
       try{
-        const r = await fetch(p,{cache:'no-store'});
-        if (r.ok){
-          const j = await r.json();
-          const arr = Array.isArray(j)?j:(j?.items||[]);
-          if (Array.isArray(arr) && arr.length){
-            const skus = new Set(arr.map(x=> String(x.sku||'').toLowerCase()).filter(Boolean));
-            return skus;
+        const r = await fetch(u, { cache:'no-store' });
+        if (!r.ok) continue;
+        const j = await r.json().catch(()=>null);
+        const arr = Array.isArray(j)?j:(j?.items||[]);
+        if (Array.isArray(arr) && arr.length){
+          const set = new Set(arr.map(x=> String(x.sku||'').toLowerCase()).filter(Boolean));
+          if (set.size){
+            src = u; $('#k-src').textContent = u.replace(/https?:\/\/raw\.githubusercontent\.com\//,'raw:/');
+            $('#k-skus').textContent = String(set.size);
+            return set;
           }
         }
       }catch(_){}
     }
+    $('#k-src').textContent = '— (không tải được dữ liệu)';
+    $('#k-skus').textContent = '0';
     return new Set();
   }
 
-  async function sizeAndDim(path){
+  async function sizeAndDim(rawUrl){
     try{
-      const res = await fetch(ghRaw(path),{cache:'no-store'});
+      const res = await fetch(rawUrl,{cache:'no-store'});
       if (!res.ok) return {size:0,w:0,h:0};
       const blob = await res.blob();
       const size = blob.size||0;
@@ -261,32 +264,15 @@
     const p = path.replace(/^\/+/,'');
     if (!p.startsWith(st.scanPath.replace(/^\/+/,'')+'/')) return null;
     const rel = p.slice(st.scanPath.length+1);
-    const folder = rel.split('/')[0]||'';
-    const okSet = new Set(['products','categories','og','brand','favicon']);
-    const group = okSet.has(folder)?folder:'other';
-
+    const folder = 'products';
     const name = fileName(p);
     const base = baseName(p);
     const ext  = extName(p);
-
     const flags = [];
-
-    // extension rules
-    if (group==='products' || group==='categories' || group==='og'){
-      if (!isWebp(p)) flags.push('ext:not-webp');
-    } else if (group==='brand'){
-      if (!(isSvg(p) || isWebp(p))) flags.push('ext:brand-should-svg-or-webp');
-    } else if (group==='favicon'){
-      if (!(isIco(p)||isPng(p)||isSvg(p))) flags.push('ext:favicon-ico-png-svg');
-    }
-
-    // naming & orphan
-    if (group==='products'){
-      if (!slugOk(base)) flags.push('name:not-slug');
-      if (st.usedSkus.size && !st.usedSkus.has(base)) flags.push('orphan:sku-not-in-data');
-    }
-
-    return { path:'/'+p, rel, folder:group, name, base, ext, flags, sha:blobSha, size:0,w:0,h:0 };
+    if (ext!=='webp') flags.push('ext:not-webp');
+    if (!slugOk(base)) flags.push('name:not-slug');
+    if (st.usedSkus.size && !st.usedSkus.has(base)) flags.push('orphan:sku-not-in-data');
+    return { path:'/'+p, rel, folder, name, base, ext, flags, sha:blobSha, size:0,w:0,h:0 };
   }
 
   function renderList(items){
@@ -297,7 +283,8 @@
 
     const host = $('#list');
     host.innerHTML = items.map((it,idx)=>{
-      const level = it.flags.some(f=>f.startsWith('orphan')||f.startsWith('ext:')||f.startsWith('name:')) ? (it.flags.some(f=>f.startsWith('orphan'))?'err':'warn') : 'ok';
+      const level = it.flags.some(f=>f.startsWith('orphan')) ? 'err'
+                   : it.flags.length ? 'warn' : 'ok';
       const vis = (showAll) ||
                   (level==='err' && showErr) ||
                   (level==='warn' && showWarn) ||
@@ -314,8 +301,8 @@
           <code class="mono">${esc(it.rel)}</code>
           <span class="right small muted">${esc(human(it.size))} ${dim?('· '+dim):''}</span>
         </header>
-        <a class="thumb" href="${esc(ghRaw(it.path))}" target="_blank" rel="noopener">
-          <img alt="${esc(it.name)}" src="${esc(ghRaw(it.path))}">
+        <a class="thumb" href="${esc(rawFrom(it.path))}" target="_blank" rel="noopener">
+          <img alt="${esc(it.name)}" src="${esc(rawFrom(it.path))}">
         </a>
         <div class="meta small">
           <div>sha: <span class="mono">${it.sha.slice(0,10)}…</span></div>
@@ -336,7 +323,7 @@
     $('#k-sel').textContent = picks.length.toString();
   }
 
-  // selection helpers
+  // selections
   $('#selNone').addEventListener('click', ()=>{
     document.querySelectorAll('.item .pick').forEach(cb=> cb.checked=false);
     updateSelected();
@@ -355,8 +342,6 @@
     });
     updateSelected();
   });
-
-  // orphan quick pick
   $('#pickOrphan').addEventListener('click', ()=>{
     document.querySelectorAll('.item').forEach(div=>{
       const i = Number(div.getAttribute('data-i'));
@@ -368,25 +353,18 @@
     updateSelected();
   });
 
-  // filters
-  ['#f-all','#f-err','#f-warn','#f-ok'].forEach(id=>{
-    $(id).addEventListener('change', ()=> renderList(st.rows));
-  });
-
-  // delete selected
+  // delete
   async function ghDeleteFile(path, sha, message){
     const url = ghApi(`/repos/${st.owner}/${st.repo}/contents/${encodeURIComponent(path.replace(/^\/+/,''))}`);
     const body = { message, sha, branch: st.branch, committer:{ name:"MXD-Bot", email:"ops@mxd.local" } };
     return gh(url,{ method:'DELETE', body: JSON.stringify(body), headers:{'Content-Type':'application/json'} });
   }
-
   $('#deleteSel').addEventListener('click', async ()=>{
     saveInputs();
     if (!st.token){ alert('Cần token GitHub (scope public_repo hoặc repo).'); return; }
     const picks = [...document.querySelectorAll('.item')].filter(x=> x.querySelector('.pick')?.checked);
     if (!picks.length){ alert('Chưa chọn ảnh nào.'); return; }
-    const yes = confirm(`Xoá ${picks.length} ảnh? Hành động này sẽ commit lên nhánh ${st.branch}.`);
-    if (!yes) return;
+    if (!confirm(`Xoá ${picks.length} ảnh? Commit trực tiếp vào ${st.branch}.`)) return;
 
     let ok=0, fail=0;
     for (const div of picks){
@@ -403,135 +381,81 @@
     alert(`Xong: xoá OK ${ok}, lỗi ${fail}.`);
   });
 
-  // ---------- stubs builder ----------
-  function titleFromSku(sku){
-    const t = String(sku||'').replace(/[-_]+/g,' ').trim();
-    return t.charAt(0).toUpperCase()+t.slice(1);
-  }
+  // stubs
   function stubFromItem(it){
-    // tối thiểu theo chuẩn MXD; image trỏ thẳng file hiện có
     return {
-      sku: it.base,
-      name: titleFromSku(it.base),
-      image: it.path, // có thể để relative /assets/img/products/xxx.webp
-      merchant: "",
-      origin_url: "",
-      deeplink: "",
-      price: null,
-      old_price: null,
-      category: "",
-      tags: [],
-      status: true,
-      created_at: new Date().toISOString()
+      sku: it.base, name: it.base.replace(/[-_]+/g,' ').replace(/^./,c=>c.toUpperCase()),
+      image: it.path, merchant:"", origin_url:"", deeplink:"",
+      price:null, old_price:null, category:"", tags:[], status:true, created_at:new Date().toISOString()
     };
   }
-  function collectOrphans(){
-    return st.rows.filter(x=> x.folder==='products' && x.flags.some(f=>f.startsWith('orphan')));
-  }
-
+  function collectOrphans(){ return st.rows.filter(x=> x.flags.some(f=>f.startsWith('orphan'))); }
+  function download(name, text, mime){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:mime})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+  function todaySlug(){ const d=new Date(),p=n=>String(n).padStart(2,'0'); return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes()); }
   $('#buildJson').addEventListener('click', ()=>{
-    const orphans = collectOrphans();
-    if (!orphans.length){ alert('Không có ảnh orphan.'); return; }
-    const arr = orphans.map(stubFromItem);
-    st.lastStubArray = arr; // lưu để commit
-    download(`stubs-${todaySlug()}.json`, JSON.stringify(arr, null, 2), 'application/json');
+    const orphans = collectOrphans(); if (!orphans.length){ alert('Không có ảnh orphan.'); return; }
+    const arr = orphans.map(stubFromItem); st.lastStubArray = arr;
+    download(`stubs-${todaySlug()}.json`, JSON.stringify(arr,null,2), 'application/json');
   });
-
   $('#buildCsv').addEventListener('click', ()=>{
-    const orphans = collectOrphans();
-    if (!orphans.length){ alert('Không có ảnh orphan.'); return; }
+    const orphans = collectOrphans(); if (!orphans.length){ alert('Không có ảnh orphan.'); return; }
     const headers = ['sku','name','merchant','origin_url','deeplink','price','old_price','category','tags','image'];
-    const rows = orphans.map(it=>{
-      const s = stubFromItem(it);
-      return [
-        s.sku, s.name, '', '', '', '', '', '', '', s.image
-      ].map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',');
-    });
-    const csv = [headers.join(','), ...rows].join('\n');
-    download(`stubs-${todaySlug()}.csv`, csv, 'text/csv');
+    const rows = orphans.map(it=>{ const s=stubFromItem(it); return [s.sku,s.name,'','','','','','','',s.image].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','); });
+    download(`stubs-${todaySlug()}.csv`, [headers.join(','),...rows].join('\n'), 'text/csv');
   });
 
-  // commit stubs file
   async function ghPutFile(path, content, message){
     const url = ghApi(`/repos/${st.owner}/${st.repo}/contents/${encodeURIComponent(path.replace(/^\/+/,''))}`);
-    const body = {
-      message,
-      content: jsonB64(content),
-      branch: st.branch,
-      committer:{ name:"MXD-Bot", email:"ops@mxd.local" }
-    };
+    const body = { message, content: btoa(unescape(encodeURIComponent(content))), branch: st.branch, committer:{ name:"MXD-Bot", email:"ops@mxd.local" } };
     return gh(url,{ method:'PUT', body: JSON.stringify(body), headers:{'Content-Type':'application/json'} });
   }
-
   $('#commitStubs').addEventListener('click', async ()=>{
     saveInputs();
     if (!st.token){ alert('Cần token GitHub.'); return; }
     let arr = st.lastStubArray;
-    if (!Array.isArray(arr) || !arr.length){
-      // nếu chưa bấm buildJson thì build nhanh từ orphan
-      const orphans = collectOrphans();
-      if (!orphans.length){ alert('Không có orphan để commit.'); return; }
-      arr = orphans.map(stubFromItem);
-    }
+    if (!Array.isArray(arr) || !arr.length){ const orphans=collectOrphans(); if(!orphans.length){ alert('Không có orphan để commit.'); return; } arr = orphans.map(stubFromItem); }
     const path = $('#stubPath').value.trim().replace(/stubs-YYYYMMDD-HHMM/, `stubs-${todaySlug()}`);
-    const yes = confirm(`Commit ${arr.length} stub → ${path} ?`);
-    if (!yes) return;
+    if (!confirm(`Commit ${arr.length} stub → ${path}?`)) return;
     const msg = `feat(data): add ${arr.length} orphan stubs → ${path} (via tools/image-audit)`;
-    const res = await ghPutFile(path, JSON.stringify(arr, null, 2), msg);
-    if (res.ok) alert('Commit stubs thành công!');
-    else {
-      const t = await res.text().catch(()=> '');
-      alert('Commit thất bại: '+t);
-    }
+    const res = await ghPutFile(path, JSON.stringify(arr,null,2), msg);
+    alert(res.ok ? 'Commit stubs thành công!' : 'Commit thất bại.');
   });
 
-  // ---------- main scan ----------
+  // main run
   $('#run').addEventListener('click', async ()=>{
     saveInputs();
-    $('#list').innerHTML = '<div class="muted">Đang quét cây Git…</div>';
+    $('#list').innerHTML = '<div class="muted">Đang tải dữ liệu & quét cây Git…</div>';
     try{
-      // 1) SKUs đang dùng
-      st.usedSkus = await loadAffProducts();
-
-      // 2) git tree
+      // 1) load SKUs
+      st.usedSkus = await loadAffProducts(); // hiển thị kèm nguồn
+      // 2) tree
       const blobs = await ghTreeRecursive();
       const imgs = blobs.filter(b=> b.path.startsWith(st.scanPath.replace(/^\/+/,'')+'/'));
-
       // 3) classify
       const rows = [];
       const shaCount = new Map();
       for (const b of imgs){
-        const c = classify('/'+b.path, b.sha);
-        if (!c) continue;
-        rows.push(c);
-        shaCount.set(b.sha, (shaCount.get(b.sha)||0)+1);
+        const c = classify('/'+b.path, b.sha); if (!c) continue;
+        rows.push(c); shaCount.set(b.sha, (shaCount.get(b.sha)||0)+1);
       }
-
-      // 4) size + dimensions
+      // 4) size/dim
       for (let i=0;i<rows.length;i++){
         const it = rows[i];
-        if (!/\.ico$/i.test(it.path)){
-          const meta = await sizeAndDim(it.path);
-          it.size = meta.size; it.w = meta.w; it.h = meta.h;
-          if (it.size>600*1024) it.flags.push('size:>600KB');
-          if (it.w>1600 || it.h>1600) it.flags.push('dim:>1600px');
-        }
+        const meta = await sizeAndDim(rawFrom(it.path));
+        it.size = meta.size; it.w = meta.w; it.h = meta.h;
+        if (it.size>600*1024) it.flags.push('size:>600KB');
+        if (it.w>1600 || it.h>1600) it.flags.push('dim:>1600px');
       }
+      // 5) duplicates
+      for (const it of rows){ const n=shaCount.get(it.sha)||0; if (n>1) it.flags.push(`dup:sha×${n}`); }
 
-      // 5) duplicate by blob
-      for (const it of rows){
-        const n = shaCount.get(it.sha)||0;
-        if (n>1) it.flags.push(`dup:sha×${n}`);
-      }
-
-      // 6) KPI + render
+      // KPI
       st.rows = rows;
       const cnt = { total:rows.length, ok:0, warn:0, err:0, orphan:0 };
       for (const r of rows){
-        const isWarn = r.flags.some(f=>f.startsWith('ext:')||f.startsWith('name:'));
         const isErr  = r.flags.some(f=>f.startsWith('orphan'));
-        if (isErr) cnt.err++; else if (isWarn) cnt.warn++; else cnt.ok++;
-        if (isErr) cnt.orphan++;
+        const isWarn = !isErr && r.flags.length>0;
+        if (isErr) { cnt.err++; cnt.orphan++; } else if (isWarn) cnt.warn++; else cnt.ok++;
       }
       $('#k-total').textContent = cnt.total;
       $('#k-ok').textContent = cnt.ok;
@@ -544,8 +468,6 @@
       $('#list').innerHTML = `<div class="err">Scan lỗi: ${esc(e.message||e)}</div>`;
     }
   });
-
-  // auto suggest scan path
 })();
 </script>
 </body>
