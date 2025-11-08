@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
+<title>MXD — Affiliates Linter (Schema + TTL deeplink + URL/merchant)</title>
+<meta name="robots" content="noindex,follow"/>
+<style>
+  :root{--bg:#0b0f14;--fg:#e8f0fb;--muted:#9fb0c3;--b:#142031;--accent:#7cc4ff;--ok:#34d399;--warn:#f59e0b;--err:#ef4444}
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);font:14px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,Arial}
+  header{padding:16px;border-bottom:1px solid #1f2b3c}
+  main{padding:16px}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .btn{background:#1a2a40;border:1px solid #274266;border-radius:10px;color:var(--fg);padding:8px 12px;cursor:pointer}
+  .btn:hover{filter:brightness(1.08)}
+  .muted{color:var(--muted)}
+  .card{background:#0f1926;border:1px solid #1f2b3c;border-radius:14px;padding:14px;margin:12px 0}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+  th,td{border-bottom:1px solid #1f2b3c;padding:8px;text-align:left;vertical-align:top}
+  th{color:#bcd4ec}
+  .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
+  code,pre{background:#0a1522;border:1px solid #19273b;border-radius:8px;padding:8px;color:#d5e9ff}
+  .tag{display:inline-block;border:1px solid #284463;border-radius:999px;padding:2px 8px;margin-right:6px}
+  .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+  .kpi .box{background:#0f1926;border:1px dashed #274266;border-radius:10px;padding:10px}
+  .dl{display:flex;gap:10px;flex-wrap:wrap}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+  .right{float:right}
+  .nowrap{white-space:nowrap}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <strong>MXD — Affiliates Linter</strong>
+    <span class="muted">• Kiểm tra schema, TTL deeplink, merchant, URL, giá, ảnh, tag…</span>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button class="btn" id="run">Quét ngay</button>
+    <button class="btn" id="dl-errors">Tải errors.csv</button>
+    <button class="btn" id="dl-fixed">Tải normalized-affiliates.json</button>
+    <span class="muted">Nguồn: <code id="src"></code></span>
+  </div>
+</header>
+<main>
+  <div class="card">
+    <div class="kpi">
+      <div class="box">Tổng item: <b id="k-total">0</b></div>
+      <div class="box">Hợp lệ: <b class="ok" id="k-ok">0</b></div>
+      <div class="box">Có cảnh báo: <b class="warn" id="k-warn">0</b></div>
+      <div class="box">Lỗi: <b class="err" id="k-err">0</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>Các lỗi/cảnh báo phát hiện</b>
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th>#</th><th>sku</th><th>merchant</th><th>mô tả</th><th>gợi ý khắc phục</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <details open>
+      <summary><b>Giải thích chuẩn “tuyệt đối”</b></summary>
+      <ul>
+        <li><b>origin_url + merchant</b> là nguồn sự thật; <b>deeplink</b> chỉ là cache (TTL mặc định 15 ngày). Nếu cache hết hạn, <code>mxdAffiliate.scan()</code> sẽ tự sinh lại khi render.</li>
+        <li><b>sku</b> là slug: chữ thường, số, dấu gạch ngang. Nếu thiếu, có thể auto-tạo từ <code>name</code>.</li>
+        <li><b>price</b> là số (VND). <b>old_price</b> &gt; <b>price</b> mới tính %OFF.</li>
+        <li><b>image</b>: ưu tiên URL tuyệt đối; nếu không có, dùng <code>/assets/img/products/&lt;sku&gt;.webp</code>.</li>
+        <li><b>status</b> = <code>true</code> hoặc <code>active</code> để hiển thị. <code>false/archived</code> sẽ ẩn.</li>
+        <li><b>tags</b>: dùng để lọc/deals (ví dụ: <code>deal</code>, <code>flash-sale</code>, <code>hot</code>...).</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="muted mono">Tip: thêm <code>?src=/affiliates.json</code> hoặc <code>?src=/products.json</code> vào URL để test nguồn khác.</div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  const SRC = (new URL(location.href)).searchParams.get("src")
+            || "/assets/data/affiliates.json";
+  document.getElementById("src").textContent = SRC;
+
+  const MERCHANTS = new Set(["shopee","lazada","tiki","tiktok"]);
+  const LABELS = {shopee:"Mua Shopee",lazada:"Mua Lazada",tiki:"Mua Tiki",tiktok:"Mua TikTok"};
+  const ISCLIX = /(^https?:\/\/)?go\.isclix\.com/i;
+
+  function norm(v){ return String(v||"").trim(); }
+  function toLower(v){ return norm(v).toLowerCase(); }
+  function stripAccents(s){ return norm(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d"); }
+  function slugify(s){
+    const t = stripAccents(s).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"");
+    return t || "";
+  }
+  function isHttp(u){ return /^https?:\/\//i.test(norm(u)); }
+  function asNum(n){
+    if (n===null || n===undefined || n==="") return null;
+    const v = Number(String(n).replace(/[^\d.]/g,""));
+    return Number.isFinite(v) ? v : null;
+  }
+  function csvEscape(v){ return `"${String(v).replace(/"/g,'""')}"`; }
+  function fmtDate(d){ try{ return new Date(d).toISOString(); }catch(_){ return ""; } }
+  function daysBetween(a,b){ try{ return Math.floor((b-a)/(1000*60*60*24)); }catch(_){ return null; } }
+
+  async function loadJson(urls){
+    if (!Array.isArray(urls)) urls=[urls];
+    for (const u of urls){
+      try{
+        const r = await fetch(u,{cache:"no-store"});
+        if (!r.ok) continue;
+        const j = await r.json();
+        const arr = Array.isArray(j) ? j : (j?.items || j || []);
+        if (Array.isArray(arr)) return arr;
+      }catch(_){}
+    }
+    return [];
+  }
+
+  function validateOne(p){
+    const errs = [];
+    const warns = [];
+    const out = JSON.parse(JSON.stringify(p||{})); // clone for normalization
+    // sku
+    let sku = toLower(p.sku || "");
+    if (!sku) sku = slugify(p.name||"");
+    if (!sku) errs.push("Thiếu sku và không thể suy từ name.");
+    if (sku && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(sku)){
+      warns.push("SKU không đúng slug (đã đề xuất bản chuẩn).");
+    }
+    out.sku = sku;
+
+    // merchant
+    const m = toLower(p.merchant||"");
+    if (!MERCHANTS.has(m)) errs.push("merchant không hợp lệ (hỗ trợ: shopee,lazada,tiki,tiktok).");
+    out.merchant = m;
+
+    // origin_url
+    const origin = norm(p.origin_url||p.origin||p.url||p.link||"");
+    if (!origin) errs.push("Thiếu origin_url.");
+    if (origin && !isHttp(origin)) errs.push("origin_url không phải HTTP(S).");
+    out.origin_url = origin;
+
+    // deeplink cache
+    const dlp = norm(p.deeplink||"");
+    if (dlp && !ISCLIX.test(dlp)) warns.push("deeplink không phải isclix (AccessTrade). Kiểm tra lại chính sách.");
+    out.deeplink = dlp || undefined;
+
+    const ttl = Number.isFinite(+p.deeplink_ttl_days) ? Math.max(1, Math.min(90, +p.deeplink_ttl_days)) : 15;
+    out.deeplink_ttl_days = ttl;
+    const cachedAt = p.deeplink_cached_at ? fmtDate(p.deeplink_cached_at) : "";
+    if (cachedAt){
+      const days = daysBetween(new Date(cachedAt), new Date());
+      if (days!==null && days>ttl) warns.push(`deeplink cache đã quá hạn ${days-ttl} ngày (TTL=${ttl}).`);
+    }
+    out.deeplink_cached_at = cachedAt || undefined;
+
+    // prices
+    const price = asNum(p.price);
+    const oldp  = asNum(p.old_price ?? p.price_old ?? p.list_price ?? p.msrp ?? p.regular_price);
+    out.price = price;
+    if (oldp!=null) out.old_price = oldp;
+    if (oldp!=null && price!=null && !(oldp>price)) warns.push("old_price không lớn hơn price — không tính được %OFF.");
+
+    // image(s)
+    const img = norm(p.image||"");
+    if (!img){
+      // không bắt buộc, vì UI fallback theo /assets/img/products/<sku>.webp
+      warns.push("thiếu image — sẽ fallback sang /assets/img/products/<sku>.webp");
+    }else{
+      // chấp nhận absolute url hoặc đường dẫn nội bộ
+      if (!(isHttp(img) || /^\/assets\/img\/products\//.test(img))){
+        warns.push("image nên là URL tuyệt đối hoặc /assets/img/products/<sku>.webp");
+      }
+    }
+    out.image = img || `/assets/img/products/${sku}.webp`;
+
+    // status/featured
+    let status = p.status;
+    if (typeof status==="string"){ status = (status==="active"); }
+    if (status===undefined) status = true;
+    out.status = !!status;
+    out.featured = !!p.featured;
+
+    // tags/categories
+    const tags = Array.isArray(p.tags) ? p.tags.filter(Boolean).map(norm) : [];
+    const cats = Array.isArray(p.categories) ? p.categories.filter(Boolean).map(norm) : [];
+    out.tags = tags;
+    out.categories = cats;
+
+    // brand/desc
+    out.brand = p.brand || undefined;
+    out.short_desc = p.short_desc || undefined;
+    out.long_desc  = p.long_desc  || undefined;
+
+    // category_path (string | array)
+    if (typeof p.category_path==="string") out.category_path = p.category_path;
+    else if (Array.isArray(p.category_path)) out.category_path = p.category_path.slice(0,6);
+
+    // rating/stock
+    if (p.rating!=null) out.rating = Math.max(0, Math.min(5, +p.rating||0));
+    if (p.stock_status) out.stock_status = p.stock_status;
+
+    // timestamps
+    if (p.created_at) out.created_at = fmtDate(p.created_at);
+    out.updated_at = fmtDate(p.updated_at || new Date());
+
+    // CTA label check
+    if (!LABELS[m]) warns.push("merchant không map được CTA label.");
+
+    return {errs, warns, out};
+  }
+
+  function renderTable(rows){
+    const tb = document.querySelector("#tbl tbody");
+    tb.innerHTML = rows.map((r,i)=>{
+      const cls = r.errs.length ? "err" : (r.warns.length ? "warn" : "ok");
+      const descr = r.errs.concat(r.warns).map(x=>`<div class="${r.errs.includes(x)?'err':'warn'}">• ${x}</div>`).join("");
+      const suggest = [];
+      if (r.errs.includes("merchant không hợp lệ (hỗ trợ: shopee,lazada,tiki,tiktok).")){
+        suggest.push("Chuẩn hóa merchant → shopee|lazada|tiki|tiktok");
+      }
+      if (r.errs.includes("Thiếu origin_url.")){
+        suggest.push("Bổ sung origin_url (HTTP/HTTPS) từ trang gốc của sản phẩm.");
+      }
+      if (r.warns.some(x=>x.includes("deeplink cache đã quá hạn"))){
+        suggest.push("Xoá deeplink hoặc để linter giữ nguyên; mxdAffiliate.scan() sẽ tái tạo khi render.");
+      }
+      if (r.warns.some(x=>x.includes("thiếu image"))){
+        suggest.push("Upload ảnh về /assets/img/products/<sku>.webp hoặc thêm image tuyệt đối.");
+      }
+      return `<tr class="${cls}">
+        <td class="nowrap">${i+1}</td>
+        <td class="mono">${r.out.sku||""}</td>
+        <td>${r.out.merchant||""}</td>
+        <td>${descr||"<span class='ok'>OK</span>"}</td>
+        <td>${suggest.join("<br/>")||""}</td>
+      </tr>`;
+    }).join("");
+  }
+
+  function download(filename, text){
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text],{type:"application/octet-stream"}));
+    a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 500);
+  }
+
+  async function run(){
+    const data = await loadJson([SRC, "/affiliates.json", "/products.json"]);
+    const rows = [];
+    let ok=0, warn=0, err=0;
+    for (const p of data){
+      const r = validateOne(p||{});
+      rows.push(r);
+      if (r.errs.length) err++;
+      else if (r.warns.length) warn++;
+      else ok++;
+    }
+    // KPI
+    document.getElementById("k-total").textContent = rows.length;
+    document.getElementById("k-ok").textContent = ok;
+    document.getElementById("k-warn").textContent = warn;
+    document.getElementById("k-err").textContent = err;
+    // Table
+    renderTable(rows);
+
+    // CSV errors
+    const lines = [["sku","merchant","level","message"].map(csvEscape).join(",")];
+    rows.forEach(r=>{
+      const sku = r.out.sku||"";
+      const m = r.out.merchant||"";
+      r.errs.forEach(e=> lines.push([sku,m,"error",e].map(csvEscape).join(",")));
+      r.warns.forEach(w=> lines.push([sku,m,"warn",w].map(csvEscape).join(",")));
+    });
+    window.__ERRCSV__ = lines.join("\n");
+
+    // Normalized JSON
+    window.__NORMALIZED__ = JSON.stringify(rows.map(r=>r.out), null, 2);
+  }
+
+  document.getElementById("run").addEventListener("click", run);
+  document.getElementById("dl-errors").addEventListener("click", ()=> download("affiliates-errors.csv", window.__ERRCSV__||"sku,merchant,level,message\n"));
+  document.getElementById("dl-fixed").addEventListener("click",  ()=> download("normalized-affiliates.json", window.__NORMALIZED__||"[]"));
+
+  // auto-run once
+  run().catch(console.error);
+})();
+</script>
+</body>
+</html>
