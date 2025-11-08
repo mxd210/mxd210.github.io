@@ -15,10 +15,18 @@
   <meta property="og:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
   <meta property="og:url" content="https://mxd210.github.io/store.html">
   <meta property="og:image" content="https://mxd210.github.io/assets/img/og/store.webp">
+  <meta property="og:locale" content="vi_VN">
+
+  <!-- Twitter (bổ sung SEO chia sẻ) -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cửa hàng MXD – Sản phẩm chọn lọc">
+  <meta name="twitter:description" content="Các sản phẩm xây dựng được chọn lọc từ MXD – đúng nhu cầu, đáng đồng tiền.">
+  <meta name="twitter:image" content="https://mxd210.github.io/assets/img/og/store.webp">
 
   <!-- VERIFY -->
   <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o">
 
+  <link rel="preload" as="fetch" href="/affiliates.json" type="application/json" crossorigin>
   <link rel="stylesheet" href="/assets/site.css">
 
   <style>
@@ -76,6 +84,14 @@
     .floating-contacts{position:fixed;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;z-index:40;pointer-events:none}
     .floating-contacts a,.floating-contacts button{pointer-events:auto;width:52px;height:52px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.18)}
     body.has-fixed-cta .floating-contacts{ bottom:112px }
+
+    /* TAG CLOUD (SEO-buddy) */
+    .tag-cloud{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
+    .tag-chip{border:1px solid var(--border);background:var(--card);border-radius:999px;padding:6px 10px;font-size:12px;cursor:pointer}
+    .tag-chip:hover{background:rgba(23,70,255,.06)}
+    .tag-count{opacity:.6;margin-left:4px}
+    .filter-info{display:inline-flex;gap:8px;align-items:center;border:1px dashed var(--border);padding:8px 10px;border-radius:10px;margin-top:8px}
+    .filter-info b{color:#1746ff}
   </style>
 
   <!-- SUB -->
@@ -89,6 +105,10 @@
   <script defer src="/assets/mxd-affiliate.js?v=2025-09-26-fb2"></script>
   <script defer src="/assets/js/render-products.js?v=2025-09-26-fb2"></script>
   <script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
+
+  <!-- JSON-LD placeholder: sẽ được tiêm động từ affiliates.json -->
+  <!-- MXD-ANCHOR: LD-ITEMLIST -->
+  <script type="application/ld+json" id="ld-itemlist">{}</script>
 </head>
 <body>
   <header style="position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(6px)">
@@ -147,6 +167,10 @@
           </a>
         </li>
       </ul>
+
+      <!-- MXD-ANCHOR: TAG-CLOUD -->
+      <div class="filter-info" id="filter-info" hidden>Đang lọc theo thẻ: <b></b></div>
+      <div class="tag-cloud" id="tag-cloud" aria-label="Thẻ phổ biến"></div>
     </section>
 
     <!-- MTE deals mount point -->
@@ -173,6 +197,81 @@
       const limit = Number.isFinite(lim) ? lim : undefined;
       MXD.renderProducts('#product-list', limit);
     });
+  </script>
+
+  <!-- Tiêm JSON-LD ItemList + dựng Tag Cloud từ affiliates.json -->
+  <script>
+    (async function(){
+      try{
+        const r = await fetch('/affiliates.json', {cache:'no-store'});
+        const data = await r.json();
+        const items = Array.isArray(data) ? data : (data.items || []);
+        const valid = items.filter(x => x && x.status !== false);
+
+        // === JSON-LD ItemList (Top 12) ===
+        const top = valid.slice(0, 12);
+        const makeAbs = (p) => {
+          try{ return new URL(p, location.origin).href; }catch{ return p; }
+        };
+        const ld = {
+          "@context":"https://schema.org",
+          "@type":"ItemList",
+          "itemListElement": top.map((p,i)=>({
+            "@type":"ListItem",
+            "position": i+1,
+            "url": `${location.origin}/g.html?sku=${encodeURIComponent(p.sku||'')}`,
+            "item":{
+              "@type":"Product",
+              "name": p.name || p.sku || "Sản phẩm",
+              "sku": p.sku || undefined,
+              "image": p.image ? makeAbs(p.image) : undefined,
+              "brand": p.brand ? {"@type":"Brand","name": p.brand} : undefined,
+              "category": p.category || (Array.isArray(p.categories) ? p.categories.join(', ') : undefined),
+              "offers": (p.price ? {
+                "@type":"Offer","priceCurrency":"VND","price": String(p.price),
+                "availability":"https://schema.org/InStock",
+                "url": `${location.origin}/g.html?sku=${encodeURIComponent(p.sku||'')}`
+              } : undefined)
+            }
+          }))
+        };
+        const holder = document.getElementById('ld-itemlist');
+        if(holder) holder.textContent = JSON.stringify(ld);
+
+        // === Tag Cloud (Top 20) ===
+        const cloud = document.getElementById('tag-cloud');
+        const info = document.getElementById('filter-info');
+        const counts = new Map();
+        for(const p of valid){
+          const arr = Array.isArray(p.tags) ? p.tags : [];
+          for(const t of arr){
+            const k = String(t||'').trim().toLowerCase();
+            if(!k) continue;
+            counts.set(k, (counts.get(k)||0)+1);
+          }
+        }
+        const tags = [...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,20);
+        if(cloud && tags.length){
+          cloud.innerHTML = tags.map(([tag,c]) =>
+            `<button class="tag-chip" data-tag="${tag}" aria-label="Lọc theo thẻ ${tag}">${tag}<span class="tag-count">${c}</span></button>`
+          ).join('');
+          cloud.addEventListener('click', (e)=>{
+            const btn = e.target.closest('.tag-chip'); if(!btn) return;
+            const t = btn.dataset.tag;
+            const url = new URL(location.href);
+            url.searchParams.set('tag', t);
+            location.href = url.toString();
+          });
+        }
+        const activeTag = new URL(location.href).searchParams.get('tag');
+        if(activeTag && info){
+          info.hidden = false;
+          info.querySelector('b').textContent = activeTag;
+        }
+      }catch(e){
+        // im lặng để không ảnh hưởng render sản phẩm
+      }
+    })();
   </script>
 
   <!-- SW -->
