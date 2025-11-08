@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
-<title>MXD Image Audit — orphan / invalid / duplicate — Delete selected</title>
+<title>MXD Image Audit v2 — orphan/invalid/duplicate · Delete & Build JSON stubs</title>
 <meta name="robots" content="noindex,follow"/>
 <style>
   :root{--bg:#0b0f14;--fg:#e8f0fb;--muted:#9fb0c3;--b:#142031;--ok:#34d399;--warn:#f59e0b;--err:#ef4444;--card:#0f1926}
@@ -17,6 +17,7 @@
   .btn{background:#1a2a40;border:1px solid #274266;border-radius:10px;color:var(--fg);padding:8px 12px;cursor:pointer}
   .btn:hover{filter:brightness(1.08)}
   .btn.danger{background:#4d0f15;border-color:#7a232c}
+  .btn.success{background:#0f3b2d;border-color:#1e6b53}
   .btn.ghost{background:transparent}
   input,select{background:#0a1522;border:1px solid #19273b;border-radius:10px;color:#d5e9ff;padding:8px 10px}
   .muted{color:var(--muted)}
@@ -40,17 +41,20 @@
   .flag.warn{border-color:#6b4f1f}
   .flag.ok{border-color:#225a46}
   .hidden{display:none}
+  .split{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:920px){ .split{grid-template-columns:1fr 1fr} }
 </style>
 </head>
 <body>
 <header>
   <div class="row">
-    <strong>MXD — Image Audit</strong>
-    <span class="muted">• Quét ảnh thừa/sai chuẩn/trùng · Xoá lựa chọn qua GitHub API</span>
+    <strong>MXD — Image Audit v2</strong>
+    <span class="muted">• Quét ảnh thừa/sai chuẩn/trùng · Xoá lựa chọn · Tạo JSON/CSV stubs từ ảnh thừa</span>
   </div>
 </header>
 
 <main>
+  <!-- SETTINGS -->
   <div class="card">
     <div class="f">
       <label>Owner <input id="owner" value="mxd210"></label>
@@ -63,6 +67,7 @@
     <div class="small muted" style="margin-top:6px">Token chỉ lưu tạm trong <code>localStorage</code> của trình duyệt. Không gửi đi nơi khác.</div>
   </div>
 
+  <!-- ACTION BAR -->
   <div class="card">
     <div class="filters">
       <b>Bộ lọc:</b>
@@ -79,6 +84,7 @@
     </div>
   </div>
 
+  <!-- KPI -->
   <div class="card">
     <div class="kpi">
       <div class="box">Tổng ảnh: <b id="k-total">0</b></div>
@@ -86,23 +92,50 @@
       <div class="box">Cảnh báo: <b class="warn" id="k-warn">0</b></div>
       <div class="box">Lỗi: <b class="err" id="k-err">0</b></div>
       <div class="box">Đã chọn: <b id="k-sel">0</b></div>
+      <div class="box">Orphan (thiếu JSON): <b id="k-orphan">0</b></div>
     </div>
   </div>
 
+  <!-- ORPHAN MANAGER -->
+  <div class="split">
+    <div class="card">
+      <b>Orphan Manager</b>
+      <div class="row" style="margin-top:8px;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="pickOrphan">Chọn tất cả ảnh orphan</button>
+        <button class="btn success" id="buildJson">Tạo JSON stubs (download)</button>
+        <button class="btn success" id="buildCsv">Tạo CSV (download)</button>
+      </div>
+      <p class="small muted" style="margin-top:6px">
+        JSON stub theo chuẩn MXD (mỗi ảnh → 1 item tối thiểu). Bạn có thể mở file, điền thêm
+        <code>merchant</code>, <code>origin_url</code>/<code>deeplink</code>, <code>price</code>, <code>tags</code>, <code>category</code>…
+      </p>
+    </div>
+
+    <div class="card">
+      <b>Commit stubs vào repo</b>
+      <div class="f" style="margin-top:8px">
+        <label>Path JSON <input id="stubPath" value="/assets/data/stubs/stubs-YYYYMMDD-HHMM.json"></label>
+        <button class="btn success" id="commitStubs">Commit stubs đã tạo</button>
+      </div>
+      <p class="small muted">Dùng GitHub API <code>PUT /contents</code>. Nội dung lấy từ lần “Tạo JSON stubs” gần nhất trên trang.</p>
+    </div>
+  </div>
+
+  <!-- LIST -->
   <div id="list" class="grid"></div>
 
+  <!-- RULES -->
   <div class="card small muted">
     <details>
       <summary><b>Quy tắc kiểm tra</b></summary>
       <ul>
         <li><b>Đường dẫn</b>: chỉ audit dưới <code>/assets/img/**</code>. Nhóm: <code>products/</code>, <code>categories/</code>, <code>og/</code>, <code>brand/</code>, <code>favicon/</code>.</li>
-        <li><b>Định dạng</b>: <code>products/</code>, <code>categories/</code>, <code>og/</code> phải là <code>.webp</code>; <code>brand/</code> cho phép <code>.svg</code>/<code>.webp</code>; <code>favicon/</code> cho phép <code>.ico</code>/<code>.png</code>/<code>.svg</code>.</li>
-        <li><b>Orphan</b>: ảnh trong <code>products/</code> không có <code>sku</code> tương ứng trong <code>/assets/data/affiliates.json</code> (hoặc <code>/affiliates.json</code>/<code>/products.json</code>).</li>
-        <li><b>Đặt tên</b>: bắt buộc chữ thường–số–gạch ngang, trùng <code>sku</code> (VD: <code>abc-123.webp</code>), không khoảng trắng.</li>
+        <li><b>Định dạng</b>: <code>products/</code>, <code>categories/</code>, <code>og/</code> dùng <code>.webp</code>; <code>brand/</code> cho phép <code>.svg</code>/<code>.webp</code>; <code>favicon/</code> cho phép <code>.ico</code>/<code>.png</code>/<code>.svg</code>.</li>
+        <li><b>Orphan</b>: ảnh trong <code>products/</code> nhưng <code>sku</code> **không có** trong <code>/assets/data/affiliates.json</code> (fallback <code>/affiliates.json</code>/<code>/products.json</code>).</li>
+        <li><b>Đặt tên</b>: bắt buộc chữ thường–số–gạch ngang, trùng <code>sku</code> (VD: <code>abc-123.webp</code>).</li>
         <li><b>Kích thước</b>: cảnh báo nếu &gt; 600KB hoặc chiều nào &gt; 1600px.</li>
-        <li><b>Trùng nội dung</b>: cùng <code>git blob sha</code> (phát hiện qua cây Git).</li>
+        <li><b>Trùng nội dung</b>: cùng <code>git blob sha</code> (trùng file).</li>
       </ul>
-      <p>Delete dùng API: <code>DELETE /repos/{owner}/{repo}/contents/{path}</code> với commit message tự động.</p>
     </details>
   </div>
 </main>
@@ -110,7 +143,7 @@
 <script>
 (function(){
   "use strict";
-  // ---- helpers
+  // ---------- helpers ----------
   const $ = s=>document.querySelector(s);
   const esc = s => String(s||"").replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   const human = n => (n>=1024)?(n>=1048576? (n/1048576).toFixed(1)+'MB' : (n/1024).toFixed(0)+'KB') : (n+'B');
@@ -125,8 +158,23 @@
   function baseName(path){ const f=fileName(path); const i=f.lastIndexOf('.'); return i>0?f.slice(0,i):f; }
   function extName(path){ const f=fileName(path); const i=f.lastIndexOf('.'); return i>0?f.slice(i+1).toLowerCase():''; }
   function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  function todaySlug(){
+    const d=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes());
+  }
+  function download(name, text, mime='application/json'){
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([text],{type:mime}));
+    a.download=name; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+  function jsonB64(obj){
+    const s = (typeof obj==='string') ? obj : JSON.stringify(obj,null,2);
+    return btoa(unescape(encodeURIComponent(s))); // base64 utf-8
+  }
 
-  // ---- state
+  // ---------- state ----------
   const st = {
     owner: localStorage.getItem('imgAudit.owner') || 'mxd210',
     repo:  localStorage.getItem('imgAudit.repo')  || 'mxd210.github.io',
@@ -134,15 +182,17 @@
     token: localStorage.getItem('imgAudit.token') || '',
     scanPath: localStorage.getItem('imgAudit.scanPath') || '/assets/img',
     rows: [],
-    usedSkus: new Set()
+    usedSkus: new Set(),
+    lastStubArray: null
   };
 
-  // ---- bind inputs
+  // ---------- bind inputs ----------
   $('#owner').value = st.owner;
   $('#repo').value  = st.repo;
   $('#branch').value= st.branch;
   $('#token').value = st.token;
   $('#scanPath').value=st.scanPath;
+  $('#stubPath').value = `/assets/data/stubs/stubs-${todaySlug()}.json`;
 
   function saveInputs(){
     st.owner = $('#owner').value.trim();
@@ -157,7 +207,7 @@
     localStorage.setItem('imgAudit.scanPath',st.scanPath);
   }
 
-  // ---- GitHub API
+  // ---------- GitHub API ----------
   function gh(url, opts={}){
     const h = { 'Accept':'application/vnd.github+json' };
     if (st.token) h['Authorization'] = 'Bearer '+st.token;
@@ -167,7 +217,6 @@
   function ghRaw(path){ return `https://raw.githubusercontent.com/${st.owner}/${st.repo}/${st.branch}${path.startsWith('/')?path:('/'+path)}`; }
 
   async function ghTreeRecursive(){
-    // 1) Get ref → sha
     const r1 = await gh(ghApi(`/repos/${st.owner}/${st.repo}/git/trees/${encodeURIComponent(st.branch)}?recursive=1`));
     if (!r1.ok){ throw new Error('Cannot load git tree'); }
     const j = await r1.json();
@@ -198,29 +247,17 @@
       if (!res.ok) return {size:0,w:0,h:0};
       const blob = await res.blob();
       const size = blob.size||0;
-      // dimensions (only try for images)
-      const w = await new Promise(resolve=>{
-        try{
-          const img = new Image();
-          img.onload=()=> resolve(img.naturalWidth||0);
-          img.onerror=()=> resolve(0);
-          img.src = URL.createObjectURL(blob);
-        }catch(_){ resolve(0); }
+      const img = new Image();
+      const dim = await new Promise(resolve=>{
+        img.onload=()=> resolve({w:img.naturalWidth||0,h:img.naturalHeight||0});
+        img.onerror=()=> resolve({w:0,h:0});
+        img.src = URL.createObjectURL(blob);
       });
-      const h = await new Promise(resolve=>{
-        try{
-          const img = new Image();
-          img.onload=()=> resolve(img.naturalHeight||0);
-          img.onerror=()=> resolve(0);
-          img.src = URL.createObjectURL(blob);
-        }catch(_){ resolve(0); }
-      });
-      return {size,w,h};
+      return {size, ...dim};
     }catch(_){ return {size:0,w:0,h:0}; }
   }
 
-  function classify(path, blobSha, usedSkus){
-    // group by folder
+  function classify(path, blobSha){
     const p = path.replace(/^\/+/,'');
     if (!p.startsWith(st.scanPath.replace(/^\/+/,'')+'/')) return null;
     const rel = p.slice(st.scanPath.length+1);
@@ -233,7 +270,6 @@
     const ext  = extName(p);
 
     const flags = [];
-    const notes = [];
 
     // extension rules
     if (group==='products' || group==='categories' || group==='og'){
@@ -244,14 +280,13 @@
       if (!(isIco(p)||isPng(p)||isSvg(p))) flags.push('ext:favicon-ico-png-svg');
     }
 
-    // naming
+    // naming & orphan
     if (group==='products'){
       if (!slugOk(base)) flags.push('name:not-slug');
-      // orphan check
-      if (usedSkus.size && !usedSkus.has(base)) flags.push('orphan:sku-not-in-data');
+      if (st.usedSkus.size && !st.usedSkus.has(base)) flags.push('orphan:sku-not-in-data');
     }
 
-    return { path:p, rel, folder:group, name, base, ext, flags, notes, sha:blobSha, size:0,w:0,h:0 };
+    return { path:'/'+p, rel, folder:group, name, base, ext, flags, sha:blobSha, size:0,w:0,h:0 };
   }
 
   function renderList(items){
@@ -289,7 +324,6 @@
       </div>`;
     }).join('');
 
-    // bind picks
     host.querySelectorAll('.item .pick').forEach(cb=>{
       cb.addEventListener('change', ()=> updateSelected());
     });
@@ -302,7 +336,7 @@
     $('#k-sel').textContent = picks.length.toString();
   }
 
-  // selection utilities
+  // selection helpers
   $('#selNone').addEventListener('click', ()=>{
     document.querySelectorAll('.item .pick').forEach(cb=> cb.checked=false);
     updateSelected();
@@ -322,17 +356,28 @@
     updateSelected();
   });
 
+  // orphan quick pick
+  $('#pickOrphan').addEventListener('click', ()=>{
+    document.querySelectorAll('.item').forEach(div=>{
+      const i = Number(div.getAttribute('data-i'));
+      const it = st.rows[i];
+      const isOrphan = it.flags.some(f=>f.startsWith('orphan'));
+      const cb = div.querySelector('.pick'); if (!cb) return;
+      cb.checked = isOrphan;
+    });
+    updateSelected();
+  });
+
   // filters
   ['#f-all','#f-err','#f-warn','#f-ok'].forEach(id=>{
     $(id).addEventListener('change', ()=> renderList(st.rows));
   });
 
-  // ---- delete selected
+  // delete selected
   async function ghDeleteFile(path, sha, message){
     const url = ghApi(`/repos/${st.owner}/${st.repo}/contents/${encodeURIComponent(path.replace(/^\/+/,''))}`);
     const body = { message, sha, branch: st.branch, committer:{ name:"MXD-Bot", email:"ops@mxd.local" } };
-    const res = await gh(url,{ method:'DELETE', body: JSON.stringify(body), headers:{'Content-Type':'application/json'} });
-    return res;
+    return gh(url,{ method:'DELETE', body: JSON.stringify(body), headers:{'Content-Type':'application/json'} });
   }
 
   $('#deleteSel').addEventListener('click', async ()=>{
@@ -352,36 +397,117 @@
         const r = await ghDeleteFile(it.path, it.sha, msg);
         if (r.ok){ ok++; div.remove(); }
         else { fail++; }
-        await delay(200); // tránh rate limit
+        await delay(200);
       }catch(_){ fail++; }
     }
     alert(`Xong: xoá OK ${ok}, lỗi ${fail}.`);
   });
 
-  // ---- main scan
+  // ---------- stubs builder ----------
+  function titleFromSku(sku){
+    const t = String(sku||'').replace(/[-_]+/g,' ').trim();
+    return t.charAt(0).toUpperCase()+t.slice(1);
+  }
+  function stubFromItem(it){
+    // tối thiểu theo chuẩn MXD; image trỏ thẳng file hiện có
+    return {
+      sku: it.base,
+      name: titleFromSku(it.base),
+      image: it.path, // có thể để relative /assets/img/products/xxx.webp
+      merchant: "",
+      origin_url: "",
+      deeplink: "",
+      price: null,
+      old_price: null,
+      category: "",
+      tags: [],
+      status: true,
+      created_at: new Date().toISOString()
+    };
+  }
+  function collectOrphans(){
+    return st.rows.filter(x=> x.folder==='products' && x.flags.some(f=>f.startsWith('orphan')));
+  }
+
+  $('#buildJson').addEventListener('click', ()=>{
+    const orphans = collectOrphans();
+    if (!orphans.length){ alert('Không có ảnh orphan.'); return; }
+    const arr = orphans.map(stubFromItem);
+    st.lastStubArray = arr; // lưu để commit
+    download(`stubs-${todaySlug()}.json`, JSON.stringify(arr, null, 2), 'application/json');
+  });
+
+  $('#buildCsv').addEventListener('click', ()=>{
+    const orphans = collectOrphans();
+    if (!orphans.length){ alert('Không có ảnh orphan.'); return; }
+    const headers = ['sku','name','merchant','origin_url','deeplink','price','old_price','category','tags','image'];
+    const rows = orphans.map(it=>{
+      const s = stubFromItem(it);
+      return [
+        s.sku, s.name, '', '', '', '', '', '', '', s.image
+      ].map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',');
+    });
+    const csv = [headers.join(','), ...rows].join('\n');
+    download(`stubs-${todaySlug()}.csv`, csv, 'text/csv');
+  });
+
+  // commit stubs file
+  async function ghPutFile(path, content, message){
+    const url = ghApi(`/repos/${st.owner}/${st.repo}/contents/${encodeURIComponent(path.replace(/^\/+/,''))}`);
+    const body = {
+      message,
+      content: jsonB64(content),
+      branch: st.branch,
+      committer:{ name:"MXD-Bot", email:"ops@mxd.local" }
+    };
+    return gh(url,{ method:'PUT', body: JSON.stringify(body), headers:{'Content-Type':'application/json'} });
+  }
+
+  $('#commitStubs').addEventListener('click', async ()=>{
+    saveInputs();
+    if (!st.token){ alert('Cần token GitHub.'); return; }
+    let arr = st.lastStubArray;
+    if (!Array.isArray(arr) || !arr.length){
+      // nếu chưa bấm buildJson thì build nhanh từ orphan
+      const orphans = collectOrphans();
+      if (!orphans.length){ alert('Không có orphan để commit.'); return; }
+      arr = orphans.map(stubFromItem);
+    }
+    const path = $('#stubPath').value.trim().replace(/stubs-YYYYMMDD-HHMM/, `stubs-${todaySlug()}`);
+    const yes = confirm(`Commit ${arr.length} stub → ${path} ?`);
+    if (!yes) return;
+    const msg = `feat(data): add ${arr.length} orphan stubs → ${path} (via tools/image-audit)`;
+    const res = await ghPutFile(path, JSON.stringify(arr, null, 2), msg);
+    if (res.ok) alert('Commit stubs thành công!');
+    else {
+      const t = await res.text().catch(()=> '');
+      alert('Commit thất bại: '+t);
+    }
+  });
+
+  // ---------- main scan ----------
   $('#run').addEventListener('click', async ()=>{
     saveInputs();
     $('#list').innerHTML = '<div class="muted">Đang quét cây Git…</div>';
     try{
-      // 1) lấy SKUs đang dùng
+      // 1) SKUs đang dùng
       st.usedSkus = await loadAffProducts();
 
-      // 2) load git tree
+      // 2) git tree
       const blobs = await ghTreeRecursive();
-      // lọc theo path
       const imgs = blobs.filter(b=> b.path.startsWith(st.scanPath.replace(/^\/+/,'')+'/'));
 
-      // 3) build rows (classify)
+      // 3) classify
       const rows = [];
       const shaCount = new Map();
       for (const b of imgs){
-        const c = classify('/'+b.path, b.sha, st.usedSkus);
+        const c = classify('/'+b.path, b.sha);
         if (!c) continue;
         rows.push(c);
         shaCount.set(b.sha, (shaCount.get(b.sha)||0)+1);
       }
 
-      // 4) bổ sung size + dimensions (chỉ cho ảnh Web, bỏ favicon ico)
+      // 4) size + dimensions
       for (let i=0;i<rows.length;i++){
         const it = rows[i];
         if (!/\.ico$/i.test(it.path)){
@@ -392,7 +518,7 @@
         }
       }
 
-      // 5) đánh dấu duplicate theo blob sha
+      // 5) duplicate by blob
       for (const it of rows){
         const n = shaCount.get(it.sha)||0;
         if (n>1) it.flags.push(`dup:sha×${n}`);
@@ -400,15 +526,18 @@
 
       // 6) KPI + render
       st.rows = rows;
-      const cnt = { total:rows.length, ok:0, warn:0, err:0 };
+      const cnt = { total:rows.length, ok:0, warn:0, err:0, orphan:0 };
       for (const r of rows){
-        const level = r.flags.some(f=>f.startsWith('orphan')||f.startsWith('ext:')||f.startsWith('name:')) ? (r.flags.some(f=>f.startsWith('orphan'))?'err':'warn') : 'ok';
-        cnt[level]++; 
+        const isWarn = r.flags.some(f=>f.startsWith('ext:')||f.startsWith('name:'));
+        const isErr  = r.flags.some(f=>f.startsWith('orphan'));
+        if (isErr) cnt.err++; else if (isWarn) cnt.warn++; else cnt.ok++;
+        if (isErr) cnt.orphan++;
       }
       $('#k-total').textContent = cnt.total;
       $('#k-ok').textContent = cnt.ok;
       $('#k-warn').textContent = cnt.warn;
       $('#k-err').textContent = cnt.err;
+      $('#k-orphan').textContent = cnt.orphan;
 
       renderList(rows);
     }catch(e){
@@ -416,8 +545,7 @@
     }
   });
 
-  // auto-run first time
-  // (để tránh gọi API khi chưa nhập token, vẫn có thể xem OK nhờ rate limit 60/h)
+  // auto suggest scan path
 })();
 </script>
 </body>
