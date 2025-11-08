@@ -2,481 +2,331 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Chi tiết sản phẩm | MXD</title>
-  <meta name="description" content="Trang chi tiết sản phẩm từ affiliates.json — hiển thị ảnh, giá, ưu đãi mới nhất và nút Mua ngay.">
-  <link id="canonical" rel="canonical" href="https://mxd210.github.io/g.html"/>
-  <meta name="robots" content="index,follow"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 
-  <!-- OG (được cập nhật động theo SKU) -->
-  <meta property="og:type" content="product"/>
-  <meta property="og:title" content="Chi tiết sản phẩm | MXD"/>
-  <meta property="og:description" content="Xem thông tin, giá sống và ưu đãi mới nhất."/>
-  <meta property="og:url" content="https://mxd210.github.io/g.html"/>
-  <meta property="og:image" content="https://mxd210.github.io/assets/og/default-og.webp"/>
+  <title>MXD — Chi tiết sản phẩm</title>
+  <meta name="description" content="Xem chi tiết sản phẩm được MXD chọn lọc: thông tin, giá, hình ảnh và ưu đãi.">
+  <link rel="canonical" href="https://mxd210.github.io/g.html">
+  <meta name="robots" content="index,follow">
 
-  <!-- Styles -->
+  <!-- OG -->
+  <meta property="og:type" content="product">
+  <meta property="og:title" content="Chi tiết sản phẩm | MXD">
+  <meta property="og:description" content="Thông tin sản phẩm, giá, ưu đãi, link mua qua Shopee/Lazada/Tiki/TikTok.">
+  <meta property="og:url" content="https://mxd210.github.io/g.html">
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/products/placeholder.webp">
+  <meta property="og:locale" content="vi_VN">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MXD — Chi tiết sản phẩm">
+  <meta name="twitter:description" content="Xem chi tiết sản phẩm được MXD chọn lọc.">
+  <meta name="twitter:image" content="https://mxd210.github.io/assets/img/products/placeholder.webp">
+
+  <!-- SUB -->
+  <meta name="at:sub1" content="">
+  <meta name="at:sub2" content="">
+  <meta name="at:sub3" content="product">
+  <meta name="at:sub4" content="mxd210">
+
+  <!-- Styles (giữ nguyên layout cũ) -->
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- Safety CSS + Gallery + Badge giảm giá -->
-  <style>
-    .pdp{max-width:1160px;margin:0 auto;padding:16px}
-    .pdp-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-
-    /* Gallery */
-    .p-gallery{display:grid;gap:12px}
-    .p-main{position:relative;border:1px solid var(--line,#e5e7eb);border-radius:12px;overflow:hidden;background:#fff}
-    .p-main img{width:100%;height:auto;display:block}
-    .sale-badge{position:absolute;left:10px;top:10px;background:#ef4444;color:#fff;font-weight:700;
-      padding:6px 10px;border-radius:999px;font-size:13px;box-shadow:0 2px 8px #0003}
-    .deal-badge{position:absolute;right:10px;top:10px;background:#111827;color:#fff;
-      padding:6px 10px;border-radius:8px;font-size:12px;opacity:.92}
-    .p-thumbs{display:flex;gap:8px;flex-wrap:wrap}
-    .p-thumbs button{border:1px solid var(--line,#e5e7eb);border-radius:10px;padding:0;background:#fff;cursor:pointer}
-    .p-thumbs img{width:72px;height:72px;object-fit:cover;border-radius:10px;display:block}
-    .p-thumbs button.active{outline:2px solid var(--ink,#111);outline-offset:2px}
-
-    .product-info h1{margin:0 0 8px 0;font-size:22px;line-height:1.25}
-    .muted{color:var(--muted,#6b7280)}
-
-    .chip{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--line,#e5e7eb);
-      background:var(--chip,#f3f4f6);font-size:12px;margin:0 6px 6px 0;color:#374151;text-decoration:none}
-    .chip:hover{background:#fff}
-    .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--chip,#f3f4f6);
-      border:1px solid var(--line,#e5e7eb);margin-right:6px}
-    .price-row{display:flex;align-items:baseline;gap:12px;margin:8px 0 12px}
-    .price-now{font-weight:800;font-size:20px}
-    .price-old{color:var(--muted,#6b7280);text-decoration:line-through}
-
-    /* CTA */
-    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .actions .buy,.actions .buy-btn{display:inline-block;padding:10px 14px;border-radius:10px;background:var(--brand,#111);color:#fff;text-decoration:none}
-    .buy[data-merchant="shopee"]{ background:#ee4d2d; border-color:#ee4d2d }
-    .buy[data-merchant="lazada"]{ background:#0f146d; border-color:#0f146d }
-    .buy[data-merchant="tiki"]  { background:#1a94ff; border-color:#1a94ff }
-    .buy[data-merchant="tiktok"]{ background:#000;    border-color:#000 }
-
-    /* Card & related */
-    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
-    .product-card{border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:12px;background:#fff}
-    .product-card .thumb img{width:100%;height:auto;border-radius:10px;display:block}
-    .product-card .name{font-size:15px;line-height:1.35;margin:8px 0}
-    .product-card .price{font-weight:600}
-
-    /* Accordion */
-    .card-extra{margin-top:12px;border-top:1px dashed var(--line,#e5e7eb);padding-top:8px}
-    .card-extra>summary{cursor:pointer;list-style:none}
-    .card-extra>summary::-webkit-details-marker{display:none}
-    .card-extra>summary .toggle{display:inline-block;font-size:12px;padding:6px 10px;border-radius:999px;background:var(--chip,#f3f4f6);border:1px solid var(--line,#e5e7eb)}
-    .card-extra[open]>summary .toggle{background:#fff}
-    .card-extra .info{font-size:13px;line-height:1.45;margin-top:6px}
-    .card-extra .info ul{margin:6px 0 0 18px;padding:0}
-
-    .meta-rows{display:flex;flex-wrap:wrap;gap:6px 10px;margin:8px 0}
-    .small-note{font-size:12px;color:var(--muted,#6b7280);margin-top:6px}
-    @media (max-width:860px){ .pdp-grid{grid-template-columns:1fr} }
-  </style>
-
-  <!-- GA4 trước affiliate (chuẩn MXD) -->
+  <!-- GA4 trước Affiliate -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
-
-  <!-- Live Price: cấu hình Worker + script (giữ nguyên tên) -->
-  <script>window.MXD_PRICE_API="https://mxd6686.workers.dev"</script>
-  <script defer src="/assets/live-price.js"></script>
 </head>
 <body>
-  <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Chi tiết</nav>
+  <header class="site-head">
+    <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line,#e5e7eb)">
+      <a href="/" class="brand" style="font-weight:900;font-size:18px;color:var(--ink,#111);text-decoration:none">MXD</a>
+      <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
+        <a href="/" class="nav-link">Trang chủ</a>
+        <a href="/store.html" class="nav-link">Cửa hàng</a>
+        <a href="/blog/" class="nav-link">Tin tức</a>
+        <a href="/tu-van.html" class="nav-link">Tư vấn</a>
+        <a href="/lien-he.html" class="nav-link">Liên hệ</a>
+      </nav>
+    </div>
+  </header>
 
-  <main id="pdp" class="pdp">
-    <!-- MXD-ANCHOR: PDP-CARD -->
-    <article class="product-card pdp-card" data-sku="">
-      <div class="pdp-grid">
-        <!-- GALLERY -->
-        <div>
-          <div id="mxd-gallery" class="p-gallery" hidden>
-            <div class="p-main">
-              <span id="badge-sale" class="sale-badge" hidden></span>
-              <span id="badge-deal" class="deal-badge" hidden>DEAL</span>
-              <img id="p-main-img" alt="">
-            </div>
-            <div id="p-thumbs" class="p-thumbs"></div>
-          </div>
-          <!-- Fallback 1 ảnh -->
-          <div id="single-img" class="product-gallery">
-            <img id="pdp-img" src="/assets/img/products/placeholder.webp" alt="Sản phẩm — MXD" width="640" height="640"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-          </div>
+  <main class="container product-page">
+    <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Chi tiết</nav>
+
+    <article id="product" class="product" data-sku="" data-merchant="" data-origin="" data-img="">
+      <div class="gallery">
+        <img id="p-img" src="/assets/img/products/placeholder.webp" alt="Ảnh sản phẩm" loading="lazy"
+             onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'"/>
+      </div>
+
+      <div class="info">
+        <h1 id="p-name" class="product-title">Sản phẩm</h1>
+        <div class="price-wrap">
+          <div id="p-price" class="price"></div>
+          <div id="p-old" class="price-old"></div>
         </div>
 
-        <!-- INFO -->
-        <div class="product-info">
-          <h1 id="pdp-name">Sản phẩm</h1>
-
-          <div class="price-row">
-            <span class="price-now" id="pdp-price" data-price="" data-sku=""></span>
-            <del class="price-old" id="pdp-old" hidden></del>
-          </div>
-
-          <div class="meta-rows">
-            <span id="pdp-merchant" class="badge" hidden></span>
-            <span id="pdp-brand" class="badge" hidden></span>
-            <span id="pdp-updated" class="badge" hidden></span>
-          </div>
-
-          <div id="pdp-tags" class="meta-rows" hidden></div>
-          <div id="pdp-categories" class="meta-rows" hidden></div>
-
-          <!-- Single CTA (fallback) -->
-          <div class="actions">
-            <a id="pdp-buy" class="buy buy-btn" href="#" data-merchant="" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
-          </div>
-          <!-- Multi-CTA (nếu có nhiều sàn) -->
-          <div id="pdp-buy-group" class="actions" hidden></div>
-
-          <p id="pdp-desc" class="muted small-note" style="margin-top:10px"></p>
-
-          <!-- Accordion khối thông tin -->
-          <details class="card-extra" id="blk-features" hidden>
-            <summary><span class="toggle">Đặc điểm nổi bật</span></summary>
-            <div class="info" id="features-body"></div>
-          </details>
-
-          <details class="card-extra" id="blk-specs" hidden>
-            <summary><span class="toggle">Thông số / Quy cách</span></summary>
-            <div class="info"><ul id="specs-list"></ul></div>
-          </details>
-
-          <details class="card-extra" id="blk-ingredients" hidden>
-            <summary><span class="toggle">Thành phần</span></summary>
-            <div class="info"><ul id="ing-list"></ul></div>
-          </details>
-
-          <details class="card-extra" id="blk-usage" hidden>
-            <summary><span class="toggle">Hướng dẫn sử dụng</span></summary>
-            <div class="info" id="usage-body"></div>
-          </details>
-
-          <details class="card-extra" id="blk-notes" hidden>
-            <summary><span class="toggle">Lưu ý / Bảo hành</span></summary>
-            <div class="info" id="notes-body"></div>
-          </details>
+        <div class="meta">
+          <div id="p-brand" class="brand muted"></div>
+          <div id="p-tags" class="tags muted"></div>
         </div>
+
+        <div class="actions">
+          <!-- CTA hiển thị — href sẽ được chuẩn hoá về origin_url, sau đó rewriter chuyển thành deeplink -->
+          <a id="p-buy" class="buy-btn" href="#" target="_blank" rel="nofollow sponsored noopener" data-merchant="">Mua ngay</a>
+        </div>
+
+        <section id="p-desc" class="desc"></section>
       </div>
     </article>
-    <!-- /MXD-ANCHOR -->
 
-    <!-- MXD-ANCHOR: RELATED -->
-    <section id="related" class="related">
+    <section class="product-related">
       <h2>Sản phẩm liên quan</h2>
-      <div id="related-grid" class="product-grid compact"></div>
+      <div id="related" class="product-grid"></div>
     </section>
-    <!-- /MXD-ANCHOR -->
   </main>
 
-  <noscript><p class="muted">Vui lòng bật JavaScript để xem nội dung sản phẩm.</p></noscript>
+  <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
 
-  <!-- Renderer: nạp từ affiliates.json/products.json theo SKU -->
+  <!-- JSON-LD holder (nếu trang có tiêm) -->
+  <script type="application/ld+json" id="ld-product">{}</script>
+
   <script>
-  (async function renderPDP(){
-    const qs  = new URLSearchParams(location.search);
-    const sku = (qs.get('sku')||'').toLowerCase().trim();
-    const card = document.querySelector('.pdp-card');
-    if (!sku){ card.outerHTML = '<p class="muted">Thiếu tham số <code>sku</code>.</p>'; return; }
-
-    const SOURCES = [
-      '/assets/data/affiliates.json','/products.json','/affiliates.json',
-      '/assets/data/products.json','/assets/affiliates.json','/data/affiliates.json','/data/products.json'
-    ];
-
-    async function loadFirst(urls){
-      for (const src of urls){
-        try{
-          const r = await fetch(src, { cache:'no-store' });
-          if (!r.ok) continue;
-          const j = await r.json();
-          if (Array.isArray(j)) return j;
-          if (j && Array.isArray(j.items)) return j.items;
-        }catch(_){}
-      }
-      return null;
-    }
-
-    const data = await loadFirst(SOURCES);
-    if (!Array.isArray(data)){ card.outerHTML = '<p class="muted">Không tải được dữ liệu sản phẩm.</p>'; return; }
-
-    const p = data.find(x => String(x.sku||'').toLowerCase() === sku);
-    if (!p){ card.outerHTML = '<p class="muted">Không tìm thấy sản phẩm với SKU <code>'+sku+'</code>.</p>'; return; }
-
-    // ===== Helpers =====
+  (function(){
+    const esc = s => String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-    const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-    const imgOf = p => p.image || (p.sku? `/assets/img/products/${String(p.sku).toLowerCase()}.webp` : '/assets/img/products/placeholder.webp');
-    const href = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
-    const asArr = v => !v ? [] : Array.isArray(v) ? v : String(v).split(/[;,|/]+/).map(s=>s.trim()).filter(Boolean);
-    const norm = v => String(v||'').toLowerCase().trim();
-    const strip = s => norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
-    const slug  = v => strip(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
-    const hostMerch = (u) => {
-      try{
-        const h = new URL(u, location.href).hostname.toLowerCase();
-        if (h.includes('shopee')) return 'shopee';
-        if (h==='lzd.co' || h.endsWith('.lzd.co') || h.includes('lazada')) return 'lazada';
-        if (h.includes('tiki')) return 'tiki';
-        if (h.includes('tiktok')) return 'tiktok';
-      }catch(_){}
-      return '';
+    const qs = new URLSearchParams(location.search);
+    const sku = (qs.get('sku')||'').trim().toLowerCase();
+
+    const $ = sel => document.querySelector(sel);
+    const el = {
+      root: $('#product'),
+      img:  $('#p-img'),
+      name: $('#p-name'),
+      price:$('#p-price'),
+      old:  $('#p-old'),
+      brand:$('#p-brand'),
+      tags: $('#p-tags'),
+      buy:  $('#p-buy'),
+      desc: $('#p-desc'),
+      related: $('#related'),
     };
 
-    // ===== Elements =====
-    card.setAttribute('data-sku', sku);
-    const elPrice= document.getElementById('pdp-price');
-    elPrice.setAttribute('data-sku', sku);
+    function setText(node, text){ if (node) node.textContent = text||''; }
 
-    const elName = document.getElementById('pdp-name');
-    const elOld  = document.getElementById('pdp-old');
-    const elBuy  = document.getElementById('pdp-buy');
-    const elBuyGroup = document.getElementById('pdp-buy-group');
-    const elDesc = document.getElementById('pdp-desc');
-    const elMer  = document.getElementById('pdp-merchant');
-    const elBrand= document.getElementById('pdp-brand');
-    const elUpdated = document.getElementById('pdp-updated');
-    const tagWrap = document.getElementById('pdp-tags');
-    const catWrap = document.getElementById('pdp-categories');
-
-    const LABELS={shopee:'Mua Shopee',lazada:'Mua Lazada',tiki:'Mua Tiki',tiktok:'Mua TikTok'};
-
-    // ===== Price & badges =====
-    const name = p.name || p.sku || 'Sản phẩm';
-    elName.textContent = name;
-
-    if (p.price!=null){ elPrice.textContent = fmt(p.price); elPrice.setAttribute('data-price', p.price); }
-    const oldPrice = p.old_price || p.price_old || p.list_price || p.msrp || p.regular_price;
-    if (oldPrice && +oldPrice > +p.price){ elOld.textContent = fmt(oldPrice); elOld.hidden=false; }
-
-    // Deal / sale %
-    const salePctFromField = (p.sale_percent!=null) ? +p.sale_percent : null;
-    const salePctCalc = (oldPrice && +oldPrice > +p.price) ? Math.round((1 - (+p.price / +oldPrice))*100) : null;
-    const salePct = (isFinite(salePctFromField)? salePctFromField : salePctCalc);
-    const badgeSale = document.getElementById('badge-sale');
-    if (isFinite(salePct) && salePct>0){ badgeSale.textContent = '-'+salePct+'%'; badgeSale.hidden=false; }
-    if (p.deal===true || (Array.isArray(p.tags) && p.tags.map(norm).some(t=>['deal','hot','flash-sale','giam-gia'].includes(t)))){
-      document.getElementById('badge-deal').hidden = false;
-    }
-
-    // ===== Gallery (images[]) or single image =====
-    const images = (Array.isArray(p.images) && p.images.length) ? p.images : (p.image ? [p.image] : []);
-    const galleryBox = document.getElementById('mxd-gallery');
-    const singleBox  = document.getElementById('single-img');
-    const mainImg = document.getElementById('p-main-img');
-    const thumbs  = document.getElementById('p-thumbs');
-
-    function setMain(src){
-      mainImg.src = src; mainImg.alt = name+' — MXD';
-      [...thumbs.querySelectorAll('button')].forEach(b=>b.classList.toggle('active', b.dataset.src===src));
-    }
-    if (images.length){
-      singleBox.style.display='none';
-      thumbs.innerHTML='';
-      images.forEach((src,i)=>{
-        const btn=document.createElement('button');
-        btn.dataset.src=src; btn.innerHTML=`<img alt="thumb" src="${esc(src)}">`;
-        btn.addEventListener('click',()=>setMain(src));
-        thumbs.appendChild(btn); if(i===0) btn.classList.add('active');
-      });
-      setMain(images[0]);
-      galleryBox.hidden=false;
-    } else {
-      // fallback 1 ảnh
-      const elImg  = document.getElementById('pdp-img');
-      elImg.src = imgOf(p); elImg.alt = name+' — MXD';
-    }
-
-    // ===== Build multi-CTA if có nhiều sàn =====
-    const multi = [];
-    const add = (url, m) => { if (url && /^https?:\/\//i.test(url)) multi.push({url, m}); };
-
-    // hỗ trợ nhiều kiểu schema
-    add(p.deeplink_shopee, 'shopee');
-    add(p.deeplink_lazada, 'lazada');
-    add(p.deeplink_tiki,   'tiki');
-    add(p.deeplink_tiktok, 'tiktok');
-    if (p.deeplinks && typeof p.deeplinks==='object'){
-      add(p.deeplinks.shopee,'shopee'); add(p.deeplinks.lazada,'lazada');
-      add(p.deeplinks.tiki,'tiki');     add(p.deeplinks.tiktok,'tiktok');
-    }
-    if (p.links && typeof p.links==='object'){
-      add(p.links.shopee,'shopee'); add(p.links.lazada,'lazada');
-      add(p.links.tiki,'tiki');     add(p.links.tiktok,'tiktok');
-    }
-    if (Array.isArray(p.buy)){
-      p.buy.forEach(x=>add(x?.url, (x?.merchant||'').toLowerCase()));
-    }
-
-    if (multi.length > 1){
-      // Hiển thị nhóm nhiều nút
-      elBuy.closest('.actions').style.display='none';
-      elBuyGroup.hidden = false;
-      elBuyGroup.innerHTML = multi.map(x =>
-        `<a class="buy buy-btn" href="${esc(x.url)}" data-merchant="${esc(x.m)}" target="_blank" rel="nofollow sponsored noopener">${LABELS[x.m]||'Mua ngay'}</a>`
-      ).join('');
-    } else {
-      // 1 nút: lấy url tốt nhất và dán label theo merchant
-      const best = multi[0]?.url || href(p);
-      const merch = (p.merchant ? String(p.merchant).toLowerCase() : '') || hostMerch(best);
-      elBuy.href = best || '#';
-      if (merch) elBuy.setAttribute('data-merchant', merch);
-      if (merch) elBuy.textContent = LABELS[merch] || 'Mua ngay';
-      if (p.merchant){ elMer.textContent = 'Nền tảng: '+p.merchant; elMer.hidden=false; }
-    }
-
-    if (p.brand){ elBrand.textContent = 'Thương hiệu: '+p.brand; elBrand.hidden=false; }
-    if (p.updated_at){ try{ const d=new Date(p.updated_at); if(!isNaN(d)){ elUpdated.textContent='Cập nhật: '+d.toLocaleString('vi-VN'); elUpdated.hidden=false; } }catch(_){} }
-    if (p.description || p.desc || p.short_desc){ elDesc.textContent = p.description || p.desc || p.short_desc; }
-
-    // ===== Tags =====
-    const tags = asArr(p.tags);
-    if (tags.length){
-      tagWrap.hidden=false; tagWrap.innerHTML='';
-      tags.forEach(t=>{
-        const span=document.createElement('span'); span.className='chip'; span.textContent='#'+t;
-        tagWrap.appendChild(span);
-      });
-    }
-
-    // ===== Categories (link sang store/<slug>.html) =====
-    const catsRaw = (Array.isArray(p.categories) && p.categories.length) ? p.categories : asArr(p.category);
-    const cats = catsRaw.map(x=>({label:x, slug: slug(x)})).filter(x=>x.slug);
-    if (cats.length){
-      catWrap.hidden=false; catWrap.innerHTML='';
-      cats.forEach(c=>{
-        const a=document.createElement('a'); a.className='chip'; a.href='/store/'+c.slug+'.html'; a.textContent=c.label||c.slug;
-        catWrap.appendChild(a);
-      });
-    }
-
-    // ===== Accordion blocks (ẩn/hiện theo dữ liệu) =====
-    const features = asArr(p.features || p.highlights);
-    if (features.length){
-      document.getElementById('blk-features').hidden = false;
-      document.getElementById('features-body').innerHTML = '<ul>'+features.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
-    }
-
-    const specs = p.specs && typeof p.specs === 'object' ? p.specs : null;
-    if (specs){
-      document.getElementById('blk-specs').hidden = false;
-      const ul = document.getElementById('specs-list'); ul.innerHTML='';
-      Object.keys(specs).forEach(k => {
-        const li = document.createElement('li'); li.textContent = k+': '+specs[k]; ul.appendChild(li);
-      });
-    }
-
-    const ings = asArr(p.ingredients);
-    if (ings.length){
-      document.getElementById('blk-ingredients').hidden = false;
-      document.getElementById('ing-list').innerHTML = ings.map(x=>'<li>'+esc(x)+'</li>').join('');
-    }
-
-    if (p.how_to_use || p.usage){
-      document.getElementById('blk-usage').hidden = false;
-      document.getElementById('usage-body').textContent = p.how_to_use || p.usage;
-    }
-
-    if (p.notes || p.cautions || p.warranty){
-      document.getElementById('blk-notes').hidden = false;
-      document.getElementById('notes-body').textContent = p.notes || p.cautions || ('Bảo hành: '+p.warranty);
-    }
-
-    // ===== Related (cùng nhãn) =====
-    function labelsOf(it){
-      const out = [];
-      const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
-      if (it.cat||it.category) out.push(...split(it.cat||it.category));
-      const arr = Array.isArray(it.cats)? it.cats : (Array.isArray(it.categories)? it.categories : []);
-      out.push(...arr.flatMap(split));
-      if (Array.isArray(it.tags)) out.push(...it.tags.flatMap(split));
-      if (typeof it.category_path === 'string') out.push(...split(it.category_path));
-      if (Array.isArray(it.category_path)) out.push(...it.category_path.flatMap(split));
-      // unique slugs
-      return Array.from(new Set(out.map(v=>slug(v)).filter(Boolean)));
-    }
-    const baseLabels = labelsOf(p);
-    const rel = data.filter(x => x!==p && labelsOf(x).some(t => baseLabels.includes(t))).slice(0,8);
-
-    const relGrid = document.getElementById('related-grid');
-    const cardHTML = (q)=>{
-      const qSku = String(q.sku||'').toLowerCase();
-      const qName = q.name || qSku || 'Sản phẩm';
-      const qImg  = q.image || (qSku? `/assets/img/products/${qSku}.webp` : '/assets/img/products/placeholder.webp');
-      const qPrice= q.price!=null ? fmt(q.price) : '';
-      const qLink = href(q);
-      const mer  = (q.merchant||'').toLowerCase() || hostMerch(qLink);
-      return `
-        <article class="product-card" data-sku="${esc(qSku)}">
-          <a class="thumb" href="/g.html?sku=${encodeURIComponent(qSku)}">
-            <img loading="lazy" src="${esc(qImg)}" alt="${esc(qName)} — MXD" width="320" height="320"
+    function buildRelated(items){
+      const top = items.filter(x=>x && x.sku && x.sku.toLowerCase()!==sku).slice(0,12);
+      const html = top.map(p=>{
+        const img = p.image || `/assets/img/products/${(p.sku||'').toLowerCase()}.webp`;
+        return `
+        <article class="product-card" data-sku="${esc(p.sku||'')}">
+          <a class="thumb" href="/g.html?sku=${encodeURIComponent(p.sku||'')}">
+            <img loading="lazy" src="${esc(img)}" alt="${esc(p.name||p.sku||'Sản phẩm')} — MXD"
                  onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
           </a>
-          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(qSku)}">${esc(qName)}</a></h3>
-          ${qPrice?`<div class="price" data-price="${esc(String(q.price||''))}">${qPrice}</div>`:''}
+          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(p.sku||'')}">${esc(p.name||p.sku||'Sản phẩm')}</a></h3>
+          ${p.price!=null?`<div class="price">${fmt(p.price)}</div>`:''}
           <div class="actions">
-            <a class="buy" href="${esc(qLink)}" data-merchant="${esc(mer)}" target="_blank" rel="nofollow sponsored noopener">${LABELS[mer]||'Mua ngay'}</a>
+            <a class="buy" href="${esc(p.origin_url||p.url||'#')}" data-merchant="${esc((p.merchant||'').toLowerCase())}"
+               target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
           </div>
         </article>`;
-    };
-    relGrid.innerHTML = (rel.length?rel:data.filter(x=>x!==p).slice(0,8)).map(cardHTML).join('');
-
-    // ===== Canonical/OG động =====
-    const abs = location.origin + location.pathname + '?sku=' + encodeURIComponent(sku);
-    const ogImg = (images && images.length ? images[0] : imgOf(p));
-    document.getElementById('canonical').setAttribute('href', abs);
-    setOg('og:url', abs);
-    setOg('og:title', name + ' | MXD');
-    setOg('og:image', ogAbs(ogImg));
-    setOg('og:description', p.description || p.desc || p.short_desc || 'Xem thông tin, giá sống và ưu đãi mới nhất.');
-
-    // ===== JSON-LD Product =====
-    try{
-      const ld = {
-        "@context":"https://schema.org",
-        "@type":"Product",
-        "name": name,
-        "sku": sku,
-        "image": ogAbs(ogImg),
-        "brand": p.brand || undefined,
-        "description": p.description || p.desc || p.short_desc || undefined,
-        "offers": {
-          "@type":"Offer",
-          "priceCurrency":"VND",
-          "price": String(p.price || ''),
-          "url": abs,
-          "availability":"https://schema.org/InStock"
-        }
-      };
-      if (p.rating || p.rating_value){
-        ld.aggregateRating = {
-          "@type":"AggregateRating",
-          "ratingValue": String(p.rating_value || p.rating),
-          "reviewCount": String(p.rating_count || p.reviews || 0)
-        };
-      }
-      const s = document.createElement('script');
-      s.type = 'application/ld+json'; s.id = 'ld-product';
-      s.textContent = JSON.stringify(ld);
-      document.head.appendChild(s);
-    }catch(_){}
-
-    // Trigger affiliate rewrite cho mọi CTA
-    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
-
-    function setOg(prop, val){
-      let m = document.querySelector(`meta[property="${prop}"]`);
-      if (!m){ m = document.createElement('meta'); m.setAttribute('property', prop); document.head.appendChild(m); }
-      m.setAttribute('content', val);
+      }).join('');
+      el.related.innerHTML = html;
+      // Dán nhãn CTA + chạy rewriter cho khối related (sau khi render)
+      try{ labelCTA(document); }catch(_){}
+      try{ if (window.mxdAffiliate && typeof window.mxdAffiliate.scan==='function'){ window.mxdAffiliate.scan(); } }catch(_){}
     }
-    function ogAbs(u){ try{ const U=new URL(u, location.origin); return U.toString(); }catch{return u;} }
 
+    async function loadData(){
+      const sources = ['/assets/data/affiliates.json','/affiliates.json','/products.json'];
+      for (const u of sources){
+        try{
+          const r = await fetch(u, { cache:'no-store' });
+          if (!r.ok) continue;
+          const j = await r.json();
+          const arr = Array.isArray(j)? j : (j?.items || []);
+          if (Array.isArray(arr) && arr.length) return arr;
+        }catch(_){}
+      }
+      return [];
+    }
+
+    function findItem(arr){
+      const s = sku;
+      if (!s) return null;
+      // match theo sku (ưu tiên), fallback theo name slug
+      const strip = (v)=> String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+      const bySku = arr.find(p => (p.sku||'').toLowerCase()===s);
+      if (bySku) return bySku;
+      const bySlug = arr.find(p => strip(p.name||'')===s);
+      return bySlug || null;
+    }
+
+    function fill(p){
+      if (!p){ setText(el.name,'Sản phẩm không tìm thấy'); return; }
+      const img = p.image || `/assets/img/products/${(p.sku||'').toLowerCase()}.webp`;
+      el.img.src = img;
+      setText(el.name, p.name || p.sku || 'Sản phẩm');
+      el.price.innerHTML = p.price!=null ? fmt(p.price) : '';
+      const op = p.old_price ?? p.price_old ?? p.list_price ?? p.msrp ?? p.regular_price ?? null;
+      el.old.innerHTML = (op && p.price && (+op>+p.price)) ? fmt(op) : '';
+      setText(el.brand, p.brand ? 'Thương hiệu: '+p.brand : '');
+      if (Array.isArray(p.tags) && p.tags.length){
+        el.tags.innerHTML = 'Thẻ: ' + p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join(' ');
+      } else el.tags.innerHTML = '';
+
+      // Mô tả
+      el.desc.innerHTML = (p.long_desc || p.short_desc || '').toString();
+
+      // Thuộc tính cho context
+      const merch = String(p.merchant||'').toLowerCase();
+      const origin = p.origin_url || p.origin || p.url || p.link || '#';
+      document.getElementById('product').setAttribute('data-sku', (p.sku||'').toLowerCase());
+      document.getElementById('product').setAttribute('data-merchant', merch);
+      document.getElementById('product').setAttribute('data-origin', origin);
+      document.getElementById('product').setAttribute('data-img', img);
+
+      // Chuẩn hoá CTA hiển thị (href = origin_url, rewriter sẽ đổi thành isclix)
+      el.buy.setAttribute('href', origin);
+      el.buy.setAttribute('data-merchant', merch);
+      el.buy.setAttribute('target','_blank');
+      el.buy.setAttribute('rel','nofollow sponsored noopener');
+
+      // Dán nhãn + rewrite
+      try{ labelCTA(document); }catch(_){}
+      try{ if (window.mxdAffiliate && typeof window.mxdAffiliate.scan==='function'){ window.mxdAffiliate.scan(); } }catch(_){}
+    }
+
+    (async function run(){
+      const arr = await loadData();
+      const item = findItem(arr);
+      fill(item);
+      if (arr.length) buildRelated(arr);
+    })();
   })();
   </script>
+  <!-- Khối dưới đây là phần BỔ SUNG an toàn: đảm bảo có meta-link ẩn và hook hậu-render -->
+  <!-- MXD-POST-RENDER HOOK + META-LINK ENFORCER (safe, no-layout-change) -->
+  <script>
+  (function(){
+    // Utilities
+    function norm(v){ return String(v||'').trim(); }
+    function isHttp(u){ return /^https?:\/\//i.test(u||''); }
+
+    // Thử nhận diện ngữ cảnh sản phẩm từ các nguồn hiện có trên trang
+    function detectContext(){
+      var sku='', merchant='', origin='', price=null, img='';
+
+      // 1) Từ phần tử có data-*
+      var root = document.querySelector('[data-sku]') || document.body;
+      if (root){
+        sku = norm(root.getAttribute('data-sku')||'');
+        merchant = norm(root.getAttribute('data-merchant')||'');
+        origin = norm(root.getAttribute('data-origin')||'');
+        img = norm(root.getAttribute('data-img')||'');
+      }
+
+      // 2) Từ anchor meta có sẵn (nếu có)
+      var meta = document.querySelector('.product-meta');
+      if (meta){
+        if (!origin) origin = norm(meta.getAttribute('href')||'');
+        if (!merchant) merchant = norm(meta.getAttribute('data-merchant')||'');
+        if (!sku) sku = norm(meta.getAttribute('data-sku')||'');
+        if (!img) img = norm(meta.getAttribute('data-img')||'');
+        if (meta.hasAttribute('data-price')) price = meta.getAttribute('data-price');
+      }
+
+      // 3) Từ JSON nhúng (nếu trang có ld-product)
+      try{
+        var ld = document.getElementById('ld-product');
+        if (ld){
+          var j = JSON.parse(ld.textContent||'{}');
+          if (!sku) sku = norm(j.sku||'');
+          if (!merchant) merchant = norm((j.merchant||'').toLowerCase());
+          if (!origin) origin = norm(j.origin_url || j.url || '');
+          if (!img) img = norm(j.image || '');
+          if (j.price!=null) price = j.price;
+        }
+      }catch(_){}
+
+      // 4) Fallback từ chính CTA đang hiển thị
+      var cta = document.querySelector('.buy, .buy-btn, a[data-role="buy"]');
+      if (cta){
+        var href = norm(cta.getAttribute('href')||'');
+        var m = norm(cta.getAttribute('data-merchant')||'');
+        if (!origin) origin = href;
+        if (!merchant) merchant = m;
+      }
+      return { sku, merchant: merchant.toLowerCase(), origin_url: origin, price, img };
+    }
+
+    // Bảo đảm có <a class="product-meta"> ẩn để rewriter đọc dữ liệu
+    function ensureMetaLink(ctx){
+      var holder = document.querySelector('.product-meta');
+      if (!holder){
+        holder = document.createElement('a');
+        holder.className = 'product-meta';
+        holder.style.position = 'absolute';
+        holder.style.left = '-9999px';
+        holder.style.width = '1px';
+        holder.style.height = '1px';
+        document.body.appendChild(holder);
+      }
+      if (ctx.origin_url) holder.setAttribute('href', ctx.origin_url);
+      if (ctx.merchant) holder.setAttribute('data-merchant', ctx.merchant);
+      if (ctx.sku) holder.setAttribute('data-sku', ctx.sku);
+      if (ctx.img) holder.setAttribute('data-img', ctx.img);
+      if (ctx.price!=null) holder.setAttribute('data-price', ctx.price);
+    }
+
+    // Đổi nhãn CTA theo sàn
+    function labelCTA(root){
+      var LABELS = {shopee:'Mua Shopee', lazada:'Mua Lazada', tiki:'Mua Tiki', tiktok:'Mua TikTok'};
+      root.querySelectorAll('a.buy, a.buy-btn, a[data-role="buy"]').forEach(function(a){
+        var m=(a.getAttribute('data-merchant')||'').toLowerCase();
+        if (LABELS[m]) a.textContent = LABELS[m];
+      });
+    }
+
+    function run(){
+      var ctx = detectContext();
+      ensureMetaLink(ctx);
+
+      // Chuẩn hoá CTA hiển thị: để href = origin_url, rewriter sẽ convert sang isclix
+      var cta = document.querySelector('.buy, .buy-btn, a[data-role="buy"]');
+      if (cta){
+        if (isHttp(ctx.origin_url)) cta.setAttribute('href', ctx.origin_url);
+        if (ctx.merchant) cta.setAttribute('data-merchant', ctx.merchant);
+        if (!cta.hasAttribute('rel')) cta.setAttribute('rel','nofollow sponsored noopener');
+        if (!cta.hasAttribute('target')) cta.setAttribute('target','_blank');
+      }
+
+      // Đổi nhãn + chạy rewriter
+      try{ labelCTA(document); }catch(_){}
+      try{
+        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function'){
+          window.mxdAffiliate.scan();
+        }
+      }catch(_){}
+    }
+
+    if (document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', run);
+    } else {
+      setTimeout(run, 0);
+    }
+  })();
+  </script>
+  <!-- (tuỳ chọn) SW -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js?v=2025-11-08-g1');
+    }
+  </script>
+
+  <!-- Anchor meta ẩn (nếu trang đã có sẵn thì script sẽ tái sử dụng) -->
+  <a class="product-meta" href="#" data-merchant="" data-sku="" data-img="" style="position:absolute;left:-9999px;width:1px;height:1px"></a>
+
 </body>
 </html>
