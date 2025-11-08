@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mxd210.github.io/assets/schema/affiliates.schema.json",
+  "title": "MXD Affiliates Product",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["sku", "name", "merchant", "origin_url"],
+  "properties": {
+    "sku": {
+      "type": "string",
+      "title": "SKU (slug)",
+      "description": "Chuẩn MXD: chữ thường, số, dấu gạch ngang; không khoảng trắng.",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 120
+    },
+    "name": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 280
+    },
+    "merchant": {
+      "type": "string",
+      "description": "Sàn/merchant. Chỉ 1 trong các giá trị MXD hỗ trợ.",
+      "enum": ["shopee", "lazada", "tiki", "tiktok"]
+    },
+    "origin_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Link gốc (nguồn sự thật) của sản phẩm."
+    },
+    "deeplink": {
+      "type": "string",
+      "format": "uri",
+      "description": "Link isclix (cache). Có thể bỏ trống, sẽ được sinh lại qua mxdAffiliate.scan()."
+    },
+    "deeplink_cached_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Thời điểm cache deeplink."
+    },
+    "deeplink_ttl_days": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 90,
+      "default": 15,
+      "description": "Hạn cache deeplink (ngày)."
+    },
+    "price": {
+      "type": ["number", "integer", "string"],
+      "description": "Giá hiện tại (VND). Cho phép string '...' để nội bộ parse."
+    },
+    "old_price": {
+      "type": ["number", "integer", "string"],
+      "description": "Giá gốc (VND) để tính %OFF."
+    },
+    "brand": { "type": "string" },
+    "image": {
+      "type": "string",
+      "description": "URL ảnh tuyệt đối hoặc đường dẫn /assets/img/products/<sku>.webp"
+    },
+    "images": {
+      "type": "array",
+      "items": { "type": "string" },
+      "maxItems": 10
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ví dụ: ['deal','flash-sale','hot','ao-thun','shorts','bao-ho']"
+    },
+    "categories": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ví dụ: ['thoi-trang','thoi-trang-nam']"
+    },
+    "category_path": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" }, "maxItems": 6 }
+      ],
+      "description": "Đường dẫn danh mục thô (nếu có), dùng để map alias rộng."
+    },
+    "short_desc": { "type": "string", "maxLength": 600 },
+    "long_desc":  { "type": "string", "maxLength": 4000 },
+    "status": {
+      "oneOf": [
+        { "type": "boolean" },
+        { "type": "string", "enum": ["active", "archived"] }
+      ],
+      "default": true,
+      "description": "false/archived sẽ bị ẩn."
+    },
+    "featured": { "type": "boolean", "default": false },
+    "rating": { "type": ["number","integer"], "minimum": 0, "maximum": 5 },
+    "stock_status": { "type": "string", "enum": ["in_stock","out_of_stock","preorder"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+
+    "sub1": { "type": "string" },
+    "sub2": { "type": "string" },
+    "sub3": { "type": "string" },
+    "sub4": { "type": "string" }
+  }
+}
