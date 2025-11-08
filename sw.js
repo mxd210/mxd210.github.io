@@ -1,5 +1,4 @@
-/* FILE:/sw.js */
-/* MXD-CHECK v2025-10-06 [sw]
+/* MXD-CHECK v2025-11-08 [sw]
 - VERSION bump mỗi lần sửa (định dạng YYYY-MM-DD-<tag>)
 - HTML: network-first (+ navigationPreload); fallback offlinePage
 - Assets same-origin: stale-while-revalidate; tránh precache 404
@@ -7,20 +6,19 @@
 - BYPASS analytics/affiliate domains; không can thiệp
 - JSON động (/assets/data/*.json, /products.json): network-first (no-store)
 - /sw-version phục vụ kiểm tra phiên bản
-FIND: MXD-CHECK v2025-10-06 [sw]
+FIND: MXD-CHECK v2025-11-08 [sw]
 */
 
-// sw.js — MXD PWA (2025-10-08)
-const VERSION = '2025-10-30-cong-cu-ops'; // BUMP
-
+// sw.js — MXD PWA
+const VERSION = '2025-11-08-aff-per-merchant'; // BUMP
 
 const CACHE_PREFIX = 'mxd';
 const CACHE = `${CACHE_PREFIX}-${VERSION}`;
 
-// ---- Precache (nhẹ) ----
+// ---- Precache (nhẹ, an toàn) ----
 const ASSETS = [
   '/', '/index.html', '/store.html', '/g.html',
-  // Tool đúng chuẩn MXD hiện dùng:
+  // Tool đang dùng (đặt đúng đường dẫn file thực tế của bạn nếu khác):
   '/tools/mxd-importerv1.html',
   // CSS & JS nền tảng:
   '/assets/site.css',
@@ -55,17 +53,20 @@ const offlinePage = () => new Response(
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const c = await caches.open(CACHE);
-    await Promise.all(ASSETS.map(u => c.add(u).catch(() => {}))); // bỏ qua asset lỗi (tránh fail toàn bộ)
+    // Bỏ qua asset lỗi để không fail toàn bộ install
+    await Promise.all(ASSETS.map(u => c.add(u).catch(() => {})));
     await self.skipWaiting();
   })());
 });
 
 self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
+    // Dọn cache cũ
     const keys = await caches.keys();
     await Promise.all(
       keys.filter(k => k.startsWith(CACHE_PREFIX) && k !== CACHE).map(k => caches.delete(k))
     );
+    // Bật navigationPreload cho HTML navigation
     if ('navigationPreload' in self.registration) {
       try { await self.registration.navigationPreload.enable(); } catch {}
     }
@@ -101,8 +102,8 @@ const BYPASS_HOSTS = new Set([
   'www.google-analytics.com','google-analytics.com',
   'analytics.google.com','g.doubleclick.net',
   'go.isclix.com',
-  'shopee.vn','cf.shopee.vn','s.shopee.vn',
-  'lazada.vn','s.lazada.vn','pages.lazada.vn',
+  'shopee.vn','cf.shopee.vn','s.shopee.vn','shope.ee','shp.ee',
+  'lazada.vn','s.lazada.vn','pages.lazada.vn','lzd.co',
   'tiki.vn','api.tiki.vn',
   'facebook.com','www.facebook.com','m.me','zalo.me'
 ]);
@@ -118,28 +119,28 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // ✅ MXD BYPASS: /cong-cu/* (hub công cụ) & /ops/* (API) → luôn network-only, không cache
+  // ✅ MXD BYPASS: /cong-cu/* & /ops/* → luôn network-only (không cache)
   if (url.origin === self.location.origin &&
       (url.pathname.startsWith('/cong-cu/') || url.pathname.startsWith('/ops/'))) {
     event.respondWith(fetch(req, { cache: 'no-store' }));
     return;
   }
 
-  // ✅ BỎ QUA sitemap & robots: để trình duyệt/bot lấy trực tiếp từ network
+  // ✅ BỎ QUA sitemap & robots: để bot lấy trực tiếp từ network
   if (url.pathname.endsWith('.xml') || url.pathname === '/robots.txt') {
     return; // không respondWith => SW không can thiệp
   }
 
-  // Phiên bản nhanh để kiểm tra
+  // Endpoint kiểm tra phiên bản
   if (url.pathname === '/sw-version') {
     event.respondWith(new Response(VERSION, { headers: {'content-type':'text/plain'} }));
     return;
   }
 
-  // bypass ngoại lệ
+  // Bypass các host đặc biệt
   if (BYPASS_HOSTS.has(url.hostname)) return;
 
-  // Ảnh qua Worker *.workers.dev/*/img → TTL 1d
+  // Ảnh qua Worker (*.workers.dev/*/img) → TTL 1d
   const isWorkerImg = /workers\.dev$/i.test(url.hostname) && url.pathname.endsWith('/img');
   if (isWorkerImg) {
     event.respondWith((async () => {
@@ -177,7 +178,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML (điều hướng) → network-first + preload
+  // HTML (điều hướng) → network-first + navigationPreload
   const isHTMLNav = req.mode === 'navigate' ||
                     (req.headers.get('accept') || '').includes('text/html');
   if (isHTMLNav) {
@@ -185,7 +186,7 @@ self.addEventListener('fetch', (event) => {
       try {
         const preload = await event.preloadResponse;
         if (preload) {
-          const copy = preload.clone(); // clone TRƯỚC khi trả về để tránh "body used"
+          const copy = preload.clone(); // clone trước khi lưu
           event.waitUntil(caches.open(CACHE).then(c => c.put(normalize(req), copy)));
           return preload;
         }
@@ -208,7 +209,7 @@ self.addEventListener('fetch', (event) => {
   const isStatic =
     url.origin === self.location.origin && (
       url.pathname.startsWith('/assets/') ||
-      /\.(css|js|webp|png|jpg|jpeg|svg|woff2)$/.test(url.pathname)
+      /\.(css|js|webp|png|jpg|jpeg|svg|gif|woff2)$/.test(url.pathname)
     );
   if (isStatic) {
     event.respondWith((async () => {
@@ -218,6 +219,7 @@ self.addEventListener('fetch', (event) => {
           const c = await caches.open(CACHE);
           const copy1 = res.clone();
           await c.put(req, copy1);
+          // Lưu thêm key normalize để tránh miss do query
           const normKey = normalize(req);
           if (normKey !== req.url) {
             const copy2 = res.clone();
@@ -231,7 +233,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Khác origin → network-first; offline → cache (nếu có)
+  // Khác origin → network-first; offline → trả cache nếu có
   event.respondWith((async () => {
     try { return await fetch(req); }
     catch {
@@ -240,4 +242,3 @@ self.addEventListener('fetch', (event) => {
     }
   })());
 });
-/* /FILE */
