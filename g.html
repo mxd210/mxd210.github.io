@@ -9,7 +9,7 @@
   <link id="canonical" rel="canonical" href="https://mxd210.github.io/g.html"/>
   <meta name="robots" content="index,follow"/>
 
-  <!-- OG (sẽ được cập nhật động theo SKU) -->
+  <!-- OG (được cập nhật động theo SKU) -->
   <meta property="og:type" content="product"/>
   <meta property="og:title" content="Chi tiết sản phẩm | MXD"/>
   <meta property="og:description" content="Xem thông tin, giá sống và ưu đãi mới nhất."/>
@@ -18,25 +18,46 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="/assets/site.css"/>
-  <!-- Safety CSS: bảo đảm bố cục & badge giảm giá hoạt động ngay cả khi thiếu style -->
+
+  <!-- Safety CSS + Gallery + Badge giảm giá -->
   <style>
     .pdp{max-width:1160px;margin:0 auto;padding:16px}
     .pdp-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-    .product-gallery img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line,#e5e7eb)}
+
+    /* Gallery */
+    .p-gallery{display:grid;gap:12px}
+    .p-main{position:relative;border:1px solid var(--line,#e5e7eb);border-radius:12px;overflow:hidden;background:#fff}
+    .p-main img{width:100%;height:auto;display:block}
+    .sale-badge{position:absolute;left:10px;top:10px;background:#ef4444;color:#fff;font-weight:700;
+      padding:6px 10px;border-radius:999px;font-size:13px;box-shadow:0 2px 8px #0003}
+    .deal-badge{position:absolute;right:10px;top:10px;background:#111827;color:#fff;
+      padding:6px 10px;border-radius:8px;font-size:12px;opacity:.92}
+    .p-thumbs{display:flex;gap:8px;flex-wrap:wrap}
+    .p-thumbs button{border:1px solid var(--line,#e5e7eb);border-radius:10px;padding:0;background:#fff;cursor:pointer}
+    .p-thumbs img{width:72px;height:72px;object-fit:cover;border-radius:10px;display:block}
+    .p-thumbs button.active{outline:2px solid var(--ink,#111);outline-offset:2px}
+
     .product-info h1{margin:0 0 8px 0;font-size:22px;line-height:1.25}
+    .muted{color:var(--muted,#6b7280)}
+
+    .chip{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--line,#e5e7eb);
+      background:var(--chip,#f3f4f6);font-size:12px;margin:0 6px 6px 0;color:#374151;text-decoration:none}
+    .chip:hover{background:#fff}
+    .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--chip,#f3f4f6);
+      border:1px solid var(--line,#e5e7eb);margin-right:6px}
     .price-row{display:flex;align-items:baseline;gap:12px;margin:8px 0 12px}
     .price-now{font-weight:800;font-size:20px}
     .price-old{color:var(--muted,#6b7280);text-decoration:line-through}
-    .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--chip,#f3f4f6);border:1px solid var(--line,#e5e7eb);margin-right:6px}
-    .badge-deal{margin-left:6px;padding:2px 6px;border-radius:6px;font-size:11px;background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
     .actions .buy,.actions .buy-btn{display:inline-block;padding:10px 14px;border-radius:10px;background:var(--brand,#111);color:#fff;text-decoration:none}
-    .muted{color:var(--muted,#6b7280)}
+
+    /* Card & related */
     .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
     .product-card{border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:12px;background:#fff}
     .product-card .thumb img{width:100%;height:auto;border-radius:10px;display:block}
     .product-card .name{font-size:15px;line-height:1.35;margin:8px 0}
     .product-card .price{font-weight:600}
-    /* Accordion trong thẻ */
+
+    /* Accordion */
     .card-extra{margin-top:12px;border-top:1px dashed var(--line,#e5e7eb);padding-top:8px}
     .card-extra>summary{cursor:pointer;list-style:none}
     .card-extra>summary::-webkit-details-marker{display:none}
@@ -44,6 +65,9 @@
     .card-extra[open]>summary .toggle{background:#fff}
     .card-extra .info{font-size:13px;line-height:1.45;margin-top:6px}
     .card-extra .info ul{margin:6px 0 0 18px;padding:0}
+
+    .meta-rows{display:flex;flex-wrap:wrap;gap:6px 10px;margin:8px 0}
+    .small-note{font-size:12px;color:var(--muted,#6b7280);margin-top:6px}
     @media (max-width:860px){ .pdp-grid{grid-template-columns:1fr} }
   </style>
 
@@ -51,7 +75,7 @@
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
 
-  <!-- Live Price: cấu hình Worker + script -->
+  <!-- Live Price: cấu hình Worker + script (giữ nguyên tên) -->
   <script>window.MXD_PRICE_API="https://mxd6686.workers.dev"</script>
   <script defer src="/assets/live-price.js"></script>
 </head>
@@ -62,24 +86,46 @@
     <!-- MXD-ANCHOR: PDP-CARD -->
     <article class="product-card pdp-card" data-sku="">
       <div class="pdp-grid">
-        <div class="product-gallery">
-          <img id="pdp-img" src="/assets/img/products/placeholder.webp" alt="Sản phẩm — MXD" width="640" height="640"
-               onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+        <!-- GALLERY -->
+        <div>
+          <div id="mxd-gallery" class="p-gallery" hidden>
+            <div class="p-main">
+              <span id="badge-sale" class="sale-badge" hidden></span>
+              <span id="badge-deal" class="deal-badge" hidden>DEAL</span>
+              <img id="p-main-img" alt="">
+            </div>
+            <div id="p-thumbs" class="p-thumbs"></div>
+          </div>
+          <!-- Fallback 1 ảnh -->
+          <div id="single-img" class="product-gallery">
+            <img id="pdp-img" src="/assets/img/products/placeholder.webp" alt="Sản phẩm — MXD" width="640" height="640"
+                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+          </div>
         </div>
+
+        <!-- INFO -->
         <div class="product-info">
           <h1 id="pdp-name">Sản phẩm</h1>
+
           <div class="price-row">
-            <span class="price-now" id="pdp-price" data-price=""></span>
+            <span class="price-now" id="pdp-price" data-price="" data-sku=""></span>
             <del class="price-old" id="pdp-old" hidden></del>
           </div>
-          <div class="meta">
+
+          <div class="meta-rows">
             <span id="pdp-merchant" class="badge" hidden></span>
             <span id="pdp-brand" class="badge" hidden></span>
+            <span id="pdp-updated" class="badge" hidden></span>
           </div>
-          <div class="actions">
+
+          <div id="pdp-tags" class="meta-rows" hidden></div>
+          <div id="pdp-categories" class="meta-rows" hidden></div>
+
+          <div class="actions" style="margin-top:10px">
             <a id="pdp-buy" class="buy buy-btn" href="#" data-merchant="" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
           </div>
-          <p id="pdp-desc" class="muted"></p>
+
+          <p id="pdp-desc" class="muted small-note" style="margin-top:10px"></p>
 
           <!-- Accordion khối thông tin -->
           <details class="card-extra" id="blk-features" hidden>
@@ -153,37 +199,106 @@
     const p = data.find(x => String(x.sku||'').toLowerCase() === sku);
     if (!p){ card.outerHTML = '<p class="muted">Không tìm thấy sản phẩm với SKU <code>'+sku+'</code>.</p>'; return; }
 
-    // ===== Fill PDP =====
+    // ===== Helpers =====
     const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
     const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
     const imgOf = p => p.image || (p.sku? `/assets/img/products/${String(p.sku).toLowerCase()}.webp` : '/assets/img/products/placeholder.webp');
     const href = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
     const asArr = v => !v ? [] : Array.isArray(v) ? v : String(v).split(/[;,|/]+/).map(s=>s.trim()).filter(Boolean);
+    const norm = v => String(v||'').toLowerCase().trim();
+    const strip = s => norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
+    const slug  = v => strip(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
 
-    // Elements
+    // ===== Elements =====
     card.setAttribute('data-sku', sku);
-    const elName = document.getElementById('pdp-name');
     const elPrice= document.getElementById('pdp-price');
+    elPrice.setAttribute('data-sku', sku);
+
+    const elName = document.getElementById('pdp-name');
     const elOld  = document.getElementById('pdp-old');
-    const elImg  = document.getElementById('pdp-img');
     const elBuy  = document.getElementById('pdp-buy');
     const elDesc = document.getElementById('pdp-desc');
     const elMer  = document.getElementById('pdp-merchant');
     const elBrand= document.getElementById('pdp-brand');
+    const elUpdated = document.getElementById('pdp-updated');
+    const tagWrap = document.getElementById('pdp-tags');
+    const catWrap = document.getElementById('pdp-categories');
 
+    // ===== Price & badges =====
     const name = p.name || p.sku || 'Sản phẩm';
     elName.textContent = name;
+
     if (p.price!=null){ elPrice.textContent = fmt(p.price); elPrice.setAttribute('data-price', p.price); }
     const oldPrice = p.old_price || p.price_old || p.list_price || p.msrp || p.regular_price;
     if (oldPrice && +oldPrice > +p.price){ elOld.textContent = fmt(oldPrice); elOld.hidden=false; }
 
-    elImg.src = imgOf(p); elImg.alt = name+' — MXD';
+    // Deal / sale %
+    const salePctFromField = (p.sale_percent!=null) ? +p.sale_percent : null;
+    const salePctCalc = (oldPrice && +oldPrice > +p.price) ? Math.round((1 - (+p.price / +oldPrice))*100) : null;
+    const salePct = (isFinite(salePctFromField)? salePctFromField : salePctCalc);
+    const badgeSale = document.getElementById('badge-sale');
+    if (isFinite(salePct) && salePct>0){ badgeSale.textContent = '-'+salePct+'%'; badgeSale.hidden=false; }
+    if (p.deal===true || (Array.isArray(p.tags) && p.tags.map(norm).some(t=>['deal','hot','flash-sale','giam-gia'].includes(t)))){
+      document.getElementById('badge-deal').hidden = false;
+    }
+
+    // ===== Gallery (images[]) or single image =====
+    const images = (Array.isArray(p.images) && p.images.length) ? p.images : (p.image ? [p.image] : []);
+    const galleryBox = document.getElementById('mxd-gallery');
+    const singleBox  = document.getElementById('single-img');
+    const mainImg = document.getElementById('p-main-img');
+    const thumbs  = document.getElementById('p-thumbs');
+
+    function setMain(src){
+      mainImg.src = src; mainImg.alt = name+' — MXD';
+      [...thumbs.querySelectorAll('button')].forEach(b=>b.classList.toggle('active', b.dataset.src===src));
+    }
+    if (images.length){
+      singleBox.style.display='none';
+      thumbs.innerHTML='';
+      images.forEach((src,i)=>{
+        const btn=document.createElement('button');
+        btn.dataset.src=src; btn.innerHTML=`<img alt="thumb" src="${esc(src)}">`;
+        btn.addEventListener('click',()=>setMain(src));
+        thumbs.appendChild(btn); if(i===0) btn.classList.add('active');
+      });
+      setMain(images[0]);
+      galleryBox.hidden=false;
+    } else {
+      // fallback 1 ảnh
+      const elImg  = document.getElementById('pdp-img');
+      elImg.src = imgOf(p); elImg.alt = name+' — MXD';
+    }
+
+    // ===== Buy link / merchant / brand / updated =====
     elBuy.href = href(p);
     if (p.merchant){ elBuy.setAttribute('data-merchant', String(p.merchant).toLowerCase()); elMer.textContent = 'Nền tảng: '+p.merchant; elMer.hidden=false; }
     if (p.brand){ elBrand.textContent = 'Thương hiệu: '+p.brand; elBrand.hidden=false; }
+    if (p.updated_at){ try{ const d=new Date(p.updated_at); if(!isNaN(d)){ elUpdated.textContent='Cập nhật: '+d.toLocaleString('vi-VN'); elUpdated.hidden=false; } }catch(_){} }
     if (p.description || p.desc || p.short_desc){ elDesc.textContent = p.description || p.desc || p.short_desc; }
 
-    // Accordion blocks (ẩn/hiện theo dữ liệu)
+    // ===== Tags =====
+    const tags = asArr(p.tags);
+    if (tags.length){
+      tagWrap.hidden=false; tagWrap.innerHTML='';
+      tags.forEach(t=>{
+        const span=document.createElement('span'); span.className='chip'; span.textContent='#'+t;
+        tagWrap.appendChild(span);
+      });
+    }
+
+    // ===== Categories (link sang store/<slug>.html) =====
+    const catsRaw = (Array.isArray(p.categories) && p.categories.length) ? p.categories : asArr(p.category);
+    const cats = catsRaw.map(x=>({label:x, slug: slug(x)})).filter(x=>x.slug);
+    if (cats.length){
+      catWrap.hidden=false; catWrap.innerHTML='';
+      cats.forEach(c=>{
+        const a=document.createElement('a'); a.className='chip'; a.href='/store/'+c.slug+'.html'; a.textContent=c.label||c.slug;
+        catWrap.appendChild(a);
+      });
+    }
+
+    // ===== Accordion blocks (ẩn/hiện theo dữ liệu) =====
     const features = asArr(p.features || p.highlights);
     if (features.length){
       document.getElementById('blk-features').hidden = false;
@@ -193,7 +308,7 @@
     const specs = p.specs && typeof p.specs === 'object' ? p.specs : null;
     if (specs){
       document.getElementById('blk-specs').hidden = false;
-      const ul = document.getElementById('specs-list');
+      const ul = document.getElementById('specs-list'); ul.innerHTML='';
       Object.keys(specs).forEach(k => {
         const li = document.createElement('li'); li.textContent = k+': '+specs[k]; ul.appendChild(li);
       });
@@ -216,43 +331,39 @@
     }
 
     // ===== Related (cùng nhãn) =====
-    const norm = v => String(v||'').toLowerCase().trim();
-    const strip = s => norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
-    const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
-    const slug  = v => strip(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
-
     function labelsOf(it){
-      const labels = [];
-      labels.push(...split(it.cat||it.category||it.section||''));
+      const out = [];
+      const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
+      if (it.cat||it.category) out.push(...split(it.cat||it.category));
       const arr = Array.isArray(it.cats)? it.cats : (Array.isArray(it.categories)? it.categories : []);
-      labels.push(...arr.flatMap(split));
-      if (Array.isArray(it.tags)) labels.push(...it.tags.flatMap(split));
-      if (typeof it.category_path === 'string') labels.push(...split(it.category_path));
-      if (Array.isArray(it.category_path)) labels.push(...it.category_path.flatMap(split));
-      return Array.from(new Set(labels.map(slug).filter(Boolean)));
+      out.push(...arr.flatMap(split));
+      if (Array.isArray(it.tags)) out.push(...it.tags.flatMap(split));
+      if (typeof it.category_path === 'string') out.push(...split(it.category_path));
+      if (Array.isArray(it.category_path)) out.push(...it.category_path.flatMap(split));
+      // unique slugs
+      return Array.from(new Set(out.map(v=>slug(v)).filter(Boolean)));
     }
-
     const baseLabels = labelsOf(p);
     const rel = data.filter(x => x!==p && labelsOf(x).some(t => baseLabels.includes(t))).slice(0,8);
 
     const relGrid = document.getElementById('related-grid');
     const cardHTML = (q)=>{
       const qSku = String(q.sku||'').toLowerCase();
-      const name = q.name || qSku || 'Sản phẩm';
-      const img  = imgOf(q);
-      const price= q.price!=null ? fmt(q.price) : '';
-      const link = href(q);
+      const qName = q.name || qSku || 'Sản phẩm';
+      const qImg  = q.image || (qSku? `/assets/img/products/${qSku}.webp` : '/assets/img/products/placeholder.webp');
+      const qPrice= q.price!=null ? fmt(q.price) : '';
+      const qLink = href(q);
       const mer  = (q.merchant||'').toLowerCase();
       return `
         <article class="product-card" data-sku="${esc(qSku)}">
           <a class="thumb" href="/g.html?sku=${encodeURIComponent(qSku)}">
-            <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
+            <img loading="lazy" src="${esc(qImg)}" alt="${esc(qName)} — MXD" width="320" height="320"
                  onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
           </a>
-          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(qSku)}">${esc(name)}</a></h3>
-          ${price?`<div class="price" data-price="${esc(String(q.price||''))}">${price}</div>`:''}
+          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(qSku)}">${esc(qName)}</a></h3>
+          ${qPrice?`<div class="price" data-price="${esc(String(q.price||''))}">${qPrice}</div>`:''}
           <div class="actions">
-            <a class="buy" href="${esc(link)}" data-merchant="${esc(mer)}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+            <a class="buy" href="${esc(qLink)}" data-merchant="${esc(mer)}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
           </div>
         </article>`;
     };
@@ -260,11 +371,12 @@
 
     // ===== Canonical/OG động =====
     const abs = location.origin + location.pathname + '?sku=' + encodeURIComponent(sku);
-    const img = imgOf(p);
+    const ogImg = (images && images.length ? images[0] : imgOf(p));
     document.getElementById('canonical').setAttribute('href', abs);
     setOg('og:url', abs);
     setOg('og:title', name + ' | MXD');
-    setOg('og:image', location.origin + img);
+    setOg('og:image', ogAbs(ogImg));
+    setOg('og:description', p.description || p.desc || p.short_desc || 'Xem thông tin, giá sống và ưu đãi mới nhất.');
 
     // ===== JSON-LD Product =====
     try{
@@ -273,7 +385,7 @@
         "@type":"Product",
         "name": name,
         "sku": sku,
-        "image": location.origin + img,
+        "image": ogAbs(ogImg),
         "brand": p.brand || undefined,
         "description": p.description || p.desc || p.short_desc || undefined,
         "offers": {
@@ -284,17 +396,30 @@
           "availability":"https://schema.org/InStock"
         }
       };
+      // optional rating fields if present
+      if (p.rating || p.rating_value){
+        ld.aggregateRating = {
+          "@type":"AggregateRating",
+          "ratingValue": String(p.rating_value || p.rating),
+          "reviewCount": String(p.rating_count || p.reviews || 0)
+        };
+      }
       const s = document.createElement('script');
       s.type = 'application/ld+json'; s.id = 'ld-product';
       s.textContent = JSON.stringify(ld);
       document.head.appendChild(s);
     }catch(_){}
 
+    // Trigger affiliate rewrite for the primary button
+    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+
     function setOg(prop, val){
       let m = document.querySelector(`meta[property="${prop}"]`);
       if (!m){ m = document.createElement('meta'); m.setAttribute('property', prop); document.head.appendChild(m); }
       m.setAttribute('content', val);
     }
+    function ogAbs(u){ try{ const U=new URL(u, location.origin); return U.toString(); }catch{return u;} }
+
   })();
   </script>
 </body>
