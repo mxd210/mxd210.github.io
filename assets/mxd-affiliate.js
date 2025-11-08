@@ -1,7 +1,15 @@
-// MXD-AFF v2025-11-08c — per-merchant AccessTrade (mxd210)
+// MXD-AFF v2025-11-08d — per-merchant AccessTrade (mxd210)
 // Yêu cầu: GA4 (/assets/analytics.js) phải load TRƯỚC file này (defer)
 
 (function () {
+  // Cho phép tắt nhanh để debug: https://.../?skip-aff=1
+  const qs = new URLSearchParams(location.search);
+  const SKIP_AFF = qs.has("skip-aff");
+  if (SKIP_AFF) {
+    window.mxdAffiliate = { scan(){}, rewriteOne(){} };
+    return;
+  }
+
   if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === "function") return;
 
   // ====== Cấu hình mxd210 (PUB & Campaign theo từng sàn) ======
@@ -20,14 +28,13 @@
     if (v) CAMPAIGN[m] = v;
   });
 
-  const qs      = new URLSearchParams(location.search);
   const getMeta = (n) => document.querySelector(`meta[name="${n}"]`)?.content || "";
   const PAGE    = location.pathname.includes("/store") ? "store" : (location.pathname.includes("/g") ? "g" : "page");
   const AFF_DEBUG = qs.get("dev") === "1" || /^true$/i.test(getMeta("mxd-aff-debug"));
   const ALLOW_AFF_DEEPLINK = /^true$/i.test(getMeta("mxd-allow-aff-deeplink")); // default: false
   const CAMPAIGN_TAG = getMeta("at:sub4") || "mxd210";
 
-  const DEEP_HOSTS = ["isclix.com", "go.isclix.com"];
+  const DEEP_HOSTS = ["go.isclix.com", "isclix.com"];
 
   // Builder: deep_link/<PUB_ID>/<CAMPAIGN_ID>?url=<origin>&sub1..sub4
   const makeTpl = (campId) => (url, s1="", s2="", s3="", s4="") =>
@@ -41,11 +48,13 @@
   };
 
   const isDeep = (u) => {
-    try { const h = new URL(u, location.href).hostname; return DEEP_HOSTS.some(d => h.endsWith(d) || h.includes(d)); }
+    try { const h = new URL(u, location.href).hostname.toLowerCase(); return DEEP_HOSTS.some(d => h === d || h.endsWith("."+d)); }
     catch { return false; }
   };
 
-  const slugify = (s) => (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  const slugify = (s) => (s || "")
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d')
+    .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
   // Nhận diện sàn từ hostname hoặc data-merchant
   function getMerchant(u, dataAttr) {
@@ -53,13 +62,9 @@
     if (m) return m;
     try {
       const h = new URL(u, location.href).hostname.toLowerCase();
-      // Shopee: shopee.vn, s.shopee.vn, shope.ee, shp.ee, etc.
-      if (h.includes("shopee") || h.endsWith("shp.ee")) return "shopee";
-      // Lazada: lazada.vn, s.lazada.vn, lzd.co, v.v.
+      if (h.includes("shopee") || h.endsWith("shp.ee")) return "shopee";     // shopee.vn, s.shopee.vn, shp.ee...
       if (h === "lzd.co" || h.endsWith(".lzd.co") || h.includes("lazada")) return "lazada";
-      // Tiki
       if (h.includes("tiki")) return "tiki";
-      // TikTok shop: vt.tiktok.com, shop.tiktok.vn, v.v.
       if (h.includes("tiktok")) return "tiktok";
     } catch (_) {}
     return "";
@@ -113,37 +118,40 @@
   }
 
   function rewriteOne(a) {
-    if (!a || a.dataset.noAff === '1') return;
+    try{
+      if (!a || a.dataset.noAff === '1') return;
 
-    const hrefNow = a.getAttribute("href") || "";
-    if (!hrefNow || !/^https?:\/\//i.test(hrefNow)) return;
+      const hrefNow = a.getAttribute("href") || "";
+      if (!hrefNow || !/^https?:\/\//i.test(hrefNow)) return;
 
-    const merchant = getMerchant(hrefNow, a.dataset.merchant);
-    if (!merchant || !TPL[merchant]) return; // Không biết sàn → bỏ qua an toàn
+      const merchant = getMerchant(hrefNow, a.dataset.merchant);
+      if (!merchant || !TPL[merchant]) return; // Không biết sàn → bỏ qua an toàn
 
-    const sku   = a.dataset.sku || a.closest("[data-sku]")?.dataset.sku || slugify(a.textContent);
-    const subs  = buildSubs(a, sku, merchant);
-    let finalUrl = hrefNow;
+      const sku   = a.dataset.sku || a.closest("[data-sku]")?.dataset.sku || slugify(a.textContent);
+      const subs  = buildSubs(a, sku, merchant);
+      let finalUrl = hrefNow;
 
-    if (isDeep(hrefNow)) {
-      if (ALLOW_AFF_DEEPLINK) {
-        finalUrl = ensureSubsInDeep(hrefNow, subs);
+      if (isDeep(hrefNow)) {
+        if (ALLOW_AFF_DEEPLINK) {
+          finalUrl = ensureSubsInDeep(hrefNow, subs);
+        } else {
+          const origin = extractOriginFromDeep(hrefNow);
+          finalUrl = origin ? TPL[merchant](origin, subs.sub1, subs.sub2, subs.sub3, subs.sub4)
+                            : ensureSubsInDeep(hrefNow, subs);
+        }
       } else {
-        const origin = extractOriginFromDeep(hrefNow);
-        finalUrl = origin ? TPL[merchant](origin, subs.sub1, subs.sub2, subs.sub3, subs.sub4)
-                          : ensureSubsInDeep(hrefNow, subs);
+        finalUrl = TPL[merchant](hrefNow, subs.sub1, subs.sub2, subs.sub3, subs.sub4);
       }
-    } else {
-      finalUrl = TPL[merchant](hrefNow, subs.sub1, subs.sub2, subs.sub3, subs.sub4);
-    }
 
-    if (finalUrl !== hrefNow) a.href = finalUrl;
-    applyAttrs(a);
-    debugOverlay(a, `[AFF] ${merchant} → ${finalUrl}`);
+      if (finalUrl !== hrefNow) a.href = finalUrl;
+      applyAttrs(a);
+      debugOverlay(a, `[AFF] ${merchant} → ${finalUrl}`);
+    }catch(_){ /* an toàn: không làm gì để tránh chặn click */ }
   }
 
+  // Chỉ quét trong các vùng sản phẩm để tránh ảnh hưởng link khác
   function scan(scope = document) {
-    scope.querySelectorAll('a.buy[href^="http"], a.buy-btn[href^="http"]').forEach(rewriteOne);
+    scope.querySelectorAll('a.buy[href^="http"], a.buy-btn[href^="http"], [data-merchant][href^="http"]').forEach(rewriteOne);
   }
 
   const mo = new MutationObserver((muts) => {
@@ -153,23 +161,13 @@
 
   document.addEventListener("DOMContentLoaded", () => scan());
 
-  // Click fallback đảm bảo rewrite kể cả khi scan chưa chạy kịp
+  // Click fallback: chỉ rewrite, KHÔNG preventDefault — để không chặn điều hướng
   document.addEventListener("click", function (e) {
-    const a = e.target.closest && e.target.closest("a.buy, a.buy-btn");
+    const a = e.target.closest?.("a.buy, a.buy-btn, a[data-merchant]");
     if (!a) return;
-
-    const hrefNow = a.getAttribute("href") || "";
-    if (!/^https?:\/\//i.test(hrefNow) || a.dataset.noAff === '1') return;
-
-    const before = hrefNow;
     rewriteOne(a);
-    const after = a.getAttribute("href") || before;
-
-    if (after !== before) {
-      e.preventDefault();
-      location.href = after;
-    }
-  }, true);
+    // Không e.preventDefault: để trình duyệt xử lý điều hướng bình thường
+  }, false);
 
   window.mxdAffiliate = { scan, rewriteOne };
 })();
