@@ -1,0 +1,22 @@
+{
+  "thoi-trang": {
+    "aliases": ["áo","aothun","tee","polo","hoodie","so-mi","somi","cardigan","quần","quan","jean","chino","vay","váy","đầm","dam","gym","sport","sneaker","giày","dep","bao-ho","áo-gió","ao-gio","khoac","len","sweater","thu-dong"],
+    "children": ["thoi-trang-nam","thoi-trang-nu","tre-em","thoi-trang-thu-dong"]
+  },
+  "may-moc-xay-dung": {
+    "aliases": ["máy","may","khoan","khoang","cắt","cat","mài","mai","hàn","han","đục","duc","laser","nivox","hukan","makita","bosch","dewalt","hitachi","nikawa","thang","hut-bui","bom","bơm","rửa","rua","cong-trinh","xay-dung"],
+    "children": []
+  },
+  "my-pham": {
+    "aliases": ["serum","kem","duong","dưỡng","srm","sua-rua-mat","toner","lip","mask","loreal","paula","innisfree","dove","kcn","spf","son","trang-diem"],
+    "children": []
+  },
+  "do-gia-dung": {
+    "aliases": ["nồi","noi","chao","lò","sưởi","lo-suoi","den-suoi","tivi","tủ","tu-lanh","ấm","am","bep","bếp","nồi-chiên","noi-chien","bao-quan","hop","binh","quat","quạt","den","đèn","chổi","choi","tu-nhiet"],
+    "children": []
+  },
+  "do-dien-tu": {
+    "aliases": ["tai-nghe","loa","sac","fly-cam","sạc","đèn","den-suoi","cap","cáp","op-lung","ốp","điện-thoại","dien-thoai","camera","smart","dong-ho","đồng-hồ","tablet","may-tinh-bang"],
+    "children": []
+  }
+}
