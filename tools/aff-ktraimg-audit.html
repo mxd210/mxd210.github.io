@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
+<title>MXD Image Audit — orphan / invalid / duplicate — Delete selected</title>
+<meta name="robots" content="noindex,follow"/>
+<style>
+  :root{--bg:#0b0f14;--fg:#e8f0fb;--muted:#9fb0c3;--b:#142031;--ok:#34d399;--warn:#f59e0b;--err:#ef4444;--card:#0f1926}
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);font:14px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,Arial}
+  header{padding:14px 16px;border-bottom:1px solid #1f2b3c}
+  main{padding:16px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .f{display:flex;flex-wrap:wrap;gap:10px}
+  .card{background:var(--card);border:1px solid #1f2b3c;border-radius:14px;padding:12px;margin:10px 0}
+  .btn{background:#1a2a40;border:1px solid #274266;border-radius:10px;color:var(--fg);padding:8px 12px;cursor:pointer}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.danger{background:#4d0f15;border-color:#7a232c}
+  .btn.ghost{background:transparent}
+  input,select{background:#0a1522;border:1px solid #19273b;border-radius:10px;color:#d5e9ff;padding:8px 10px}
+  .muted{color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .item{background:#0a1522;border:1px solid #19273b;border-radius:12px;overflow:hidden}
+  .item header{display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid #19273b}
+  .thumb{display:block;height:160px;background:#0d1726;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:contain}
+  .meta{padding:8px;font-size:12px;line-height:1.35}
+  .tag{display:inline-block;border:1px solid #274266;border-radius:999px;padding:2px 8px;margin:2px 4px 0 0}
+  .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
+  .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+  .kpi .box{background:#0f1926;border:1px dashed #274266;border-radius:10px;padding:10px}
+  code,pre{background:#0a1522;border:1px solid #19273b;border-radius:8px;padding:6px 8px;color:#d5e9ff}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+  .small{font-size:12px}
+  .right{margin-left:auto}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .flag{padding:2px 6px;border-radius:6px;border:1px solid #274266}
+  .flag.err{border-color:#7a232c}
+  .flag.warn{border-color:#6b4f1f}
+  .flag.ok{border-color:#225a46}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <strong>MXD — Image Audit</strong>
+    <span class="muted">• Quét ảnh thừa/sai chuẩn/trùng · Xoá lựa chọn qua GitHub API</span>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="f">
+      <label>Owner <input id="owner" value="mxd210"></label>
+      <label>Repo <input id="repo" value="mxd210.github.io"></label>
+      <label>Branch <input id="branch" value="main"></label>
+      <label>Token <input id="token" type="password" placeholder="ghp_xxx (scope public_repo / repo)"></label>
+      <label>Scan path <input id="scanPath" value="/assets/img"></label>
+      <label class="right"><button class="btn" id="run">Scan</button></label>
+    </div>
+    <div class="small muted" style="margin-top:6px">Token chỉ lưu tạm trong <code>localStorage</code> của trình duyệt. Không gửi đi nơi khác.</div>
+  </div>
+
+  <div class="card">
+    <div class="filters">
+      <b>Bộ lọc:</b>
+      <label class="flag"><input type="checkbox" id="f-all" checked> Tất cả</label>
+      <label class="flag warn"><input type="checkbox" id="f-warn" checked> Cảnh báo</label>
+      <label class="flag err"><input type="checkbox" id="f-err" checked> Lỗi</label>
+      <label class="flag ok"><input type="checkbox" id="f-ok"> OK</label>
+      <span class="right">
+        <button class="btn ghost" id="selNone">Bỏ chọn</button>
+        <button class="btn ghost" id="selErr">Chọn lỗi</button>
+        <button class="btn ghost" id="selWarn">Chọn cảnh báo</button>
+        <button class="btn danger" id="deleteSel">Delete selected</button>
+      </span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="kpi">
+      <div class="box">Tổng ảnh: <b id="k-total">0</b></div>
+      <div class="box">OK: <b class="ok" id="k-ok">0</b></div>
+      <div class="box">Cảnh báo: <b class="warn" id="k-warn">0</b></div>
+      <div class="box">Lỗi: <b class="err" id="k-err">0</b></div>
+      <div class="box">Đã chọn: <b id="k-sel">0</b></div>
+    </div>
+  </div>
+
+  <div id="list" class="grid"></div>
+
+  <div class="card small muted">
+    <details>
+      <summary><b>Quy tắc kiểm tra</b></summary>
+      <ul>
+        <li><b>Đường dẫn</b>: chỉ audit dưới <code>/assets/img/**</code>. Nhóm: <code>products/</code>, <code>categories/</code>, <code>og/</code>, <code>brand/</code>, <code>favicon/</code>.</li>
+        <li><b>Định dạng</b>: <code>products/</code>, <code>categories/</code>, <code>og/</code> phải là <code>.webp</code>; <code>brand/</code> cho phép <code>.svg</code>/<code>.webp</code>; <code>favicon/</code> cho phép <code>.ico</code>/<code>.png</code>/<code>.svg</code>.</li>
+        <li><b>Orphan</b>: ảnh trong <code>products/</code> không có <code>sku</code> tương ứng trong <code>/assets/data/affiliates.json</code> (hoặc <code>/affiliates.json</code>/<code>/products.json</code>).</li>
+        <li><b>Đặt tên</b>: bắt buộc chữ thường–số–gạch ngang, trùng <code>sku</code> (VD: <code>abc-123.webp</code>), không khoảng trắng.</li>
+        <li><b>Kích thước</b>: cảnh báo nếu &gt; 600KB hoặc chiều nào &gt; 1600px.</li>
+        <li><b>Trùng nội dung</b>: cùng <code>git blob sha</code> (phát hiện qua cây Git).</li>
+      </ul>
+      <p>Delete dùng API: <code>DELETE /repos/{owner}/{repo}/contents/{path}</code> với commit message tự động.</p>
+    </details>
+  </div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  // ---- helpers
+  const $ = s=>document.querySelector(s);
+  const esc = s => String(s||"").replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const human = n => (n>=1024)?(n>=1048576? (n/1048576).toFixed(1)+'MB' : (n/1024).toFixed(0)+'KB') : (n+'B');
+  function norm(v){ return String(v||"").trim(); }
+  function toLower(v){ return norm(v).toLowerCase(); }
+  function isWebp(p){ return /\.webp$/i.test(p); }
+  function isSvg(p){ return /\.svg$/i.test(p); }
+  function isPng(p){ return /\.png$/i.test(p); }
+  function isIco(p){ return /\.ico$/i.test(p); }
+  function slugOk(name){ return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name); }
+  function fileName(path){ const m=String(path).split('/').pop(); return m||path; }
+  function baseName(path){ const f=fileName(path); const i=f.lastIndexOf('.'); return i>0?f.slice(0,i):f; }
+  function extName(path){ const f=fileName(path); const i=f.lastIndexOf('.'); return i>0?f.slice(i+1).toLowerCase():''; }
+  function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+  // ---- state
+  const st = {
+    owner: localStorage.getItem('imgAudit.owner') || 'mxd210',
+    repo:  localStorage.getItem('imgAudit.repo')  || 'mxd210.github.io',
+    branch:localStorage.getItem('imgAudit.branch')|| 'main',
+    token: localStorage.getItem('imgAudit.token') || '',
+    scanPath: localStorage.getItem('imgAudit.scanPath') || '/assets/img',
+    rows: [],
+    usedSkus: new Set()
+  };
+
+  // ---- bind inputs
+  $('#owner').value = st.owner;
+  $('#repo').value  = st.repo;
+  $('#branch').value= st.branch;
+  $('#token').value = st.token;
+  $('#scanPath').value=st.scanPath;
+
+  function saveInputs(){
+    st.owner = $('#owner').value.trim();
+    st.repo  = $('#repo').value.trim();
+    st.branch= $('#branch').value.trim();
+    st.token = $('#token').value;
+    st.scanPath=$('#scanPath').value.trim().replace(/\/+$/,'');
+    localStorage.setItem('imgAudit.owner',st.owner);
+    localStorage.setItem('imgAudit.repo',st.repo);
+    localStorage.setItem('imgAudit.branch',st.branch);
+    localStorage.setItem('imgAudit.token',st.token);
+    localStorage.setItem('imgAudit.scanPath',st.scanPath);
+  }
+
+  // ---- GitHub API
+  function gh(url, opts={}){
+    const h = { 'Accept':'application/vnd.github+json' };
+    if (st.token) h['Authorization'] = 'Bearer '+st.token;
+    return fetch(url,{...opts,headers:{...h,...(opts.headers||{})}});
+  }
+  function ghApi(p){ return `https://api.github.com${p}`; }
+  function ghRaw(path){ return `https://raw.githubusercontent.com/${st.owner}/${st.repo}/${st.branch}${path.startsWith('/')?path:('/'+path)}`; }
+
+  async function ghTreeRecursive(){
+    // 1) Get ref → sha
+    const r1 = await gh(ghApi(`/repos/${st.owner}/${st.repo}/git/trees/${encodeURIComponent(st.branch)}?recursive=1`));
+    if (!r1.ok){ throw new Error('Cannot load git tree'); }
+    const j = await r1.json();
+    return (j.tree||[]).filter(x=>x.type==='blob');
+  }
+
+  async function loadAffProducts(){
+    const cand = ['/assets/data/affiliates.json','/affiliates.json','/products.json'];
+    for (const p of cand){
+      try{
+        const r = await fetch(p,{cache:'no-store'});
+        if (r.ok){
+          const j = await r.json();
+          const arr = Array.isArray(j)?j:(j?.items||[]);
+          if (Array.isArray(arr) && arr.length){
+            const skus = new Set(arr.map(x=> String(x.sku||'').toLowerCase()).filter(Boolean));
+            return skus;
+          }
+        }
+      }catch(_){}
+    }
+    return new Set();
+  }
+
+  async function sizeAndDim(path){
+    try{
+      const res = await fetch(ghRaw(path),{cache:'no-store'});
+      if (!res.ok) return {size:0,w:0,h:0};
+      const blob = await res.blob();
+      const size = blob.size||0;
+      // dimensions (only try for images)
+      const w = await new Promise(resolve=>{
+        try{
+          const img = new Image();
+          img.onload=()=> resolve(img.naturalWidth||0);
+          img.onerror=()=> resolve(0);
+          img.src = URL.createObjectURL(blob);
+        }catch(_){ resolve(0); }
+      });
+      const h = await new Promise(resolve=>{
+        try{
+          const img = new Image();
+          img.onload=()=> resolve(img.naturalHeight||0);
+          img.onerror=()=> resolve(0);
+          img.src = URL.createObjectURL(blob);
+        }catch(_){ resolve(0); }
+      });
+      return {size,w,h};
+    }catch(_){ return {size:0,w:0,h:0}; }
+  }
+
+  function classify(path, blobSha, usedSkus){
+    // group by folder
+    const p = path.replace(/^\/+/,'');
+    if (!p.startsWith(st.scanPath.replace(/^\/+/,'')+'/')) return null;
+    const rel = p.slice(st.scanPath.length+1);
+    const folder = rel.split('/')[0]||'';
+    const okSet = new Set(['products','categories','og','brand','favicon']);
+    const group = okSet.has(folder)?folder:'other';
+
+    const name = fileName(p);
+    const base = baseName(p);
+    const ext  = extName(p);
+
+    const flags = [];
+    const notes = [];
+
+    // extension rules
+    if (group==='products' || group==='categories' || group==='og'){
+      if (!isWebp(p)) flags.push('ext:not-webp');
+    } else if (group==='brand'){
+      if (!(isSvg(p) || isWebp(p))) flags.push('ext:brand-should-svg-or-webp');
+    } else if (group==='favicon'){
+      if (!(isIco(p)||isPng(p)||isSvg(p))) flags.push('ext:favicon-ico-png-svg');
+    }
+
+    // naming
+    if (group==='products'){
+      if (!slugOk(base)) flags.push('name:not-slug');
+      // orphan check
+      if (usedSkus.size && !usedSkus.has(base)) flags.push('orphan:sku-not-in-data');
+    }
+
+    return { path:p, rel, folder:group, name, base, ext, flags, notes, sha:blobSha, size:0,w:0,h:0 };
+  }
+
+  function renderList(items){
+    const showAll = $('#f-all').checked;
+    const showErr = $('#f-err').checked;
+    const showWarn= $('#f-warn').checked;
+    const showOk  = $('#f-ok').checked;
+
+    const host = $('#list');
+    host.innerHTML = items.map((it,idx)=>{
+      const level = it.flags.some(f=>f.startsWith('orphan')||f.startsWith('ext:')||f.startsWith('name:')) ? (it.flags.some(f=>f.startsWith('orphan'))?'err':'warn') : 'ok';
+      const vis = (showAll) ||
+                  (level==='err' && showErr) ||
+                  (level==='warn' && showWarn) ||
+                  (level==='ok' && showOk);
+      const cls = vis ? '' : 'hidden';
+      const tFlags = it.flags.map(f=>{
+        const c = f.startsWith('orphan')?'err':(f.startsWith('ext:')||f.startsWith('name:')?'warn':'ok');
+        return `<span class="tag ${c}">${esc(f)}</span>`;
+      }).join('');
+      const dim = (it.w && it.h) ? `${it.w}×${it.h}px` : '';
+      return `<div class="item ${cls}" data-i="${idx}" data-level="${level}">
+        <header>
+          <input type="checkbox" class="pick">
+          <code class="mono">${esc(it.rel)}</code>
+          <span class="right small muted">${esc(human(it.size))} ${dim?('· '+dim):''}</span>
+        </header>
+        <a class="thumb" href="${esc(ghRaw(it.path))}" target="_blank" rel="noopener">
+          <img alt="${esc(it.name)}" src="${esc(ghRaw(it.path))}">
+        </a>
+        <div class="meta small">
+          <div>sha: <span class="mono">${it.sha.slice(0,10)}…</span></div>
+          <div>flags: ${tFlags || '<span class="ok">OK</span>'}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // bind picks
+    host.querySelectorAll('.item .pick').forEach(cb=>{
+      cb.addEventListener('change', ()=> updateSelected());
+    });
+    updateSelected();
+  }
+
+  function updateSelected(){
+    const host = $('#list');
+    const picks = [...host.querySelectorAll('.item')].filter(x=> x.querySelector('.pick')?.checked);
+    $('#k-sel').textContent = picks.length.toString();
+  }
+
+  // selection utilities
+  $('#selNone').addEventListener('click', ()=>{
+    document.querySelectorAll('.item .pick').forEach(cb=> cb.checked=false);
+    updateSelected();
+  });
+  $('#selErr').addEventListener('click', ()=>{
+    document.querySelectorAll('.item').forEach(div=>{
+      const cb = div.querySelector('.pick'); if(!cb) return;
+      cb.checked = (div.getAttribute('data-level')==='err');
+    });
+    updateSelected();
+  });
+  $('#selWarn').addEventListener('click', ()=>{
+    document.querySelectorAll('.item').forEach(div=>{
+      const cb = div.querySelector('.pick'); if(!cb) return;
+      cb.checked = (div.getAttribute('data-level')!=='ok');
+    });
+    updateSelected();
+  });
+
+  // filters
+  ['#f-all','#f-err','#f-warn','#f-ok'].forEach(id=>{
+    $(id).addEventListener('change', ()=> renderList(st.rows));
+  });
+
+  // ---- delete selected
+  async function ghDeleteFile(path, sha, message){
+    const url = ghApi(`/repos/${st.owner}/${st.repo}/contents/${encodeURIComponent(path.replace(/^\/+/,''))}`);
+    const body = { message, sha, branch: st.branch, committer:{ name:"MXD-Bot", email:"ops@mxd.local" } };
+    const res = await gh(url,{ method:'DELETE', body: JSON.stringify(body), headers:{'Content-Type':'application/json'} });
+    return res;
+  }
+
+  $('#deleteSel').addEventListener('click', async ()=>{
+    saveInputs();
+    if (!st.token){ alert('Cần token GitHub (scope public_repo hoặc repo).'); return; }
+    const picks = [...document.querySelectorAll('.item')].filter(x=> x.querySelector('.pick')?.checked);
+    if (!picks.length){ alert('Chưa chọn ảnh nào.'); return; }
+    const yes = confirm(`Xoá ${picks.length} ảnh? Hành động này sẽ commit lên nhánh ${st.branch}.`);
+    if (!yes) return;
+
+    let ok=0, fail=0;
+    for (const div of picks){
+      const i = Number(div.getAttribute('data-i'));
+      const it = st.rows[i];
+      try{
+        const msg = `chore(images): delete ${it.rel} (orphan/invalid — via tools/image-audit)`;
+        const r = await ghDeleteFile(it.path, it.sha, msg);
+        if (r.ok){ ok++; div.remove(); }
+        else { fail++; }
+        await delay(200); // tránh rate limit
+      }catch(_){ fail++; }
+    }
+    alert(`Xong: xoá OK ${ok}, lỗi ${fail}.`);
+  });
+
+  // ---- main scan
+  $('#run').addEventListener('click', async ()=>{
+    saveInputs();
+    $('#list').innerHTML = '<div class="muted">Đang quét cây Git…</div>';
+    try{
+      // 1) lấy SKUs đang dùng
+      st.usedSkus = await loadAffProducts();
+
+      // 2) load git tree
+      const blobs = await ghTreeRecursive();
+      // lọc theo path
+      const imgs = blobs.filter(b=> b.path.startsWith(st.scanPath.replace(/^\/+/,'')+'/'));
+
+      // 3) build rows (classify)
+      const rows = [];
+      const shaCount = new Map();
+      for (const b of imgs){
+        const c = classify('/'+b.path, b.sha, st.usedSkus);
+        if (!c) continue;
+        rows.push(c);
+        shaCount.set(b.sha, (shaCount.get(b.sha)||0)+1);
+      }
+
+      // 4) bổ sung size + dimensions (chỉ cho ảnh Web, bỏ favicon ico)
+      for (let i=0;i<rows.length;i++){
+        const it = rows[i];
+        if (!/\.ico$/i.test(it.path)){
+          const meta = await sizeAndDim(it.path);
+          it.size = meta.size; it.w = meta.w; it.h = meta.h;
+          if (it.size>600*1024) it.flags.push('size:>600KB');
+          if (it.w>1600 || it.h>1600) it.flags.push('dim:>1600px');
+        }
+      }
+
+      // 5) đánh dấu duplicate theo blob sha
+      for (const it of rows){
+        const n = shaCount.get(it.sha)||0;
+        if (n>1) it.flags.push(`dup:sha×${n}`);
+      }
+
+      // 6) KPI + render
+      st.rows = rows;
+      const cnt = { total:rows.length, ok:0, warn:0, err:0 };
+      for (const r of rows){
+        const level = r.flags.some(f=>f.startsWith('orphan')||f.startsWith('ext:')||f.startsWith('name:')) ? (r.flags.some(f=>f.startsWith('orphan'))?'err':'warn') : 'ok';
+        cnt[level]++; 
+      }
+      $('#k-total').textContent = cnt.total;
+      $('#k-ok').textContent = cnt.ok;
+      $('#k-warn').textContent = cnt.warn;
+      $('#k-err').textContent = cnt.err;
+
+      renderList(rows);
+    }catch(e){
+      $('#list').innerHTML = `<div class="err">Scan lỗi: ${esc(e.message||e)}</div>`;
+    }
+  });
+
+  // auto-run first time
+  // (để tránh gọi API khi chưa nhập token, vẫn có thể xem OK nhờ rate limit 60/h)
+})();
+</script>
+</body>
+</html>
