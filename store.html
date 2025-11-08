@@ -193,14 +193,30 @@
 
   <!-- Render (ưu tiên renderer MXD, có fallback an toàn) -->
   <script>
+    // === HOOK HẬU-RENDER: đổi nhãn CTA theo sàn + chạy affiliate rewriter ===
+    function runPostRenderHook(){
+      try { labelCTA(document); } catch(_){}
+      try {
+        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
+          window.mxdAffiliate.scan();
+        }
+      } catch(_){}
+    }
+
     window.addEventListener('DOMContentLoaded', async () => {
       const qs = new URLSearchParams(location.search);
       const lim = qs.has('limit') ? Number(qs.get('limit')) : undefined;
       const limit = Number.isFinite(lim) ? lim : undefined;
 
       if (window.MXD?.renderProducts) {
-        try { MXD.renderProducts('#product-list', limit); }
-        catch(e){ console.warn('[MXD] renderProducts error, using fallback', e); await fallbackRender(limit); }
+        try {
+          MXD.renderProducts('#product-list', limit);
+          // Bảo đảm nút “Mua Shopee/Lazada/…” và isclix luôn hoạt động khi dùng renderer ngoài
+          setTimeout(runPostRenderHook, 0);
+        } catch(e){
+          console.warn('[MXD] renderProducts error, using fallback', e);
+          await fallbackRender(limit);
+        }
       } else {
         await fallbackRender(limit);
       }
