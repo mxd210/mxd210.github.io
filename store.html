@@ -107,7 +107,49 @@
   <script defer src="/assets/mxd-affiliate.js?v=2025-11-08-s1"></script>
   <script defer src="/assets/js/render-products.js?v=2025-11-08-s1"></script>
   <script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
+<script>
+/* MXD store-enhancer: map SKU -> merchant/origin từ affiliates.json, rồi gọi MXD_AFF_SCAN */
+(async () => {
+  try {
+    const res = await fetch('/affiliates.json', { cache: 'no-store' });
+    const json = await res.json();
+    const items = Array.isArray(json) ? json : (json.items || json.products || []);
+    const bySku = {};
+    items.forEach(it => {
+      const sku = (it.sku || it.id || it.handle || '').toString().trim();
+      if (!sku) return;
+      bySku[sku] = it;
+    });
 
+    document.querySelectorAll('.product-card,[data-sku]').forEach(card => {
+      const sku = (card.dataset.sku || '').trim();
+      const it = bySku[sku];
+      if (!it) return;
+
+      const merchant = (it.merchant || it.source || it.store || '').toLowerCase();
+      const origin   = it.origin_url || it.url || it.link || it.product_url || '';
+
+      if (!merchant || !origin) return;
+
+      // gắn vào card để affiliate engine đọc
+      card.dataset.merchant = merchant;
+      card.dataset.origin   = origin;
+
+      // nếu nút mua chưa có data-*, set luôn
+      const btn = card.querySelector('a.buy, a.buy-btn');
+      if (btn) {
+        btn.dataset.merchant = merchant;
+        btn.dataset.origin   = origin;
+      }
+    });
+
+    // gọi lại engine để gắn isclix cho nút mua trong lưới
+    if (window.MXD_AFF_SCAN) window.MXD_AFF_SCAN();
+  } catch (e) {
+    console.warn('MXD store-enhancer error:', e);
+  }
+})();
+</script>
   <!-- JSON-LD placeholder: sẽ được tiêm động từ affiliates.json -->
   <!-- MXD-ANCHOR: LD-ITEMLIST -->
   <script type="application/ld+json" id="ld-itemlist">{}</script>
