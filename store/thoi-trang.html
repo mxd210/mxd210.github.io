@@ -18,26 +18,21 @@
 
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- Safety CSS -->
+  <!-- Safety CSS: đảm bảo lưới luôn hiện kể cả khi có rule che từ site.css -->
   <style>
     .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
     .product-deals .product-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-    .product-card{position:relative;border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:12px;background:#fff}
+    .product-card{border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:12px;background:#fff}
     .product-card .thumb img{width:100%;height:auto;display:block;border-radius:10px}
     .product-card .name{font-size:15px;line-height:1.35;margin:8px 0}
     .product-card .price{font-weight:600}
     .product-card .actions .buy-btn{display:inline-block;padding:8px 12px;border-radius:10px;background:var(--brand,#111);color:#fff;text-decoration:none}
     .muted{color:var(--muted,#6b7280)}
-    /* Deal extras */
-    .price-old{ text-decoration:line-through;color:var(--muted,#6b7280);font-size:13px;margin-top:2px }
-    .off-badge{position:absolute;top:8px;left:8px;border-radius:8px;padding:2px 6px;font-size:12px;background:#f43f5e;color:#fff;font-weight:700}
   </style>
 
   <!-- GA4 TRƯỚC affiliate -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
-<script>window.MXD_PRICE_API="https://mxd6686.workers.dev"</script>
-<script defer src="/assets/live-price.js"></script>
 </head>
 <body>
   <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Thời trang</nav>
@@ -64,7 +59,9 @@
            class="product-grid"
            data-category="thoi-trang"
            data-alias="thoi-trang,thoi-trang-nam,thoi-trang-nu,tre-em,thoi-trang-thu-dong">
+    <!-- Renderer sẽ đổ thẻ .product-card vào đây -->
   </section>
+  <!-- /MXD-ANCHOR -->
 
   <section id="deals" class="product-deals">
     <h2>Deal hôm nay</h2>
@@ -119,17 +116,16 @@
 
   <!-- Subnav active -->
   <script>
-  (function(){
+  (function mxdSubnavActive(){
     try{
       const here = new URL(location.href);
-      const els = document.querySelectorAll('.filter-row a.btn');
-      for (const a of els){
+      document.querySelectorAll('.filter-row a.btn').forEach(a=>{
         try{
           const u = new URL(a.getAttribute('href'), location.origin);
           if (u.pathname === here.pathname){ a.classList.add('is-active'); a.setAttribute('aria-current','page'); }
           else { a.classList.remove('is-active'); a.removeAttribute('aria-current'); }
         }catch(_){}
-      }
+      });
     }catch(_){}
   })();
   </script>
@@ -141,21 +137,15 @@
 
   <!-- Renderer -->
   <script>
-  (function(){
+  (async function renderMXD(){
     const grid = document.getElementById('product-grid');
     const dealsEl = document.getElementById('deals-grid');
-
-    function fmt(n){return (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';}
-    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-    const norm = v => String(v||'').toLowerCase().trim();
-    const stripAccents = s => norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
-    const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
-    const toSlug = v => stripAccents(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
 
     const cat = (grid.getAttribute('data-category')||'').trim().toLowerCase();
     const aliases = (grid.getAttribute('data-alias')||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
     const ALIASES = new Set([cat, ...aliases]);
 
+    // Mở rộng đường dẫn nguồn để tăng cơ hội có dữ liệu
     const sources = [
       '/affiliates.json','/products.json',
       '/assets/affiliates.json','/assets/data/affiliates.json','/assets/data/products.json',
@@ -175,6 +165,17 @@
       return null;
     }
 
+    const data = await loadFirst(sources);
+    if (!Array.isArray(data)){
+      grid.innerHTML = `<p class="muted">Không tải được dữ liệu sản phẩm (đã thử ${sources.join(' → ')}).</p>`;
+      return;
+    }
+
+    const norm = v => String(v||'').toLowerCase().trim();
+    const stripAccents = s => norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
+    const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
+    const toSlug = v => stripAccents(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+
     function labelsOf(p){
       const labels = [];
       labels.push(...split(p.cat||p.category||p.section||''));
@@ -187,6 +188,7 @@
     }
 
     const isLive = p => p && p.status !== false && p.status !== 'archived';
+
     function inCat(p){
       const labels = labelsOf(p);
       if (!labels.length) return false;
@@ -195,14 +197,18 @@
       return false;
     }
 
-    function imgOf(p){
-      const cand = (p.image || p.image_url || p.img || (Array.isArray(p.images)? p.images[0] : null));
-      if (cand) return String(cand);
-      const sku = (p.sku||'').toLowerCase();
-      return sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp';
-    }
+    let items = data.filter(p => isLive(p) && inCat(p));
 
-    function hrefOf(p){ return p.deeplink || p.origin_url || p.origin || p.url || '#'; }
+    // Fallback: nếu lọc ra 0, hiển thị 12 sản phẩm đầu để tránh "trắng trang"
+    if (!items.length) items = data.filter(isLive).slice(0,12);
+
+    const fmt   = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
+    const esc   = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    const href  = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
+    const imgOf = p => {
+      const sku = (p.sku||'').toLowerCase();
+      return p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp');
+    };
 
     function cardHTML(p){
       const sku   = (p.sku||'').toLowerCase();
@@ -210,7 +216,7 @@
       const img   = imgOf(p);
       const price = fmt(p.price);
       const merchant = (p.merchant||'').toLowerCase();
-      const link  = hrefOf(p);
+      const link  = href(p);
       return `
         <article class="product-card" data-sku="${esc(sku)}">
           <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
@@ -220,99 +226,39 @@
           <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
           ${price?`<div class="price">${price}</div>`:''}
           <div class="actions">
-            <a class="buy-btn" href="${esc(link)}" data-merchant="${esc(merchant)}"
+            <a class="buy buy-btn" href="${esc(link)}" data-merchant="${esc(merchant)}"
                target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
           </div>
         </article>`;
     }
 
-    function oldPriceOf(p){ return p.old_price ?? p.price_old ?? p.list_price ?? p.msrp ?? p.regular_price ?? null; }
-    function discountOf(p){
-      const pct = p.discount_percent ?? p.sale_percent ?? p.off_percent ?? null;
-      if (pct!=null && isFinite(+pct)) return Math.round(Math.abs(+pct));
-      const op = oldPriceOf(p);
-      if (op && p.price && +op > +p.price) return Math.round((1 - (+p.price/+op))*100);
-      return 0;
+    grid.innerHTML = items.map(cardHTML).join('');
+
+    // DEALS
+    if (dealsEl){
+      const isDeal = p => {
+        const t = Array.isArray(p.tags)? p.tags.map(norm) : [];
+        const flag = (p.deal===true) || t.includes('deal') || t.includes('flash-sale') || t.includes('sale') || t.includes('giam-gia') || t.includes('hot');
+        const oldPrice = p.old_price || p.price_old || p.list_price || p.msrp || p.regular_price;
+        return flag || (oldPrice && +oldPrice > +p.price);
+      };
+      const deals = items.filter(isDeal).slice(0,8);
+      const list = (deals.length ? deals : items.slice(0,8)).map(cardHTML).join('');
+      dealsEl.innerHTML = list;
     }
 
-    function dealCardHTML(p){
-      const sku = String(p.sku||'').toLowerCase();
-      const name = p.name || sku || 'Sản phẩm';
-      const img  = imgOf(p);
-      const link = hrefOf(p);
-      const merchant = String(p.merchant||'').toLowerCase();
-      const priceNow = fmt(p.price);
-      const priceOld = oldPriceOf(p);
-      const pct = discountOf(p);
-      return `
-        <article class="product-card" data-sku="${esc(sku)}">
-          ${pct?`<div class="off-badge">-${pct}%</div>`:''}
-          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
-            <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
-                 onerror="this.onerror=null;this.dataset.err=1;this.src='/assets/img/products/placeholder.webp'">
-          </a>
-          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
-          ${priceNow?`<div class="price">${priceNow}</div>`:''}
-          ${priceOld?`<div class="price-old">${fmt(priceOld)}</div>`:''}
-          <div class="actions">
-            <a class="buy-btn" href="${esc(link)}" data-merchant="${esc(merchant)}"
-               target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
-          </div>
-        </article>`;
-    }
+    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
 
-    async function run(){
-      const data = await loadFirst(sources);
-      if (!Array.isArray(data)){
-        grid.innerHTML = `<p class="muted">Không tải được dữ liệu sản phẩm (đã thử ${sources.join(' → ')}).</p>`;
-        return;
-      }
-
-      let items = data.filter(p => isLive(p) && inCat(p));
-      if (!items.length) items = data.filter(isLive).slice(0,12); // tránh trắng trang
-
-      grid.innerHTML = items.map(cardHTML).join('');
-
-      // DEALS — lọc + sắp xếp theo % giảm
-      if (dealsEl){
-        function isDeal(p){
-          const t = Array.isArray(p.tags)? p.tags.map(norm) : [];
-          const flag = (p.deal===true) || t.includes('deal') || t.includes('flash-sale') || t.includes('sale') || t.includes('giam-gia') || t.includes('hot');
-          const op = oldPriceOf(p);
-          return flag || (op && +op > +p.price) || (discountOf(p) > 0);
-        }
-        let deals = items.filter(isDeal);
-        deals.sort((a,b) => (discountOf(b)||0) - (discountOf(a)||0) || (+a.price||0) - (+b.price||0));
-        dealsEl.innerHTML = (deals.length?deals:items).slice(0,12).map(dealCardHTML).join('');
-      }
-
-      // Affiliate scan (không dùng optional chaining)
-      try{
-        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function'){
-          window.mxdAffiliate.scan();
-        }
-      }catch(_){}
-
-      // Analytics cho FAQ (không dùng optional chaining)
-      try{
-        var faq = document.querySelectorAll('.category-faq details');
-        for (var i=0;i<faq.length;i++){
-          faq[i].addEventListener('toggle', (function(d){
-            return function(){
-              if (d.open && window.gtag){
-                var s = d.querySelector('summary');
-                var q = s ? (s.textContent||'faq') : 'faq';
-                window.gtag('event','faq_open',{category:'fashion',label:q});
-              }
-            };
-          })(faq[i]));
-        }
-      }catch(_){}
-    }
-
-    run().catch(function(){
-      grid.innerHTML = '<p class="muted">Không thể hiển thị lưới do lỗi runtime.</p>';
-    });
+    try{
+      document.querySelectorAll('.category-faq details').forEach(d=>{
+        d.addEventListener('toggle', ()=>{
+          if (d.open && window.gtag){
+            const q = d.querySelector('summary')?.textContent?.trim() || 'faq';
+            gtag('event','faq_open',{category:'fashion',label:q});
+          }
+        });
+      });
+    }catch(_){}
   })();
   </script>
 
