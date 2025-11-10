@@ -32,6 +32,11 @@
   <!-- Styles (giữ nguyên layout cũ) -->
   <link rel="stylesheet" href="/assets/site.css"/>
 
+  <!-- Chống click 404 khi không có link hợp lệ -->
+  <style>
+    .disabled-buy{opacity:.6;pointer-events:none;cursor:not-allowed;background:#777 !important;border-color:#777 !important}
+  </style>
+
   <!-- GA4 trước Affiliate -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
@@ -98,6 +103,20 @@
     const qs = new URLSearchParams(location.search);
     const sku = (qs.get('sku')||'').trim().toLowerCase();
 
+    // === Helpers chống 404 cho CTA ===
+    const isHttp = (u) => /^https?:\/\//i.test(String(u||'').trim());
+    const normalizeOrigin = (u) => {
+      let s = String(u||'').trim();
+      if (!s) return '';
+      if (/^\/\//.test(s)) return 'https:' + s; // //shopee.vn/...
+      if (isHttp(s)) return s;
+      // domain trần / thiếu giao thức → thêm https://
+      if (/^[a-z0-9.-]+\.(vn|com|net|co)(\/|$)/i.test(s)) {
+        return 'https://' + s.replace(/^\/+/, '');
+      }
+      return ''; // relative path, '#', ... → coi như không hợp lệ
+    };
+
     const $ = sel => document.querySelector(sel);
     const el = {
       root: $('#product'),
@@ -118,6 +137,10 @@
       const top = items.filter(x=>x && x.sku && x.sku.toLowerCase()!==sku).slice(0,12);
       const html = top.map(p=>{
         const img = p.image || `/assets/img/products/${(p.sku||'').toLowerCase()}.webp`;
+        const rawOrigin = p.origin_url || p.origin || p.url || p.link || '';
+        const fixed = normalizeOrigin(rawOrigin);
+        const buy = fixed || (isHttp(p.deeplink) ? p.deeplink : '#');
+        const merch = String(p.merchant||'').toLowerCase();
         return `
         <article class="product-card" data-sku="${esc(p.sku||'')}">
           <a class="thumb" href="/g.html?sku=${encodeURIComponent(p.sku||'')}">
@@ -127,47 +150,44 @@
           <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(p.sku||'')}">${esc(p.name||p.sku||'Sản phẩm')}</a></h3>
           ${p.price!=null?`<div class="price">${fmt(p.price)}</div>`:''}
           <div class="actions">
-            <a class="buy" href="${esc(p.origin_url||p.url||'#')}" data-merchant="${esc((p.merchant||'').toLowerCase())}"
+            <a class="buy" href="${esc(buy)}" data-merchant="${esc(merch)}"
                target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
           </div>
         </article>`;
       }).join('');
       el.related.innerHTML = html;
-      // Dán nhãn CTA + chạy rewriter cho khối related (sau khi render)
-      try{ labelCTA(document); }catch(_){}
-      try{ if (window.mxdAffiliate && typeof window.mxdAffiliate.scan==='function'){ window.mxdAffiliate.scan(); } }catch(_){}
+      try{ if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan(); }catch(_){}
     }
 
+    // GỘP dữ liệu từ nhiều nguồn thay vì dừng ở file đầu tiên
     async function loadData(){
-      const sources = ['/assets/data/affiliates.json','/affiliates.json','/products.json'];
-      for (const u of sources){
+      const srcs = ['/assets/data/affiliates.json','/affiliates.json','/products.json'];
+      const all = [];
+      for (const u of srcs){
         try{
           const r = await fetch(u, { cache:'no-store' });
           if (!r.ok) continue;
           const j = await r.json();
           const arr = Array.isArray(j)? j : (j?.items || []);
-          if (Array.isArray(arr) && arr.length) return arr;
+          if (Array.isArray(arr) && arr.length) all.push(...arr);
         }catch(_){}
       }
-      return [];
+      return all;
     }
 
     function findItem(arr){
       const s = sku;
       if (!s) return null;
-      // match theo sku (ưu tiên), fallback theo name slug
       const strip = (v)=> String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
-      const bySku = arr.find(p => (p.sku||'').toLowerCase()===s);
-      if (bySku) return bySku;
-      const bySlug = arr.find(p => strip(p.name||'')===s);
-      return bySlug || null;
+      return arr.find(p => (p.sku||'').toLowerCase()===s) || arr.find(p => strip(p.name||'')===s) || null;
     }
 
     function fill(p){
       if (!p){ setText(el.name,'Sản phẩm không tìm thấy'); return; }
+      const name = p.name || p.sku || 'Sản phẩm';
       const img = p.image || `/assets/img/products/${(p.sku||'').toLowerCase()}.webp`;
-      el.img.src = img;
-      setText(el.name, p.name || p.sku || 'Sản phẩm');
+      el.img.src = img; el.img.alt = name;
+      setText(el.name, name);
       el.price.innerHTML = p.price!=null ? fmt(p.price) : '';
       const op = p.old_price ?? p.price_old ?? p.list_price ?? p.msrp ?? p.regular_price ?? null;
       el.old.innerHTML = (op && p.price && (+op>+p.price)) ? fmt(op) : '';
@@ -181,21 +201,33 @@
 
       // Thuộc tính cho context
       const merch = String(p.merchant||'').toLowerCase();
-      const origin = p.origin_url || p.origin || p.url || p.link || '#';
-      document.getElementById('product').setAttribute('data-sku', (p.sku||'').toLowerCase());
-      document.getElementById('product').setAttribute('data-merchant', merch);
-      document.getElementById('product').setAttribute('data-origin', origin);
-      document.getElementById('product').setAttribute('data-img', img);
+      const rawOrigin = p.origin_url || p.origin || p.url || p.link || '';
+      const fixedOrigin = normalizeOrigin(rawOrigin);
+      const buyUrl = fixedOrigin || (isHttp(p.deeplink) ? p.deeplink : '');
 
-      // Chuẩn hoá CTA hiển thị (href = origin_url, rewriter sẽ đổi thành isclix)
-      el.buy.setAttribute('href', origin);
-      el.buy.setAttribute('data-merchant', merch);
-      el.buy.setAttribute('target','_blank');
-      el.buy.setAttribute('rel','nofollow sponsored noopener');
+      const root = document.getElementById('product');
+      root.setAttribute('data-sku', (p.sku||'').toLowerCase());
+      root.setAttribute('data-merchant', merch);
+      root.setAttribute('data-origin', buyUrl || fixedOrigin || rawOrigin || '');
+      root.setAttribute('data-img', img);
 
-      // Dán nhãn + rewrite
-      try{ labelCTA(document); }catch(_){}
-      try{ if (window.mxdAffiliate && typeof window.mxdAffiliate.scan==='function'){ window.mxdAffiliate.scan(); } }catch(_){}
+      // CTA: luôn đặt http(s) hợp lệ; nếu không có → disable để tránh 404
+      if (buyUrl){
+        el.buy.classList.remove('disabled-buy');
+        el.buy.setAttribute('href', buyUrl);
+        el.buy.setAttribute('data-merchant', merch);
+        el.buy.setAttribute('target','_blank');
+        el.buy.setAttribute('rel','nofollow sponsored noopener');
+        el.buy.textContent = ({shopee:'Mua Shopee',lazada:'Mua Lazada',tiki:'Mua Tiki',tiktok:'Mua TikTok'}[merch] || 'Mua ngay');
+      } else {
+        el.buy.setAttribute('href', '#');
+        el.buy.removeAttribute('target');
+        el.buy.removeAttribute('rel');
+        el.buy.classList.add('disabled-buy');
+        el.buy.textContent = 'Liên kết hỏng';
+      }
+
+      try{ if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan(); }catch(_){}
     }
 
     (async function run(){
@@ -206,19 +238,16 @@
     })();
   })();
   </script>
-  <!-- Khối dưới đây là phần BỔ SUNG an toàn: đảm bảo có meta-link ẩn và hook hậu-render -->
-  <!-- MXD-POST-RENDER HOOK + META-LINK ENFORCER (safe, no-layout-change) -->
+
+  <!-- MXD-POST-RENDER HOOK + META-LINK ENFORCER (giữ nguyên, bổ trợ rewriter) -->
   <script>
   (function(){
-    // Utilities
     function norm(v){ return String(v||'').trim(); }
     function isHttp(u){ return /^https?:\/\//i.test(u||''); }
 
-    // Thử nhận diện ngữ cảnh sản phẩm từ các nguồn hiện có trên trang
     function detectContext(){
       var sku='', merchant='', origin='', price=null, img='';
 
-      // 1) Từ phần tử có data-*
       var root = document.querySelector('[data-sku]') || document.body;
       if (root){
         sku = norm(root.getAttribute('data-sku')||'');
@@ -227,7 +256,6 @@
         img = norm(root.getAttribute('data-img')||'');
       }
 
-      // 2) Từ anchor meta có sẵn (nếu có)
       var meta = document.querySelector('.product-meta');
       if (meta){
         if (!origin) origin = norm(meta.getAttribute('href')||'');
@@ -237,7 +265,6 @@
         if (meta.hasAttribute('data-price')) price = meta.getAttribute('data-price');
       }
 
-      // 3) Từ JSON nhúng (nếu trang có ld-product)
       try{
         var ld = document.getElementById('ld-product');
         if (ld){
@@ -250,7 +277,6 @@
         }
       }catch(_){}
 
-      // 4) Fallback từ chính CTA đang hiển thị
       var cta = document.querySelector('.buy, .buy-btn, a[data-role="buy"]');
       if (cta){
         var href = norm(cta.getAttribute('href')||'');
@@ -261,7 +287,6 @@
       return { sku, merchant: merchant.toLowerCase(), origin_url: origin, price, img };
     }
 
-    // Bảo đảm có <a class="product-meta"> ẩn để rewriter đọc dữ liệu
     function ensureMetaLink(ctx){
       var holder = document.querySelector('.product-meta');
       if (!holder){
@@ -280,7 +305,6 @@
       if (ctx.price!=null) holder.setAttribute('data-price', ctx.price);
     }
 
-    // Đổi nhãn CTA theo sàn
     function labelCTA(root){
       var LABELS = {shopee:'Mua Shopee', lazada:'Mua Lazada', tiki:'Mua Tiki', tiktok:'Mua TikTok'};
       root.querySelectorAll('a.buy, a.buy-btn, a[data-role="buy"]').forEach(function(a){
@@ -293,22 +317,16 @@
       var ctx = detectContext();
       ensureMetaLink(ctx);
 
-      // Chuẩn hoá CTA hiển thị: để href = origin_url, rewriter sẽ convert sang isclix
       var cta = document.querySelector('.buy, .buy-btn, a[data-role="buy"]');
-      if (cta){
-        if (isHttp(ctx.origin_url)) cta.setAttribute('href', ctx.origin_url);
+      if (cta && isHttp(ctx.origin_url)){
+        cta.setAttribute('href', ctx.origin_url);
         if (ctx.merchant) cta.setAttribute('data-merchant', ctx.merchant);
         if (!cta.hasAttribute('rel')) cta.setAttribute('rel','nofollow sponsored noopener');
         if (!cta.hasAttribute('target')) cta.setAttribute('target','_blank');
       }
 
-      // Đổi nhãn + chạy rewriter
       try{ labelCTA(document); }catch(_){}
-      try{
-        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function'){
-          window.mxdAffiliate.scan();
-        }
-      }catch(_){}
+      try{ if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan(); }catch(_){}
     }
 
     if (document.readyState === 'loading'){
@@ -318,6 +336,7 @@
     }
   })();
   </script>
+
   <!-- (tuỳ chọn) SW -->
   <script>
     if ('serviceWorker' in navigator) {
@@ -327,6 +346,8 @@
 
   <!-- Anchor meta ẩn (nếu trang đã có sẵn thì script sẽ tái sử dụng) -->
   <a class="product-meta" href="#" data-merchant="" data-sku="" data-img="" style="position:absolute;left:-9999px;width:1px;height:1px"></a>
-<script defer src="/assets/mxd-buy.js?v=1"></script>
+
+  <!-- Giữ nguyên nếu bạn cần; nếu nghi ngờ nó can thiệp điều hướng nội bộ, có thể tạm comment dòng dưới để test -->
+  <script defer src="/assets/mxd-buy.js?v=1"></script>
 </body>
 </html>
