@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MXD Affiliates List",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "sku", "slug", "title",
+      "merchant", "origin_url",
+      "price", "image", "category"
+    ],
+    "properties": {
+      "sku":        { "type": "string", "minLength": 2, "maxLength": 64 },
+      "slug":       { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+      "title":      { "type": "string", "minLength": 4 },
+      "merchant":   { "type": "string", "enum": ["shopee", "lazada", "tiktok", "tiki"] },
+      "origin_url": { "type": "string", "format": "uri" },
+      "price":      { "type": "number", "minimum": 0 },
+      "price_old":  { "type": ["number", "null"], "minimum": 0 },
+      "image":      { "type": "string", "pattern": "^/assets/.+\\.(webp|jpg|jpeg|png)$" },
+      "category":   { "type": "string", "minLength": 2 },
+      "tags":       { "type": "array", "items": { "type": "string" } },
+      "badge":      { "type": "string" },
+      "rating":     { "type": "number", "minimum": 0, "maximum": 5 },
+      "reviews":    { "type": "integer", "minimum": 0 },
+      "pdp":        { "type": "string" }  // ex: "/p/<slug>-<sku>.html"
+    }
+  }
+}
