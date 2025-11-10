@@ -47,7 +47,6 @@
     /* QUICK-NAV (chặn chấm đầu dòng tuyệt đối) */
     .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:12px 0; list-style:none; padding-left:0}
     .quick-nav li{list-style:none;margin:0;padding:0}
-    .quick-nav li::marker{content:''}
     .qnav-item{
       display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);
       border-radius:12px;background:var(--card);box-shadow:var(--shadow);color:var(--text);
@@ -104,52 +103,19 @@
 
   <!-- GA4 trước Affiliate -->
   <script defer src="/assets/analytics.js?v=2025-11-08-s1"></script>
-  <script defer src="/assets/mxd-affiliate.js?v=2025-11-08-s1"></script>
+
+  <!-- Affiliate engine (bắt buộc trước renderer & buy handlers) -->
+  <script defer src="/assets/mxd-affiliates.js?v=2025-11-08-s1"></script>
+
+  <!-- Renderer + helpers -->
   <script defer src="/assets/js/render-products.js?v=2025-11-08-s1"></script>
   <script defer src="/assets/js/floating-contact.js?v=2025-09-26-1"></script>
-<script>
-/* MXD store-enhancer: map SKU -> merchant/origin từ affiliates.json, rồi gọi MXD_AFF_SCAN */
-(async () => {
-  try {
-    const res = await fetch('/affiliates.json', { cache: 'no-store' });
-    const json = await res.json();
-    const items = Array.isArray(json) ? json : (json.items || json.products || []);
-    const bySku = {};
-    items.forEach(it => {
-      const sku = (it.sku || it.id || it.handle || '').toString().trim();
-      if (!sku) return;
-      bySku[sku] = it;
-    });
 
-    document.querySelectorAll('.product-card,[data-sku]').forEach(card => {
-      const sku = (card.dataset.sku || '').trim();
-      const it = bySku[sku];
-      if (!it) return;
+  <!-- MXD-CHECK markers -->
+  <!-- MXD-CHECK:GA4-BEFORE-AFFILIATE -->
+  <!-- MXD-CHECK:CANONICAL-ABSOLUTE -->
+  <!-- MXD-CHECK:OG-COMPLETE -->
 
-      const merchant = (it.merchant || it.source || it.store || '').toLowerCase();
-      const origin   = it.origin_url || it.url || it.link || it.product_url || '';
-
-      if (!merchant || !origin) return;
-
-      // gắn vào card để affiliate engine đọc
-      card.dataset.merchant = merchant;
-      card.dataset.origin   = origin;
-
-      // nếu nút mua chưa có data-*, set luôn
-      const btn = card.querySelector('a.buy, a.buy-btn');
-      if (btn) {
-        btn.dataset.merchant = merchant;
-        btn.dataset.origin   = origin;
-      }
-    });
-
-    // gọi lại engine để gắn isclix cho nút mua trong lưới
-    if (window.MXD_AFF_SCAN) window.MXD_AFF_SCAN();
-  } catch (e) {
-    console.warn('MXD store-enhancer error:', e);
-  }
-})();
-</script>
   <!-- JSON-LD placeholder: sẽ được tiêm động từ affiliates.json -->
   <!-- MXD-ANCHOR: LD-ITEMLIST -->
   <script type="application/ld+json" id="ld-itemlist">{}</script>
@@ -233,6 +199,50 @@
     </div>
   </footer>
 
+  <!-- store-enhancer: map SKU -> merchant/origin từ assets/data/affiliates.json, rồi gọi affiliate.scan -->
+  <script>
+  (async () => {
+    try {
+      const res = await fetch('/assets/data/affiliates.json', { cache: 'no-store' });
+      const json = await res.json();
+      const items = Array.isArray(json) ? json : (json.items || json.products || []);
+      const bySku = {};
+      items.forEach(it => {
+        const sku = (it.sku || it.id || it.handle || '').toString().trim().toLowerCase();
+        if (!sku) return;
+        bySku[sku] = it;
+      });
+
+      document.querySelectorAll('.product-card,[data-sku]').forEach(card => {
+        const sku = (card.dataset.sku || '').trim().toLowerCase();
+        const it = bySku[sku];
+        if (!it) return;
+
+        const merchant = (it.merchant || it.source || it.store || '').toLowerCase();
+        const origin   = it.origin_url || it.url || it.link || it.product_url || '';
+
+        if (!merchant || !origin) return;
+
+        // gắn vào card để affiliate engine đọc
+        card.dataset.merchant = merchant;
+        card.dataset.origin   = origin;
+
+        // nếu nút mua chưa có data-*, set luôn
+        const btn = card.querySelector('a.buy, a.buy-btn');
+        if (btn) {
+          btn.dataset.merchant = merchant;
+          btn.dataset.origin   = origin;
+        }
+      });
+
+      // gọi lại engine để gắn isclix cho nút mua trong lưới
+      if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') window.mxdAffiliate.scan();
+    } catch (e) {
+      console.warn('MXD store-enhancer error:', e);
+    }
+  })();
+  </script>
+
   <!-- Render (ưu tiên renderer MXD, có fallback an toàn) -->
   <script>
     // === HOOK HẬU-RENDER: đổi nhãn CTA theo sàn + chạy affiliate rewriter ===
@@ -299,30 +309,37 @@
 
       wrap.innerHTML = arr.slice(0, LIMIT).map(p=>{
         const sku = (p.sku||'').toLowerCase();
-        const name = p.name || sku || 'Sản phẩm';
+        const name = p.title || p.name || sku || 'Sản phẩm';
         const origin = p.origin_url || p.origin || p.url || p.link || '#';
         const merchant = (p.merchant||'').toLowerCase();
         const priceAttr = (p.price!=null && p.price!=='') ? `data-price="${p.price}"` : '';
         const priceHtml = (p.price!=null && p.price!=='') ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>` : '';
+
+        // ưu tiên pdp nếu có, nếu không sinh ra đường dẫn PDP hợp lý hoặc fallback g.html
+        const pdpHref = p.pdp
+          ? p.pdp
+          : (p.slug ? `/p/${p.slug}-${sku}.html` : `/g.html?sku=${encodeURIComponent(sku)}`);
+
         return `
           <article class="card" data-sku="${esc(sku)}">
             <!-- meta link cho Affiliate rewriter -->
             <a class="product-meta sr-only"
                href="${esc(origin)}" data-merchant="${esc(merchant)}"
-               data-sku="${esc(sku)}" data-img="/assets/img/products/${esc(sku)}.webp"
+               data-sku="${esc(sku)}" data-img="${esc(p.image||('/assets/img/products/' + esc(sku) + '.webp'))}"
                ${priceAttr}>${esc(name)}</a>
 
-            <a href="/g.html?sku=${encodeURIComponent(sku)}" aria-label="Xem chi tiết ${esc(name)}">
+            <a href="${pdpHref}" aria-label="Xem chi tiết ${esc(name)}">
               <img loading="lazy" decoding="async"
-                   src="/assets/img/products/${esc(sku)}.webp"
+                   src="${esc(p.image || ('/assets/img/products/' + sku + '.webp'))}"
                    alt="${esc(name)}"
                    onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
             </a>
             <div class="body">
-              <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
+              <h3 class="name"><a href="${pdpHref}">${esc(name)}</a></h3>
               ${priceHtml}
               <div class="actions">
                 <a class="buy" href="${esc(origin)}" data-merchant="${esc(merchant)}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+                ${p.pdp ? `<a class="btn ghost" href="${pdpHref}">Chi tiết</a>` : ''}
               </div>
             </div>
           </article>`;
@@ -365,10 +382,10 @@
           "itemListElement": top.map((p,i)=>({
             "@type":"ListItem",
             "position": i+1,
-            "url": `${location.origin}/g.html?sku=${encodeURIComponent(p.sku||'')}`,
+            "url": `${location.origin}${p.pdp ? p.pdp : (`/p/${(p.slug||p.sku||'').toString()}-${(p.sku||'')}.html`)}`,
             "item":{
               "@type":"Product",
-              "name": p.name || p.sku || "Sản phẩm",
+              "name": p.title || p.name || p.sku || "Sản phẩm",
               "sku": p.sku || undefined,
               "image": p.image ? makeAbs(p.image) : makeAbs(`/assets/img/products/${(p.sku||'').toLowerCase()}.webp`),
               "brand": p.brand ? {"@type":"Brand","name": p.brand} : undefined,
@@ -376,7 +393,7 @@
               "offers": (p.price ? {
                 "@type":"Offer","priceCurrency":"VND","price": String(p.price),
                 "availability":"https://schema.org/InStock",
-                "url": `${location.origin}/g.html?sku=${encodeURIComponent(p.sku||'')}`
+                "url": `${location.origin}${p.pdp ? p.pdp : (`/p/${(p.slug||p.sku||'').toString()}-${(p.sku||'')}.html`)}`
               } : undefined)
             }
           }))
@@ -415,15 +432,17 @@
     })();
   </script>
 
-  <!-- SW -->
+  <!-- Buy handler: must be loaded after mxd-affiliates and renderer -->
+  <script defer src="/assets/mxd-buy.js?v=2025-11-08-s1"></script>
+
+  <!-- SW: register after buy handler so click handlers are ready -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js?v=2025-11-08-s1');
+      navigator.serviceWorker.register('/sw.js?v=2025-11-08-s1').catch(()=>{/* swallow */});
     }
   </script>
 
   <!-- MTE tracking mount -->
   <!-- MTE:TRACKING -->
-  <script defer src="/assets/mxd-buy.js?v=1"></script>
 </body>
 </html>
