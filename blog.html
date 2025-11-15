@@ -23,29 +23,13 @@
   <!-- Styles -->
   <link rel="stylesheet" href="/assets/site.css" />
 
-
-
-
-
-<!-- MXD-CHECK v2025-10-06 [type: store] [file:/store/chong-tham.html]
-- Canonical tuyệt đối = https://mxd210.github.io/store.html
-- robots=index,follow
-- GA4 TRƯỚC affiliate (defer; 1 lần)
-- Lưới tile danh mục (.category-grid): chỉ liên kết tới /store/<slug>.html (KHÔNG nhồi mục con ở trang này)
-- Icon danh mục: /assets/img/categories/<slug>.webp ; alt="<Tên danh mục> — MXD"
-- OG: đầy đủ; ảnh ≥1200×630 .webp
--->
-
-
-<!-- MXD-CHECK v2025-10-06 [type: store] [file:/store/chong-tham.html]
-- Canonical tuyệt đối = https://mxd210.github.io/store.html
-- robots=index,follow
-- GA4 TRƯỚC affiliate (defer; 1 lần)
-- Lưới tile danh mục (.category-grid): chỉ liên kết tới /store/<slug>.html (KHÔNG nhồi mục con ở trang này)
-- Icon danh mục: /assets/img/categories/<slug>.webp ; alt="<Tên danh mục> — MXD"
-- OG: đầy đủ; ảnh ≥1200×630 .webp
--->
-
+  <!-- MXD-CHECK v2025-10-06 [type: blog] [file:/blog.html]
+  - Canonical tuyệt đối = https://mxd210.github.io/blog.html
+  - robots=index,follow
+  - GA4 TRƯỚC affiliate (defer; 1 lần)
+  - Trang danh sách: chỉ index các bài con trong /blog/
+  - OG: đầy đủ; có thể dùng ảnh mặc định cho blog
+  -->
 </head>
 <body>
 <header class="mxd-header">
@@ -68,7 +52,16 @@
         <span style="font-size:1.6rem">🧱</span>
         <span>Chia sẻ kinh nghiệm thi công & chọn sản phẩm</span>
       </h1>
-      <p class="lead">Các bài viết hữu ích dành cho thợ xây dựng, kỹ sư & người làm nhà.</p>
+      <p class="lead">
+        Các bài viết hữu ích dành cho thợ xây dựng, kỹ sư & người làm nhà –
+        đồng thời là “góc học viện” cho anh em muốn làm affiliate theo cách MXD.
+      </p>
+      <div class="hero-actions">
+        <!-- Liên hệ: dùng luôn trang Tư vấn hiện có -->
+        <a href="/tu-van.html" class="btn btn-outline">Liên hệ</a>
+        <!-- Đăng ký: kéo xuống box đăng ký ở cuối trang -->
+        <a href="#dang-ky-mxd" class="btn btn-primary">Đăng ký MXD-AFF</a>
+      </div>
     </section>
 
     <!-- Blog cards (auto from sitemap) -->
@@ -84,6 +77,17 @@
         </li>
       </ul>
     </section>
+
+    <!-- Box đăng ký – nơi sau này ta bổ sung chi tiết Zalo, form, v.v. -->
+    <section id="dang-ky-mxd" class="signup-box" aria-label="Đăng ký nhận hướng dẫn MXD-AFF">
+      <h2>Đăng ký nhận hướng dẫn MXD-AFF</h2>
+      <p>
+        Nếu cậu muốn mình hướng dẫn chi tiết hơn về cách dựng web, tạo link aff,
+        xử lý rơi đơn… cậu có thể đăng ký để mình hỗ trợ trực tiếp qua Zalo.
+      </p>
+      <a href="#" class="btn btn-primary">Đăng ký qua Zalo</a>
+      <!-- TODO: thay "#" bằng link Zalo hoặc trang đăng ký riêng khi đã có -->
+    </section>
   </div>
 </main>
 
@@ -94,7 +98,7 @@
 <script src="/assets/mxd-affiliate.js" defer></script>
 <script src="/js/floating-contact.js" defer></script>
 
-<!-- JSON-LD: CollectionPage (sửa cú pháp type) -->
+<!-- JSON-LD: CollectionPage -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -261,6 +265,17 @@
   .sk-thumb{width:100%;aspect-ratio:16/9;background:linear-gradient(90deg,#eee,#f6f6f6,#eee);animation:sk 1.2s infinite}
   .sk-line{height:14px;background:#eee;border-radius:6px;animation:sk 1.2s infinite}
   @keyframes sk{0%{background-position:0 0}100%{background-position:200% 0}}
+
+  /* Nút & box đăng ký cho blog */
+  .hero-actions{margin-top:12px;display:flex;flex-wrap:wrap;gap:10px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;border-radius:999px;font-size:.9rem;font-weight:500;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:background .18s ease,color .18s ease,border-color .18s ease,transform .12s ease}
+  .btn-primary{background:#111;color:#fff;border-color:#111}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .btn-outline{background:#fff;color:#111;border-color:#ddd}
+  .btn-outline:hover{border-color:#bbb;background:#f7f7f7}
+  .signup-box{margin-top:32px;padding:18px 16px;border-radius:16px;border:1px solid #e3e3e3;background:#fafafa}
+  .signup-box h2{margin:0 0 8px;font-size:1.15rem}
+  .signup-box p{margin:0 0 12px;color:#444;font-size:.95rem}
 </style>
 </body>
 </html>
