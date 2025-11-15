@@ -21,12 +21,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://mxd210.github.io/blog/phoi-do-thu-dong.html</loc>
-    <lastmod>2025-10-03</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://mxd210.github.io/blog/toi-uu-mua-sam-affiliate.html</loc>
     <lastmod>2025-10-03</lastmod>
     <changefreq>weekly</changefreq>
@@ -105,13 +99,6 @@
 <!-- INSERT -->
 <url>
   <loc>https://mxd210.github.io/blog/kinh-nghiem-chon-may-khoan-cat.html</loc>
-  <lastmod>2025-10-04</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>0.8</priority>
-</url>
-<!-- INSERT -->
-<url>
-  <loc>https://mxd210.github.io/blog/phoi-do-thu-dong.html</loc>
   <lastmod>2025-10-04</lastmod>
   <changefreq>weekly</changefreq>
   <priority>0.8</priority>
