@@ -1,7 +1,7 @@
 // /assets/mxd-affiliate.js
 (() => {
   const BASE = {
-    shopee: "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237/4751584435713464237?url=",
+    shopee: "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=",
     lazada: "https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=",
     tiktok: "https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url=",
     tiki:   "https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url="
