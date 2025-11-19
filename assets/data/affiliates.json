@@ -14,48 +14,6 @@
     "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2F%25C3%2581O-Kho%25C3%25A1c-Cadigan-%25C3%2581o-len-cadigan-si%25C3%25AAu-xinh-c%25E1%25BB%25B1c-hot-m%25E1%25BA%25ABu-m%25E1%25BB%259Bi-2025-%25C3%25A1o-kho%25C3%25A1c-len-bomber-cadigan-th%25C3%25B4m-si%25C3%25AAu-xinh-2025-i.562119848.27360944564%3FextraParams%3D%257B%2522display_model_id%2522%253A166719522362%252C%2522model_selection_logic%2522%253A3%257D%26xptdk%3Dae12187e-c220-4c2f-a6ad-24817302b794&sub1=sku&sub2=shopee&sub3=tool&sub4=mxd210"
   },
   {
-  "sku": "lazada-ao-khoac-gio-nam-chong-nuoc-nhe",
-  "name": "Áo khoác gió nam chống nước nhẹ",
-  "price": 199000,
-  "old_price": 289000,
-  "merchant": "lazada",
-  "origin_url": "https://www.lazada.vn/products/ao-khoac-gio-nam-chong-nuoc-nhe-i123456789.html",
-  "image": "/assets/img/products/lazada-ao-khoac-gio-nam-chong-nuoc-nhe.webp",
-  "brand": "NoBrand",
-  "categories": ["thoi-trang","thoi-trang-nam","ao-khoac"],
-  "tags": ["deal","chong-nuoc","giam-gia"],
-  "status": true,
-  "updated_at": "2025-11-08T10:30:00.000Z"
-},
-{
-  "sku": "lazada-son-duong-co-mau-spf",
-  "name": "Son dưỡng có màu SPF – ẩm mượt tự nhiên",
-  "price": 89000,
-  "old_price": 129000,
-  "merchant": "lazada",
-  "origin_url": "https://www.lazada.vn/products/son-duong-co-mau-spf-i987654321.html",
-  "image": "/assets/img/products/lazada-son-duong-co-mau-spf.webp",
-  "brand": "Care+",
-  "categories": ["my-pham","trang-diem","son-duong"],
-  "tags": ["deal","skincare","lip-care"],
-  "status": true,
-  "updated_at": "2025-11-08T10:30:00.000Z"
-},
-{
-  "sku": "lazada-dep-the-thao-eva-nhe-chan",
-  "name": "Dép thể thao EVA nhẹ chân",
-  "price": 69000,
-  "old_price": 99000,
-  "merchant": "lazada",
-  "origin_url": "https://www.lazada.vn/products/dep-the-thao-eva-nhe-chan-i192837465.html",
-  "image": "/assets/img/products/lazada-dep-the-thao-eva-nhe-chan.webp",
-  "brand": "LightStep",
-  "categories": ["thoi-trang","phu-kien","giay-dep"],
-  "tags": ["deal","flash-sale"],
-  "status": true,
-  "updated_at": "2025-11-08T10:30:00.000Z"
-},
-  {
     "name": "Áo croptop ba lỗ nữ TOPTIFY",
     "price": 99000,
     "origin": "https://shopee.vn/%C3%81o-croptop-ba-l%E1%BB%97-n%E1%BB%AF-TOPTIFY-c%E1%BB%95-l%E1%BB%8D-tr%C6%A1n-s%C3%A1t-n%C3%A1ch-thun-bo-g%C3%A2n-co-gi%C3%A3n-form-basic-Trip-Away-Top-AC221-TTF023-i.408175384.11370273132?sp_atk=00f330f5-6016-46bd-984a-0120c7a353c6&xptdk=00f330f5-6016-46bd-984a-0120c7a353c6",
@@ -110,6 +68,28 @@
     "status": true,
     "updated_at": "2025-11-06T07:42:22.731Z",
     "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2F%25C3%2581o-Kho%25C3%25A1c-Cadigan-%25C3%2581o-Cardigan-n%25E1%25BB%25AF-Thom-Browne-C%25E1%25BB%2595-Tr%25C3%25B2n-Tay-K%25E1%25BA%25BB-D%25E1%25BB%2585-Th%25C6%25B0%25C6%25A1ng-Phong-C%25C3%25A1ch-Thome-H%25C3%25A0n-Qu%25E1%25BB%2591c-Nh%25E1%25BA%25B9-Nh%25C3%25A0ng-i.1429783425.55200666176%3FextraParams%3D%257B%2522display_model_id%2522%253A330058228955%252C%2522model_selection_logic%2522%253A3%257D%26sp_atk%3Dc18fbd0b-b4c0-456b-9dd4-09daab1bf70c%26xptdk%3Dc18fbd0b-b4c0-456b-9dd4-09daab1bf70c&sub1=sku&sub2=shopee&sub3=tool&sub4=mxd210"
+  },
+  {
+    "sku": "lazada-ao-khoac-gio-nam-chong-nuoc-nhe",
+    "name": "Áo khoác gió nam chống nước nhẹ",
+    "price": 199000,
+    "old_price": 289000,
+    "merchant": "lazada",
+    "origin_url": "https://www.lazada.vn/products/ao-khoac-gio-nam-chong-nuoc-nhe-i123456789.html",
+    "image": "/assets/img/products/lazada-ao-khoac-gio-nam-chong-nuoc-nhe.webp",
+    "brand": "NoBrand",
+    "categories": [
+      "thoi-trang",
+      "thoi-trang-nam",
+      "ao-khoac"
+    ],
+    "tags": [
+      "deal",
+      "chong-nuoc",
+      "giam-gia"
+    ],
+    "status": true,
+    "updated_at": "2025-11-08T10:30:00.000Z"
   },
   {
     "name": "Áo Khoác Nỉ Nam KRIK Form Relaxed Chất Liệu Cotton Thiết Kế Cổ Trụ Thanh Lịch Hiện Đạ",
@@ -604,6 +584,27 @@
     "status": true,
     "updated_at": "2025-10-27T15:08:58.758Z",
     "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FD%C3%A9p-s%E1%BB%A5c-clog-classic-nam-n%E1%BB%AF-%C4%91%C3%BAc-nguy%C3%AAn-kh%E1%BB%91i-ch%E1%BA%A5t-li%E1%BB%87u-EVA-%C3%8Am-nh%E1%BA%B9-T%E1%BA%B7ng-V%E1%BB%9B-ch%E1%BB%91ng-tr%C6%A1n-tr%E1%BB%A3t-i.134952940.3443588628%3FextraParams%3D%257B%22display_model_id%22%253A266608518756%252C%22model_selection_logic%22%253A3%257D%26sp_atk%3D3952f117-433a-467b-84f7-3d2022602675%26xptdk%3D3952f117-433a-467b-84f7-3d2022602675&sub1=sku&sub2=shopee&sub3=tool&sub4=mxd210"
+  },
+  {
+    "sku": "lazada-dep-the-thao-eva-nhe-chan",
+    "name": "Dép thể thao EVA nhẹ chân",
+    "price": 69000,
+    "old_price": 99000,
+    "merchant": "lazada",
+    "origin_url": "https://www.lazada.vn/products/dep-the-thao-eva-nhe-chan-i192837465.html",
+    "image": "/assets/img/products/lazada-dep-the-thao-eva-nhe-chan.webp",
+    "brand": "LightStep",
+    "categories": [
+      "thoi-trang",
+      "phu-kien",
+      "giay-dep"
+    ],
+    "tags": [
+      "deal",
+      "flash-sale"
+    ],
+    "status": true,
+    "updated_at": "2025-11-08T10:30:00.000Z"
   },
   {
     "name": "Hộp 10 miếng Mặt Nạ Giấy COLORKEY LUMINOUS Vitamin B5",
@@ -1708,6 +1709,20 @@
     }
   },
   {
+    "name": "Ốp Lưng iPhone Viền Camera Kim Loại Cao Cấp, Chống Sốc, Bảo Vệ Camera iP 7/8/X/XS/11/12/13/14/15/16/17/Plus/Pro/Max/Air",
+    "price": 25000,
+    "origin": "shopee.vn/Ốp-Lưng-iPhone-Viền-Camera-Kim-Loại-Cao-Cấp-Chống-Sốc-Bảo-Vệ-Camera-iP-7-8-X-XS-11-12-13-14-15-16-17-Plus-Pro-Max-Air-i.89827191.14799374397?extraParams=%7B\"display_model_id\"%3A59342490301%2C\"model_selection_logic\"%3A3%7D",
+    "merchant": "shopee",
+    "sku": "op-lung-iphone-vien-camera-kim-loai-cao-cap-chong-soc-bao-ve-camera-ip-7-8-x-xs-11-12-13-14-15-16-17-plus-pro-max-air",
+    "image": "/assets/img/products/op-lung-iphone-vien-camera-kim-loai-cao-cap-chong-soc-bao-ve-camera-ip-7-8-x-xs-11-12-13-14-15-16-17-plus-pro-max-air.webp",
+    "category": "do-dien-tu",
+    "brand": "",
+    "featured": true,
+    "status": true,
+    "updated_at": "2025-11-19T15:44:31.942Z",
+    "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=shopee.vn%2F%E1%BB%90p-L%C6%B0ng-iPhone-Vi%E1%BB%81n-Camera-Kim-Lo%E1%BA%A1i-Cao-C%E1%BA%A5p-Ch%E1%BB%91ng-S%E1%BB%91c-B%E1%BA%A3o-V%E1%BB%87-Camera-iP-7-8-X-XS-11-12-13-14-15-16-17-Plus-Pro-Max-Air-i.89827191.14799374397%3FextraParams%3D%257B%22display_model_id%22%253A59342490301%252C%22model_selection_logic%22%253A3%257D&sub1=sku&sub2=shopee&sub3=tool&sub4=mxd210"
+  },
+  {
     "name": "Quần thun nữ co giãn ống loe màu trơn, quần dài nữ lưng cao chất thun tăm hack dáng",
     "price": 89000,
     "origin": "https://shopee.vn/Qu%C3%A2%CC%80n-thun-n%E1%BB%AF-co-gi%C3%A3n-%E1%BB%91ng-loe-m%C3%A0u-tr%C6%A1n-qu%E1%BA%A7n-d%C3%A0i-n%E1%BB%AF-l%C6%B0ng-cao-ch%E1%BA%A5t-thun-t%C4%83m-hack-d%C3%A1ng-i.1429783425.44376043732?extraParams=%7B%22display_model_id%22%3A345058223728%2C%22model_selection_logic%22%3A3%7D&sp_atk=9e08cb76-e51e-4db9-98d4-f57293ec74dc&xptdk=9e08cb76-e51e-4db9-98d4-f57293ec74dc",
@@ -1747,6 +1762,28 @@
     "status": true,
     "updated_at": "2025-10-14T16:39:50.676Z",
     "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FSet-3-m%25C3%25B3n-Bigsize-n%25E1%25BB%25AF-%25C3%25A1o-s%25C6%25A1-mi-s%25E1%25BB%258Dc-d%25C3%25A0i-tay-ph%25E1%25BB%2591i-%25C3%25A1o-thun-hai-d%25C3%25A2y-co-gi%25C3%25A3n-k%25C3%25A8m-qu%25E1%25BA%25A7n-%25C4%2591%25C3%25B9i-d%25C3%25A1ng-A-n%25C4%2583ng-%25C4%2591%25E1%25BB%2599ng-c%25C3%25A1-t%25C3%25ADnh-i.409338962.28032531056&sub1=set-3-mon-bigsize-nu-ao-so-mi-soc-dai-tay-phoi-ao-thun-hai-day&sub2=shopee&sub3=tool&sub4=mxd210"
+  },
+  {
+    "sku": "lazada-son-duong-co-mau-spf",
+    "name": "Son dưỡng có màu SPF – ẩm mượt tự nhiên",
+    "price": 89000,
+    "old_price": 129000,
+    "merchant": "lazada",
+    "origin_url": "https://www.lazada.vn/products/son-duong-co-mau-spf-i987654321.html",
+    "image": "/assets/img/products/lazada-son-duong-co-mau-spf.webp",
+    "brand": "Care+",
+    "categories": [
+      "my-pham",
+      "trang-diem",
+      "son-duong"
+    ],
+    "tags": [
+      "deal",
+      "skincare",
+      "lip-care"
+    ],
+    "status": true,
+    "updated_at": "2025-11-08T10:30:00.000Z"
   },
   {
     "name": "Sục Cross Đế Cao 3cm Nữ Hình JD 3D",
