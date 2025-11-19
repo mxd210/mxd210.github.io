@@ -1,5 +1,6 @@
-<!-- /assets/mxd-store.v2.js -->
-<script>
+// /assets/mxd-store.v2.js
+// MXD STORE v2 — render danh mục từ affiliates.json
+
 document.addEventListener('DOMContentLoaded', () => {
   initMXDCategoryPage().catch(err => {
     console.error('MXD STORE v2 error:', err);
@@ -8,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initMXDCategoryPage() {
   const root = document.querySelector('[data-mxd-category-page]');
-  if (!root) return; // trang không phải trang mục
+  if (!root) return; // Không phải trang danh mục → thoát
 
   const categorySlug = (root.dataset.category || '').trim();
   const limit = parseInt(root.dataset.limit || '60', 10);
@@ -28,14 +29,33 @@ async function initMXDCategoryPage() {
     return;
   }
 
-  let data = await res.json();
+  let data;
+  try {
+    data = await res.json();
+  } catch (e) {
+    console.error('AFF JSON parse error:', e);
+    grid.innerHTML = '<p class="mxd-error">Dữ liệu sản phẩm không hợp lệ.</p>';
+    return;
+  }
+
   if (!Array.isArray(data)) data = [];
 
-  // 2) Lọc theo status + category
-  let products = data.filter(p => (p.status || 'active') !== 'archived');
+  // 2) Lọc status + category
+  let products = data.filter(p => {
+    const status = (p.status || 'active').toString().toLowerCase();
+    if (['archived', 'hidden', 'draft'].includes(status)) return false;
+    return true;
+  });
 
   if (categorySlug) {
-    products = products.filter(p => (p.category || '') === categorySlug);
+    products = products.filter(p => {
+      const cat =
+        p.category ||
+        p.category_slug ||
+        p.cat ||
+        '';
+      return cat === categorySlug;
+    });
   }
 
   // 3) Sắp xếp
@@ -43,15 +63,15 @@ async function initMXDCategoryPage() {
     products.sort((a, b) => {
       const fa = a.featured ? 1 : 0;
       const fb = b.featured ? 1 : 0;
-      if (fb !== fa) return fb - fa; // featured lên trước
-      const ta = new Date(a.updated_at || 0).getTime();
-      const tb = new Date(b.updated_at || 0).getTime();
-      return tb - ta; // mới lên trên
+      if (fb !== fa) return fb - fa; // featured trước
+      const ta = getTime(a.updated_at);
+      const tb = getTime(b.updated_at);
+      return tb - ta; // mới trước
     });
   } else {
     products.sort((a, b) => {
-      const ta = new Date(a.updated_at || 0).getTime();
-      const tb = new Date(b.updated_at || 0).getTime();
+      const ta = getTime(a.updated_at);
+      const tb = getTime(b.updated_at);
       return tb - ta;
     });
   }
@@ -76,12 +96,20 @@ function renderMXDProductCard(p) {
   const name = escapeHTML(p.name || '');
   const sku = escapeHTML(p.sku || '');
   const brand = escapeHTML(p.brand || '');
-  const merchant = escapeHTML(p.merchant || '');
-  const origin = p.origin || '#';
+  const merchantRaw = (p.merchant || '').toString().toLowerCase();
+  const merchant = merchantRaw || detectMerchant(p.origin || p.origin_url || '');
+  const origin = (p.origin || p.origin_url || '#').trim();
+
   const img = p.image || `/assets/img/products/${sku}.webp`;
-  const shortDesc = escapeHTML((p.short_desc || p.description || p.name || '').trim());
+  const shortDesc = escapeHTML(
+    (p.short_desc || p.description || p.name || '').toString().trim()
+  );
+
   const detailHref = `/g.html?sku=${encodeURIComponent(p.sku || '')}`;
-  const price = formatVND(p.price);
+  const priceValue = getPrice(p);
+  const priceText = formatVND(priceValue);
+
+  const merchantLabel = merchantLabelFromSlug(merchant);
 
   return `
   <article class="product-card" data-sku="${sku}">
@@ -102,14 +130,15 @@ function renderMXDProductCard(p) {
       </h3>
       <div class="product-meta">
         ${brand ? `<span class="product-brand">${brand}</span>` : ''}
+        ${merchantLabel ? `<span class="product-merchant">${merchantLabel}</span>` : ''}
       </div>
       <div class="product-price">
-        ${price ? `<span class="price">${price}</span>` : ''}
+        ${priceText ? `<span class="price">${priceText}</span>` : ''}
       </div>
       <div class="product-actions">
         <a class="btn-buy"
-           href="${origin}"
-           data-merchant="${merchant}"
+           href="${escapeAttr(origin)}"
+           data-merchant="${escapeAttr(merchant)}"
            data-sku="${sku}">
           Mua ngay
         </a>
@@ -119,10 +148,22 @@ function renderMXDProductCard(p) {
   `;
 }
 
+function getTime(val) {
+  if (!val) return 0;
+  const t = new Date(val).getTime();
+  return Number.isFinite(t) ? t : 0;
+}
+
+function getPrice(p) {
+  // Hỗ trợ cả price và price_vnd (cũ)
+  const v = p.price ?? p.price_vnd ?? p.price_vnd_int;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
 function formatVND(value) {
-  const n = Number(value);
-  if (!Number.isFinite(n)) return '';
-  return n.toLocaleString('vi-VN') + '₫';
+  if (value == null) return '';
+  return Number(value).toLocaleString('vi-VN') + '₫';
 }
 
 function escapeHTML(str) {
@@ -133,4 +174,32 @@ function escapeHTML(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
-</script>
+
+function escapeAttr(str) {
+  return escapeHTML(str).replace(/`/g, '&#96;');
+}
+
+function detectMerchant(url) {
+  try {
+    if (!url) return '';
+    const u = new URL(url.startsWith('http') ? url : 'https://' + url);
+    const host = u.hostname.toLowerCase();
+    if (host.includes('shopee')) return 'shopee';
+    if (host.includes('lazada')) return 'lazada';
+    if (host.includes('tiki')) return 'tiki';
+    if (host.includes('tiktok')) return 'tiktok';
+    return '';
+  } catch {
+    return '';
+  }
+}
+
+function merchantLabelFromSlug(slug) {
+  switch (slug) {
+    case 'shopee': return 'Shopee';
+    case 'lazada': return 'Lazada';
+    case 'tiki': return 'Tiki';
+    case 'tiktok': return 'TikTok Shop';
+    default: return '';
+  }
+}
