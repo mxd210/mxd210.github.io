@@ -3,7 +3,7 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
-  <title>MXD JSON Normalizer • Chuẩn hoá + soát deeplink mxd210</title>
+  <title>MXD JSON Normalizer • Chuẩn hoá + soát deeplink + SEO meta</title>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
   <style>
@@ -132,10 +132,11 @@
 <body>
   <h1>MXD JSON Normalizer</h1>
   <div class="subtitle">
-    Chuẩn hoá schema + soát deeplink cho <strong>mxd210</strong>.<br>
+    Chuẩn hoá schema + soát deeplink + sinh mô tả/SEO/tag cho <strong>mxd210</strong>.<br>
     • Đổi <code>price_vnd → price</code>, <code>origin_url → origin</code><br>
     • Tách URL gốc nếu <code>origin/deeplink</code> đang là link isclix<br>
-    • Tự sinh / sửa deeplink theo aff-base của mxd210 (Shopee/Lazada/Tiki/TikTok)
+    • Ép deeplink về aff-base mxd210 (Shopee/Lazada/Tiki/TikTok)<br>
+    • Sinh <code>short_desc</code>, <code>seo_title</code>, <code>seo_description</code>, <code>tags</code> nếu thiếu
   </div>
 
   <div class="controls">
@@ -143,7 +144,7 @@
       <span>●</span> aff-base mxd210 (AccessTrade)
     </span>
     <span class="hint">
-      Shopee, Lazada, TikTok, Tiki → đều ép về mã của mxd210. Deeplink lạ sẽ bị rewrite hoặc xoá.
+      Dán <code>affiliates.json</code> hoặc block sản phẩm → bấm nút → copy output → dán lại vào repo.
     </span>
   </div>
 
@@ -160,7 +161,7 @@
 
     <div>
       <div class="panel-title">
-        <span>Output JSON (đã chuẩn hoá & sạch deeplink lạ):</span>
+        <span>Output JSON (đã chuẩn hoá, sạch deeplink lạ & có meta):</span>
         <div style="display:flex;gap:6px;align-items:center;">
           <button type="button" class="secondary" onclick="copyOutput()">Copy output</button>
         </div>
@@ -168,19 +169,16 @@
       <textarea id="output" readonly placeholder="Kết quả chuẩn hoá sẽ hiện ở đây..."></textarea>
 
       <div class="report-wrapper">
-        <div class="report-label">Nhật ký kiểm tra & sửa deeplink:</div>
-        <textarea id="report" readonly style="min-height:120px" placeholder="Log chi tiết theo từng SKU sẽ hiện ở đây (deeplink bị sửa, bị xoá, tự sinh lại...)"></textarea>
+        <div class="report-label">Nhật ký kiểm tra & sửa deeplink / SEO:</div>
+        <textarea id="report" readonly style="min-height:120px" placeholder="Log chi tiết theo từng SKU sẽ hiện ở đây (deeplink bị sửa, bị xoá, tự sinh lại, meta được sinh...)"></textarea>
       </div>
     </div>
   </div>
 
   <div class="controls">
     <button type="button" onclick="normalizeForMXD210()">
-      ⚙️ Chuẩn hoá + soát deeplink cho mxd210
+      ⚙️ Chuẩn hoá + soát deeplink + sinh meta cho mxd210
     </button>
-    <span class="hint">
-      Bước dùng: copy JSON gốc → dán vào ô trái → bấm nút → copy output → dán lại vào <code>/assets/data/affiliates.json</code>.
-    </span>
   </div>
 
   <div id="log" class="log"></div>
@@ -229,6 +227,88 @@
       return "";
     }
 
+    function slugify(str) {
+      if (!str) return "";
+      return str.toString()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
+    }
+
+    function genShortDesc(item) {
+      const name = item.name || item.sku || "Sản phẩm";
+      const price = item.price;
+      const merchant = (item.merchant || "").toLowerCase();
+      const priceStr = Number.isFinite(+price)
+        ? new Intl.NumberFormat("vi-VN").format(+price) + "₫"
+        : "giá tốt";
+
+      const brand = item.brand ? ` từ thương hiệu ${item.brand}` : "";
+      let s = `${name}${brand} – lựa chọn phù hợp cho bạn với ${priceStr}.`;
+
+      let san = "";
+      if (merchant === "shopee") san = "Shopee";
+      else if (merchant === "lazada") san = "Lazada";
+      else if (merchant === "tiki") san = "Tiki";
+      else if (merchant === "tiktok") san = "TikTok Shop";
+
+      if (san) {
+        s += ` Đặt mua online trên ${san} qua MXD.`;
+      } else {
+        s += ` Đặt mua online dễ dàng qua MXD.`;
+      }
+      return s;
+    }
+
+    function genSeoTitle(item) {
+      const name = item.name || item.sku || "Sản phẩm";
+      const category = item.category ? ` | ${item.category}` : "";
+      return `${name}${category} | MXD`;
+    }
+
+    function genSeoDesc(item) {
+      const name = item.name || item.sku || "Sản phẩm";
+      const short = item.short_desc || "";
+      const merchant = (item.merchant || "").toLowerCase();
+      const price = item.price;
+      const priceStr = Number.isFinite(+price)
+        ? new Intl.NumberFormat("vi-VN").format(+price) + "₫"
+        : "";
+
+      let san = "";
+      if (merchant === "shopee") san = "Shopee";
+      else if (merchant === "lazada") san = "Lazada";
+      else if (merchant === "tiki") san = "Tiki";
+      else if (merchant === "tiktok") san = "TikTok Shop";
+
+      const parts = [`${name} do MXD chọn lọc, phù hợp nhu cầu sử dụng hàng ngày.`];
+      if (priceStr) parts.push(`Giá tham khảo khoảng ${priceStr}.`);
+      if (san) parts.push(`Đặt mua trên ${san} qua liên kết affiliate MXD.`);
+      if (short) parts.push(short);
+      return parts.join(" ");
+    }
+
+    function genTags(item) {
+      const tags = new Set();
+      const sku = item.sku || "";
+      const cat = item.category || "";
+      const merchant = item.merchant || "";
+      const brand = item.brand || "";
+
+      if (sku) {
+        sku.toString().toLowerCase().split(/[^a-z0-9]+/i).forEach(t => {
+          t = t.trim();
+          if (t.length >= 3) tags.add(t);
+        });
+      }
+      if (cat) tags.add(slugify(cat));
+      if (merchant) tags.add(merchant.toString().toLowerCase());
+      if (brand) tags.add(slugify(brand));
+
+      return Array.from(tags).slice(0, 10);
+    }
+
     function normalizeForMXD210() {
       const inputEl  = document.getElementById("input");
       const outputEl = document.getElementById("output");
@@ -247,7 +327,6 @@
       try {
         let text = raw;
         if (!text.trim().startsWith("[") && !text.trim().startsWith("{")) {
-          // Đang là nhiều object dán liền nhau → wrap thử
           text = "[" + text + "]";
           wrapped = true;
         }
@@ -272,7 +351,11 @@
         merchantDetected: 0,
         deeplinkRewritten: 0,
         deeplinkDropped: 0,
-        deeplinkGenerated: 0
+        deeplinkGenerated: 0,
+        shortDescGenerated: 0,
+        seoTitleGenerated: 0,
+        seoDescGenerated: 0,
+        tagsGenerated: 0
       };
       const reportLines = [];
 
@@ -282,7 +365,7 @@
         const sku = (item.sku || "").toString();
         const tag = sku || ("#"+(idx+1));
 
-        // 1) price_vnd -> price (parse số)
+        // 1) price_vnd -> price
         if (typeof item.price === "undefined" && typeof item.price_vnd !== "undefined") {
           if (typeof item.price_vnd === "string") {
             const digits = item.price_vnd.replace(/[^\d]/g, "");
@@ -298,7 +381,6 @@
           }
           delete item.price_vnd;
         } else if (typeof item.price === "string") {
-          // nếu price là "199.000" -> chuyển thành số
           const digits = item.price.replace(/[^\d]/g, "");
           if (digits) {
             item.price = Number(digits);
@@ -316,7 +398,7 @@
           item.origin = ensureHttps(item.origin);
         }
 
-        // 3) Nếu origin là deeplink isclix → tách URL gốc ra
+        // 3) origin là deeplink isclix -> tách URL gốc
         if (item.origin && item.origin.includes("go.isclix.com")) {
           const orig = extractOriginFromDeeplink(item.origin);
           if (orig) {
@@ -327,7 +409,7 @@
           }
         }
 
-        // 4) Nếu chưa có origin mà có deeplink isclix → tách URL gốc
+        // 4) chưa có origin nhưng có deeplink isclix -> tách URL gốc
         if (!item.origin && item.deeplink && item.deeplink.includes("go.isclix.com")) {
           const orig = extractOriginFromDeeplink(item.deeplink);
           if (orig) {
@@ -342,7 +424,7 @@
           item.origin = ensureHttps(item.origin);
         }
 
-        // 5) merchant: ưu tiên field, nếu không có thì đoán từ URL
+        // 5) merchant
         let merchant = "";
         if (item.merchant) {
           merchant = String(item.merchant).toLowerCase().trim();
@@ -359,7 +441,7 @@
           }
         }
 
-        // 6) chuẩn hoá các field meta khác
+        // 6) meta cơ bản
         if (!item.sub1 && item.sku) {
           item.sub1 = item.sku;
           changed = true;
@@ -377,7 +459,29 @@
           changed = true;
         }
 
-        // 7) Deeplink sanitizer: luôn ưu tiên aff-base của MXD210
+        // 7) SEO / mô tả / tags
+        if (!item.short_desc) {
+          item.short_desc = genShortDesc(item);
+          stats.shortDescGenerated++;
+          changed = true;
+        }
+        if (!item.seo_title) {
+          item.seo_title = genSeoTitle(item);
+          stats.seoTitleGenerated++;
+          changed = true;
+        }
+        if (!item.seo_description) {
+          item.seo_description = genSeoDesc(item);
+          stats.seoDescGenerated++;
+          changed = true;
+        }
+        if (!item.tags || !Array.isArray(item.tags) || !item.tags.length) {
+          item.tags = genTags(item);
+          stats.tagsGenerated++;
+          changed = true;
+        }
+
+        // 8) Deeplink sanitizer
         const base = merchant && AFF_BASE[merchant] ? AFF_BASE[merchant] : null;
 
         if (item.deeplink) {
@@ -391,7 +495,6 @@
               changed = true;
               reportLines.push(`${tag}: deeplink KHÁC aff-base mxd210 (${merchant}) → đã rewrite.`);
             } else {
-              // đã đúng base, nhưng nếu url bên trong khác origin hiện tại thì cũng nên đồng bộ lại
               const fromDl = extractOriginFromDeeplink(dl);
               if (fromDl && fromDl !== safeOrigin) {
                 item.deeplink = newDl;
@@ -401,14 +504,12 @@
               }
             }
           } else {
-            // không có merchant hoặc origin → xoá deeplink cho an toàn
             delete item.deeplink;
             stats.deeplinkDropped++;
             changed = true;
             reportLines.push(`${tag}: deeplink bị xoá (không đủ thông tin để rewrite an toàn).`);
           }
         } else {
-          // Không có deeplink, nhưng nếu có origin + merchant + base → tự sinh
           if (base && item.origin) {
             const safeOrigin = ensureHttps(item.origin);
             item.deeplink = base + encodeURIComponent(safeOrigin);
@@ -423,7 +524,6 @@
         }
       });
 
-      // Nếu ban đầu chỉ là 1 object thì trả lại object, không ép thành mảng
       let outputData = data;
       if (wrapped && data.length === 1) {
         outputData = data[0];
@@ -439,14 +539,18 @@
         `• origin từ deeplink isclix: ${stats.originFromDeeplink + stats.originFromIsclix}`,
         `• merchant đoán từ URL: ${stats.merchantDetected}`,
         `• Deeplink rewrite theo aff-base mxd210: ${stats.deeplinkRewritten}`,
-        `• Deeplink bị xoá (nghi ngờ / thiếu info): ${stats.deeplinkDropped}`,
-        `• Deeplink tự sinh mới: ${stats.deeplinkGenerated}`
+        `• Deeplink bị xoá: ${stats.deeplinkDropped}`,
+        `• Deeplink sinh mới: ${stats.deeplinkGenerated}`,
+        `• short_desc sinh mới: ${stats.shortDescGenerated}`,
+        `• seo_title sinh mới: ${stats.seoTitleGenerated}`,
+        `• seo_description sinh mới: ${stats.seoDescGenerated}`,
+        `• tags sinh mới: ${stats.tagsGenerated}`
       ].join(" | ");
 
       logEl.textContent = summary;
       reportEl.value = reportLines.length
         ? reportLines.join("\n")
-        : "Không có thay đổi đáng chú ý về deeplink. (Hoặc input không có deeplink.)";
+        : "Không có thay đổi đáng chú ý về deeplink / merchant. Meta SEO đã được sinh nếu thiếu.";
     }
 
     function copyOutput() {
@@ -493,6 +597,8 @@
     "origin": "https://shopee.vn/Ao-croptop-ba-lo-nu-TOPTIFY-...",
     "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/9999999999999999999?url=https%3A%2F%2Fshopee.vn%2FAo-croptop-ba-lo-nu-TOPTIFY-...",
     "merchant": "shopee",
+    "brand": "TOPTIFY",
+    "category": "Thời trang nữ",
     "image": "/assets/img/products/ao-croptop-ba-lo-nu-toptify.webp"
   }
 ]`;
