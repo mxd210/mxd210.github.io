@@ -1,0 +1,339 @@
+<!-- NEW FILE: /tools/mxd-json-normalizer.html -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <title>MXD JSON Normalizer v1 • Chuẩn hoá price_vnd → price, origin_url → origin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b1020;
+      color: #f5f5f5;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0 0 8px;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: #aaa;
+      margin-bottom: 16px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    textarea {
+      width: 100%;
+      min-height: 320px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #050714;
+      color: #f5f5f5;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+      resize: vertical;
+      white-space: pre;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #ff4fa3;
+      box-shadow: 0 0 0 1px #ff4fa3;
+    }
+    .panel-title {
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .hint {
+      font-size: 11px;
+      color: #888;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      background: #ff4fa3;
+      color: #060716;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(255, 79, 163, 0.35);
+    }
+    button.secondary {
+      background: #1f2435;
+      color: #f5f5f5;
+      box-shadow: none;
+      border: 1px solid #333a52;
+    }
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .controls {
+      margin: 12px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .log {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #aaa;
+      min-height: 18px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      background: #1a1f33;
+      color: #ff4fa3;
+      border: 1px solid #343c5c;
+    }
+    .badge span {
+      font-size: 12px;
+    }
+    a {
+      color: #ff9fd0;
+    }
+  </style>
+</head>
+<body>
+  <h1>MXD JSON Normalizer v1</h1>
+  <div class="subtitle">
+    Chuẩn hoá dữ liệu sản phẩm khi move giữa các repo:
+    <strong>price_vnd → price</strong>,
+    <strong>origin_url → origin</strong>, tự thêm <code>status</code>, <code>featured</code>, <code>sub1</code>, <code>updated_at</code>.
+  </div>
+
+  <div class="controls">
+    <span class="badge">
+      <span>●</span> Chuẩn mxd210
+    </span>
+    <button type="button" class="secondary" onclick="fillDemo()">
+      Dán ví dụ demo
+    </button>
+    <span class="hint">
+      Bước dùng: dán JSON gốc → bấm <strong>Chuẩn hoá cho mxd210</strong> → copy JSON mới dán vào <code>assets/data/affiliates.json</code>.
+    </span>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="panel-title">
+        <span>Input JSON (từ repo khác hoặc tool):</span>
+        <span class="hint">Có thể là 1 object, nhiều object, hoặc cả mảng <code>[...]</code>.</span>
+      </div>
+      <textarea id="input" placeholder='Ví dụ:
+[
+  {
+    "sku": "pijama-xinh",
+    "name": "Pijama Xinh...",
+    "price_vnd": 57000,
+    "origin_url": "shopee.vn/...",
+    "image": "/assets/img/products/pijama-xinh.webp"
+  }
+]'></textarea>
+    </div>
+
+    <div>
+      <div class="panel-title">
+        <span>Output JSON (chuẩn mxd210):</span>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button type="button" class="secondary" onclick="copyOutput()">Copy output</button>
+        </div>
+      </div>
+      <textarea id="output" readonly placeholder="Kết quả chuẩn hoá sẽ hiện ở đây..."></textarea>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button type="button" onclick="normalizeForMXD210()">
+      ⚙️ Chuẩn hoá JSON cho mxd210
+    </button>
+    <span class="hint">
+      Tool sẽ:
+      <strong>price_vnd → price (number)</strong>,
+      <strong>origin_url → origin (auto thêm https nếu thiếu)</strong>,
+      thêm mặc định <code>status: &quot;active&quot;</code>, <code>featured: false</code>, <code>sub1 = sku</code>, <code>updated_at = ISO time</code> nếu đang thiếu.
+    </span>
+  </div>
+
+  <div id="log" class="log"></div>
+
+  <script>
+    function normalizeForMXD210() {
+      const inputEl = document.getElementById("input");
+      const outputEl = document.getElementById("output");
+      const logEl = document.getElementById("log");
+
+      let raw = (inputEl.value || "").trim();
+      if (!raw) {
+        logEl.textContent = "Chưa có dữ liệu ở ô bên trái.";
+        return;
+      }
+
+      let data;
+      let wrapped = false;
+
+      try {
+        let text = raw;
+
+        // Nếu không phải mảng JSON, thử wrap thành [ ... ]
+        if (!text.trim().startsWith("[")) {
+          text = "[" + text + "]";
+          wrapped = true;
+        }
+
+        data = JSON.parse(text);
+      } catch (e) {
+        logEl.textContent = "❌ Lỗi parse JSON: " + e.message;
+        return;
+      }
+
+      if (!Array.isArray(data)) {
+        data = [data];
+      }
+
+      const now = new Date().toISOString();
+      let touched = 0;
+
+      data.forEach((item) => {
+        if (!item || typeof item !== "object") return;
+
+        let changed = false;
+
+        // price_vnd -> price
+        if (typeof item.price === "undefined" && typeof item.price_vnd !== "undefined") {
+          if (typeof item.price_vnd === "string") {
+            const digits = item.price_vnd.replace(/[^\d]/g, "");
+            if (digits) {
+              item.price = Number(digits);
+            }
+          } else {
+            item.price = item.price_vnd;
+          }
+          delete item.price_vnd;
+          changed = true;
+        }
+
+        // origin_url -> origin (auto thêm https nếu thiếu)
+        if (!item.origin && item.origin_url) {
+          let url = String(item.origin_url).trim();
+          if (url && !/^https?:\/\//i.test(url)) {
+            url = "https://" + url;
+          }
+          item.origin = url;
+          delete item.origin_url;
+          changed = true;
+        }
+
+        // sub1 = sku (nếu thiếu)
+        if (!item.sub1 && item.sku) {
+          item.sub1 = item.sku;
+          changed = true;
+        }
+
+        // status mặc định
+        if (!item.status) {
+          item.status = "active";
+          changed = true;
+        }
+
+        // featured mặc định false nếu chưa có
+        if (typeof item.featured === "undefined") {
+          item.featured = false;
+          changed = true;
+        }
+
+        // updated_at nếu thiếu
+        if (!item.updated_at) {
+          item.updated_at = now;
+          changed = true;
+        }
+
+        if (changed) touched++;
+      });
+
+      // Nếu ban đầu input chỉ là 1 object, không cần wrap mảng nữa
+      let outputData = data;
+      if (wrapped && data.length === 1) {
+        outputData = data[0];
+      }
+
+      outputEl.value = JSON.stringify(outputData, null, 2);
+      logEl.textContent = `✅ Đã chuẩn hoá ${touched} sản phẩm. Copy output và dán vào assets/data/affiliates.json của mxd210.`;
+    }
+
+    function copyOutput() {
+      const outputEl = document.getElementById("output");
+      const logEl = document.getElementById("log");
+      const text = outputEl.value || "";
+
+      if (!text.trim()) {
+        logEl.textContent = "Chưa có gì để copy.";
+        return;
+      }
+
+      if (!navigator.clipboard) {
+        outputEl.select();
+        document.execCommand("copy");
+        logEl.textContent = "Đã copy (execCommand).";
+        return;
+      }
+
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          logEl.textContent = "📋 Đã copy output vào clipboard.";
+        })
+        .catch((err) => {
+          logEl.textContent = "Không copy được: " + err.message;
+        });
+    }
+
+    function fillDemo() {
+      const inputEl = document.getElementById("input");
+      inputEl.value = `[
+  {
+    "sku": "pijama-xinh",
+    "name": "Pijama Xinh Tay Dài Quần Dài",
+    "price_vnd": "57.000",
+    "origin_url": "shopee.vn/Pijama-Xinh-Tay-Dai-Quan-Dai",
+    "image": "/assets/img/products/pijama-xinh.webp"
+  },
+  {
+    "sku": "ao-croptop-ba-lo-nu-toptify",
+    "name": "Áo croptop ba lỗ nữ TOPTIFY",
+    "price_vnd": 99000,
+    "origin_url": "https://shopee.vn/Ao-croptop-ba-lo-nu-TOPTIFY-...",
+    "image": "/assets/img/products/ao-croptop-ba-lo-nu-toptify.webp",
+    "merchant": "shopee"
+  }
+]`;
+    }
+  </script>
+</body>
+</html>
