@@ -48,6 +48,7 @@
 .product-grid .product-card .thumb{
   aspect-ratio:1;display:grid;place-items:center;padding:10px;
   background:var(--surface);border-bottom:1px solid var(--card-border);
+  position:relative;overflow:hidden;
 }
 #product-list .thumb img, #featured-grid .thumb img,
 .product-grid .thumb img,
@@ -123,7 +124,9 @@
 /* Nút mua — sắc nét; màu theo sàn (giữ class .buy để affiliate hoạt động) */
 #product-list .buy, #featured-grid .buy,
 .product-grid .card .buy,
-.product-grid .product-card .buy{
+.product-grid .product-card .buy,
+.product-grid .card .btn-buy,
+.product-grid .product-card .btn-buy{
   display:inline-block;width:100%;text-align:center;
   padding:10px 12px;border-radius:10px;font-weight:900;
   color:#fff;border:1px solid transparent;background:#1746ff;border-color:#1746ff;
@@ -131,22 +134,46 @@
 }
 #product-list .buy:active, #featured-grid .buy:active,
 .product-grid .card .buy:active,
-.product-grid .product-card .buy:active{transform:translateY(1px)}
+.product-grid .product-card .buy:active,
+.product-grid .card .btn-buy:active,
+.product-grid .product-card .btn-buy:active{
+  transform:translateY(1px)
+}
 #product-list .buy:hover,  #featured-grid .buy:hover,
 .product-grid .card .buy:hover,
-.product-grid .product-card .buy:hover{box-shadow:0 6px 16px rgba(0,0,0,.12);filter:brightness(1.03)}
+.product-grid .product-card .buy:hover,
+.product-grid .card .btn-buy:hover,
+.product-grid .product-card .btn-buy:hover{
+  box-shadow:0 6px 16px rgba(0,0,0,.12);filter:brightness(1.03)
+}
 #product-list .buy[data-merchant="shopee"], #featured-grid .buy[data-merchant="shopee"],
 .product-grid .card .buy[data-merchant="shopee"],
-.product-grid .product-card .buy[data-merchant="shopee"]{background:#ee4d2d;border-color:#ee4d2d}
+.product-grid .product-card .buy[data-merchant="shopee"],
+.product-grid .card .btn-buy[data-merchant="shopee"],
+.product-grid .product-card .btn-buy[data-merchant="shopee"]{
+  background:#ee4d2d;border-color:#ee4d2d
+}
 #product-list .buy[data-merchant="lazada"], #featured-grid .buy[data-merchant="lazada"],
 .product-grid .card .buy[data-merchant="lazada"],
-.product-grid .product-card .buy[data-merchant="lazada"]{background:#0f146d;border-color:#0f146d}
+.product-grid .product-card .buy[data-merchant="lazada"],
+.product-grid .card .btn-buy[data-merchant="lazada"],
+.product-grid .product-card .btn-buy[data-merchant="lazada"]{
+  background:#0f146d;border-color:#0f146d
+}
 #product-list .buy[data-merchant="tiki"],   #featured-grid .buy[data-merchant="tiki"],
 .product-grid .card .buy[data-merchant="tiki"],
-.product-grid .product-card .buy[data-merchant="tiki"]{background:#1a94ff;border-color:#1a94ff}
+.product-grid .product-card .buy[data-merchant="tiki"],
+.product-grid .card .btn-buy[data-merchant="tiki"],
+.product-grid .product-card .btn-buy[data-merchant="tiki"]{
+  background:#1a94ff;border-color:#1a94ff
+}
 #product-list .buy[data-merchant="tiktok"], #featured-grid .buy[data-merchant="tiktok"],
 .product-grid .card .buy[data-merchant="tiktok"],
-.product-grid .product-card .buy[data-merchant="tiktok"]{background:#111;border-color:#111}
+.product-grid .product-card .buy[data-merchant="tiktok"],
+.product-grid .card .btn-buy[data-merchant="tiktok"],
+.product-grid .product-card .btn-buy[data-merchant="tiktok"]{
+  background:#111;border-color:#111
+}
 
 /* Skeleton */
 #product-list .skeleton, #featured-grid .skeleton{
@@ -202,9 +229,44 @@ body.has-fixed-cta .floating-contacts{ bottom:112px; }
 /* ====== DỰ PHÒNG 404/LỖI ẢNH (ẩn card) ====== */
 .product-grid .product-card[data-broken],
 .product-grid .product-card[data-img-missing="1"]{ display:none !important; }
+
 /* Live Price discount badge */
 .badge-deal{
   margin-left:6px; padding:2px 6px; border-radius:6px; font-size:11px;
   background:#fee2e2; color:#991b1b; border:1px solid #fecaca
 }
+
+/* ====== HOVER MÔ TẢ SẢN PHẨM (overlay trên ảnh) ====== */
+.product-hover{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  color:#fff;
+  padding:10px;
+  font-size:13px;
+  line-height:1.4;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .16s ease, visibility .16s ease;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+}
+.product-hover p{
+  margin:0;
+  overflow:hidden;
+  display:-webkit-box;
+  -webkit-line-clamp:5;
+  -webkit-box-orient:vertical;
+}
+
+/* Hiện overlay khi hover card (áp dụng chung cho store) */
+.product-grid .product-card:hover .product-hover,
+.product-grid .card:hover .product-hover,
+#product-list .card:hover .product-hover,
+#featured-grid .card:hover .product-hover{
+  opacity:1;
+  visibility:visible;
+}
+
 /* === /MXD PATCH === */
