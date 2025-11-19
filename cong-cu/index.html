@@ -54,9 +54,16 @@ FIND: MXD-ANCHOR:HEAD | MXD-ANCHOR:TILES | MXD-ANCHOR:BODY-END
 
     <!-- MXD-ANCHOR:TILES -->
     <div class="grid" id="tools">
+      <!-- Tile #1: Up sản phẩm -->
       <a class="tile" href="/cong-cu/up-san-pham.html" data-tool="uploader">
         <h3>Up sản phẩm</h3>
         <p>Dán link/CSV → chuẩn hóa → preview → commit/PR vào repo đích. Hỗ trợ ảnh <code>.webp</code> theo SKU.</p>
+      </a>
+
+      <!-- NEW: MXD JSON Normalizer -->
+      <a class="tile" href="/tools/mxd-json-normalizer.html" data-tool="json-normalizer">
+        <h3>Chuẩn hoá JSON sản phẩm</h3>
+        <p>Dùng khi copy sản phẩm từ repo khác về MXD: đổi <code>price_vnd → price</code>, <code>origin_url → origin</code>, tự thêm <code>status</code>, <code>featured</code>, <code>sub1</code>, <code>updated_at</code>…</p>
       </a>
 
       <a class="tile" href="#" onclick="alert('Sắp ra mắt'); return false;">
@@ -81,7 +88,11 @@ FIND: MXD-ANCHOR:HEAD | MXD-ANCHOR:TILES | MXD-ANCHOR:BODY-END
   <script>
     // GA4: log mở tile
     document.querySelectorAll('[data-tool]').forEach(el=>{
-      el.addEventListener('click', ()=>{ try{ window.gtag && gtag('event','tools_open',{tool:el.dataset.tool}); }catch(e){} });
+      el.addEventListener('click', ()=>{
+        try{
+          window.gtag && gtag('event','tools_open',{tool:el.dataset.tool});
+        }catch(e){}
+      });
     });
   </script>
 </body>
