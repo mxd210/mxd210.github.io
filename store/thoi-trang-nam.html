@@ -1,203 +1,60 @@
+<!-- REPLACE WHOLE FILE: /store/thoi-trang-nam.html -->
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Thời trang nam | MXD</title>
-  <meta name="description" content="Áo sơ mi, quần âu, đồ bảo hộ lao động, giày — khu nam MXD hiển thị tự động từ affiliates.json."/>
+
+  <title>Thời trang nam | MXD210</title>
+  <meta name="description" content="Áo thun, sơ mi, quần dài, quần short và đồ mặc nhà cho nam – phong cách đơn giản, dễ phối.">
   <link rel="canonical" href="https://mxd210.github.io/store/thoi-trang-nam.html"/>
   <meta name="robots" content="index,follow"/>
 
-  <!-- SEO: OG -->
+  <meta property="og:title" content="Thời trang nam | MXD210"/>
+  <meta property="og:description" content="Gợi ý những món đồ nam dễ phối, ít lỗi mốt, hợp từ đi làm đến đi chơi, cà phê."/>
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Thời trang nam | MXD"/>
-  <meta property="og:description" content="Danh mục thời trang nam. Dữ liệu từ affiliates.json (OSOT)."/>
   <meta property="og:url" content="https://mxd210.github.io/store/thoi-trang-nam.html"/>
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/thoi-trang.webp"/>
 
-  <!-- CSS cố định -->
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- GA4 TRƯỚC affiliate (chuẩn MXD) -->
   <script defer src="/assets/analytics.js"></script>
-  <script defer src="/assets/mxd-affiliate.js"></script>
+  <script defer src="/assets/mxd-affiliates.js"></script>
+  <script defer src="/assets/mxd-store.v2.js"></script>
 </head>
-<body>
-  <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Thời trang nam</nav>
-  <h1>Thời trang nam</h1>
-
-  <!-- Subnav đồng nhất cụm Thời trang (không hard-code .is-active) -->
-  <div class="filter-row" data-subnav="thoi-trang">
-    <a class="btn" href="/store/thoi-trang.html">Tất cả</a>
-    <a class="btn" href="/store/thoi-trang-nam.html">Thời trang nam</a>
-    <a class="btn" href="/store/thoi-trang-nu.html">Thời trang nữ</a>
-    <a class="btn" href="/store/tre-em.html">Trẻ em</a>
-    <a class="btn" href="/store/thoi-trang-thu-dong.html">Thu đông</a>
+<body data-nav="store">
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="logo">
+      <span class="logo-main">MXD210</span>
+      <span class="logo-sub">Xây dựng &amp; Affiliate</span>
+    </a>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="/" data-nav="home">Trang chủ</a></li>
+        <li><a href="/store.html" data-nav="store">Cửa hàng</a></li>
+        <li><a href="/blog-xay-dung.html" data-nav="blog-xd">Góc xây dựng</a></li>
+        <li><a href="/mxd-aff-academy.html" data-nav="aff-academy">Góc Affiliate</a></li>
+        <li><a href="/contact.html" data-nav="contact">Liên hệ</a></li>
+      </ul>
+    </nav>
   </div>
+</header>
 
-  <!-- Lưới sản phẩm -->
-  <section id="product-grid" class="product-grid"
+<main class="page-main">
+  <section class="category-hero">
+    <div class="container">
+      <h1>Thời trang nam</h1>
+      <p>Đồ nam thiên về basic: dễ lựa, dễ mặc, không phải suy nghĩ quá nhiều mỗi sáng.</p>
+    </div>
+  </section>
+
+  <section class="category-products container"
+           data-mxd-category-page
            data-category="thoi-trang-nam"
-           data-alias="thoi-trang,thoi-trang-nam,nam,men,do-nam"></section>
-
-  <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
-
-  <!-- MXD-ANCHOR:SUBNAV-ACTIVE -->
-  <script>
-  (function mxdSubnavActive(){
-    try{
-      const here = new URL(location.href);
-      document.querySelectorAll('.filter-row a.btn').forEach(a=>{
-        try{
-          const u = new URL(a.getAttribute('href'), location.origin);
-          if (u.pathname === here.pathname){
-            a.classList.add('is-active'); a.setAttribute('aria-current','page');
-          } else {
-            a.classList.remove('is-active'); a.removeAttribute('aria-current');
-          }
-        }catch(_){}
-      });
-    }catch(_){}
-  })();
-  </script>
-
-  <!-- MXD-ANCHOR:THOI-TRANG-NAM-FILTER -->
-  <script>
-  (async function(){
-    const grid = document.getElementById('product-grid');
-    const cat  = String(grid.getAttribute('data-category')||'').trim().toLowerCase();
-    const aliases = String(grid.getAttribute('data-alias')||'')
-      .split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-    const ALIASES = new Set([cat, ...aliases]);
-
-    // Nguồn dữ liệu theo OSOT + fallback
-    const SOURCES = ['/assets/data/affiliates.json','/products.json','/affiliates.json'];
-    async function loadFirst(urls){
-      for (const src of urls){
-        try{
-          const r = await fetch(src, { cache:'no-store' });
-          if (!r.ok) continue;
-          const json = await r.json();
-          if (Array.isArray(json)) return json;
-          if (json && Array.isArray(json.items)) return json.items;
-        }catch(e){}
-      }
-      return null;
-    }
-
-    const data = await loadFirst(SOURCES);
-    if (!Array.isArray(data)){
-      grid.innerHTML = `<p class="muted">Không đọc được dữ liệu sản phẩm (đã thử ${SOURCES.join(' → ')}).</p>`;
-      return;
-    }
-
-    // === Chuẩn hóa & lọc mở rộng (an toàn, không phá dữ liệu cũ) ===
-    const norm  = v => String(v||'').toLowerCase().trim();
-    const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
-    const slug  = v => norm(v).replace(/[^a-z0-9\-]+/g,'-').replace(/--+/g,'-');
-
-    function labelsOf(p){
-      const out = [];
-      // string: cat/category/section
-      out.push(...split(p.cat||p.category||p.section||''));
-      // array: cats/categories
-      const group = Array.isArray(p.cats) ? p.cats : (Array.isArray(p.categories) ? p.categories : []);
-      out.push(...group.flatMap(split));
-      // tags
-      if (Array.isArray(p.tags)) out.push(...p.tags.flatMap(split));
-      // chuẩn hóa slug
-      return Array.from(new Set(out.map(slug).filter(Boolean)));
-    }
-
-    const isLive = p => p && p.status !== false && p.status !== 'archived';
-
-    function inCat(p){
-      const labels = labelsOf(p);
-      if (!labels.length) return false;
-      // match chặt: trùng alias
-      if (labels.some(l => ALIASES.has(l))) return true;
-      // match rộng: alias/label có quan hệ tiền tố (thoi-trang bao trùm thoi-trang-nam)
-      for (const a of ALIASES){
-        if (labels.some(l => l.startsWith(a) || a.startsWith(l))) return true;
-      }
-      return false;
-    }
-
-    const items = data.filter(p => isLive(p) && inCat(p));
-
-    if (!items.length){
-      grid.innerHTML = `<p class="muted">Chưa có sản phẩm cho danh mục này. Thêm slug/tag <code>thoi-trang-nam</code> (hoặc alias liên quan) trong <code>affiliates.json</code>.</p>`;
-      return;
-    }
-
-    // === Render card + phòng thủ 404 ===
-    const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-    const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-    const linkOf = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
-    const imgOf  = p => {
-      const sku = norm(p.sku||'');
-      return p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp`);
-    };
-
-    grid.innerHTML = items.map(p=>{
-      const sku   = norm(p.sku||'');
-      const name  = p.name || sku || 'Sản phẩm';
-      const img   = imgOf(p);
-      const price = fmt(p.price);
-      const merchant = norm(p.merchant||'');
-      const buy   = linkOf(p);
-      const broken = !/^https?:\/\//.test(buy);
-
-      return `
-        <article class="product-card" data-sku="${esc(sku)}" ${broken?'data-broken="link"':''}>
-          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
-            <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
-                 onerror="this.onerror=null;this.dataset.err=1;this.src='/assets/img/products/placeholder.webp';this.closest('article').setAttribute('data-img-missing','1')">
-          </a>
-          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
-          ${price ? `<div class="price">${price}</div>` : ''}
-          <div class="actions">
-            <a class="buy" href="${esc(buy)}" data-merchant="${esc(merchant)}"
-               target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
-          </div>
-        </article>`;
-    }).join('');
-
-    // Ẩn card hỏng cơ bản (link không hợp lệ hoặc ảnh lỗi)
-    grid.querySelectorAll('article.product-card[data-broken], article.product-card[data-img-missing="1"]').forEach(el=>{
-      el.style.display = 'none';
-    });
-
-    // Gọi lại affiliate rewriter nếu có
-    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
-
-    // (Tùy chọn) Audit 404 qua Worker nếu đã bật endpoint
-    try{
-      const itemsForAudit = Array.from(grid.querySelectorAll('article.product-card'))
-        .map(el=>{
-          const sku = el.getAttribute('data-sku')||'';
-          const a = el.querySelector('.buy');
-          return { sku, url: a ? a.getAttribute('href') : '' };
-        }).filter(x=>/^https?:\/\//.test(x.url));
-      if (itemsForAudit.length){
-        const r = await fetch('/ops/audit-links', {
-          method:'POST',
-          headers:{'content-type':'application/json'},
-          body: JSON.stringify({ items: itemsForAudit, src: location.pathname })
-        });
-        if (r.ok){
-          const rep = await r.json();
-          if (rep && Array.isArray(rep.broken)){
-            const bad = new Set(rep.broken.map(x=>String(x).toLowerCase()));
-            grid.querySelectorAll('article.product-card').forEach(el=>{
-              const sku = (el.getAttribute('data-sku')||'').toLowerCase();
-              if (bad.has(sku)) el.style.display='none';
-            });
-          }
-        }
-      }
-    }catch(_){ /* im lặng, không chặn render */ }
-  })();
-  </script>
-</body>
-</html>
+           data-limit="60"
+           data-featured-first="true">
+    <div class="category-toolbar">
+      <div class="category-info">
+        <strong>Thời trang nam</strong>
+        <span data-category-count></span>
+      </div>
