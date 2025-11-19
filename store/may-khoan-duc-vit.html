@@ -1,261 +1,73 @@
-<!-- MXD-CHECK v2025-10-07 [hub:/store/may-khoan-duc-vit.html]
-- Canonical tuyệt đối; robots=index,follow; meta verify OK
-- GA4 (/assets/analytics.js) TRƯỚC /assets/mxd-affiliate.js
-- OG: title/desc/url/image tuyệt đối (≥1200×630 .webp)
-- product-grid: data-category="may-khoan-duc-vit" (nhận alias mở rộng)
-- Không dán deep-link thủ công; renderer dùng origin -> affiliate rewrite
--->
+<!-- REPLACE WHOLE FILE: /store/may-khoan-duc-vit.html -->
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Máy khoan / đục / vít (SDS+, pin, bulông) | MXD</title>
-  <meta name="description" content="Khoan bê tông SDS+, khoan pin đa năng, bắn vít/ bắt vít, súng bulông, khoan rút lõi & máy thổi — tuyển chuẩn MXD, hiển thị gọn dễ mua."/>
+
+  <title>Máy khoan, máy đục, máy bắn vít | MXD210</title>
+  <meta name="description" content="Máy khoan, máy đục, máy bắn vít cho thợ và chủ nhà tự sửa chữa – ưu tiên dễ dùng, bền, dễ mua phụ kiện.">
   <link rel="canonical" href="https://mxd210.github.io/store/may-khoan-duc-vit.html"/>
   <meta name="robots" content="index,follow"/>
 
-  <!-- VERIFY -->
-  <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o"/>
-
-  <!-- OG -->
+  <meta property="og:title" content="Máy khoan, máy đục, máy bắn vít | MXD210"/>
+  <meta property="og:description" content="Danh mục máy khoan, máy đục, máy bắn vít được chọn dựa trên trải nghiệm thực tế khi thi công."/>
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Máy khoan / đục / vít (SDS+, pin, bulông) | MXD"/>
-  <meta property="og:description" content="Khoan bê tông, khoan/vặn vít, súng bulông, rút lõi, thổi/bơm — dữ liệu affiliates chuẩn hoá hiển thị."/>
   <meta property="og:url" content="https://mxd210.github.io/store/may-khoan-duc-vit.html"/>
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/may-khoan-duc-vit-og.webp"/>
-  <meta property="og:image:width" content="1200"/>
-  <meta property="og:image:height" content="630"/>
 
-<link rel="stylesheet" href="/assets/site.css"/>
+  <link rel="stylesheet" href="/assets/site.css"/>
 
-<!-- GA4 trước Affiliate (chuẩn MXD) -->
-<script defer src="/assets/analytics.js"></script>
-
-<!-- Aliases: phải load TRƯỚC khi render -->
-<script defer src="/assets/js/category-alias.js"></script>
-
-<!-- giữ để tương thích nếu nơi khác gọi -->
-<script defer src="/assets/js/render-products.js"></script>
-
-<!-- Affiliate luôn cuối cùng -->
-<script defer src="/assets/mxd-affiliate.js"></script>
-
-  <style>
-    .container{max-width:1100px;margin:0 auto;padding:0 16px}
-    .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:8px 0 0}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border,#eaeaea);border-radius:12px;background:var(--card,#fff);text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.06);color:inherit}
-    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin:12px 0}
-
-    /* Card sạch + clamp 2 dòng + nút thẳng hàng */
-    .product-card{display:flex;flex-direction:column;height:100%;border:1px solid var(--border,#eee);border-radius:12px;overflow:hidden;background:var(--card,#fff);box-shadow:0 6px 20px rgba(0,0,0,.04)}
-    .product-card .thumb{display:block;aspect-ratio:1/1;overflow:hidden;background:#fafafa}
-    .product-card img{width:100%;height:100%;object-fit:cover;display:block}
-    .product-card .body{padding:10px 10px 12px;display:flex;flex-direction:column;gap:6px}
-    .product-card h3{margin:0;font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
-    .product-card .price{font-weight:700}
-    .product-card .meta{font-size:12px;opacity:.8}
-    .product-card .actions{margin-top:auto}
-    .product-card .btn{display:block;text-align:center;padding:8px 10px;border-radius:10px;background:#ff4d2d;color:#fff;text-decoration:none}
-  </style>
+  <script defer src="/assets/analytics.js"></script>
+  <script defer src="/assets/mxd-affiliates.js"></script>
+  <script defer src="/assets/mxd-store.v2.js"></script>
 </head>
-<body>
-  <header class="container">
-    <nav class="breadcrumb" style="padding:12px 0;border-bottom:1px solid var(--border,#eaeaea);margin-bottom:8px">
-      <a href="/">MXD</a> › <a href="/store.html">Cửa hàng</a> › <span>Khoan / Đục / Vít</span>
+<body data-nav="store">
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="logo">
+      <span class="logo-main">MXD210</span>
+      <span class="logo-sub">Xây dựng &amp; Affiliate</span>
+    </a>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="/" data-nav="home">Trang chủ</a></li>
+        <li><a href="/store.html" data-nav="store">Cửa hàng</a></li>
+        <li><a href="/blog-xay-dung.html" data-nav="blog-xd">Góc xây dựng</a></li>
+        <li><a href="/mxd-aff-academy.html" data-nav="aff-academy">Góc Affiliate</a></li>
+        <li><a href="/contact.html" data-nav="contact">Liên hệ</a></li>
+      </ul>
     </nav>
-    <h1>Máy khoan / đục / vít <small>(SDS+, pin, bulông…)</small></h1>
-    <p class="lead">Gom nhóm theo công việc: khoan bê tông, khoan/vặn vít, impact driver/wrench, rút lõi, thổi/bơm. Link gốc sẽ được affiliate script tự rewrite.</p>
-  </header>
+  </div>
+</header>
 
-  <section class="container quick-nav">
-    <a href="#khoan-sds-plus" class="chip">Khoan bê tông (SDS+)</a>
-    <a href="#khoan-pin" class="chip">Khoan pin đa năng</a>
-    <a href="#impact-driver" class="chip">Bắn vít / bắt vít</a>
-    <a href="#impact-wrench" class="chip">Súng bulông</a>
-    <a href="#rut-loi" class="chip">Khoan rút lõi</a>
-    <a href="#blower" class="chip">Máy thổi / bơm hơi</a>
-    <a href="#phu-kien-khoan" class="chip">Phụ kiện</a>
-    <a href="#faq" class="chip">FAQ</a>
+<main class="page-main">
+  <section class="category-hero">
+    <div class="container">
+      <h1>Máy khoan, đục, bắn vít</h1>
+      <p>Các dòng máy phục vụ khoan bê tông, đục tường và bắn vít gỗ/kim loại – từ nhu cầu gia đình đến thợ chuyên.</p>
+    </div>
   </section>
 
-  <main class="container">
-    <section id="khoan-sds-plus">
-      <h2>Khoan bê tông (SDS+)</h2>
-      <div class="product-grid" data-category="may-khoan-duc-vit" data-sub="khoan-sds-plus"></div>
-    </section>
+  <section class="category-products container"
+           data-mxd-category-page
+           data-category="may-khoan-duc-vit"
+           data-limit="60"
+           data-featured-first="true">
+    <div class="category-toolbar">
+      <div class="category-info">
+        <strong>Máy khoan / đục / vít</strong>
+        <span data-category-count></span>
+      </div>
+    </div>
 
-    <section id="khoan-pin">
-      <h2>Khoan pin đa năng (drill/driver)</h2>
-      <div class="product-grid" data-category="may-khoan-duc-vit" data-sub="khoan-pin"></div>
-    </section>
+    <div class="product-grid"></div>
+  </section>
+</main>
 
-    <section id="impact-driver">
-      <h2>Impact driver (bắn/bắt vít)</h2>
-      <div class="product-grid" data-category="may-khoan-duc-vit" data-sub="impact-driver"></div>
-    </section>
-
-    <section id="impact-wrench">
-      <h2>Súng bulông (impact wrench)</h2>
-      <div class="product-grid" data-category="may-khoan-duc-vit" data-sub="impact-wrench"></div>
-    </section>
-
-    <section id="rut-loi">
-      <h2>Khoan rút lõi</h2>
-      <div class="product-grid" data-category="may-khoan-duc-vit" data-sub="rut-loi"></div>
-    </section>
-
-    <section id="blower">
-      <h2>Máy thổi / bơm hơi</h2>
-      <div class="product-grid" data-category="may-khoan-duc-vit" data-sub="blower"></div>
-    </section>
-
-    <section id="phu-kien-khoan">
-      <h2>Phụ kiện</h2>
-      <ul class="bullets">
-        <li>Mũi khoan SDS+/SDS-max, đầu vít PH/PZ/TX, khẩu bulông 1/2”.</li>
-        <li>Đầu chuyển, chổi than/pin/adapter, tay nắm, chặn độ sâu…</li>
-      </ul>
-      <div class="product-grid" data-category="may-khoan-duc-vit" data-sub="phu-kien-khoan"></div>
-    </section>
-
-    <section id="faq">
-      <h2>FAQ</h2>
-      <details><summary>Chọn SDS+ hay khoan pin?</summary><p>SDS+ cho bê tông nặng (đục/khoan tường); khoan pin cho gỗ/kim loại, lắp đặt nhẹ. Làm nhiều bê tông → SDS+; nội thất → khoan pin + impact driver.</p></details>
-      <details><summary>Impact driver khác impact wrench?</summary><p>Driver bắn vít (đầu lục giác 1/4"); Wrench siết bulông (đầu vuông 1/2").</p></details>
-    </section>
-  </main>
-
-  <footer class="container" style="margin-top:16px;border-top:1px solid var(--border,#eaeaea);padding:12px 0">
-    <p>Icon danh mục: <img src="/assets/img/categories/may-khoan-duc-vit.webp" alt="Máy khoan/đục/vít — MXD" width="64" height="64" loading="lazy"/></p>
-  </footer>
-
-  <script>
-    // ====== Chuẩn hoá & alias danh mục ======
-    const deaccent = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    const norm = s => deaccent(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/(^-|-$)/g,'');
-
-    // Nhận nhiều biến thể tên (để gom chung vào trang này)
-    const ALLOW_KEYS = [
-      'may-khoan-duc-vit','may-khoan','may-khoan-be-tong','khoan-sds','may-duc',
-      'may-ban-vit','may-bat-vit','impact-driver','may-bulong','sung-bulong','impact-wrench',
-      'khoan-rut-loi','may-rut-loi','may-thoi','may-thoi-la','blower','may-bom-hoi','bom-hoi-pin',
-      'phu-kien-khoan'
-    ];
-    const isAllowedCat = c => {
-      const x = norm(c);
-      return ALLOW_KEYS.some(k => x.startsWith(k));
-    };
-
-    // ====== Định tuyến nhóm hiển thị ======
-    const SUBS = ['khoan-sds-plus','khoan-pin','impact-driver','impact-wrench','rut-loi','blower','phu-kien-khoan'];
-
-    function routeSub(p){
-      const s = norm((p.sku||'')+' '+(Array.isArray(p.tags)?p.tags.join(' '):'')+' '+(p.name||''));
-      // SDS+ / bê tông
-      if (/\b(sds|be-tong|duc|rotary-hammer|rh-|k98|2230|3100|mulinsen|workfix|total)\b/.test(s)) return 'khoan-sds-plus';
-      // Impact driver (bắn/bắt vít)
-      if (/\b(impact-?driver|ban-vit|bat-vit|driver-1-4|1-4|hex-1-4|vặn-vit)\b/.test(s)) return 'impact-driver';
-      // Impact wrench (bulông)
-      if (/\b(impact-?wrench|bulong|1-2|vuong-1-2|wrench)\b/.test(s)) return 'impact-wrench';
-      // Khoan pin đa năng (drill/driver)
-      if (/\b(khoan-pin|drill|driver|m21|hm21|18v|21v)\b/.test(s)) return 'khoan-pin';
-      // Rút lõi
-      if (/\b(rut-loi|core-?drill|krl-|krl-178|loi-be-tong)\b/.test(s)) return 'rut-loi';
-      // Blower / bơm hơi / thổi lá / nén khí mini
-      if (/\b(blower|thoi|thoi-la|bom-hoi|inflator|may-bom)\b/.test(s)) return 'blower';
-      // Phụ kiện
-      if (/\b(sds-?plus|sds-?max|mui-khoan|mui-duc|dau-vi|dau-vit|socket|khau|bit|adapter|phu-kien)\b/.test(s)) return 'phu-kien-khoan';
-      // Nếu là nailer / dụng cụ pin khác -> tạm gom blower/phụ trợ
-      if (/\b(nailer|ban-dinh|sbd|ban-dinh-go)\b/.test(s)) return 'blower';
-      // fallback hợp lý
-      return 'khoan-pin';
-    }
-
-    // ====== Render ======
-    function priceText(v){ try{ const n=Number(v||0); return n? n.toLocaleString('vi-VN')+'₫':'Liên hệ'; }catch(e){ return 'Liên hệ'; } }
-    function esc(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;' }[m]))}
-
-    function marketFromURL(url){
-      try{
-        const u = new URL(url);
-        if (u.hostname.includes('shopee')) return 'Shopee';
-        if (u.hostname.includes('lazada')) return 'Lazada';
-        if (u.hostname.includes('tiki')) return 'Tiki';
-      }catch(_){}
-      return 'Cửa hàng';
-    }
-
-    function cardHTML(p){
-      const url = p.origin || p.deeplink || '#';
-      const img = p.image || '/assets/img/placeholder.webp';
-      const name = esc(p.name||'');
-      const shop = marketFromURL(url);
-      return `
-      <article class="product-card" data-sku="${esc(p.sku||'')}" data-cat="${esc(p.category||'')}">
-        <a class="thumb" href="${url}" target="_blank" rel="nofollow noopener" data-origin="${url}">
-          <img loading="lazy" src="${img}" alt="${name}">
-        </a>
-        <div class="body">
-          <h3 title="${name}"><a href="${url}" target="_blank" rel="nofollow noopener" data-origin="${url}">${name}</a></h3>
-          <div class="price">${priceText(p.price)}</div>
-          <div class="meta">${esc(p.brand||'')}</div>
-          <div class="actions">
-            <a class="btn" href="${url}" target="_blank" rel="nofollow noopener" data-origin="${url}">Mua trên ${shop}</a>
-          </div>
-        </div>
-      </article>`;
-    }
-
-    async function renderDrills(){
-      try{
-        const res = await fetch('/assets/data/affiliates.json',{cache:'no-store'});
-        const all = await res.json();
-
-        // lọc theo danh mục cho phép, hoặc heuristic bắt từ khoá
-        const list0 = all.filter(p=>{
-          if (!p || p.status === false) return false;
-          if (p.category && isAllowedCat(p.category)) return true;
-          const s = norm((p.name||'')+' '+(Array.isArray(p.tags)?p.tags.join(' '):''));
-          return /\b(khoan|be-tong|sds|ban-vit|bat-vit|impact|bulong|wrench|rut-loi|thoi|blower|bom-hoi)\b/.test(s);
-        });
-
-        // khử trùng lặp theo sku
-        const seen = new Set();
-        const list = list0.filter(p => !seen.has(p.sku) && seen.add(p.sku));
-
-        // gom nhóm
-        const buckets = Object.fromEntries(SUBS.map(k => [k, []]));
-        for (const p of list){
-          buckets[routeSub(p)].push(p);
-        }
-
-        // render
-        document.querySelectorAll('.product-grid[data-category]').forEach(grid=>{
-          const sub = grid.getAttribute('data-sub');
-          const items = buckets[sub] || [];
-          grid.innerHTML = items.map(cardHTML).join('');
-        });
-
-        // fallback nếu trống: rải đều vài sp
-        const flat = list.slice(0,12);
-        for (const sub of SUBS){
-          const grid = document.querySelector(`.product-grid[data-sub="${sub}"]`);
-          if (grid && !grid.children.length){
-            grid.innerHTML = flat.map(cardHTML).join('');
-          }
-        }
-
-        // Cho affiliate rewrite
-        if (window.MXD && typeof MXD.affRewrite === 'function'){ MXD.affRewrite(); }
-      }catch(err){
-        console.error('[may-khoan-duc-vit] render error:', err);
-        if (window.MXD?.renderCategory) MXD.renderCategory('may-khoan-duc-vit');
-        else if (window.MXD?.renderProducts) MXD.renderProducts('.product-grid');
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', renderDrills);
-  </script>
+<footer class="site-footer">
+  <div class="container">
+    <p>© MXD210 – Chia sẻ kinh nghiệm chọn máy khoan, đục, vít sát thực tế.</p>
+  </div>
+</footer>
 </body>
 </html>
