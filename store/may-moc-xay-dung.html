@@ -1,94 +1,81 @@
+<!-- REPLACE WHOLE FILE: /store/may-moc-xay-dung.html -->
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Máy móc xây dựng | MXD</title>
-  <meta name="description" content="Gộp máy cắt, máy laser, khoan/đục/vít… hiển thị tự động từ dữ liệu chuẩn MXD."/>
+
+  <title>Máy móc xây dựng – Thiết bị chọn lọc | MXD210</title>
+  <meta name="description" content="Máy móc, thiết bị phục vụ thi công và sửa chữa nhỏ – được MXD210 chọn theo tiêu chí: dễ mua, dễ bảo hành, phù hợp với nhu cầu thực tế ngoài công trình.">
   <link rel="canonical" href="https://mxd210.github.io/store/may-moc-xay-dung.html"/>
   <meta name="robots" content="index,follow"/>
 
-  <!-- OG -->
+  <!-- OPEN GRAPH -->
+  <meta property="og:title" content="Máy móc xây dựng – Thiết bị chọn lọc | MXD210"/>
+  <meta property="og:description" content="Gợi ý máy móc, thiết bị xây dựng từ MXD210 – ưu tiên những mẫu phù hợp thợ thi công, chủ nhà tự xử lý các hạng mục nhỏ."/>
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Máy móc xây dựng | MXD"/>
-  <meta property="og:description" content="Máy cắt • Máy laser • Khoan/Đục/Vít — lấy từ affiliates.json; fallback products.json."/>
   <meta property="og:url" content="https://mxd210.github.io/store/may-moc-xay-dung.html"/>
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/may-moc-xay-dung.webp"/>
 
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- GA4 trước affiliate -->
+  <!-- Analytics trước Affiliate -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
+  <script defer src="/assets/mxd-store.v2.js"></script>
 </head>
-<body>
-  <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Máy móc xây dựng</nav>
-  <h1>Máy móc xây dựng</h1>
-  <p>Gộp: máy cắt • máy laser • khoan/đục/vít.</p>
+<body data-nav="store">
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">
+        <span class="logo-main">MXD210</span>
+        <span class="logo-sub">Xây dựng &amp; Affiliate</span>
+      </a>
 
-  <div class="filter-row">
-    <a class="btn" href="/store/may-moc-xay-dung.html">Tất cả</a>
-    <a class="btn" href="/store/may-cat.html">Máy cắt</a>
-    <a class="btn" href="/store/may-lazer.html">Máy laser</a>
-    <a class="btn" href="/store/khoan-duc-vit.html">Khoan · Đục · Vít</a>
-  </div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="/" data-nav="home">Trang chủ</a></li>
+          <li><a href="/store.html" data-nav="store">Cửa hàng</a></li>
+          <li><a href="/blog-xay-dung.html" data-nav="blog-xd">Góc xây dựng</a></li>
+          <li><a href="/mxd-aff-academy.html" data-nav="aff-academy">Góc Affiliate</a></li>
+          <li><a href="/contact.html" data-nav="contact">Liên hệ</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-  <section id="product-grid"
-           class="product-grid"
-           data-alias="may-cat,may-lazer,may-khoan-duc-vit"></section>
+  <main class="page-main">
+    <section class="category-hero">
+      <div class="container">
+        <h1>Máy móc &amp; thiết bị cho anh em hiện trường</h1>
+        <p>
+          Những món phục vụ trực tiếp cho thi công, sửa chữa: máy khoan, máy cắt,
+          thiết bị đo, phụ kiện đi kèm… được chọn dựa trên kinh nghiệm thực tế ngoài công trình.
+        </p>
+      </div>
+    </section>
 
-  <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
+    <section class="category-products container"
+             data-mxd-category-page
+             data-category="may-moc-xay-dung"
+             data-limit="60"
+             data-featured-first="true">
+      <div class="category-toolbar">
+        <div class="category-info">
+          <strong>Máy móc xây dựng</strong>
+          <span data-category-count></span>
+        </div>
+      </div>
 
-  <script>
-  (async function renderMXD(){
-    const grid = document.getElementById('product-grid');
-    const aliases = (grid.getAttribute('data-alias')||'').split(',').map(s=>s.trim()).filter(Boolean);
-    const sources = ['/assets/data/affiliates.json','/products.json','/affiliates.json'];
-    let data=null;
+      <div class="product-grid">
+        <!-- mxd-store.v2.js sẽ tự render card ở đây -->
+      </div>
+    </section>
+  </main>
 
-    for (const src of sources){
-      try { const r = await fetch(src,{cache:'no-store'}); if(r.ok){ data = await r.json(); break; } } catch {}
-    }
-    if (!Array.isArray(data)) {
-      grid.innerHTML = `<p class="muted">Không tải được dữ liệu (đã thử ${sources.join(' → ')}).</p>`;
-      return;
-    }
-
-    const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-    const items = data.filter(p=>{
-      if (!p || p.status === 'archived') return false;
-      const c = (p.category||'').toLowerCase();
-      return aliases.includes(c);
-    });
-
-    if (!items.length) {
-      grid.innerHTML = `<p class="muted">Chưa có sản phẩm cho nhóm này. Hãy nạp dữ liệu vào <code>/assets/data/affiliates.json</code>.</p>`;
-      return;
-    }
-
-    grid.innerHTML = items.map(p=>{
-      const sku = p.sku || '';
-      const name = p.name || sku || 'Sản phẩm';
-      const img  = p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp');
-      const price = fmt(p.price);
-      const merchant = (p.merchant||'').toLowerCase();
-      const origin = p.deeplink || p.origin || p.origin_url || p.url || '#';
-      return `
-        <article class="product-card" data-sku="${sku}">
-          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
-            <img loading="lazy" src="${img}" alt="${name} — MXD" width="320" height="320"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-          </a>
-          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${name}</a></h3>
-          ${price?`<div class="price">${price}</div>`:''}
-          <div class="actions">
-            <a class="buy" href="${origin}" data-merchant="${merchant}" rel="nofollow sponsored noopener" target="_blank">Mua ngay</a>
-          </div>
-        </article>`;
-    }).join('');
-
-    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
-  })();
-  </script>
+  <footer class="site-footer">
+    <div class="container">
+      <p>© MXD210 – Đồng hành cùng anh em ngoài công trình lẫn trong nhà.</p>
+    </div>
+  </footer>
 </body>
 </html>
