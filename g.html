@@ -3,397 +3,475 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
-  <title>Chi tiết sản phẩm | MXD</title>
-  <meta name="description" content="Chi tiết sản phẩm được MXD chọn lọc – xem thông tin, giá tham khảo và mua qua các sàn TMĐT.">
-  <link rel="canonical" href="https://mxd210.github.io/g.html">
+  <title>Chi tiết sản phẩm | MXD210</title>
+  <meta name="description" content="Chi tiết sản phẩm được MXD210 chọn lọc từ các sàn thương mại điện tử.">
+  <!-- canonical sẽ được JS cập nhật theo SKU -->
+  <link rel="canonical" href="https://mxd210.github.io/g.html"/>
+
   <meta name="robots" content="index,follow"/>
 
-  <!-- OG fallback (sẽ được JS cập nhật lại theo từng sản phẩm nếu cần) -->
-  <meta property="og:type" content="product"/>
-  <meta property="og:title" content="Chi tiết sản phẩm | MXD"/>
-  <meta property="og:description" content="Sản phẩm do MXD chọn lọc, dễ mua, dễ so sánh."/>
+  <!-- OPEN GRAPH (JS sẽ cập nhật lại theo sản phẩm) -->
+  <meta property="og:title" content="Chi tiết sản phẩm | MXD210"/>
+  <meta property="og:description" content="Xem chi tiết sản phẩm được MXD210 chọn lọc."/>
+  <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://mxd210.github.io/g.html"/>
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/home.webp"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/logo-1200x630.webp"/>
 
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- GA4 trước affiliate -->
+  <!-- Google Analytics 4 -->
   <script defer src="/assets/analytics.js"></script>
-  <script defer src="/assets/mxd-affiliate.js"></script>
+  <!-- Affiliate rewrite (bắt buộc sau GA4) -->
+  <script defer src="/assets/mxd-affiliates.js"></script>
 
-  <style>
-    :root{
-      --brand:#ff6a00;
-      --muted:#6b7280;
-      --border:#e5e7eb;
-    }
-    body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#111;background:#fff}
-    header{position:sticky;top:0;z-index:50;background:#fff;backdrop-filter:blur(6px);border-bottom:1px solid var(--border)}
-    .container{max-width:1180px;margin:0 auto;padding:0 16px}
-    .site-header-inner{
-      display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-      padding:12px 16px;
-    }
-    .brand{font-weight:900;font-size:20px;color:#111;text-decoration:none}
-    .site-nav{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
-    .nav-link{padding:8px 10px;border-radius:10px;text-decoration:none;color:#111;font-size:14px}
-    .nav-link:hover{background:rgba(255,106,0,.08)}
-    .nav-link[aria-current="page"]{background:#fff4ec;color:#b24900}
-
-    main{padding:16px 0 32px}
-    .breadcrumbs{
-      font-size:13px;color:var(--muted);margin:8px 0 12px;
-    }
-    .breadcrumbs a{color:var(--muted);text-decoration:none}
-    .breadcrumbs a:hover{text-decoration:underline}
-
-    .product-page{
-      display:grid;
-      grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);
-      gap:24px;
-      align-items:flex-start;
-    }
-    @media(max-width:840px){
-      .product-page{grid-template-columns:1fr}
-    }
-
-    .product-media img{
-      width:100%;
-      border-radius:16px;
-      border:1px solid var(--border);
-      background:#f3f4f6;
-      object-fit:cover;
-    }
-
-    .product-meta h1{
-      font-size:22px;
-      margin:0 0 8px;
-      line-height:1.4;
-    }
-    .price{
-      font-size:22px;
-      font-weight:800;
-      color:#b91c1c;
-      margin:8px 0 10px;
-    }
-    .meta-line{
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:4px;
-    }
-    .meta-line strong{color:#111}
-    .tags{
-      margin:8px 0 12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-    }
-    .tag{
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background:#f9fafb;
-      color:#374151;
-    }
-
-    .buy-area{
-      margin:16px 0 12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-    .btn-buy{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-      padding:10px 16px;
-      border-radius:999px;
-      border:none;
-      text-decoration:none;
-      font-size:14px;
-      font-weight:700;
-      cursor:pointer;
-      background:var(--brand);
-      color:#fff;
-    }
-    .btn-buy[data-merchant="shopee"]{background:#ee4d2d}
-    .btn-buy[data-merchant="lazada"]{background:#0f146d}
-    .btn-buy[data-merchant="tiki"]{background:#1a94ff}
-    .btn-buy[data-merchant="tiktok"]{background:#000}
-    .btn-buy:hover{filter:brightness(1.05)}
-
-    .btn-secondary{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-      padding:10px 16px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background:#f9fafb;
-      color:#111;
-      font-size:13px;
-      text-decoration:none;
-    }
-
-    .desc-block{
-      margin-top:12px;
-      font-size:14px;
-      line-height:1.6;
-    }
-
-    .section-title{
-      font-size:18px;
-      font-weight:700;
-      margin:24px 0 12px;
-    }
-
-    .related-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-      gap:16px;
-    }
-    .card{
-      border:1px solid var(--border);
-      border-radius:12px;
-      overflow:hidden;
-      background:#fff;
-      text-decoration:none;
-      color:#111;
-      font-size:13px;
-    }
-    .card img{
-      width:100%;
-      aspect-ratio:1/1;
-      object-fit:cover;
-      background:#f3f4f6;
-    }
-    .card-body{padding:8px 10px}
-    .card-title{
-      margin:0 0 6px;
-      font-size:13px;
-      line-height:1.4;
-      max-height:2.8em;
-      overflow:hidden;
-    }
-    .card-price{
-      font-weight:700;
-      color:#b91c1c;
-      font-size:13px;
-    }
-
-    .muted{color:var(--muted);font-size:13px}
-    footer{
-      border-top:1px solid var(--border);
-      padding:12px 16px;
-      font-size:13px;
-      color:var(--muted);
-    }
-  </style>
+  <!-- JSON-LD sẽ được JS fill -->
+  <script type="application/ld+json" id="product-jsonld"></script>
 </head>
-<body>
-  <header>
-    <div class="container site-header-inner">
-      <a href="/" class="brand">MXD</a>
-      <nav class="site-nav">
-        <a href="/" class="nav-link">Trang chủ</a>
-        <a href="/store.html" class="nav-link">Cửa hàng</a>
-        <a href="/blog/" class="nav-link">Tin tức</a>
-        <a href="/tu-van.html" class="nav-link">Tư vấn</a>
-        <a href="/cong-cu/" class="nav-link">Công cụ</a>
-        <a href="/lien-he.html" class="nav-link">Liên hệ</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container">
-    <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › <span>Chi tiết</span>
+<body data-nav="store">
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="logo">
+      <span class="logo-main">MXD210</span>
+      <span class="logo-sub">Xây dựng &amp; Affiliate</span>
+    </a>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="/" data-nav="home">Trang chủ</a></li>
+        <li><a href="/store.html" data-nav="store">Cửa hàng</a></li>
+        <li><a href="/blog-xay-dung.html" data-nav="blog-xd">Góc xây dựng</a></li>
+        <li><a href="/mxd-aff-academy.html" data-nav="aff-academy">Góc Affiliate</a></li>
+        <li><a href="/contact.html" data-nav="contact">Liên hệ</a></li>
+      </ul>
     </nav>
+  </div>
+</header>
 
-    <div id="product-wrap">
-      <p class="muted">Đang tải dữ liệu sản phẩm…</p>
+<main class="page-main">
+  <!-- KHỐI CHI TIẾT SẢN PHẨM -->
+  <section class="product-detail container" data-mxd-product-page>
+    <div class="product-detail-grid">
+      <div class="product-media">
+        <img id="product-image"
+             src="/assets/img/products/placeholder.webp"
+             alt="Đang tải sản phẩm"
+             loading="lazy"
+             onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp';">
+      </div>
+
+      <div class="product-info">
+        <h1 id="product-name">Đang tải sản phẩm…</h1>
+
+        <p class="product-price" id="product-price"></p>
+
+        <div class="product-short" id="product-short"></div>
+
+        <div class="product-meta">
+          <span id="product-merchant"></span>
+          <span id="product-brand"></span>
+          <span id="product-updated"></span>
+        </div>
+
+        <div class="product-actions">
+          <a id="product-buy"
+             class="buy btn-buy"
+             href="#"
+             data-merchant=""
+             data-sku="">
+            Mua ngay tại sàn
+          </a>
+        </div>
+      </div>
     </div>
 
-    <section id="related-section" style="display:none">
-      <h2 class="section-title">Sản phẩm liên quan</h2>
-      <div id="related-list" class="related-grid"></div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">
-      © MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> ·
-      <a href="/chinh-sach/doi-tra.html">Đổi trả</a> ·
-      <a href="/chinh-sach/bao-hanh.html">Bảo hành</a>
+    <div class="product-error" id="product-error" hidden>
+      <p>Không tìm thấy sản phẩm hoặc thiếu mã <code>sku</code>. Vui lòng quay lại cửa hàng và thử lại.</p>
+      <p><a href="/store.html">← Quay lại cửa hàng MXD210</a></p>
     </div>
-  </footer>
+  </section>
 
-  <script>
-    (function(){
-      const params = new URLSearchParams(location.search);
-      const sku = (params.get('sku') || '').toLowerCase().trim();
+  <!-- KHỐI SẢN PHẨM LIÊN QUAN -->
+  <section class="container related-section">
+    <header class="section-header">
+      <h2>Sản phẩm liên quan</h2>
+    </header>
+    <div class="product-grid" id="related-grid">
+      <!-- JS render card, cùng chuẩn với các trang mục -->
+    </div>
+  </section>
+</main>
 
-      const wrap = document.getElementById('product-wrap');
-      const relatedSection = document.getElementById('related-section');
-      const relatedList = document.getElementById('related-list');
+<footer class="site-footer">
+  <div class="container">
+    <p>© MXD210 – Gợi ý sản phẩm gần với nhu cầu thực tế của anh em ngoài công trình và trong gia đình.</p>
+  </div>
+</footer>
 
-      if (!sku) {
-        wrap.innerHTML = '<p class="muted">Thiếu tham số <code>sku</code>. Vui lòng quay lại cửa hàng.</p>';
-        return;
-      }
+<script>
+// ================== MXD PRODUCT DETAIL v2 ==================
 
-      const money = n => Number.isFinite(+n)
-        ? new Intl.NumberFormat('vi-VN').format(+n) + '₫'
-        : '';
+document.addEventListener('DOMContentLoaded', () => {
+  initMXDProductPage().catch(err => {
+    console.error('MXD g.html error:', err);
+  });
+});
 
-      function esc(s){
-        return String(s || '').replace(/[&<>"']/g, c => ({
-          '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-        }[c]));
-      }
+async function initMXDProductPage() {
+  const root = document.querySelector('[data-mxd-product-page]');
+  if (!root) return;
 
-      fetch('/assets/data/affiliates.json', { cache: 'no-store' })
-        .then(r => r.ok ? r.json() : [])
-        .then(all => {
-          const arr = Array.isArray(all) ? all : (all.items || []);
-          if (!arr.length) {
-            wrap.innerHTML = '<p class="muted">Chưa có dữ liệu sản phẩm.</p>';
-            return;
-          }
+  const params = new URLSearchParams(window.location.search);
+  const sku = (params.get('sku') || '').trim();
 
-          const product = arr.find(p => (p.sku || '').toLowerCase() === sku);
-          if (!product) {
-            wrap.innerHTML = '<p class="muted">Không tìm thấy sản phẩm với SKU <code>'+esc(sku)+'</code>.</p>';
-            return;
-          }
+  if (!sku) {
+    renderNotFound('Thiếu mã sản phẩm (sku).');
+    return;
+  }
 
-          const name = product.name || product.sku || 'Sản phẩm';
-          const priceHtml = Number.isFinite(+product.price)
-            ? '<div class="price">'+ money(+product.price) +'</div>' : '';
-          const img = product.image || ('/assets/img/products/'+ sku +'.webp');
-          const brand = product.brand || '';
-          const category = product.category || '';
-          const merchant = (product.merchant || '').toLowerCase();
-          const tags = Array.isArray(product.tags) ? product.tags : [];
-          const shortDesc = product.short_desc || '';
-          const fullSeoDesc = product.seo_description || shortDesc || '';
+  const res = await fetch('/assets/data/affiliates.json', { cache: 'no-store' });
+  if (!res.ok) {
+    renderNotFound('Không tải được dữ liệu sản phẩm.');
+    return;
+  }
 
-          // Ưu tiên deeplink, fallback origin
-          let buyUrl = product.deeplink || product.origin || product.origin_url || '';
-          if (!buyUrl) buyUrl = '#';
+  let data;
+  try {
+    data = await res.json();
+  } catch (e) {
+    console.error('AFF parse error:', e);
+    renderNotFound('Dữ liệu sản phẩm không hợp lệ.');
+    return;
+  }
+  if (!Array.isArray(data)) data = [];
 
-          // Cập nhật <title> + meta description theo sản phẩm
-          const seoTitle = product.seo_title || (name + ' | MXD');
-          document.title = seoTitle;
+  // tìm sản phẩm theo sku
+  const product = data.find(p => String(p.sku || '') === sku);
+  if (!product) {
+    renderNotFound('Không tìm thấy sản phẩm với mã: ' + sku);
+    return;
+  }
 
-          const metaDesc = document.querySelector('meta[name="description"]');
-          if (metaDesc) metaDesc.setAttribute('content', fullSeoDesc || 'Sản phẩm do MXD chọn lọc.');
-          const ogTitle = document.querySelector('meta[property="og:title"]');
-          if (ogTitle) ogTitle.setAttribute('content', seoTitle);
-          const ogDesc = document.querySelector('meta[property="og:description"]');
-          if (ogDesc) ogDesc.setAttribute('content', fullSeoDesc || 'Sản phẩm do MXD chọn lọc.');
-          const ogImage = document.querySelector('meta[property="og:image"]');
-          if (ogImage) ogImage.setAttribute('content', new URL(img, location.origin).href);
-          const ogUrl = document.querySelector('meta[property="og:url"]');
-          if (ogUrl) ogUrl.setAttribute('content', location.href);
+  renderProductDetail(product);
+  updateHeadMeta(product);
+  updateProductJsonLd(product);
 
-          // Render chi tiết sản phẩm
-          let merchantLabel = 'Mua ngay';
-          if (merchant === 'shopee') merchantLabel = 'Mua trên Shopee';
-          else if (merchant === 'lazada') merchantLabel = 'Mua trên Lazada';
-          else if (merchant === 'tiki') merchantLabel = 'Mua trên Tiki';
-          else if (merchant === 'tiktok') merchantLabel = 'Mua trên TikTok Shop';
+  renderRelatedProducts(data, product);
+}
 
-          wrap.innerHTML = `
-            <div class="product-page">
-              <div class="product-media">
-                <img loading="lazy" decoding="async"
-                     src="${esc(img)}"
-                     alt="${esc(name)}"
-                     onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-              </div>
-              <article class="product-meta">
-                <h1>${esc(name)}</h1>
-                ${priceHtml}
-                ${brand ? `<div class="meta-line"><strong>Thương hiệu:</strong> ${esc(brand)}</div>` : ''}
-                ${category ? `<div class="meta-line"><strong>Danh mục:</strong> ${esc(category)}</div>` : ''}
-                ${merchant ? `<div class="meta-line"><strong>Sàn:</strong> ${esc(merchant)}</div>` : ''}
-                
-                <div class="buy-area">
-                  <a class="btn-buy"
-                     id="buyBtn"
-                     href="${esc(buyUrl)}"
-                     data-merchant="${esc(merchant)}"
-                     target="_blank"
-                     rel="nofollow sponsored noopener">
-                    ${merchantLabel}
-                  </a>
-                  <a class="btn-secondary" href="/store.html">← Về cửa hàng</a>
-                </div>
+function renderNotFound(msg) {
+  const detailGrid = document.querySelector('.product-detail-grid');
+  const errorBox = document.getElementById('product-error');
+  if (detailGrid) detailGrid.style.display = 'none';
+  if (errorBox) {
+    errorBox.hidden = false;
+    errorBox.querySelector('p').firstChild.nodeValue = msg + ' ';
+  }
 
-                ${tags.length ? `
-                  <div class="tags">
-                    ${tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}
-                  </div>
-                ` : ''}
+  const related = document.getElementById('related-grid');
+  if (related) related.innerHTML = '';
+}
 
-                ${shortDesc ? `
-                  <div class="desc-block">
-                    <strong>Mô tả ngắn:</strong><br>
-                    ${esc(shortDesc)}
-                  </div>
-                ` : ''}
-              </article>
-            </div>
-          `;
+function renderProductDetail(p) {
+  const name = p.name || '';
+  const priceValue = getPrice(p);
+  const priceText = priceValue != null ? formatVND(priceValue) : '';
+  const shortDesc = (p.short_desc || p.description || '').toString().trim();
+  const sku = p.sku || '';
+  const brand = (p.brand || '').toString().trim();
+  const updated = (p.updated_at || '').toString().trim();
+  const originRaw = (p.origin || p.origin_url || '').toString().trim();
+  const origin = originRaw || '#';
 
-          // Render sản phẩm liên quan (cùng category hoặc cùng merchant)
-          const related = arr.filter(p =>
-            p !== product &&
-            p.status !== 'hidden' &&
-            (
-              (category && p.category === category) ||
-              ((p.merchant || '').toLowerCase() === merchant)
-            )
-          ).slice(0, 8);
+  const merchant = (p.merchant || detectMerchant(origin)).toString().toLowerCase();
+  const merchantLabel = merchantLabelFor(merchant);
 
-          if (related.length) {
-            relatedSection.style.display = '';
-            relatedList.innerHTML = related.map(p => {
-              const rSku = (p.sku || '').toLowerCase();
-              const rName = p.name || rSku || 'Sản phẩm';
-              const rImg = p.image || ('/assets/img/products/'+ rSku +'.webp');
-              const rPrice = Number.isFinite(+p.price) ? money(+p.price) : '';
-              return `
-                <a class="card" href="/g.html?sku=${encodeURIComponent(rSku)}">
-                  <img loading="lazy" decoding="async"
-                       src="${esc(rImg)}"
-                       alt="${esc(rName)}"
-                       onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-                  <div class="card-body">
-                    <div class="card-title">${esc(rName)}</div>
-                    ${rPrice ? `<div class="card-price">${rPrice}</div>` : ''}
-                  </div>
-                </a>
-              `;
-            }).join('');
-          }
+  const imgSrc = p.image || `/assets/img/products/${encodeURIComponent(sku || 'placeholder')}.webp`;
 
-          // Cho mxdAffiliate xử lý deeplink (nếu chỉ có origin)
-          if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
-            window.mxdAffiliate.scan();
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          wrap.innerHTML = '<p class="muted">Lỗi tải dữ liệu sản phẩm. Vui lòng thử lại sau.</p>';
-        });
-    })();
-  </script>
+  const imgEl = document.getElementById('product-image');
+  const nameEl = document.getElementById('product-name');
+  const priceEl = document.getElementById('product-price');
+  const shortEl = document.getElementById('product-short');
+  const merchantEl = document.getElementById('product-merchant');
+  const brandEl = document.getElementById('product-brand');
+  const updatedEl = document.getElementById('product-updated');
+  const buyEl = document.getElementById('product-buy');
+
+  if (imgEl) {
+    imgEl.src = imgSrc;
+    imgEl.alt = name || 'Sản phẩm';
+  }
+  if (nameEl) nameEl.textContent = name || 'Sản phẩm không tên';
+  if (priceEl) priceEl.textContent = priceText ? priceText : '';
+  if (shortEl) {
+    shortEl.textContent = shortDesc || 'Đang cập nhật mô tả chi tiết cho sản phẩm này.';
+  }
+  if (merchantEl) {
+    merchantEl.textContent = merchantLabel ? `Mua trên: ${merchantLabel}` : '';
+  }
+  if (brandEl && brand) {
+    brandEl.textContent = `• Thương hiệu: ${brand}`;
+  }
+  if (updatedEl && updated) {
+    const d = new Date(updated);
+    if (!isNaN(d.getTime())) {
+      const formatted = d.toLocaleDateString('vi-VN');
+      updatedEl.textContent = `• Cập nhật: ${formatted}`;
+    }
+  }
+
+  if (buyEl) {
+    buyEl.href = escapeAttr(origin);
+    buyEl.dataset.merchant = merchant;
+    buyEl.dataset.sku = sku;
+    if (merchantLabel) {
+      buyEl.textContent = `Mua ngay trên ${merchantLabel}`;
+    } else {
+      buyEl.textContent = 'Mua ngay tại sàn';
+    }
+  }
+}
+
+// ========== HEAD META & JSON-LD ==========
+
+function updateHeadMeta(p) {
+  const params = new URLSearchParams(window.location.search);
+  const sku = (p.sku || params.get('sku') || '').toString();
+  const origin = window.location.origin || 'https://mxd210.github.io';
+  const canonical = `${origin}/g.html?sku=${encodeURIComponent(sku)}`;
+
+  // title
+  document.title = `${p.name || 'Chi tiết sản phẩm'} | MXD210`;
+
+  // meta description
+  const desc = buildDescription(p);
+  let metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) {
+    metaDesc.setAttribute('content', desc);
+  }
+
+  // canonical
+  let linkCanon = document.querySelector('link[rel="canonical"]');
+  if (!linkCanon) {
+    linkCanon = document.createElement('link');
+    linkCanon.rel = 'canonical';
+    document.head.appendChild(linkCanon);
+  }
+  linkCanon.href = canonical;
+
+  // OG
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.setAttribute('content', `${p.name || ''} | MXD210`);
+
+  const ogDesc = document.querySelector('meta[property="og:description"]');
+  if (ogDesc) ogDesc.setAttribute('content', desc);
+
+  const ogUrl = document.querySelector('meta[property="og:url"]');
+  if (ogUrl) ogUrl.setAttribute('content', canonical);
+
+  const ogImg = document.querySelector('meta[property="og:image"]');
+  const imgSrc = p.image || `/assets/img/products/${encodeURIComponent(p.sku || 'placeholder')}.webp`;
+  if (ogImg) ogImg.setAttribute('content', absUrl(imgSrc));
+}
+
+function updateProductJsonLd(p) {
+  const params = new URLSearchParams(window.location.search);
+  const sku = (p.sku || params.get('sku') || '').toString();
+  const origin = window.location.origin || 'https://mxd210.github.io';
+  const canonical = `${origin}/g.html?sku=${encodeURIComponent(sku)}`;
+
+  const priceValue = getPrice(p);
+  const imgSrc = p.image || `/assets/img/products/${encodeURIComponent(p.sku || 'placeholder')}.webp`;
+  const shortDesc = (p.short_desc || p.description || p.name || '').toString().trim();
+
+  const json = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": p.name || "",
+    "image": [absUrl(imgSrc)],
+    "description": shortDesc,
+    "sku": p.sku || "",
+    "brand": p.brand ? { "@type": "Brand", "name": p.brand } : undefined,
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "VND",
+      "price": priceValue != null ? String(priceValue) : "",
+      "url": canonical,
+      "availability": "https://schema.org/InStock"
+    }
+  };
+  // xoá key undefined cho gọn
+  if (!json.brand) delete json.brand;
+
+  const el = document.getElementById('product-jsonld');
+  if (el) {
+    el.textContent = JSON.stringify(json, null, 2);
+  }
+}
+
+// ========== RELATED PRODUCTS ==========
+
+function renderRelatedProducts(allProducts, current) {
+  const grid = document.getElementById('related-grid');
+  if (!grid) return;
+
+  const currentSku = (current.sku || '').toString();
+  const category = (current.category || '').toString();
+
+  let list = allProducts.filter(p => {
+    const status = (p.status || 'active').toString().toLowerCase();
+    if (['archived', 'hidden', 'draft'].includes(status)) return false;
+    if (String(p.sku || '') === currentSku) return false;
+    return (p.category || '') === category;
+  });
+
+  // fallback: nếu cùng category quá ít, mở rộng nhẹ
+  if (list.length < 4) {
+    const extra = allProducts.filter(p => {
+      const status = (p.status || 'active').toString().toLowerCase();
+      if (['archived', 'hidden', 'draft'].includes(status)) return false;
+      if (String(p.sku || '') === currentSku) return false;
+      if ((p.category || '') === category) return false; // tránh trùng
+      return true;
+    });
+    list = list.concat(extra).slice(0, 8);
+  }
+
+  // sort: featured trước, sau đó updated_at mới trước
+  list.sort((a, b) => {
+    const fa = a.featured ? 1 : 0;
+    const fb = b.featured ? 1 : 0;
+    if (fb !== fa) return fb - fa;
+    const ta = getTime(a.updated_at);
+    const tb = getTime(b.updated_at);
+    return tb - ta;
+  });
+
+  const limit = 8;
+  if (list.length > limit) list = list.slice(0, limit);
+
+  if (list.length === 0) {
+    grid.innerHTML = '<p>Chưa có sản phẩm liên quan để gợi ý.</p>';
+    return;
+  }
+
+  grid.innerHTML = list.map(renderRelatedCard).join('');
+}
+
+function renderRelatedCard(p) {
+  const name = escapeHTML(p.name || '');
+  const sku = escapeHTML(p.sku || '');
+  const originRaw = (p.origin || p.origin_url || '').toString().trim();
+  const origin = originRaw || '#';
+  const imgSrc = p.image || `/assets/img/products/${encodeURIComponent(p.sku || 'placeholder')}.webp`;
+  const shortDesc = escapeHTML(
+    (p.short_desc || p.description || p.name || '').toString().trim()
+  );
+  const priceValue = getPrice(p);
+  const priceText = priceValue != null ? escapeHTML(formatVND(priceValue)) : '';
+  const merchantRaw = (p.merchant || detectMerchant(origin)).toString().toLowerCase();
+  const detailHref = `/g.html?sku=${encodeURIComponent(p.sku || '')}`;
+
+  return `
+  <article class="product-card" data-sku="${sku}">
+    <a href="${detailHref}">
+      <div class="thumb">
+        <img src="${imgSrc}"
+             alt="${name}"
+             loading="lazy"
+             onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp';">
+        <div class="product-hover">
+          <p>${shortDesc}</p>
+        </div>
+      </div>
+    </a>
+    <div class="body">
+      <div class="product-title title">
+        <a href="${detailHref}">${name}</a>
+      </div>
+      <div class="price">${priceText}</div>
+      <div class="actions">
+        <a class="buy btn-buy"
+           href="${escapeAttr(origin)}"
+           data-merchant="${escapeAttr(merchantRaw)}"
+           data-sku="${sku}">
+          Mua ngay
+        </a>
+      </div>
+    </div>
+  </article>
+  `;
+}
+
+// ========== HELPERS ==========
+function getTime(val) {
+  if (!val) return 0;
+  const t = new Date(val).getTime();
+  return Number.isFinite(t) ? t : 0;
+}
+
+function getPrice(p) {
+  const v = p.price ?? p.price_vnd ?? p.price_vnd_int;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function formatVND(value) {
+  return Number(value).toLocaleString('vi-VN') + '₫';
+}
+
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeAttr(str) {
+  return escapeHTML(str).replace(/`/g, '&#96;');
+}
+
+function detectMerchant(url) {
+  try {
+    if (!url) return '';
+    const u = new URL(url.startsWith('http') ? url : 'https://' + url);
+    const host = u.hostname.toLowerCase();
+    if (host.includes('shopee')) return 'shopee';
+    if (host.includes('lazada')) return 'lazada';
+    if (host.includes('tiki')) return 'tiki';
+    if (host.includes('tiktok')) return 'tiktok';
+    return '';
+  } catch {
+    return '';
+  }
+}
+
+function merchantLabelFor(m) {
+  switch (m) {
+    case 'shopee': return 'Shopee';
+    case 'lazada': return 'Lazada';
+    case 'tiki':   return 'Tiki';
+    case 'tiktok': return 'TikTok Shop';
+    default:       return '';
+  }
+}
+
+function absUrl(path) {
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path;
+  const origin = window.location.origin || 'https://mxd210.github.io';
+  return origin.replace(/\/+$/, '') + '/' + String(path).replace(/^\/+/, '');
+}
+
+function buildDescription(p) {
+  const base = (p.short_desc || p.description || p.name || '').toString().trim();
+  if (base) return base;
+  const brand = (p.brand || '').toString().trim();
+  if (brand) return `${p.name || 'Sản phẩm'} của ${brand}, được MXD210 chọn lọc từ các sàn thương mại điện tử.`;
+  return `${p.name || 'Sản phẩm'} được MXD210 chọn lọc từ các sàn thương mại điện tử.`;
+}
+</script>
 </body>
 </html>
