@@ -1,227 +1,73 @@
-<!-- FILE:/store/may-cat.html -->
-<!-- MXD-CHECK v2025-10-06 [hub:/store/may-cat.html]
-- Canonical tuyệt đối; robots=index,follow; meta verify hiện diện
-- GA4 (/assets/analytics.js) TRƯỚC /assets/mxd-affiliate.js (duy nhất 1 lần)
-- OG: title/desc/url/image (≥1200×630 .webp) tuyệt đối
-- Hub KHÔNG nhồi mục con trong store.html; trang này là hub chuyên mục
-- product-grid dùng data-category="may-cat" (+ data-sub cho anchor)
-- Icon danh mục dùng /assets/img/categories/may-cat.webp ; alt="Máy cắt — MXD"
-- Không dán deep-link thủ công: renderer sinh meta link + buy link từ link gốc; affiliate script rewrite
-- SW: HTML network-first; assets SWR; bump sw.js VERSION khi đổi asset
-FIND: MXD-CHECK v2025-10-06 [hub:/store/may-cat.html]
--->
-<!doctype html> 
+<!-- REPLACE WHOLE FILE: /store/may-cat.html -->
+<!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Máy cắt (Gạch/Đá/Đa năng) | MXD</title>
-  <meta name="description" content="Máy cắt gạch bàn, máy cắt gạch cầm tay, máy cắt đa năng, máy cắt sắt/nhôm và lưỡi cắt — danh mục chuẩn MXD, tối ưu thi công."/>
+
+  <title>Máy cắt gạch, sắt, gỗ | MXD210</title>
+  <meta name="description" content="Máy cắt gạch, cắt sắt, cắt gỗ – ưu tiên các mẫu phổ biến, dễ mua lưỡi thay thế và dễ bảo hành.">
   <link rel="canonical" href="https://mxd210.github.io/store/may-cat.html"/>
   <meta name="robots" content="index,follow"/>
 
-  <!-- VERIFY -->
-  <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o"/>
-  <!-- <meta name="msvalidate.01" content="YOUR_BING_CODE"> -->
-
-  <!-- OG -->
+  <meta property="og:title" content="Máy cắt gạch, sắt, gỗ | MXD210"/>
+  <meta property="og:description" content="Danh mục máy cắt phù hợp nhiều hạng mục: từ cắt gạch ốp lát đến cắt sắt, gỗ cơ bản."/>
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Máy cắt (Gạch/Đá/Đa năng) | MXD"/>
-  <meta property="og:description" content="Máy cắt gạch bàn, cắt gạch cầm tay, máy cắt đa năng, cắt sắt/nhôm &amp; lưỡi cắt — danh mục chuẩn MXD."/>
   <meta property="og:url" content="https://mxd210.github.io/store/may-cat.html"/>
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/may-cat-og.webp"/>
-  <meta property="og:image:width" content="1200"/>
-  <meta property="og:image:height" content="630"/>
 
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- GA4 trước Affiliate (chuẩn MXD) -->
   <script defer src="/assets/analytics.js"></script>
-
-  <!-- Aliases (nếu có) phải load TRƯỚC khi render -->
-  <script defer src="/assets/js/category-alias.js"></script>
-
-  <!-- Giữ để tương thích nếu nơi khác gọi -->
-  <script defer src="/assets/js/render-products.js"></script>
-
-  <!-- Affiliate luôn cuối cùng -->
-  <script defer src="/assets/mxd-affiliate.js"></script>
-
-  <style>
-    .container{max-width:1100px;margin:0 auto;padding:0 16px}
-    .quick-nav{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;margin:8px 0 0}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border,#eaeaea);border-radius:12px;background:var(--card,#fff);text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.06);color:inherit}
-    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin:12px 0}
-    .product-card{display:flex;flex-direction:column;height:100%;border:1px solid var(--border,#eee);border-radius:12px;overflow:hidden;background:var(--card,#fff);box-shadow:0 6px 20px rgba(0,0,0,.04)}
-    .product-card .thumb{display:block;aspect-ratio:1/1;overflow:hidden;background:#fafafa}
-    .product-card img{width:100%;height:100%;object-fit:cover;display:block}
-    .product-card .body{padding:10px 10px 12px;display:flex;flex-direction:column;gap:6px}
-    .product-card h3{margin:0;font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
-    .product-card .price{font-weight:700}
-    .product-card .actions{margin-top:auto}
-    .product-card .btn{display:block;text-align:center;padding:8px 10px;border-radius:10px;background:#1746ff;color:#fff;text-decoration:none}
-    .bullets,.steps{padding-left:18px}
-  </style>
+  <script defer src="/assets/mxd-affiliates.js"></script>
+  <script defer src="/assets/mxd-store.v2.js"></script>
 </head>
-<body>
-  <header class="container">
-    <nav class="breadcrumb" style="padding:12px 0;border-bottom:1px solid var(--border,#eaeaea);margin-bottom:8px">
-      <a href="/">MXD</a> › <a href="/store.html">Cửa hàng</a> › <span>Máy cắt</span>
+<body data-nav="store">
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="logo">
+      <span class="logo-main">MXD210</span>
+      <span class="logo-sub">Xây dựng &amp; Affiliate</span>
+    </a>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="/" data-nav="home">Trang chủ</a></li>
+        <li><a href="/store.html" data-nav="store">Cửa hàng</a></li>
+        <li><a href="/blog-xay-dung.html" data-nav="blog-xd">Góc xây dựng</a></li>
+        <li><a href="/mxd-aff-academy.html" data-nav="aff-academy">Góc Affiliate</a></li>
+        <li><a href="/contact.html" data-nav="contact">Liên hệ</a></li>
+      </ul>
     </nav>
-    <h1>Máy cắt <small>(Gạch/Đá/Đa năng)</small></h1>
-    <p class="lead">Máy cắt gạch bàn, máy cắt gạch cầm tay, oscillating đa năng, cắt sắt/nhôm &amp; lưỡi cắt đúng vật liệu.</p>
-  </header>
+  </div>
+</header>
 
-  <section class="container quick-nav">
-    <a href="#may-cat-gach-ban" class="chip">Máy cắt gạch bàn</a>
-    <a href="#may-cat-gach-cam-tay" class="chip">Máy cắt gạch cầm tay</a>
-    <a href="#may-cat-da-nang" class="chip">Máy cắt đa năng</a>
-    <a href="#may-cat-sat-nhom" class="chip">Máy cắt sắt/nhôm</a>
-    <a href="#luoi-cat" class="chip">Lưỡi cắt &amp; phụ kiện</a>
-    <a href="#faq" class="chip">FAQ</a>
+<main class="page-main">
+  <section class="category-hero">
+    <div class="container">
+      <h1>Máy cắt gạch, sắt, gỗ</h1>
+      <p>Các dòng máy cắt phổ thông, ưu tiên dễ thay lưỡi, có phụ kiện đầy đủ và thương hiệu rõ.</p>
+    </div>
   </section>
 
-  <main class="container">
-    <section id="may-cat-gach-ban">
-      <h2>Máy cắt gạch bàn</h2>
-      <div class="product-grid" data-category="may-cat" data-sub="may-cat-gach-ban"></div>
-    </section>
+  <section class="category-products container"
+           data-mxd-category-page
+           data-category="may-cat"
+           data-limit="60"
+           data-featured-first="true">
+    <div class="category-toolbar">
+      <div class="category-info">
+        <strong>Máy cắt</strong>
+        <span data-category-count></span>
+      </div>
+    </div>
 
-    <section id="may-cat-gach-cam-tay">
-      <h2>Máy cắt gạch cầm tay</h2>
-      <div class="product-grid" data-category="may-cat" data-sub="may-cat-gach-cam-tay"></div>
-    </section>
+    <div class="product-grid"></div>
+  </section>
+</main>
 
-    <section id="may-cat-da-nang">
-      <h2>Máy cắt đa năng (oscillating)</h2>
-      <div class="product-grid" data-category="may-cat" data-sub="may-cat-da-nang"></div>
-    </section>
-
-    <section id="may-cat-sat-nhom">
-      <h2>Máy cắt sắt/nhôm (cut-off)</h2>
-      <div class="product-grid" data-category="may-cat" data-sub="may-cat-sat-nhom"></div>
-    </section>
-
-    <section id="luoi-cat">
-      <h2>Lưỡi cắt &amp; phụ kiện</h2>
-      <ul class="bullets">
-        <li>Lưỡi kim cương 110/125/180/230 mm — khô/ướt, mỏng/siêu mỏng</li>
-        <li>Đá cắt sắt/inox, đế cữ, thước 45°; lưỡi oscillating cho gỗ/kim loại/gạch mỏng</li>
-      </ul>
-      <div class="product-grid" data-category="may-cat" data-sub="luoi-cat"></div>
-    </section>
-
-    <section id="faq">
-      <h2>FAQ</h2>
-      <details><summary>Lưỡi ướt/khô khác gì?</summary><p>Ướt cho mép cắt mịn, ít bụi; khô tiện thi công nhanh nhưng nhiều bụi/nhiệt.</p></details>
-      <details><summary>Chọn đường kính lưỡi?</summary><p>110–125 mm cho cầm tay; 180–230 mm cho sâu cắt lớn; chiều dài bàn theo gạch 600/800/1200 mm.</p></details>
-    </section>
-  </main>
-
-  <footer class="container" style="margin-top:16px;border-top:1px solid var(--border,#eaeaea);padding:12px 0">
-    <p>Icon danh mục: <img src="/assets/img/categories/may-cat.webp" alt="Máy cắt — MXD" width="64" height="64" loading="lazy"/></p>
-  </footer>
-
-  <!-- Guard render: chỉ may-cat* & luoi-cat*, gom theo data-sub -->
-  <script>
-    const ALLOW = /^(may-cat|luoi-cat)(-|$)/;
-    const SUBS = ['may-cat-gach-ban','may-cat-gach-cam-tay','may-cat-da-nang','may-cat-sat-nhom','luoi-cat'];
-
-    function deaccent(str){ return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
-
-    function routeSub(p){
-      const s = deaccent((p.sku || p.name || '').toLowerCase());
-      if (/gach.*ban|ban.*gach|gach-ban/.test(s)) return 'may-cat-gach-ban';
-      if (/da-?nang|oscillat|rung|mcr/.test(s)) return 'may-cat-da-nang';
-      if (/sat|nhom|cut[- ]?off|mcs\d*|mcs/.test(s)) return 'may-cat-sat-nhom';
-      if (/luoi|blade|da-cat|disc|disk/.test(s)) return 'luoi-cat';
-      if (/cam-?tay|cat-?goc|ag|mai-?cat|hg2|hkg2|6000j|50550/.test(s)) return 'may-cat-gach-cam-tay';
-      return 'may-cat-gach-cam-tay';
-    }
-
-    function merchantFrom(u){
-      try{
-        const h = new URL(u).hostname;
-        if (h.includes('shopee')) return 'shopee';
-        if (h.includes('lazada')) return 'lazada';
-        if (h.includes('tiki'))   return 'tiki';
-        if (h.includes('tiktok')) return 'tiktok';
-      }catch(_){}
-      return '';
-    }
-
-    function cardHTML(p){
-      const price = Number(p.price || 0);
-      const priceText = price ? price.toLocaleString('vi-VN') + '₫' : 'Liên hệ';
-      const url = p.origin || p.url || p.link || '#'; // origin trước, tuyệt đối không deep-link tay
-      const name = escapeHTML(p.name || '');
-      const img = p.image || '/assets/img/products/placeholder.webp';
-      const m = merchantFrom(url);
-      const label = m ? `Mua ${m}` : 'Mua ngay';
-      return `
-      <article class="product-card" data-sku="${escapeAttr(p.sku||'')}" data-cat="${escapeAttr(p.category||'')}">
-        <a class="thumb" href="${url}" target="_blank" rel="nofollow sponsored noopener" data-origin="${url}" data-merchant="${m}">
-          <img loading="lazy" decoding="async"
-               src="${img}" alt="${name}"
-               onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-        </a>
-        <div class="body">
-          <h3 title="${name}"><a href="${url}" target="_blank" rel="nofollow sponsored noopener" data-origin="${url}" data-merchant="${m}">${name}</a></h3>
-          <div class="price">${priceText}</div>
-          <div class="actions">
-            <a class="btn" href="${url}" target="_blank" rel="nofollow sponsored noopener" data-origin="${url}" data-merchant="${m}">${label}</a>
-          </div>
-        </div>
-      </article>`;
-    }
-    function escapeHTML(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;' }[m]))}
-    function escapeAttr(s){return String(s).replace(/"/g,'&quot;')}
-
-    async function renderMayCat(){
-      try{
-        const res = await fetch('/assets/data/affiliates.json',{cache:'no-store'});
-        const all = Array.isArray(await res.json()) ? await (await fetch('/assets/data/affiliates.json',{cache:'no-store'})).json() : (await (await fetch('/assets/data/affiliates.json',{cache:'no-store'})).json());
-      }catch(_){}
-      // lấy dữ liệu một lần (gọn):
-      const r = await fetch('/assets/data/affiliates.json',{cache:'no-store'}).catch(()=>null);
-      const raw = r && r.ok ? await r.json() : [];
-      const list0 = Array.isArray(raw) ? raw : (Array.isArray(raw.items) ? raw.items : []);
-      const valid = list0.filter(p => p && p.status !== false && p.category && ALLOW.test(p.category));
-
-      // Khử trùng lặp theo sku (ưu tiên bản ghi đầu)
-      const seen = new Set();
-      const list = valid.filter(p => !seen.has((p.sku||'').toLowerCase()) && seen.add((p.sku||'').toLowerCase()));
-
-      // Gom nhóm theo sub
-      const buckets = Object.fromEntries(SUBS.map(k => [k, []]));
-      for (const p of list){
-        const sub = routeSub(p);
-        if (buckets[sub]) buckets[sub].push(p);
-      }
-
-      // Render theo từng grid
-      document.querySelectorAll('.product-grid[data-category="may-cat"]').forEach(grid=>{
-        const sub = grid.getAttribute('data-sub');
-        const items = buckets[sub] || [];
-        grid.innerHTML = items.map(cardHTML).join('');
-      });
-
-      // Fallback: nếu bucket trống, đổ tạm 6–8 item đầu cho đỡ rỗng
-      for (const sub of SUBS){
-        const grid = document.querySelector(`.product-grid[data-sub="${sub}"]`);
-        if (grid && !grid.children.length){
-          const pool = list.slice(0,8);
-          grid.innerHTML = pool.map(cardHTML).join('');
-        }
-      }
-
-      // Kích hoạt affiliate rewrite/scanner
-      if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') window.mxdAffiliate.scan();
-      else if (window.MXD && typeof window.MXD.affRewrite === 'function') window.MXD.affRewrite();
-    }
-
-    window.addEventListener('DOMContentLoaded', () => { renderMayCat().catch(console.error); });
-  </script>
+<footer class="site-footer">
+  <div class="container">
+    <p>© MXD210 – Gợi ý máy móc vừa túi tiền nhưng đủ dùng cho nhiều hạng mục.</p>
+  </div>
+</footer>
 </body>
 </html>
-<!-- /FILE -->
