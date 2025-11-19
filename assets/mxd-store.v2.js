@@ -1,5 +1,5 @@
 // /assets/mxd-store.v2.js
-// MXD STORE v2 — render danh mục từ affiliates.json
+// MXD STORE v2 — render danh mục từ affiliates.json + hover mô tả
 
 document.addEventListener('DOMContentLoaded', () => {
   initMXDCategoryPage().catch(err => {
@@ -22,7 +22,7 @@ async function initMXDCategoryPage() {
 
   grid.innerHTML = '<div class="mxd-loading">Đang tải sản phẩm…</div>';
 
-  // 1) Load AFF
+  // 1) Load AFF JSON
   const res = await fetch('/assets/data/affiliates.json', { cache: 'no-store' });
   if (!res.ok) {
     grid.innerHTML = '<p class="mxd-error">Không tải được dữ liệu sản phẩm.</p>';
@@ -95,48 +95,50 @@ async function initMXDCategoryPage() {
 function renderMXDProductCard(p) {
   const name = escapeHTML(p.name || '');
   const sku = escapeHTML(p.sku || '');
-  const brand = escapeHTML(p.brand || '');
   const merchantRaw = (p.merchant || '').toString().toLowerCase();
-  const merchant = merchantRaw || detectMerchant(p.origin || p.origin_url || '');
-  const origin = (p.origin || p.origin_url || '#').trim();
+  const originRaw = (p.origin || p.origin_url || '').toString().trim();
 
-  const img = p.image || `/assets/img/products/${sku}.webp`;
+  // Luôn để origin là link gốc; mxd-affiliate.js sẽ tự rewrite → isclix
+  const origin = originRaw || '#';
+
+  const merchant = merchantRaw || detectMerchant(origin);
+  const imgSrc = p.image || `/assets/img/products/${encodeURIComponent(p.sku || 'placeholder')}.webp`;
+
   const shortDesc = escapeHTML(
     (p.short_desc || p.description || p.name || '').toString().trim()
   );
 
   const detailHref = `/g.html?sku=${encodeURIComponent(p.sku || '')}`;
   const priceValue = getPrice(p);
-  const priceText = formatVND(priceValue);
-
-  const merchantLabel = merchantLabelFromSlug(merchant);
+  const priceText = priceValue != null ? formatVND(priceValue) : '';
 
   return `
   <article class="product-card" data-sku="${sku}">
-    <div class="product-thumb">
-      <a href="${detailHref}">
-        <img src="${img}"
-             alt="${name}"
-             loading="lazy"
-             onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp';"/>
+    <a href="${detailHref}">
+      <div class="thumb">
+        <img
+          src="${imgSrc}"
+          alt="${name}"
+          loading="lazy"
+          onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp';"
+        />
         <div class="product-hover">
           <p>${shortDesc}</p>
         </div>
-      </a>
-    </div>
-    <div class="product-body">
-      <h3 class="product-title">
+      </div>
+    </a>
+
+    <div class="body">
+      <div class="product-title title">
         <a href="${detailHref}">${name}</a>
-      </h3>
-      <div class="product-meta">
-        ${brand ? `<span class="product-brand">${brand}</span>` : ''}
-        ${merchantLabel ? `<span class="product-merchant">${merchantLabel}</span>` : ''}
       </div>
-      <div class="product-price">
-        ${priceText ? `<span class="price">${priceText}</span>` : ''}
+
+      <div class="price">
+        ${priceText ? escapeHTML(priceText) : ''}
       </div>
-      <div class="product-actions">
-        <a class="btn-buy"
+
+      <div class="actions">
+        <a class="buy btn-buy"
            href="${escapeAttr(origin)}"
            data-merchant="${escapeAttr(merchant)}"
            data-sku="${sku}">
@@ -148,6 +150,8 @@ function renderMXDProductCard(p) {
   `;
 }
 
+/* ===== Helpers ===== */
+
 function getTime(val) {
   if (!val) return 0;
   const t = new Date(val).getTime();
@@ -155,14 +159,13 @@ function getTime(val) {
 }
 
 function getPrice(p) {
-  // Hỗ trợ cả price và price_vnd (cũ)
+  // Hỗ trợ cả price, price_vnd, price_vnd_int
   const v = p.price ?? p.price_vnd ?? p.price_vnd_int;
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
 }
 
 function formatVND(value) {
-  if (value == null) return '';
   return Number(value).toLocaleString('vi-VN') + '₫';
 }
 
@@ -191,15 +194,5 @@ function detectMerchant(url) {
     return '';
   } catch {
     return '';
-  }
-}
-
-function merchantLabelFromSlug(slug) {
-  switch (slug) {
-    case 'shopee': return 'Shopee';
-    case 'lazada': return 'Lazada';
-    case 'tiki': return 'Tiki';
-    case 'tiktok': return 'TikTok Shop';
-    default: return '';
   }
 }
