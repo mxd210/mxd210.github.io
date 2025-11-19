@@ -4,275 +4,70 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Thời trang | MXD</title>
-  <meta name="description" content="Thời trang MXD: bền–chuẩn–dễ phối cho công sở, đi công trình và cuối tuần. Lưới sản phẩm, deal hôm nay, FAQ chọn size/chất liệu, gợi ý phối đồ.">
+
+  <title>Thời trang – Trang phục chọn lọc | MXD210</title>
+  <meta name="description" content="Tổng hợp các sản phẩm thời trang được MXD210 chọn lọc: đồ đi làm, đi chơi, ở nhà… ưu tiên dễ mặc và giá hợp lý.">
   <link rel="canonical" href="https://mxd210.github.io/store/thoi-trang.html"/>
   <meta name="robots" content="index,follow"/>
 
-  <!-- OG -->
+  <meta property="og:title" content="Thời trang – Trang phục chọn lọc | MXD210"/>
+  <meta property="og:description" content="Góc thời trang của MXD210 – những món quần áo, phụ kiện dễ phối, dễ mua, không quá cầu kỳ nhưng vẫn gọn gàng."/>
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Thời trang | MXD"/>
-  <meta property="og:description" content="Danh mục thời trang tổng hợp: công sở, basic, bảo hộ, thể thao; deal hôm nay & FAQ chọn nhanh."/>
   <meta property="og:url" content="https://mxd210.github.io/store/thoi-trang.html"/>
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/thoi-trang.webp"/>
 
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- Safety CSS: đảm bảo lưới luôn hiện kể cả khi có rule che từ site.css -->
-  <style>
-    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
-    .product-deals .product-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-    .product-card{border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:12px;background:#fff}
-    .product-card .thumb img{width:100%;height:auto;display:block;border-radius:10px}
-    .product-card .name{font-size:15px;line-height:1.35;margin:8px 0}
-    .product-card .price{font-weight:600}
-    .product-card .actions .buy-btn{display:inline-block;padding:8px 12px;border-radius:10px;background:var(--brand,#111);color:#fff;text-decoration:none}
-    .muted{color:var(--muted,#6b7280)}
-  </style>
-
-  <!-- GA4 TRƯỚC affiliate -->
   <script defer src="/assets/analytics.js"></script>
-  <script defer src="/assets/mxd-affiliate.js"></script>
+  <script defer src="/assets/mxd-affiliates.js"></script>
+  <script defer src="/assets/mxd-store.v2.js"></script>
 </head>
-<body>
-  <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Thời trang</nav>
-  <h1>Thời trang</h1>
-
-  <section class="category-hero">
-    <p>Thời trang ở MXD xoay quanh ba tiêu chí <strong>bền – chuẩn – dễ phối</strong> cho khí hậu nóng ẩm: thấm hút, nhanh khô, dễ layer từ phòng lạnh ra ngoài trời. Chọn đúng chất liệu và form, bạn “mặc nhanh mà vẫn đúng”.</p>
-    <p class="cta-row">
-      <a class="btn" href="#deals">Deal hôm nay</a>
-      <a class="btn" href="#faq-size">Bảng size nhanh</a>
-    </p>
-  </section>
-
-  <div class="filter-row" data-subnav="thoi-trang">
-    <a class="btn" href="/store/thoi-trang.html">Tất cả</a>
-    <a class="btn" href="/store/thoi-trang-nam.html">Thời trang nam</a>
-    <a class="btn" href="/store/thoi-trang-nu.html">Thời trang nữ</a>
-    <a class="btn" href="/store/tre-em.html">Trẻ em</a>
-    <a class="btn" href="/store/thoi-trang-thu-dong.html">Thu đông</a>
-  </div>
-
-  <!-- MXD-ANCHOR: PRODUCTS-GRID -->
-  <section id="product-grid"
-           class="product-grid"
-           data-category="thoi-trang"
-           data-alias="thoi-trang,thoi-trang-nam,thoi-trang-nu,tre-em,thoi-trang-thu-dong">
-    <!-- Renderer sẽ đổ thẻ .product-card vào đây -->
-  </section>
-  <!-- /MXD-ANCHOR -->
-
-  <section id="deals" class="product-deals">
-    <h2>Deal hôm nay</h2>
-    <div id="deals-grid" class="product-grid compact"></div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="category-faq">
-    <h2>Hỏi nhanh – đáp gọn</h2>
-
-    <details>
-      <summary>Áo thun mặc với gì? (phối nhanh)</summary>
+<body data-nav="store">
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="logo">
+      <span class="logo-main">MXD210</span>
+      <span class="logo-sub">Xây dựng &amp; Affiliate</span>
+    </a>
+    <nav class="main-nav">
       <ul>
-        <li>Basic: tee cotton–spandex + <a href="/store/thoi-trang.html#deals">jean/chino</a> + sneaker trắng.</li>
-        <li>Smart-casual: khoác <a href="/store/thoi-trang-nam.html">sơ mi oxford mỏng</a> ngoài tee + chino be.</li>
-        <li>Ngoài trời: tee nhanh khô + <a href="/store/thoi-trang-thu-dong.html">áo gió chống nước nhẹ</a>.</li>
+        <li><a href="/" data-nav="home">Trang chủ</a></li>
+        <li><a href="/store.html" data-nav="store">Cửa hàng</a></li>
+        <li><a href="/blog-xay-dung.html" data-nav="blog-xd">Góc xây dựng</a></li>
+        <li><a href="/mxd-aff-academy.html" data-nav="aff-academy">Góc Affiliate</a></li>
+        <li><a href="/contact.html" data-nav="contact">Liên hệ</a></li>
       </ul>
-    </details>
+    </nav>
+  </div>
+</header>
 
-    <details>
-      <summary>Áo polo khác áo thun ở điểm nào?</summary>
-      <p>Polo có cổ, dệt piqué đứng phom; tee mềm thoải mái. Xem ở <a href="/store/thoi-trang-nam.html">Nam</a> / <a href="/store/thoi-trang-nu.html">Nữ</a>.</p>
-    </details>
-
-    <details id="faq-size">
-      <summary>Chọn size sao để không phải đổi?</summary>
-      <p>Đo Ngực–Eo–Mông, so bảng size từng sản phẩm. Vai/lưng lớn → ưu tiên rộng ở áo; đồ thể thao tăng nửa size.</p>
-    </details>
-
-    <details><summary>Sơ mi ít nhăn chọn vải nào?</summary><p>Oxford/twill, cotton pha spandex hoặc poly-blend.</p></details>
-    <details><summary>Linen có nóng không?</summary><p>Linen pha rất thoáng; chấp nhận nhăn tự nhiên càng mặc càng “đẹp chất”.</p></details>
-    <details><summary>Quần jean đi công trình được chứ?</summary><p>Jean 12–14oz hoặc nylon ripstop túi hộp; kết hợp <a href="/store/thoi-trang-thu-dong.html">áo gió</a>.</p></details>
-    <details><summary>Đi mưa nhẹ nên mặc gì?</summary><p><a href="/store/thoi-trang-thu-dong.html">Áo gió chống nước nhẹ</a> + tee nhanh khô.</p></details>
-    <details><summary>Giặt đồ thể thao thế nào để bền?</summary><p>Giặt ≤30°C, không dùng mềm vải, phơi râm ngay sau khi tập.</p></details>
-    <details><summary>Màu “an toàn” cho sơ mi ngoài trời?</summary><p>Đen–navy–xám–be làm nền; điểm nhấn trắng/olive/camel.</p></details>
-    <details><summary>Chọn giày bảo hộ cỡ nào?</summary><p>Tăng nửa size nếu dùng tất dày; ưu tiên mũi thép, đế kháng dầu.</p></details>
+<main class="page-main">
+  <section class="category-hero">
+    <div class="container">
+      <h1>Thời trang chọn lọc</h1>
+      <p>Không chạy theo trend quá nhanh, chỉ lọc những món dễ mặc, dễ phối, hợp với nhịp sống hàng ngày.</p>
+    </div>
   </section>
 
-  <!-- Extra hướng dẫn -->
-  <section class="category-extra">
-    <details>
-      <summary>Hướng dẫn chuyên sâu: chất liệu, form, bảo quản</summary>
-      <div class="category-intro">
-        <p><strong>Chất liệu:</strong> Cotton compact/cotton–spandex; linen pha; polyester (dry–fit); nylon ripstop; denim.</p>
-        <p><strong>Form:</strong> “ôm–vừa–rộng”: áo trong ôm, lớp giữa vừa, outer rộng nửa size.</p>
-        <p><strong>Bảo quản:</strong> Giặt nhẹ ≤30°C, lộn trái đồ in; denim/len giặt ít; đồ thể thao phơi ngay.</p>
+  <section class="category-products container"
+           data-mxd-category-page
+           data-category="thoi-trang"
+           data-limit="60"
+           data-featured-first="true">
+    <div class="category-toolbar">
+      <div class="category-info">
+        <strong>Thời trang</strong>
+        <span data-category-count></span>
       </div>
-    </details>
+    </div>
+
+    <div class="product-grid"></div>
   </section>
+</main>
 
-  <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
-
-  <!-- Subnav active -->
-  <script>
-  (function mxdSubnavActive(){
-    try{
-      const here = new URL(location.href);
-      document.querySelectorAll('.filter-row a.btn').forEach(a=>{
-        try{
-          const u = new URL(a.getAttribute('href'), location.origin);
-          if (u.pathname === here.pathname){ a.classList.add('is-active'); a.setAttribute('aria-current','page'); }
-          else { a.classList.remove('is-active'); a.removeAttribute('aria-current'); }
-        }catch(_){}
-      });
-    }catch(_){}
-  })();
-  </script>
-
-  <!-- CATEGORY META -->
-  <script type="application/json" id="mxd-category-fields">
-  {"slug":"thoi-trang","primary_intents":["công sở","basic hằng ngày","bảo hộ lao động","thể thao","phụ kiện"],"materials":["cotton compact","cotton-spandex","linen pha","polyester (dry-fit)","denim","nylon ripstop"]}
-  </script>
-
-  <!-- Renderer -->
-  <script>
-  (async function renderMXD(){
-    const grid = document.getElementById('product-grid');
-    const dealsEl = document.getElementById('deals-grid');
-
-    const cat = (grid.getAttribute('data-category')||'').trim().toLowerCase();
-    const aliases = (grid.getAttribute('data-alias')||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-    const ALIASES = new Set([cat, ...aliases]);
-
-    // Mở rộng đường dẫn nguồn để tăng cơ hội có dữ liệu
-    const sources = [
-      '/affiliates.json','/products.json',
-      '/assets/affiliates.json','/assets/data/affiliates.json','/assets/data/products.json',
-      '/data/affiliates.json','/data/products.json'
-    ];
-
-    async function loadFirst(urls){
-      for (const src of urls){
-        try{
-          const r = await fetch(src, { cache:'no-store' });
-          if (!r.ok) continue;
-          const json = await r.json();
-          if (Array.isArray(json)) return json;
-          if (json && Array.isArray(json.items)) return json.items;
-        }catch(e){}
-      }
-      return null;
-    }
-
-    const data = await loadFirst(sources);
-    if (!Array.isArray(data)){
-      grid.innerHTML = `<p class="muted">Không tải được dữ liệu sản phẩm (đã thử ${sources.join(' → ')}).</p>`;
-      return;
-    }
-
-    const norm = v => String(v||'').toLowerCase().trim();
-    const stripAccents = s => norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
-    const split = v => norm(v).split(/[,\s/|>]+/).filter(Boolean);
-    const toSlug = v => stripAccents(v).replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
-
-    function labelsOf(p){
-      const labels = [];
-      labels.push(...split(p.cat||p.category||p.section||''));
-      const m1 = Array.isArray(p.cats)? p.cats : (Array.isArray(p.categories)? p.categories : []);
-      labels.push(...m1.flatMap(split));
-      if (Array.isArray(p.tags)) labels.push(...p.tags.flatMap(split));
-      if (typeof p.category_path === 'string') labels.push(...split(p.category_path));
-      if (Array.isArray(p.category_path)) labels.push(...p.category_path.flatMap(split));
-      return Array.from(new Set(labels.map(toSlug).filter(Boolean)));
-    }
-
-    const isLive = p => p && p.status !== false && p.status !== 'archived';
-
-    function inCat(p){
-      const labels = labelsOf(p);
-      if (!labels.length) return false;
-      if (labels.some(l => ALIASES.has(l))) return true;
-      for (const a of ALIASES){ if (labels.some(l => l.startsWith(a) || a.startsWith(l))) return true; }
-      return false;
-    }
-
-    let items = data.filter(p => isLive(p) && inCat(p));
-
-    // Fallback: nếu lọc ra 0, hiển thị 12 sản phẩm đầu để tránh "trắng trang"
-    if (!items.length) items = data.filter(isLive).slice(0,12);
-
-    const fmt   = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-    const esc   = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-    const href  = p => p.deeplink || p.origin_url || p.origin || p.url || '#';
-    const imgOf = p => {
-      const sku = (p.sku||'').toLowerCase();
-      return p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp');
-    };
-
-    function cardHTML(p){
-      const sku   = (p.sku||'').toLowerCase();
-      const name  = p.name || sku || 'Sản phẩm';
-      const img   = imgOf(p);
-      const price = fmt(p.price);
-      const merchant = (p.merchant||'').toLowerCase();
-      const link  = href(p);
-      return `
-        <article class="product-card" data-sku="${esc(sku)}">
-          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
-            <img loading="lazy" src="${esc(img)}" alt="${esc(name)} — MXD" width="320" height="320"
-                 onerror="this.onerror=null;this.dataset.err=1;this.src='/assets/img/products/placeholder.webp'">
-          </a>
-          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${esc(name)}</a></h3>
-          ${price?`<div class="price">${price}</div>`:''}
-          <div class="actions">
-            <a class="buy buy-btn" href="${esc(link)}" data-merchant="${esc(merchant)}"
-               target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
-          </div>
-        </article>`;
-    }
-
-    grid.innerHTML = items.map(cardHTML).join('');
-
-    // DEALS
-    if (dealsEl){
-      const isDeal = p => {
-        const t = Array.isArray(p.tags)? p.tags.map(norm) : [];
-        const flag = (p.deal===true) || t.includes('deal') || t.includes('flash-sale') || t.includes('sale') || t.includes('giam-gia') || t.includes('hot');
-        const oldPrice = p.old_price || p.price_old || p.list_price || p.msrp || p.regular_price;
-        return flag || (oldPrice && +oldPrice > +p.price);
-      };
-      const deals = items.filter(isDeal).slice(0,8);
-      const list = (deals.length ? deals : items.slice(0,8)).map(cardHTML).join('');
-      dealsEl.innerHTML = list;
-    }
-
-    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
-
-    try{
-      document.querySelectorAll('.category-faq details').forEach(d=>{
-        d.addEventListener('toggle', ()=>{
-          if (d.open && window.gtag){
-            const q = d.querySelector('summary')?.textContent?.trim() || 'faq';
-            gtag('event','faq_open',{category:'fashion',label:q});
-          }
-        });
-      });
-    }catch(_){}
-  })();
-  </script>
-
-  <!-- FAQPage JSON-LD -->
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-    {"@type":"Question","name":"Áo thun mặc với gì? (phối nhanh)","acceptedAnswer":{"@type":"Answer","text":"Basic: tee + jean/chino + sneaker; Smart-casual: khoác sơ mi oxford; Ngoài trời: tee nhanh khô + áo gió chống nước nhẹ."}},
-    {"@type":"Question","name":"Áo polo khác áo thun ở điểm nào?","acceptedAnswer":{"@type":"Answer","text":"Polo có cổ, dệt piqué đứng phom; tee mềm thoải mái."}},
-    {"@type":"Question","name":"Chọn size sao để không phải đổi?","acceptedAnswer":{"@type":"Answer","text":"Đo Ngực–Eo–Mông, so bảng size từng sản phẩm; thể thao tăng nửa size."}},
-    {"@type":"Question","name":"Sơ mi ít nhăn chọn vải nào?","acceptedAnswer":{"@type":"Answer","text":"Oxford/twill, cotton pha spandex hoặc poly-blend."}},
-    {"@type":"Question","name":"Linen có nóng không?","acceptedAnswer":{"@type":"Answer","text":"Rất thoáng; chấp nhận nhăn tự nhiên càng mặc càng đẹp."}}
-  ]}
-  </script>
-
-  <noscript><p class="muted">Vui lòng bật JavaScript để xem lưới sản phẩm.</p></noscript>
+<footer class="site-footer">
+  <div class="container">
+    <p>© MXD210 – Vừa là thợ, vừa là người thường, nên chọn đồ mặc cũng thực tế như vậy.</p>
+  </div>
+</footer>
 </body>
 </html>
