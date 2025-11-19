@@ -1,80 +1,76 @@
+<!-- REPLACE WHOLE FILE: /store/noi-bat.html -->
 <!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Sản phẩm nổi bật | MXD</title>
-  <meta name="description" content="Danh sách sản phẩm nổi bật (featured) hiển thị tự động từ dữ liệu chuẩn của MXD."/>
+
+  <title>Sản phẩm nổi bật | MXD210</title>
+  <meta name="description" content="Tổng hợp những sản phẩm nổi bật trên MXD210: đang được xem nhiều, giảm giá tốt hoặc được nhắc đến nhiều trong thực tế.">
   <link rel="canonical" href="https://mxd210.github.io/store/noi-bat.html"/>
   <meta name="robots" content="index,follow"/>
 
-  <!-- OG -->
+  <meta property="og:title" content="Sản phẩm nổi bật | MXD210"/>
+  <meta property="og:description" content="Một chỗ để xem nhanh các sản phẩm nổi bật, deal đang ngon ở nhiều danh mục trên MXD210."/>
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Sản phẩm nổi bật | MXD"/>
-  <meta property="og:description" content="Các sản phẩm được gắn nổi bật từ dữ liệu MXD, cập nhật theo thời gian."/>
   <meta property="og:url" content="https://mxd210.github.io/store/noi-bat.html"/>
-  <meta property="og:image" content="https://mxd210.github.io/assets/img/categories/noi-bat.webp"/>
 
   <link rel="stylesheet" href="/assets/site.css"/>
 
-  <!-- GA4 trước affiliate -->
   <script defer src="/assets/analytics.js"></script>
-  <script defer src="/assets/mxd-affiliate.js"></script>
+  <script defer src="/assets/mxd-affiliates.js"></script>
+  <script defer src="/assets/mxd-store.v2.js"></script>
 </head>
-<body>
-  <nav class="breadcrumb"><a href="/">Trang chủ</a> › <a href="/store.html">Cửa hàng</a> › Sản phẩm nổi bật</nav>
-  <h1>Sản phẩm nổi bật</h1>
-  <p>Danh sách tự động từ dữ liệu chuẩn của MXD. Hiển thị các mục có <code>featured:true</code>.</p>
+<body data-nav="store">
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="logo">
+      <span class="logo-main">MXD210</span>
+      <span class="logo-sub">Xây dựng &amp; Affiliate</span>
+    </a>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="/" data-nav="home">Trang chủ</a></li>
+        <li><a href="/store.html" data-nav="store">Cửa hàng</a></li>
+        <li><a href="/blog-xay-dung.html" data-nav="blog-xd">Góc xây dựng</a></li>
+        <li><a href="/mxd-aff-academy.html" data-nav="aff-academy">Góc Affiliate</a></li>
+        <li><a href="/contact.html" data-nav="contact">Liên hệ</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
 
-  <section id="product-grid" class="product-grid"></section>
+<main class="page-main">
+  <section class="category-hero">
+    <div class="container">
+      <h1>Sản phẩm nổi bật trên MXD210</h1>
+      <p>
+        Những món đang được chú ý nhiều hơn bình thường: hoặc là deal tốt,
+        hoặc là hữu ích thực sự ngoài công trình và trong đời sống.
+      </p>
+    </div>
+  </section>
 
-  <footer class="page-foot">© MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a></footer>
+  <section class="category-products container"
+           data-mxd-category-page
+           data-category="noi-bat"
+           data-limit="60"
+           data-featured-first="true">
+    <div class="category-toolbar">
+      <div class="category-info">
+        <strong>Nổi bật</strong>
+        <span data-category-count></span>
+      </div>
+    </div>
 
-  <script>
-  (async function renderMXD(){
-    const grid = document.getElementById('product-grid');
-    const sources = ['/assets/data/affiliates.json','/products.json','/affiliates.json'];
-    let data=null;
+    <div class="product-grid"></div>
+  </section>
+</main>
 
-    for (const src of sources){
-      try { const r = await fetch(src,{cache:'no-store'}); if(r.ok){ data = await r.json(); break; } } catch {}
-    }
-    if (!Array.isArray(data)) {
-      grid.innerHTML = `<p class="muted">Không tải được dữ liệu (đã thử ${sources.join(' → ')}).</p>`;
-      return;
-    }
-
-    const fmt = n => (n!=null && isFinite(+n)) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-    const items = data.filter(p => p && p.featured === true && p.status !== 'archived');
-
-    if (!items.length) {
-      grid.innerHTML = `<p class="muted">Chưa có sản phẩm nổi bật.</p>`;
-      return;
-    }
-
-    grid.innerHTML = items.map(p=>{
-      const sku = p.sku || '';
-      const name = p.name || sku || 'Sản phẩm';
-      const img  = p.image || (sku ? `/assets/img/products/${sku}.webp` : '/assets/img/products/placeholder.webp');
-      const price = fmt(p.price);
-      const merchant = (p.merchant||'').toLowerCase();
-      const origin = p.deeplink || p.origin || p.origin_url || p.url || '#';
-      return `
-        <article class="product-card" data-sku="${sku}">
-          <a class="thumb" href="/g.html?sku=${encodeURIComponent(sku)}">
-            <img loading="lazy" src="${img}" alt="${name} — MXD" width="320" height="320"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-          </a>
-          <h3 class="name"><a href="/g.html?sku=${encodeURIComponent(sku)}">${name}</a></h3>
-          ${price?`<div class="price">${price}</div>`:''}
-          <div class="actions">
-            <a class="buy" href="${origin}" data-merchant="${merchant}" rel="nofollow sponsored noopener" target="_blank">Mua ngay</a>
-          </div>
-        </article>`;
-    }).join('');
-
-    if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
-  })();
-  </script>
+<footer class="site-footer">
+  <div class="container">
+    <p>© MXD210 – Điểm lại những món đáng xem nhất trong từng giai đoạn.</p>
+  </div>
+</footer>
 </body>
 </html>
