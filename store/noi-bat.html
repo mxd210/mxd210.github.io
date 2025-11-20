@@ -6,19 +6,25 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
   <title>Sản phẩm nổi bật | MXD210</title>
-  <meta name="description" content="Tổng hợp những sản phẩm nổi bật trên MXD210: đang được xem nhiều, giảm giá tốt hoặc được nhắc đến nhiều trong thực tế.">
+  <meta name="description"
+        content="Những sản phẩm đang nổi bật trên MXD210: hoặc là deal tốt, hoặc là thật sự hữu ích ngoài công trình và trong đời sống."/>
   <link rel="canonical" href="https://mxd210.github.io/store/noi-bat.html"/>
   <meta name="robots" content="index,follow"/>
 
+  <!-- OPEN GRAPH -->
   <meta property="og:title" content="Sản phẩm nổi bật | MXD210"/>
-  <meta property="og:description" content="Một chỗ để xem nhanh các sản phẩm nổi bật, deal đang ngon ở nhiều danh mục trên MXD210."/>
+  <meta property="og:description"
+        content="Điểm lại các sản phẩm nổi bật trên MXD210 – deal ngon hoặc hữu ích thật sự cho anh em."/>
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://mxd210.github.io/store/noi-bat.html"/>
 
   <link rel="stylesheet" href="/assets/site.css"/>
 
+  <!-- Analytics trước affiliate -->
   <script defer src="/assets/analytics.js"></script>
+  <!-- DÙNG FILE ĐÚNG: mxd-affiliate.js (không có s) -->
   <script defer src="/assets/mxd-affiliate.js"></script>
+  <!-- Render lưới sản phẩm -->
   <script defer src="/assets/mxd-store.v2.js"></script>
 </head>
 <body data-nav="store">
@@ -28,6 +34,7 @@
       <span class="logo-main">MXD210</span>
       <span class="logo-sub">Xây dựng &amp; Affiliate</span>
     </a>
+
     <nav class="main-nav">
       <ul>
         <li><a href="/" data-nav="home">Trang chủ</a></li>
@@ -45,19 +52,18 @@
     <div class="container">
       <h1>Sản phẩm nổi bật trên MXD210</h1>
       <p>
-        Những món đang được chú ý nhiều hơn bình thường: hoặc là deal tốt,
-        hoặc là hữu ích thực sự ngoài công trình và trong đời sống.
+        Những món đang được chú ý nhiều hơn bình thường: hoặc là deal tốt, hoặc là hữu ích
+        thực sự ngoài công trình và trong đời sống.
       </p>
     </div>
   </section>
-<section class="category-products container"
-         data-mxd-category-page
-         data-category="noi-bat"
-         data-limit="600"
-         data-featured-first="true"
-         data-featured-only="true">
 
-
+  <section class="category-products container"
+           data-mxd-category-page
+           data-category="noi-bat"
+           data-limit="600"
+           data-featured-first="true"
+           data-featured-only="true">
     <div class="category-toolbar">
       <div class="category-info">
         <strong>Nổi bật</strong>
@@ -65,7 +71,9 @@
       </div>
     </div>
 
-    <div class="product-grid"></div>
+    <div class="product-grid">
+      <!-- mxd-store.v2.js sẽ tự render card ở đây -->
+    </div>
   </section>
 </main>
 
