@@ -1,59 +1,43 @@
-<!-- REPLACE WHOLE FILE: /store/may-moc-xay-dung.html -->
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-
-  <title>Máy móc xây dựng – Thiết bị chọn lọc | MXD210</title>
-  <meta name="description" content="Máy móc, thiết bị phục vụ thi công và sửa chữa nhỏ – được MXD210 chọn theo tiêu chí: dễ mua, dễ bảo hành, phù hợp với nhu cầu thực tế ngoài công trình.">
-  <link rel="canonical" href="https://mxd210.github.io/store/may-moc-xay-dung.html"/>
-  <meta name="robots" content="index,follow"/>
-
-  <!-- OPEN GRAPH -->
-  <meta property="og:title" content="Máy móc xây dựng – Thiết bị chọn lọc | MXD210"/>
-  <meta property="og:description" content="Gợi ý máy móc, thiết bị xây dựng từ MXD210 – ưu tiên những mẫu phù hợp thợ thi công, chủ nhà tự xử lý các hạng mục nhỏ."/>
-  <meta property="og:type" content="website"/>
-  <meta property="og:url" content="https://mxd210.github.io/store/may-moc-xay-dung.html"/>
-
-  <link rel="stylesheet" href="/assets/site.css"/>
-
-  <!-- Analytics trước Affiliate -->
-  <script defer src="/assets/analytics.js"></script>
-  <script defer src="/assets/mxd-affiliate.js"></script>
-  <script defer src="/assets/mxd-store.v2.js"></script>
+  <meta charset="utf-8">
+  <title>Máy móc xây dựng — MXD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/assets/site.css" rel="stylesheet">
+  <style>
+    .wrap{max-width:1100px;margin:0 auto;padding:32px 16px}
+    h1{text-align:center;margin:0 0 8px}
+    .muted{color:#666;text-align:center;margin:0 0 20px}
+    .stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:10px 0 22px}
+    .stat{border:1px solid #eaeaea;border-radius:12px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.06);padding:10px 14px;min-width:170px;text-align:center}
+    .stat b{font-size:18px;display:block}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px}
+    .card{border:1px solid #eaeaea;border-radius:16px;background:#fff;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+    .card img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#f7f7f7}
+    .card .body{padding:12px}
+    .name{font-size:16px;line-height:1.35;margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
+    .price{font-weight:800;margin:4px 0 10px;color:#e11d48}
+    .buy{display:inline-block;width:100%;text-align:center;padding:10px 12px;border-radius:12px;font-weight:800;color:#fff;background:#1746ff;text-decoration:none}
+  </style>
 </head>
-<body data-nav="store">
-  <header class="site-header">
-    <div class="container">
-      <a href="/" class="logo">
-        <span class="logo-main">MXD210</span>
-        <span class="logo-sub">Xây dựng &amp; Affiliate</span>
-      </a>
+<body>
+  <main class="wrap">
+    <h1>Máy móc xây dựng</h1>
+    <p class="muted">Gộp: máy cắt • máy laser • khoan/đục/vít</p>
 
-      <nav class="main-nav">
-        <ul>
-          <li><a href="/" data-nav="home">Trang chủ</a></li>
-          <li><a href="/store.html" data-nav="store">Cửa hàng</a></li>
-          <li><a href="/blog-xay-dung.html" data-nav="blog-xd">Góc xây dựng</a></li>
-          <li><a href="/mxd-aff-academy.html" data-nav="aff-academy">Góc Affiliate</a></li>
-          <li><a href="/contact.html" data-nav="contact">Liên hệ</a></li>
-        </ul>
-      </nav>
+    <div class="stats">
+      <div class="stat"><span>Tổng sản phẩm</span><b id="stat-count">—</b></div>
+      <div class="stat"><span>Giá thấp nhất</span><b id="stat-min">—</b></div>
+      <div class="stat"><span>Giá cao nhất</span><b id="stat-max">—</b></div>
+      <div class="stat"><span>Đang nổi bật</span><b id="stat-hot">—</b></div>
     </div>
-  </header>
 
-  <main class="page-main">
-    <section class="category-hero">
-      <div class="container">
-        <h1>Máy móc &amp; thiết bị cho anh em hiện trường</h1>
-        <p>
-          Những món phục vụ trực tiếp cho thi công, sửa chữa: máy khoan, máy cắt,
-          thiết bị đo, phụ kiện đi kèm… được chọn dựa trên kinh nghiệm thực tế ngoài công trình.
-        </p>
-      </div>
-    </section>
-<script>
+    <div id="grid" class="grid" aria-live="polite"></div>
+    <p id="empty" class="muted" style="display:none">Chưa có sản phẩm phù hợp.</p>
+  </main>
+
+  <script>
     const GROUPS = new Set(['may-cat','may-lazer','may-khoan-duc-vit']);
     const money = n => Number.isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
     const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -109,28 +93,5 @@
       if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
     })();
   </script>
-    <section class="category-products container"
-             data-mxd-category-page
-             data-category="may-moc-xay-dung"
-             data-limit="60"
-             data-featured-first="true">
-      <div class="category-toolbar">
-        <div class="category-info">
-          <strong>Máy móc xây dựng</strong>
-          <span data-category-count></span>
-        </div>
-      </div>
-
-      <div class="product-grid">
-        <!-- mxd-store.v2.js sẽ tự render card ở đây -->
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      <p>© MXD210 – Đồng hành cùng anh em ngoài công trình lẫn trong nhà.</p>
-    </div>
-  </footer>
 </body>
 </html>
