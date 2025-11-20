@@ -117,7 +117,10 @@ function renderMXDProductCard(p) {
   const sku = escapeHTML(p.sku || '');
   const merchantRaw = (p.merchant || '').toString().toLowerCase();
   const originRaw = (p.origin || p.origin_url || '').toString().trim();
-
+// Sau khi gán grid.innerHTML…
+if (window.mxdAffiliate && window.mxdAffiliate.scan) {
+  window.mxdAffiliate.scan();
+}
   // Luôn để origin là link gốc; mxd-affiliates.js sẽ rewrite → isclix
   const origin = originRaw || '#';
 
