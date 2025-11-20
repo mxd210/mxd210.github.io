@@ -9,11 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initMXDCategoryPage() {
   const root = document.querySelector('[data-mxd-category-page]');
-  if (!root) return; // Không phải trang danh mục → thoát
+  if (!root) return; // không phải trang danh mục
 
   const categorySlug = (root.dataset.category || '').trim();
+  const altRaw = (root.dataset.categoryAlt || '').trim();
+  const altSlugs = altRaw
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
   const limit = parseInt(root.dataset.limit || '60', 10);
   const featuredFirst = root.dataset.featuredFirst === 'true';
+  const featuredOnly = root.dataset.featuredOnly === 'true';
 
   const grid = root.querySelector('.product-grid');
   const countLabel = root.querySelector('[data-category-count]');
@@ -40,25 +47,30 @@ async function initMXDCategoryPage() {
 
   if (!Array.isArray(data)) data = [];
 
-  // 2) Lọc status + category
+  // 2) Lọc status chung
   let products = data.filter(p => {
     const status = (p.status || 'active').toString().toLowerCase();
     if (['archived', 'hidden', 'draft'].includes(status)) return false;
     return true;
   });
 
-  if (categorySlug) {
+  // 3) Lọc theo featured / category
+  if (featuredOnly) {
+    // Trang "Nổi bật": lấy mọi sản phẩm có featured = true, không quan tâm category
+    products = products.filter(p => !!p.featured);
+  } else if (categorySlug) {
+    // Trang danh mục thường: lọc theo categorySlug + categoryAlt nếu có
     products = products.filter(p => {
       const cat =
         p.category ||
         p.category_slug ||
         p.cat ||
         '';
-      return cat === categorySlug;
+      return cat === categorySlug || altSlugs.includes(cat);
     });
   }
 
-  // 3) Sắp xếp
+  // 4) Sắp xếp
   if (featuredFirst) {
     products.sort((a, b) => {
       const fa = a.featured ? 1 : 0;
@@ -80,7 +92,7 @@ async function initMXDCategoryPage() {
     products = products.slice(0, limit);
   }
 
-  // 4) Render
+  // 5) Render
   if (products.length === 0) {
     grid.innerHTML = '<p class="mxd-empty">Danh mục này hiện chưa có sản phẩm nào.</p>';
   } else {
@@ -98,7 +110,7 @@ function renderMXDProductCard(p) {
   const merchantRaw = (p.merchant || '').toString().toLowerCase();
   const originRaw = (p.origin || p.origin_url || '').toString().trim();
 
-  // Luôn để origin là link gốc; mxd-affiliate.js sẽ tự rewrite → isclix
+  // Luôn để origin là link gốc; mxd-affiliates.js sẽ rewrite → isclix
   const origin = originRaw || '#';
 
   const merchant = merchantRaw || detectMerchant(origin);
