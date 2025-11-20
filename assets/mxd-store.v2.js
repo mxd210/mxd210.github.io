@@ -11,11 +11,12 @@ async function initMXDCategoryPage() {
   const root = document.querySelector('[data-mxd-category-page]');
   if (!root) return; // không phải trang danh mục
 
-  const categorySlug = (root.dataset.category || '').trim();
+  const rawSlug = (root.dataset.category || '').trim();
+  const categorySlug = normalizeSlug(rawSlug);
   const altRaw = (root.dataset.categoryAlt || '').trim();
   const altSlugs = altRaw
     .split(',')
-    .map(s => s.trim())
+    .map(s => normalizeSlug(s))
     .filter(Boolean);
 
   const limit = parseInt(root.dataset.limit || '60', 10);
@@ -48,26 +49,33 @@ async function initMXDCategoryPage() {
   if (!Array.isArray(data)) data = [];
 
   // 2) Lọc status chung
-  let products = data.filter(p => {
+  let baseProducts = data.filter(p => {
     const status = (p.status || 'active').toString().toLowerCase();
-    if (['archived', 'hidden', 'draft'].includes(status)) return false;
-    return true;
+    return !['archived', 'hidden', 'draft'].includes(status);
   });
+
+  let products = [];
 
   // 3) Lọc theo featured / category
   if (featuredOnly) {
-    // Trang "Nổi bật": lấy mọi sản phẩm có featured = true, không quan tâm category
-    products = products.filter(p => !!p.featured);
+    // Trang "Nổi bật": ưu tiên sản phẩm featured
+    products = baseProducts.filter(p => !!p.featured);
+    // nếu chưa ai được đánh featured → fallback ra top sản phẩm mới
+    if (products.length === 0) {
+      products = [...baseProducts];
+    }
   } else if (categorySlug) {
-    // Trang danh mục thường: lọc theo categorySlug + categoryAlt nếu có
-    products = products.filter(p => {
+    products = baseProducts.filter(p => {
       const cat =
         p.category ||
         p.category_slug ||
         p.cat ||
         '';
-      return cat === categorySlug || altSlugs.includes(cat);
+      const catNorm = normalizeSlug(cat);
+      return catNorm === categorySlug || altSlugs.includes(catNorm);
     });
+  } else {
+    products = [...baseProducts];
   }
 
   // 4) Sắp xếp
@@ -163,6 +171,13 @@ function renderMXDProductCard(p) {
 }
 
 /* ===== Helpers ===== */
+
+function normalizeSlug(str) {
+  return String(str || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-');
+}
 
 function getTime(val) {
   if (!val) return 0;
