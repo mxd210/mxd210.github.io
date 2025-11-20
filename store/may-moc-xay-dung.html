@@ -53,7 +53,62 @@
         </p>
       </div>
     </section>
+<script>
+    const GROUPS = new Set(['may-cat','may-lazer','may-khoan-duc-vit']);
+    const money = n => Number.isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
+    const esc = s => String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    const pickUrl = p => p.deeplink || p.origin_url || p.origin || p.url || p.link || '#';
+    const pickImg = p => p.image || (p.sku ? `/assets/img/products/${String(p.sku).toLowerCase()}.webp` : '/assets/img/products/placeholder.webp');
+    const isLive = p => p && (p.status !== false);
 
+    async function loadFirst(paths){
+      for (const path of paths){
+        try{
+          const r = await fetch(path, { cache:'no-store' });
+          if (!r.ok) continue;
+          const data = await r.json();
+          const arr = Array.isArray(data) ? data : (data.items||[]);
+          if (arr.length) return arr;
+        }catch{}
+      }
+      return [];
+    }
+
+    (async function init(){
+      const all  = await loadFirst(['/assets/data/affiliates.json','/products.json']);
+      const list = all.filter(isLive).filter(p => GROUPS.has(p.category));
+      const prices = list.map(p=>+p.price).filter(Number.isFinite);
+
+      document.getElementById('stat-count').textContent = list.length;
+      document.getElementById('stat-hot').textContent   = list.filter(p=>p.featured).length;
+      document.getElementById('stat-min').textContent   = prices.length ? money(Math.min(...prices)) : '—';
+      document.getElementById('stat-max').textContent   = prices.length ? money(Math.max(...prices)) : '—';
+
+      const grid = document.getElementById('grid');
+      const empty = document.getElementById('empty');
+      if (!list.length){ empty.style.display='block'; return; }
+
+      grid.innerHTML = list.map(p=>{
+        const name = p.name || p.sku || 'Sản phẩm';
+        const href = pickUrl(p);
+        const img  = pickImg(p);
+        const priceHtml = Number.isFinite(+p.price) ? `<div class="price">${money(+p.price)}</div>` : '';
+        return `
+          <article class="card">
+            <a href="${href}" target="_blank" rel="nofollow sponsored noopener">
+              <img loading="lazy" decoding="async" src="${esc(img)}" alt="${esc(name)}"
+                   onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+            </a>
+            <div class="body">
+              <h3 class="name"><a href="${href}" target="_blank" rel="nofollow noopener">${esc(name)}</a></h3>
+              ${priceHtml}
+              <a class="buy" href="${href}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+            </div>
+          </article>`;
+      }).join('');
+      if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+    })();
+  </script>
     <section class="category-products container"
              data-mxd-category-page
              data-category="may-moc-xay-dung"
