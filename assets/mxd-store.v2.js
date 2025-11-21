@@ -31,7 +31,7 @@ async function initMXDCategoryPage() {
   grid.innerHTML = '<div class="mxd-loading">Đang tải sản phẩm…</div>';
 
   // 1) Load AFF JSON
-  const res = await fetch('/assets/data/affiliates.json', { cache: 'no-store' });
+  const res = await fetch('/assets/data/affiliate.json', { cache: 'no-store' });
   if (!res.ok) {
     grid.innerHTML = '<p class="mxd-error">Không tải được dữ liệu sản phẩm.</p>';
     return;
