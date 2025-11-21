@@ -207,6 +207,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     .metric svg{width:22px;height:22px}
     .metric span{color:var(--muted);font-size:13px}
 
+     */
     .floating-contacts{
       position:fixed;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));
       display:flex;flex-direction:column;gap:12px;z-index:40;pointer-events:none;
@@ -361,7 +362,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       (function(){
         const hero = document.getElementById('hero');
         const img = new Image();
-        img.onload = () => {};
+        img.onload = () => {}; 
         img.onerror = () => hero.classList.add('hero-fallback');
         img.src = '/assets/img/hero/home-hero.webp';
       })();
@@ -413,6 +414,15 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           </a>
         </li>
         <li>
+  <a href="/store/do-gia-dung.html" class="qnav-item">
+    <img src="/assets/img/categories/do-gia-dung.webp"
+         alt="Đồ gia dụng — MXD" width="28" height="28"
+         onerror="this.src='/assets/img/categories/placeholder.webp'">
+    Đồ gia dụng
+  </a>
+</li>
+
+        <li>
           <a href="/store/do-dien-tu.html" class="qnav-item">
             <img src="/assets/img/categories/do-dien-tu.webp"
                  alt="Đồ điện tử — MXD" width="28" height="28"
@@ -452,34 +462,45 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     </div>
   </footer>
   
-  <!-- Config renderer + normalizer link gốc -->
+  <!-- Config renderer -->
   <script>
     window.MXD_RENDER = window.MXD_RENDER || {};
     window.MXD_RENDER.source = '/assets/data/affiliates.json';
     window.MXD_RENDER.limit = 30;
+  </script>
 
-    // Chuẩn hoá origin_url: tự thêm https://, auto encode tiếng Việt/khoảng trắng
-    window.MXD_NORMALIZE_ORIGIN = function (u) {
+  <!-- Helper chuẩn hoá URL affiliate (thêm https://, encode, v.v.) -->
+  <script>
+    window.MXD = window.MXD || {};
+
+    window.MXD.normalizeAffiliateUrl = function (u) {
       if (!u) return '#';
-      try {
-        let s = String(u).trim();
-        if (!s) return '#';
+      let s = String(u).trim();
+      if (!s) return '#';
 
-        // Nếu chưa có protocol thì thêm https://
-        if (!/^https?:\/\//i.test(s)) {
-          if (s.startsWith('//')) {
-            s = 'https:' + s;
-          } else {
-            // ví dụ: shopee.vn/Áo...  → https://shopee.vn/Áo...
-            s = 'https://' + s.replace(/^\/+/, '');
-          }
+      // Giữ link nội bộ dạng /path
+      if (s.startsWith('/')) {
+        try {
+          return new URL(s, location.origin).href;
+        } catch (e) {
+          return s;
         }
+      }
 
-        const url = new URL(s);
-        // new URL sẽ tự encode UTF-8, khoảng trắng,...
-        return url.href;
+      // Nếu thiếu protocol (shopee.vn/..., lazada.vn/..., go.isclix.vn/...)
+      if (!/^https?:\/\//i.test(s)) {
+        if (s.startsWith('//')) {
+          s = 'https:' + s;
+        } else {
+          s = 'https://' + s.replace(/^\/+/, '');
+        }
+      }
+
+      try {
+        // new URL(...).href sẽ tự encode space, unicode, v.v.
+        return new URL(s).href;
       } catch (e) {
-        return '#';
+        return s;
       }
     };
   </script>
@@ -488,15 +509,11 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   <script>
     window.addEventListener('DOMContentLoaded', () => {
       if (window.MXD?.renderProducts) {
-        // Nếu sau này render-products.js có hỗ trợ normalizer,
-        // chỉ cần engine đó đọc MXD_NORMALIZE_ORIGIN là xong.
         MXD.renderProducts('#product-list');
       } else {
-        const wrap  = document.querySelector('#product-list');
+        const wrap = document.querySelector('#product-list');
         const empty = document.getElementById('empty');
-        if (!wrap) return;
-
-        wrap.innerHTML = Array.from({length:6}).map(() => `
+        wrap.innerHTML = Array.from({length:6}).map(()=>`
           <article class="card">
             <div class="skeleton" style="height:200px"></div>
             <div class="body">
@@ -507,84 +524,51 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         `).join('');
 
         fetch('/assets/data/affiliates.json', { cache: 'no-store' })
-          .then(r => r.ok ? r.json() : [])
-          .then(all => {
-            const arr = Array.isArray(all) ? all : (all.items || []);
-            if (!arr.length) {
-              empty.style.display = 'block';
-              wrap.innerHTML = '';
-              return;
-            }
-
+          .then(r=>r.ok?r.json():[])
+          .then(all=>{
+            const arr = Array.isArray(all) ? all : (all.items||[]);
+            if (!arr.length){ empty.style.display='block'; wrap.innerHTML=''; return; }
             const LIMIT = window.MXD_RENDER?.limit || 30;
-            const fmt = n =>
-              isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
+            const fmt = n => isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
+            wrap.innerHTML = arr.slice(0, LIMIT).map(p=>{
+              const sku = (p.sku||'').toLowerCase();
+              const name = p.name || sku || 'Sản phẩm';
 
-            wrap.innerHTML = arr.slice(0, LIMIT).map(p => {
-              const sku       = (p.sku || '').toLowerCase();
-              const name      = p.name || sku || 'Sản phẩm';
-              const rawOrigin =
-                p.origin_url || p.origin || p.url || p.link || p.deeplink || '';
-              const origin = window.MXD_NORMALIZE_ORIGIN
-                ? window.MXD_NORMALIZE_ORIGIN(rawOrigin)
-                : (rawOrigin || '#');
+              const originRaw = p.deeplink || p.origin_url || p.origin || p.url || p.link || '#';
+              const origin    = window.MXD.normalizeAffiliateUrl(originRaw);
 
-              const merchant  = (p.merchant || '').toLowerCase();
-              const priceHtml = p.price
-                ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>`
-                : '';
-              const priceAttr = p.price ? `data-price="${p.price}"` : '';
-              const img       = `/assets/img/products/${sku}.webp`;
-
+              const merchant = (p.merchant||'').toLowerCase();
+              const price = p.price ? `<div class="price" data-price="\${p.price}">\${fmt(p.price)}</div>` : '';
               return `
                 <article class="card">
-                  <!-- product-meta cho mxd-affiliate.js -->
                   <a class="product-meta sr-only"
-                     href="${origin}"
-                     data-merchant="${merchant}"
-                     data-sku="${sku}"
-                     data-img="${img}"
-                     ${priceAttr}>${name}</a>
+                     href="\${origin}" data-merchant="\${merchant}"
+                     data-sku="\${sku}" data-img="/assets/img/products/\${sku}.webp"
+                     ${'${p.price?`data-price="${p.price}"`:``}'}>\${name}</a>
 
-                  <!-- Ở index cho phép click ảnh/tên đi thẳng sang sàn (sau khi được normalize + isclix) -->
-                  <a href="${origin}"
-                     aria-label="Xem chi tiết ${name}"
-                     target="_blank"
-                     rel="nofollow sponsored noopener">
+                  <a href="\${origin}" aria-label="Xem chi tiết \${name}" target="_blank" rel="nofollow sponsored noopener">
                     <img loading="lazy" decoding="async"
-                         src="${img}"
-                         alt="${name}"
+                         src="/assets/img/products/\${sku}.webp"
+                         alt="\${name}"
                          onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
                   </a>
                   <div class="body">
-                    <h3 class="name">
-                      <a href="${origin}" target="_blank" rel="nofollow sponsored noopener">
-                        ${name}
-                      </a>
-                    </h3>
-                    ${priceHtml}
+                    <h3 class="name"><a href="\${origin}" target="_blank" rel="nofollow sponsored noopener">\${name}</a></h3>
+                    \${price}
                     <div class="actions">
-                      <a class="buy"
-                         href="${origin}"
-                         data-merchant="${merchant}"
-                         target="_blank"
-                         rel="nofollow sponsored noopener">Mua ngay</a>
+                      <a class="buy" href="\${origin}" data-merchant="\${merchant}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
                     </div>
                   </div>
                 </article>`;
             }).join('');
-
             if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
           })
-          .catch(() => {
-            empty.style.display = 'block';
-            wrap.innerHTML = '';
-          });
+          .catch(()=>{ empty.style.display='block'; wrap.innerHTML=''; });
       }
 
       // DEDUPE floating contacts (nếu script ngoài có inject)
       const fcs = document.querySelectorAll('#floating-contacts,.floating-contacts,.fc');
-      if (fcs.length > 1) fcs.forEach((el,i) => i > 0 && el.remove());
+      if (fcs.length > 1) fcs.forEach((el,i)=> i>0 && el.remove());
     });
 
     // Nút lên đầu trang
@@ -603,70 +587,39 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       const updatedEmpty  = document.getElementById('updated-empty');
       if (!updatedWrap) return;
 
-      const money = n =>
-        Number.isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
-      const esc   = s =>
-        String(s||'').replace(/[&<>"']/g, c => (
-          {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
-        ));
-
+      const money = n => Number.isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
+      const esc   = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
       const abs   = (u) => {
         if (!u) return '';
         try {
           const url = new URL(u, location.origin);
-          if (url.origin === location.origin && u.startsWith('/')) {
-            return 'https://mxd210.github.io' + u;
-          }
+          if (url.origin === location.origin && u.startsWith('/')) return 'https://mxd210.github.io' + u;
           return url.href;
         } catch { return ''; }
       };
       const parseDate = s => { const t = Date.parse(s); return isNaN(t) ? null : t; };
 
       function render(list){
-        if (!list.length){
-          updatedEmpty.style.display='block';
-          updatedWrap.innerHTML='';
-          return;
-        }
+        if (!list.length){ updatedEmpty.style.display='block'; updatedWrap.innerHTML=''; return; }
         updatedWrap.innerHTML = list.map(p=>{
-          const sku       = (p.sku||'').toLowerCase();
-          const name      = p.name || sku || 'Sản phẩm';
-          const rawOrigin =
-            p.origin_url || p.origin || p.url || p.link || p.deeplink || '';
-          const origin = window.MXD_NORMALIZE_ORIGIN
-            ? window.MXD_NORMALIZE_ORIGIN(rawOrigin)
-            : (rawOrigin || '#');
+          const sku = (p.sku||'').toLowerCase();
+          const name = p.name || sku || 'Sản phẩm';
 
-          const buy       = origin || '#';
-          const priceHtml = Number.isFinite(+p.price)
-            ? `<div class="price">${money(+p.price)}</div>`
-            : '';
-          const img = p.image || `/assets/img/products/${sku}.webp`;
-          const merchant = (p.merchant || '').toLowerCase();
+          const buyRaw = p.deeplink || p.origin || '#';
+          const buy    = window.MXD.normalizeAffiliateUrl(buyRaw);
 
+          const priceHtml = Number.isFinite(+p.price) ? `<div class="price">\${money(+p.price)}</div>` : '';
+          const img = p.image || `/assets/img/products/\${sku}.webp`;
           return `
             <article class="card">
-              <!-- product-meta ẩn để affiliate script có dữ liệu nếu cần -->
-              <a class="product-meta sr-only"
-                 href="${buy}"
-                 data-merchant="${merchant}"
-                 data-sku="${sku}"
-                 data-img="${img}">${esc(name)}</a>
-
-              <a href="${buy}" target="_blank" rel="nofollow sponsored noopener" aria-label="Mua ${esc(name)}">
-                <img loading="lazy" decoding="async" src="${esc(img)}" alt="${esc(name)}"
+              <a href="\${buy}" target="_blank" rel="nofollow sponsored noopener" aria-label="Mua \${esc(name)}">
+                <img loading="lazy" decoding="async" src="\${esc(img)}" alt="\${esc(name)}"
                      onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
               </a>
               <div class="body">
-                <h3 class="name"><a href="${buy}" target="_blank" rel="nofollow noopener">${esc(name)}</a></h3>
-                ${priceHtml}
-                <div class="actions">
-                  <a class="buy"
-                     data-merchant="${merchant}"
-                     href="${buy}"
-                     target="_blank"
-                     rel="nofollow sponsored noopener">Mua ngay</a>
-                </div>
+                <h3 class="name"><a href="\${buy}" target="_blank" rel="nofollow noopener">\${esc(name)}</a></h3>
+                \${priceHtml}
+                <div class="actions"><a class="buy" data-merchant="\${(p.merchant||'').toLowerCase()}" href="\${buy}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a></div>
               </div>
             </article>`;
         }).join('');
@@ -681,18 +634,13 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           "name":"Mới cập nhật — MXD",
           "url":"https://mxd210.github.io/",
           "itemListElement": list.map((p, i) => {
-            const sku       = (p.sku || '').toLowerCase();
-            const rawOrigin =
-              p.origin_url || p.origin || p.url || p.link || p.deeplink || '';
-            const origin = window.MXD_NORMALIZE_ORIGIN
-              ? window.MXD_NORMALIZE_ORIGIN(rawOrigin)
-              : (rawOrigin || 'https://mxd210.github.io/');
-
-            const url = origin || 'https://mxd210.github.io/';
+            const url = window.MXD.normalizeAffiliateUrl(
+              p.deeplink || p.origin || 'https://mxd210.github.io/'
+            );
             const product = {
               "@type":"Product",
               "name": p.name || p.sku || "Sản phẩm",
-              "image": abs(p.image || `/assets/img/products/${sku}.webp`),
+              "image": abs(p.image || `/assets/img/products/${(p.sku||'').toLowerCase()}.webp`),
               "url": url
             };
             if (Number.isFinite(+p.price)) {
@@ -717,17 +665,13 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       fetch('/products.json', { cache:'no-store' })
         .then(r => r.ok ? r.json() : [])
         .then(all => {
-          const list = (Array.isArray(all) ? all : [])
-            .filter(p => p && p.status && parseDate(p.updated_at));
+          const list = (Array.isArray(all) ? all : []).filter(p => p && p.status && parseDate(p.updated_at));
           list.sort((a,b) => parseDate(b.updated_at) - parseDate(a.updated_at));
           const top = list.slice(0, 8);
           render(top);
           injectJSONLD(top);
         })
-        .catch(() => {
-          updatedEmpty.style.display='block';
-          updatedWrap.innerHTML='';
-        });
+        .catch(() => { updatedEmpty.style.display='block'; updatedWrap.innerHTML=''; });
     })();
   </script>
 
