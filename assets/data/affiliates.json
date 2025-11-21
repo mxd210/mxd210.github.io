@@ -29,7 +29,7 @@
       "khoac"
     ]
   },
-    {
+  {
     "name": "Áo croptop ba lỗ nữ TOPTIFY",
     "price": 99000,
     "origin": "https://shopee.vn/%C3%81o-croptop-ba-l%E1%BB%97-n%E1%BB%AF-TOPTIFY-c%E1%BB%95-l%E1%BB%8D-tr%C6%A1n-s%C3%A1t-n%C3%A1ch-thun-bo-g%C3%A2n-co-gi%C3%A3n-form-basic-Trip-Away-Top-AC221-TTF023-i.408175384.11370273132?sp_atk=00f330f5-6016-46bd-984a-0120c7a353c6&xptdk=00f330f5-6016-46bd-984a-0120c7a353c6",
@@ -113,7 +113,7 @@
       "khoac"
     ]
   },
-   {
+  {
     "name": "Áo Hoodie Zip Nỉ Bông Form Rộng Nam Nữ",
     "price": 119000,
     "origin": "https://shopee.vn/%C3%81o-Hoodie-Zip-N%E1%BB%89-B%C3%B4ng-Form-R%E1%BB%99ng-Nam-N%E1%BB%AF-T%C3%BAi-D%C3%A2y-K%C3%A9o-N%C3%B3n-To-Logo-Th%C3%AAu-Ng%E1%BB%B1a-i.1141437072.29266108904?sp_atk=fdcc0e3b-cb46-4bd0-b186-6a275ec63eae&xptdk=fdcc0e3b-cb46-4bd0-b186-6a275ec63eae",
@@ -201,7 +201,7 @@
       "tru"
     ]
   },
-    {
+  {
     "sku": "ao-khoac-tap-gym-nu-om-sat-co-gian-tham-hut-mo-hoi-evasport",
     "name": "Áo Khoác Tập Gym Nữ Ôm Sát Co Giãn Thấm Hút Mồ Hôi Evasport",
     "merchant": "shopee",
@@ -439,7 +439,7 @@
       "shopee"
     ]
   },
-    {
+  {
     "name": "Áo Phao Béo Siêu Nhẹ Nam Nữ GUNO",
     "price": 599000,
     "origin": "https://shopee.vn/%C3%81o-Phao-B%C3%A9o-Si%C3%AAu-Nh%E1%BA%B9-Nam-N%E1%BB%AF-GUNO-Ch%E1%BA%A7n-B%C3%B4ng-Cao-C%E1%BA%A5p-C%C3%B3-M%C5%A9-Gi%E1%BB%AF-%E1%BA%A4m-%C3%81o-Kho%C3%A1c-M%C3%B9a-%C4%90%C3%B4ng-SP5-25AG158-AB192-i.225457932.42168167813",
@@ -471,7 +471,7 @@
       "shopee"
     ]
   },
-    {
+  {
     "name": "Áo Sơ Mi Trắng Nữ Rymola, Không Nhăn, Giấu Nút",
     "price": 199000,
     "origin": "https://shopee.vn/%C3%81o-S%C6%A1-Mi-Tr%E1%BA%AFng-N%E1%BB%AF-Rymola-Kh%C3%B4ng-Nh%C4%83n-Gi%E1%BA%A5u-N%C3%BAt-Tay-D%C3%A0i-C%C3%B3-Bigsize-S%C6%A1-Mi-Tr%E1%BA%AFng-C%C3%B4ng-S%E1%BB%9F-Ch%E1%BA%A5t-V%E1%BA%A3i-Cotton-Form-Su%C3%B4ng-i.8496476.6342798120?sp_atk=950dcfb9-cb5e-4abb-9615-dcdc5b5e36be&xptdk=950dcfb9-cb5e-4abb-9615-dcdc5b5e36be",
@@ -619,7 +619,7 @@
       "thoi-trang-nu"
     ]
   },
-   {
+  {
     "name": "Áo thun NELLY - COUPLE \"HER-HIM\" 100% cotton",
     "price": 210000,
     "origin": "https://shopee.vn/product/301785019/29080067518?seoName=%C3%81o%20thun%20NELLY%20-%20COUPLE%20%22HER-HIM%22%20100%25%20cotton%20260gsm%20Premium%20-Tay%20L%E1%BB%A1%20Form%20R%E1%BB%99ng%20Oversize%20Nam%20N%E1%BB%AF",
@@ -674,7 +674,7 @@
       "shopee"
     ]
   },
-   {
+  {
     "name": "Áo thun nữ cổ tròn FA1-0044-14",
     "price": 42000,
     "origin": "https://shopee.vn/-Choice-New-%C3%81o-thun-n%E1%BB%AF-c%E1%BB%95-tr%C3%B2n-FA1-0044-14-phong-c%C3%A1ch-%C4%91%C6%A1n-gi%E1%BA%A3n-ch%E1%BA%A5t-thun-g%C3%A2n-co-gi%C3%A3n-%C3%B4m-body-i.851157471.27141370977",
@@ -727,7 +727,7 @@
       "shopee"
     ]
   },
-   {
+  {
     "name": "Bình giữ nhiệt HUKAN HK-BGN504BD",
     "price": 50000,
     "origin": "https://shopee.vn/B%C3%ACnh-gi%E1%BB%AF-nhi%E1%BB%87t-HUKAN-HK-BGN504BD-Dung-t%C3%ADch-500ml-Gi%E1%BB%AF-nhi%E1%BB%87t-n%C3%B3ng-l%E1%BA%A1nh-C%C3%B3-hi%E1%BB%83n-th%E1%BB%8B-nhi%E1%BB%87t-%C4%91%E1%BB%99-i.319001815.43170676207",
@@ -1576,6 +1576,35 @@
       "fullbox",
       "tai",
       "bmobile",
+      "app",
+      "do-dien-tu",
+      "lazada"
+    ]
+  },
+  {
+    "sku": "dien-thoai-samsung-s23-ultra-8-256gb-app",
+    "name": "Điện Thoại Samsung S23 ULTRA 8 256GB App",
+    "merchant": "lazada",
+    "image": "/assets/img/products/dien-thoai-samsung-s23-ultra-8-256gb-app.webp",
+    "category": "do-dien-tu",
+    "brand": "",
+    "featured": true,
+    "status": true,
+    "updated_at": "2025-11-21T19:42:07.572Z",
+    "price": 31799000,
+    "origin": "lazada.vn/products/dien-thoai-samsung-s23-ultra-8-256gb-i2447896767-s12052420566.html?&search=pdp_v2v?spm=a2o4n.pdp_revamp.recommendation_2.12.19e54b5ccZhDom&mp=1&scm=1007.16389.286994.0&clickTrackInfo=de1f137a-f42c-4eb9-8eb2-597f7c004ca1__2447896767__4518__trigger2i__287002__0.045__0.045__0.0__0.0__0.0__0.045__11__null__null__null__null__null__null____3.199E7__0.0__0.0__0__3.199E7__113326__null__null__null__3650.16504_955.3631__null__32104__null__0.0__0.0________null__null__0",
+    "sub1": "dien-thoai-samsung-s23-ultra-8-256gb-app",
+    "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?sub4=oneatweb&sub1=sku&sub2=lazada&sub3=tool",
+    "short_desc": "Điện Thoại Samsung S23 ULTRA 8 256GB App – lựa chọn phù hợp cho bạn với 31.799.000₫. Đặt mua online trên Lazada qua MXD.",
+    "seo_title": "Điện Thoại Samsung S23 ULTRA 8 256GB App | do-dien-tu | MXD",
+    "seo_description": "Điện Thoại Samsung S23 ULTRA 8 256GB App do MXD chọn lọc, phù hợp nhu cầu sử dụng hàng ngày. Giá tham khảo khoảng 31.799.000₫. Đặt mua trên Lazada qua liên kết affiliate MXD. Điện Thoại Samsung S23 ULTRA 8 256GB App – lựa chọn phù hợp cho bạn với 31.799.000₫. Đặt mua online trên Lazada qua MXD.",
+    "tags": [
+      "dien",
+      "thoai",
+      "samsung",
+      "s23",
+      "ultra",
+      "256gb",
       "app",
       "do-dien-tu",
       "lazada"
