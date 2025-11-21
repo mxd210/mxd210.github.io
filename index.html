@@ -1,4 +1,4 @@
-<!-- FILE:/index.html -->
+<!-- REPLACE WHOLE FILE: /index.html -->
 <!-- MXD-CHECK v2025-10-13 [index]
 - Canonical: https://mxd210.github.io/ ; robots=index,follow
 - GA4 (/assets/analytics.js) BEFORE /assets/mxd-affiliate.js (only once)
@@ -188,8 +188,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     /* Misc */
     .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%)}
     .skeleton::after{content:'';position:absolute;inset:0;animation:shimmer 1.4s infinite}
-    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}
-    }
+    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
     .nav-link{ padding:8px 10px; border-radius:10px; color:var(--text); text-decoration:none; }
     .nav-link:hover{ background:rgba(255,106,0,.08) }
     .nav-link[aria-current="page"]{ background:#fff4ec; color:#b24900 }
@@ -207,7 +206,6 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     .metric svg{width:22px;height:22px}
     .metric span{color:var(--muted);font-size:13px}
 
-     */
     .floating-contacts{
       position:fixed;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));
       display:flex;flex-direction:column;gap:12px;z-index:40;pointer-events:none;
@@ -312,8 +310,9 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   <script defer src="/assets/js/render-products.js"></script>
   <!-- 3) Affiliate -->
   <script defer src="/assets/mxd-affiliate.js"></script>
-  <!-- Engine render sản phẩm (đọc products.json, gắn nút mua) -->
+  <!-- 4) Engine store (dùng cho các trang mục, không ảnh hưởng index fallback) -->
   <script defer src="/assets/mxd-store.v2.js"></script>
+
   <!-- JSON-LD Organization -->
   <script type="application/ld+json">
   {
@@ -362,7 +361,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       (function(){
         const hero = document.getElementById('hero');
         const img = new Image();
-        img.onload = () => {}; 
+        img.onload = () => {};
         img.onerror = () => hero.classList.add('hero-fallback');
         img.src = '/assets/img/hero/home-hero.webp';
       })();
@@ -381,7 +380,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           <div><strong>Giao nhanh</strong><span>ưu tiên hàng nội địa</span></div>
         </div>
         <div class="metric">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1l3 7h7l-6 4 2 7-6-4-6 4h7z"/></svg>
           <div><strong>Hàng chọn lọc</strong><span>đáng tiền – dễ mua</span></div>
         </div>
         <div class="metric">
@@ -414,14 +413,12 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           </a>
         </li>
         <li>
-  <a href="/store/do-gia-dung.html" class="qnav-item">
-    <img src="/assets/img/categories/do-gia-dung.webp"
-         alt="Đồ gia dụng — MXD" width="28" height="28"
-         onerror="this.src='/assets/img/categories/placeholder.webp'">
-    Đồ gia dụng
-  </a>
-</li>
-
+          <a href="/store/do-gia-dung.html" class="qnav-item">
+            <img src="/assets/img/categories/do-gia-dung.webp"
+                 alt="Đồ gia dụng — MXD" width="28" height="28"
+                 onerror="this.src='/assets/img/categories/placeholder.webp'"> Đồ gia dụng
+          </a>
+        </li>
         <li>
           <a href="/store/do-dien-tu.html" class="qnav-item">
             <img src="/assets/img/categories/do-dien-tu.webp"
@@ -461,7 +458,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       © MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> · <a href="/chinh-sach/doi-tra.html">Đổi trả</a> · <a href="/chinh-sach/bao-hanh.html">Bảo hành</a>
     </div>
   </footer>
-  
+
   <!-- Config renderer -->
   <script>
     window.MXD_RENDER = window.MXD_RENDER || {};
@@ -469,51 +466,19 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     window.MXD_RENDER.limit = 30;
   </script>
 
-  <!-- Helper chuẩn hoá URL affiliate (thêm https://, encode, v.v.) -->
-  <script>
-    window.MXD = window.MXD || {};
-
-    window.MXD.normalizeAffiliateUrl = function (u) {
-      if (!u) return '#';
-      let s = String(u).trim();
-      if (!s) return '#';
-
-      // Giữ link nội bộ dạng /path
-      if (s.startsWith('/')) {
-        try {
-          return new URL(s, location.origin).href;
-        } catch (e) {
-          return s;
-        }
-      }
-
-      // Nếu thiếu protocol (shopee.vn/..., lazada.vn/..., go.isclix.vn/...)
-      if (!/^https?:\/\//i.test(s)) {
-        if (s.startsWith('//')) {
-          s = 'https:' + s;
-        } else {
-          s = 'https://' + s.replace(/^\/+/, '');
-        }
-      }
-
-      try {
-        // new URL(...).href sẽ tự encode space, unicode, v.v.
-        return new URL(s).href;
-      } catch (e) {
-        return s;
-      }
-    };
-  </script>
-
   <!-- Render sản phẩm (affiliates.json) -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      if (window.MXD?.renderProducts) {
-        MXD.renderProducts('#product-list');
+      const wrap = document.querySelector('#product-list');
+      const empty = document.getElementById('empty');
+      if (!wrap) return;
+
+      // Nếu đã có engine MXD.renderProducts thì ưu tiên dùng
+      if (window.MXD && typeof window.MXD.renderProducts === 'function') {
+        window.MXD.renderProducts('#product-list');
       } else {
-        const wrap = document.querySelector('#product-list');
-        const empty = document.getElementById('empty');
-        wrap.innerHTML = Array.from({length:6}).map(()=>`
+        // Fallback: tự fetch affiliates.json
+        wrap.innerHTML = Array.from({length: 6}).map(() => `
           <article class="card">
             <div class="skeleton" style="height:200px"></div>
             <div class="body">
@@ -524,51 +489,86 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         `).join('');
 
         fetch('/assets/data/affiliates.json', { cache: 'no-store' })
-          .then(r=>r.ok?r.json():[])
-          .then(all=>{
-            const arr = Array.isArray(all) ? all : (all.items||[]);
-            if (!arr.length){ empty.style.display='block'; wrap.innerHTML=''; return; }
-            const LIMIT = window.MXD_RENDER?.limit || 30;
-            const fmt = n => isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n)+'₫' : '';
-            wrap.innerHTML = arr.slice(0, LIMIT).map(p=>{
-              const sku = (p.sku||'').toLowerCase();
-              const name = p.name || sku || 'Sản phẩm';
+          .then(r => r.ok ? r.json() : [])
+          .then(all => {
+            const arr = Array.isArray(all) ? all : (all.items || []);
+            if (!arr.length) {
+              if (empty) empty.style.display = 'block';
+              wrap.innerHTML = '';
+              return;
+            }
 
-              const originRaw = p.deeplink || p.origin_url || p.origin || p.url || p.link || '#';
-              const origin    = window.MXD.normalizeAffiliateUrl(originRaw);
+            const LIMIT = (window.MXD_RENDER && window.MXD_RENDER.limit) || 30;
+            const fmt = n => isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
 
-              const merchant = (p.merchant||'').toLowerCase();
-              const price = p.price ? `<div class="price" data-price="\${p.price}">\${fmt(p.price)}</div>` : '';
+            wrap.innerHTML = arr.slice(0, LIMIT).map(p => {
+              const rawSku = (p.sku || '').toString();
+              const skuSlug = rawSku.toLowerCase();
+              const name = p.name || rawSku || 'Sản phẩm';
+
+              const originRaw = (p.origin_url || p.origin || p.url || p.link || '').toString().trim();
+              const hasDeeplink = typeof p.deeplink === 'string' &&
+                /go\.isclix\.com\/deep_link/i.test(p.deeplink);
+              const hrefInitial = hasDeeplink
+                ? p.deeplink
+                : (originRaw || '#');
+
+              const merchant = (p.merchant || '').toLowerCase();
+              const priceHtml = p.price
+                ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>`
+                : '';
+
+              const detailHref = rawSku
+                ? `/g.html?sku=${encodeURIComponent(rawSku)}`
+                : '#';
+
               return `
                 <article class="card">
                   <a class="product-meta sr-only"
-                     href="\${origin}" data-merchant="\${merchant}"
-                     data-sku="\${sku}" data-img="/assets/img/products/\${sku}.webp"
-                     ${'${p.price?`data-price="${p.price}"`:``}'}>\${name}</a>
+                     href="${hrefInitial}"
+                     data-merchant="${merchant}"
+                     data-sku="${rawSku}"
+                     data-origin-url="${originRaw}">
+                    ${name}
+                  </a>
 
-                  <a href="\${origin}" aria-label="Xem chi tiết \${name}" target="_blank" rel="nofollow sponsored noopener">
+                  <a href="${detailHref}" aria-label="Xem chi tiết ${name}">
                     <img loading="lazy" decoding="async"
-                         src="/assets/img/products/\${sku}.webp"
-                         alt="\${name}"
+                         src="/assets/img/products/${skuSlug || 'placeholder'}.webp"
+                         alt="${name}"
                          onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
                   </a>
                   <div class="body">
-                    <h3 class="name"><a href="\${origin}" target="_blank" rel="nofollow sponsored noopener">\${name}</a></h3>
-                    \${price}
+                    <h3 class="name"><a href="${detailHref}">${name}</a></h3>
+                    ${priceHtml}
                     <div class="actions">
-                      <a class="buy" href="\${origin}" data-merchant="\${merchant}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a>
+                      <a class="buy"
+                         href="${hrefInitial}"
+                         data-merchant="${merchant}"
+                         data-sku="${rawSku}"
+                         data-origin-url="${originRaw}"
+                         target="_blank"
+                         rel="nofollow sponsored noopener">
+                        Mua ngay
+                      </a>
                     </div>
                   </div>
                 </article>`;
             }).join('');
-            if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+
+            if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
+              window.mxdAffiliate.scan(wrap);
+            }
           })
-          .catch(()=>{ empty.style.display='block'; wrap.innerHTML=''; });
+          .catch(() => {
+            if (empty) empty.style.display = 'block';
+            wrap.innerHTML = '';
+          });
       }
 
       // DEDUPE floating contacts (nếu script ngoài có inject)
       const fcs = document.querySelectorAll('#floating-contacts,.floating-contacts,.fc');
-      if (fcs.length > 1) fcs.forEach((el,i)=> i>0 && el.remove());
+      if (fcs.length > 1) fcs.forEach((el, i) => i > 0 && el.remove());
     });
 
     // Nút lên đầu trang
@@ -605,25 +605,54 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           const sku = (p.sku||'').toLowerCase();
           const name = p.name || sku || 'Sản phẩm';
 
-          const buyRaw = p.deeplink || p.origin || '#';
-          const buy    = window.MXD.normalizeAffiliateUrl(buyRaw);
+          const originRaw = (p.origin_url || p.origin || p.url || p.link || '').toString().trim();
+          const hasDeeplink = typeof p.deeplink === 'string' &&
+            /go\.isclix\.com\/deep_link/i.test(p.deeplink);
+          const buy = hasDeeplink ? p.deeplink : (originRaw || '#');
 
-          const priceHtml = Number.isFinite(+p.price) ? `<div class="price">\${money(+p.price)}</div>` : '';
-          const img = p.image || `/assets/img/products/\${sku}.webp`;
+          const priceHtml = Number.isFinite(+p.price) ? `<div class="price">${money(+p.price)}</div>` : '';
+          const img = p.image || `/assets/img/products/${sku}.webp`;
+          const merchantAttr = (p.merchant || '').toLowerCase();
+
           return `
             <article class="card">
-              <a href="\${buy}" target="_blank" rel="nofollow sponsored noopener" aria-label="Mua \${esc(name)}">
-                <img loading="lazy" decoding="async" src="\${esc(img)}" alt="\${esc(name)}"
+              <a href="${esc(buy)}"
+                 target="_blank"
+                 rel="nofollow sponsored noopener"
+                 aria-label="Mua ${esc(name)}"
+                 data-origin-url="${esc(originRaw)}"
+                 data-merchant="${esc(merchantAttr)}">
+                <img loading="lazy" decoding="async"
+                     src="${esc(img)}" alt="${esc(name)}"
                      onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
               </a>
               <div class="body">
-                <h3 class="name"><a href="\${buy}" target="_blank" rel="nofollow noopener">\${esc(name)}</a></h3>
-                \${priceHtml}
-                <div class="actions"><a class="buy" data-merchant="\${(p.merchant||'').toLowerCase()}" href="\${buy}" target="_blank" rel="nofollow sponsored noopener">Mua ngay</a></div>
+                <h3 class="name">
+                  <a href="${esc(buy)}"
+                     target="_blank"
+                     rel="nofollow noopener"
+                     data-origin-url="${esc(originRaw)}"
+                     data-merchant="${esc(merchantAttr)}">
+                    ${esc(name)}
+                  </a>
+                </h3>
+                ${priceHtml}
+                <div class="actions">
+                  <a class="buy"
+                     data-merchant="${esc(merchantAttr)}"
+                     data-origin-url="${esc(originRaw)}"
+                     href="${esc(buy)}"
+                     target="_blank"
+                     rel="nofollow sponsored noopener">
+                    Mua ngay
+                  </a>
+                </div>
               </div>
             </article>`;
         }).join('');
-        if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
+        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
+          window.mxdAffiliate.scan(updatedWrap);
+        }
       }
 
       function injectJSONLD(list){
@@ -634,9 +663,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           "name":"Mới cập nhật — MXD",
           "url":"https://mxd210.github.io/",
           "itemListElement": list.map((p, i) => {
-            const url = window.MXD.normalizeAffiliateUrl(
-              p.deeplink || p.origin || 'https://mxd210.github.io/'
-            );
+            const url = p.deeplink || p.origin || 'https://mxd210.github.io/';
             const product = {
               "@type":"Product",
               "name": p.name || p.sku || "Sản phẩm",
