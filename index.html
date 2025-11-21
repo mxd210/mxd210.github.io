@@ -48,62 +48,62 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         --card:#14181d; --shadow:0 10px 28px rgba(0,0,0,.35);
       }
       /* === MXD COLOR ENHANCE v2025-10-13 =============================== */
-/* Palette mở rộng cho hiệu ứng màu */
-:root{
-  --brand-2:#ffb703;      /* cam vàng phối */
-  --brand-3:#ff914d;      /* cam nhạt để đổ bóng */
-  --chip-bg:linear-gradient(135deg, rgba(255,106,0,.10), rgba(255,183,3,.10));
-  --chip-border:#ffd9c4;
-  --chip-shadow:0 8px 22px rgba(255,106,0,.12);
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --chip-bg:linear-gradient(135deg, rgba(255,106,0,.08), rgba(255,183,3,.08));
-    --chip-border:#3b2a1f;
-    --chip-shadow:0 10px 28px rgba(255,106,0,.18);
-  }
-}
+      /* Palette mở rộng cho hiệu ứng màu */
+      :root{
+        --brand-2:#ffb703;      /* cam vàng phối */
+        --brand-3:#ff914d;      /* cam nhạt để đổ bóng */
+        --chip-bg:linear-gradient(135deg, rgba(255,106,0,.10), rgba(255,183,3,.10));
+        --chip-border:#ffd9c4;
+        --chip-shadow:0 8px 22px rgba(255,106,0,.12);
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --chip-bg:linear-gradient(135deg, rgba(255,106,0,.08), rgba(255,183,3,.08));
+          --chip-border:#3b2a1f;
+          --chip-shadow:0 10px 28px rgba(255,106,0,.18);
+        }
+      }
 
-/* 1) NAV — tab có màu, active nổi khối */
-.site-nav .nav-link{
-  border:1px solid transparent;
-  border-radius:12px;
-  transition:background .15s ease, box-shadow .15s ease, border-color .15s ease;
-}
-.site-nav .nav-link:hover{
-  background:var(--chip-bg);
-  border-color:var(--chip-border);
-  box-shadow:var(--chip-shadow);
-}
-.site-nav .nav-link[aria-current="page"]{
-  background:linear-gradient(135deg,#fff4ec,#ffe6d9);
-  border-color:#ffc9ae;
-  color:#b24900;
-  box-shadow:0 8px 20px rgba(255,106,0,.18);
-}
+      /* 1) NAV — tab có màu, active nổi khối */
+      .site-nav .nav-link{
+        border:1px solid transparent;
+        border-radius:12px;
+        transition:background .15s ease, box-shadow .15s ease, border-color .15s ease;
+      }
+      .site-nav .nav-link:hover{
+        background:var(--chip-bg);
+        border-color:var(--chip-border);
+        box-shadow:var(--chip-shadow);
+      }
+      .site-nav .nav-link[aria-current="page"]{
+        background:linear-gradient(135deg,#fff4ec,#ffe6d9);
+        border-color:#ffc9ae;
+        color:#b24900;
+        box-shadow:0 8px 20px rgba(255,106,0,.18);
+      }
 
-/* 2) CHIPS/METRICS — thẻ có nền chuyển sắc, icon mang màu thương hiệu */
-.metrics .metric{
-  background:var(--chip-bg);
-  border-color:var(--chip-border);
-  box-shadow:var(--chip-shadow);
-  position:relative;
-}
-.metrics .metric svg{ color:var(--brand); } /* icon đồng bộ màu brand */
-/* chấm nhấn góc phải */
-.metrics .metric::after{
-  content:''; position:absolute; top:10px; right:12px;
-  width:8px; height:8px; border-radius:999px; background:var(--brand);
-  box-shadow:0 0 0 4px rgba(255,106,0,.12);
-}
+      /* 2) CHIPS/METRICS — thẻ có nền chuyển sắc, icon mang màu thương hiệu */
+      .metrics .metric{
+        background:var(--chip-bg);
+        border-color:var(--chip-border);
+        box-shadow:var(--chip-shadow);
+        position:relative;
+      }
+      .metrics .metric svg{ color:var(--brand); } /* icon đồng bộ màu brand */
+      /* chấm nhấn góc phải */
+      .metrics .metric::after{
+        content:''; position:absolute; top:10px; right:12px;
+        width:8px; height:8px; border-radius:999px; background:var(--brand);
+        box-shadow:0 0 0 4px rgba(255,106,0,.12);
+      }
 
-/* (tuỳ chọn) cùng phong cách cho quick-nav nếu sau này bật lại */
-.quick-nav .qnav-item{
-  background:var(--chip-bg);
-  border-color:var(--chip-border);
-  box-shadow:var(--chip-shadow);
-}
- }
+      /* (tuỳ chọn) cùng phong cách cho quick-nav nếu sau này bật lại */
+      .quick-nav .qnav-item{
+        background:var(--chip-bg);
+        border-color:var(--chip-border);
+        box-shadow:var(--chip-shadow);
+      }
+    }
     html,body{height:100%}
     body{
       margin:0; background:var(--bg); color:var(--text);
@@ -205,10 +205,8 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     .metrics-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
     .metric{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--card);box-shadow:var(--shadow)}
     .metric svg{width:22px;height:22px}
-    .metric strong{display:block}
     .metric span{color:var(--muted);font-size:13px}
 
-     */
     .floating-contacts{
       position:fixed;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));
       display:flex;flex-direction:column;gap:12px;z-index:40;pointer-events:none;
@@ -220,88 +218,90 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.18);
     }
     body.has-fixed-cta .floating-contacts{ bottom:112px }
+
     /* === MXD COLOR ENHANCE — HARD OVERRIDE v2025-10-13 ================= */
-:root{
-  --brand-2:#ffb703;      /* phối cam vàng */
-  --brand-3:#ff914d;      /* cam nhạt */
-  --chip-bg:linear-gradient(135deg, rgba(255,106,0,.12), rgba(255,183,3,.10));
-  --chip-border:#ffc9ae;
-  --chip-shadow:0 8px 22px rgba(255,106,0,.16);
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --chip-bg:linear-gradient(135deg, rgba(255,106,0,.10), rgba(255,183,3,.08));
-    --chip-border:#3b2a1f;
-    --chip-shadow:0 10px 28px rgba(255,106,0,.22);
-  }
-}
+    :root{
+      --brand-2:#ffb703;      /* phối cam vàng */
+      --brand-3:#ff914d;      /* cam nhạt */
+      --chip-bg:linear-gradient(135deg, rgba(255,106,0,.12), rgba(255,183,3,.10));
+      --chip-border:#ffcfb6;
+      --chip-shadow:0 8px 22px rgba(255,106,0,.16);
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --chip-bg:linear-gradient(135deg, rgba(255,106,0,.10), rgba(255,183,3,.08));
+        --chip-border:#3b2a1f;
+        --chip-shadow:0 10px 28px rgba(255,106,0,.22);
+      }
+    }
 
-/* NAV: màu hover + active (ưu tiên cao, chống đè) */
-.site-nav .nav-link{
-  border:1px solid transparent; border-radius:12px;
-  transition:background .15s, box-shadow .15s, border-color .15s;
-}
-.site-nav .nav-link:hover{
-  background:var(--chip-bg) !important;
-  border-color:var(--chip-border) !important;
-  box-shadow:var(--chip-shadow) !important;
-}
-.site-nav .nav-link[aria-current="page"]{
-  background:linear-gradient(135deg,#fff0e6,#ffe6d9) !important;
-  border-color:#ffcfb6 !important;
-  color:#b24900 !important;
-  box-shadow:0 8px 20px rgba(255,106,0,.20) !important;
-}
+    /* NAV: màu hover + active (ưu tiên cao, chống đè) */
+    .site-nav .nav-link{
+      border:1px solid transparent; border-radius:12px;
+      transition:background .15s, box-shadow .15s, border-color .15s;
+    }
+    .site-nav .nav-link:hover{
+      background:var(--chip-bg) !important;
+      border-color:var(--chip-border) !important;
+      box-shadow:var(--chip-shadow) !important;
+    }
+    .site-nav .nav-link[aria-current="page"]{
+      background:linear-gradient(135deg,#fff0e6,#ffe6d9) !important;
+      border-color:#ffcfb6 !important;
+      color:#b24900 !important;
+      box-shadow:0 8px 20px rgba(255,106,0,.20) !important;
+    }
 
-/* CHIPS/METRICS: gradient dịu + icon theo brand */
-.metrics .metric{
-  background:var(--chip-bg) !important;
-  border-color:var(--chip-border) !important;
-  box-shadow:var(--chip-shadow) !important;
-  position:relative;
-}
-.metrics .metric svg{ color:var(--brand) !important; }
-.metrics .metric::after{
-  content:''; position:absolute; top:10px; right:12px;
-  width:8px; height:8px; border-radius:999px; background:var(--brand);
-  box-shadow:0 0 0 4px rgba(255,106,0,.14);
-}
+    /* CHIPS/METRICS: gradient dịu + icon theo brand */
+    .metrics .metric{
+      background:var(--chip-bg) !important;
+      border-color:var(--chip-border) !important;
+      box-shadow:var(--chip-shadow) !important;
+      position:relative;
+    }
+    .metrics .metric svg{ color:var(--brand) !important; }
+    .metrics .metric::after{
+      content:''; position:absolute; top:10px; right:12px;
+      width:8px; height:8px; border-radius:999px; background:var(--brand);
+      box-shadow:0 0 0 4px rgba(255,106,0,.14);
+    }
 
-/* (tuỳ chọn) áp dụng cùng style cho quick-nav nếu bật lại */
-.quick-nav .qnav-item{
-  background:var(--chip-bg) !important;
-  border-color:var(--chip-border) !important;
-  box-shadow:var(--chip-shadow) !important;
-}
-/* === MXD NAV STRIP (blue) v2025-10-13 — minimal override ================ */
-:root{
-  --nav-blue-1:#1746ff;     /* xanh dương chính */
-  --nav-blue-2:#1a94ff;     /* xanh dương phối */
-  --nav-blue-ring:rgba(255,255,255,.18);
-}
+    /* (tuỳ chọn) áp dụng cùng style cho quick-nav nếu bật lại */
+    .quick-nav .qnav-item{
+      background:var(--chip-bg) !important;
+      border-color:var(--chip-border) !important;
+      box-shadow:var(--chip-shadow) !important;
+    }
 
-/* Dải nền xanh dương cho toàn bộ cụm menu */
-.site-nav{
-  background:linear-gradient(135deg,var(--nav-blue-1),var(--nav-blue-2)) !important;
-  padding:6px 10px !important;
-  border-radius:14px !important;
-  border:1px solid var(--nav-blue-ring) !important;
-  box-shadow:0 10px 24px rgba(23,70,255,.20) !important;
-}
+    /* === MXD NAV STRIP (blue) v2025-10-13 — minimal override ================ */
+    :root{
+      --nav-blue-1:#1746ff;     /* xanh dương chính */
+      --nav-blue-2:#1a94ff;     /* xanh dương phối */
+      --nav-blue-ring:rgba(255,255,255,.18);
+    }
 
-/* Link trắng trên nền xanh, hover/active dịu mắt */
-.site-nav .nav-link{
-  color:#fff !important;
-  border-color:transparent !important;
-  background:transparent !important;
-}
-.site-nav .nav-link:hover{
-  background:rgba(255,255,255,.14) !important;
-}
-.site-nav .nav-link[aria-current="page"]{
-  background:rgba(255,255,255,.22) !important;
-  color:#fff !important;
-}
+    /* Dải nền xanh dương cho toàn bộ cụm menu */
+    .site-nav{
+      background:linear-gradient(135deg,var(--nav-blue-1),var(--nav-blue-2)) !important;
+      padding:6px 10px !important;
+      border-radius:14px !important;
+      border:1px solid var(--nav-blue-ring) !important;
+      box-shadow:0 10px 24px rgba(23,70,255,.20) !important;
+    }
+
+    /* Link trắng trên nền xanh, hover/active dịu mắt */
+    .site-nav .nav-link{
+      color:#fff !important;
+      border-color:transparent !important;
+      background:transparent !important;
+    }
+    .site-nav .nav-link:hover{
+      background:rgba(255,255,255,.14) !important;
+    }
+    .site-nav .nav-link[aria-current="page"]{
+      background:rgba(255,255,255,.22) !important;
+      color:#fff !important;
+    }
 
   </style>
 
@@ -311,7 +311,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   <script defer src="/assets/js/render-products.js"></script>
   <!-- 3) Affiliate -->
   <script defer src="/assets/mxd-affiliate.js"></script>
-<!-- Engine render sản phẩm (đọc products.json, gắn nút mua) -->
+  <!-- Engine render sản phẩm (đọc products.json, gắn nút mua) -->
   <script defer src="/assets/mxd-store.v2.js"></script>
   <!-- JSON-LD Organization -->
   <script type="application/ld+json">
@@ -361,7 +361,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       (function(){
         const hero = document.getElementById('hero');
         const img = new Image();
-        img.onload = () => {}; 
+        img.onload = () => {};
         img.onerror = () => hero.classList.add('hero-fallback');
         img.src = '/assets/img/hero/home-hero.webp';
       })();
@@ -413,12 +413,12 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           </a>
         </li>
         <li>
-  <a href="/store/do-dien-tu.html" class="qnav-item">
-    <img src="/assets/img/categories/do-dien-tu.webp"
-         alt="Đồ điện tử — MXD" width="28" height="28"
-         onerror="this.src='/assets/img/categories/placeholder.webp'"> Đồ điện tử
-  </a>
-</li>
+          <a href="/store/do-dien-tu.html" class="qnav-item">
+            <img src="/assets/img/categories/do-dien-tu.webp"
+                 alt="Đồ điện tử — MXD" width="28" height="28"
+                 onerror="this.src='/assets/img/categories/placeholder.webp'"> Đồ điện tử
+          </a>
+        </li>
         <!-- NEW: Mỹ phẩm -->
         <li>
           <a href="/store/my-pham.html" class="qnav-item">
@@ -452,31 +452,32 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     </div>
   </footer>
   
-    <!-- Config renderer -->
+  <!-- Config renderer + normalizer link gốc -->
   <script>
-    // Cấu hình nguồn render cho MXD.renderProducts (nếu có)
     window.MXD_RENDER = window.MXD_RENDER || {};
     window.MXD_RENDER.source = '/assets/data/affiliates.json';
     window.MXD_RENDER.limit = 30;
 
-    // Chuẩn hoá link origin: tự thêm https:// và encode ký tự Unicode
+    // Chuẩn hoá origin_url: tự thêm https://, auto encode tiếng Việt/khoảng trắng
     window.MXD_NORMALIZE_ORIGIN = function (u) {
       if (!u) return '#';
       try {
         let s = String(u).trim();
         if (!s) return '#';
 
-        // Chưa có protocol → thêm https://
+        // Nếu chưa có protocol thì thêm https://
         if (!/^https?:\/\//i.test(s)) {
           if (s.startsWith('//')) {
             s = 'https:' + s;
           } else {
+            // ví dụ: shopee.vn/Áo...  → https://shopee.vn/Áo...
             s = 'https://' + s.replace(/^\/+/, '');
           }
         }
 
         const url = new URL(s);
-        return url.href; // new URL sẽ tự encode tiếng Việt, khoảng trắng...
+        // new URL sẽ tự encode UTF-8, khoảng trắng,...
+        return url.href;
       } catch (e) {
         return '#';
       }
@@ -486,17 +487,16 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   <!-- Render sản phẩm (affiliates.json) -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      // Nếu đã có engine chung MXD.renderProducts thì dùng luôn
       if (window.MXD?.renderProducts) {
+        // Nếu sau này render-products.js có hỗ trợ normalizer,
+        // chỉ cần engine đó đọc MXD_NORMALIZE_ORIGIN là xong.
         MXD.renderProducts('#product-list');
       } else {
-        // Fallback: tự fetch affiliates.json và dựng card
         const wrap  = document.querySelector('#product-list');
         const empty = document.getElementById('empty');
-
         if (!wrap) return;
 
-        wrap.innerHTML = Array.from({ length: 6 }).map(() => `
+        wrap.innerHTML = Array.from({length:6}).map(() => `
           <article class="card">
             <div class="skeleton" style="height:200px"></div>
             <div class="body">
@@ -521,11 +521,10 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
               isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
 
             wrap.innerHTML = arr.slice(0, LIMIT).map(p => {
-              const sku  = (p.sku || '').toLowerCase();
-              const name = p.name || sku || 'Sản phẩm';
-
+              const sku       = (p.sku || '').toLowerCase();
+              const name      = p.name || sku || 'Sản phẩm';
               const rawOrigin =
-                p.origin_url || p.origin || p.url || p.link || '';
+                p.origin_url || p.origin || p.url || p.link || p.deeplink || '';
               const origin = window.MXD_NORMALIZE_ORIGIN
                 ? window.MXD_NORMALIZE_ORIGIN(rawOrigin)
                 : (rawOrigin || '#');
@@ -536,7 +535,6 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
                 : '';
               const priceAttr = p.price ? `data-price="${p.price}"` : '';
               const img       = `/assets/img/products/${sku}.webp`;
-              const detail    = `/g.html?sku=${encodeURIComponent(sku)}`;
 
               return `
                 <article class="card">
@@ -548,7 +546,11 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
                      data-img="${img}"
                      ${priceAttr}>${name}</a>
 
-                  <a href="${detail}" aria-label="Xem chi tiết ${name}">
+                  <!-- Ở index cho phép click ảnh/tên đi thẳng sang sàn (sau khi được normalize + isclix) -->
+                  <a href="${origin}"
+                     aria-label="Xem chi tiết ${name}"
+                     target="_blank"
+                     rel="nofollow sponsored noopener">
                     <img loading="lazy" decoding="async"
                          src="${img}"
                          alt="${name}"
@@ -556,11 +558,12 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
                   </a>
                   <div class="body">
                     <h3 class="name">
-                      <a href="${detail}">${name}</a>
+                      <a href="${origin}" target="_blank" rel="nofollow sponsored noopener">
+                        ${name}
+                      </a>
                     </h3>
                     ${priceHtml}
                     <div class="actions">
-                      <!-- href dùng origin đã được normalize; mxd-affiliate sẽ rewrite sang isclix -->
                       <a class="buy"
                          href="${origin}"
                          data-merchant="${merchant}"
@@ -581,7 +584,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
 
       // DEDUPE floating contacts (nếu script ngoài có inject)
       const fcs = document.querySelectorAll('#floating-contacts,.floating-contacts,.fc');
-      if (fcs.length > 1) fcs.forEach((el, i) => i > 0 && el.remove());
+      if (fcs.length > 1) fcs.forEach((el,i) => i > 0 && el.remove());
     });
 
     // Nút lên đầu trang
@@ -589,30 +592,25 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       const toTop = document.getElementById('toTop');
       if (!toTop) return;
       toTop.style.display = scrollY > 400 ? 'flex' : 'none';
-    }, { passive: true });
-
-    document.getElementById('toTop')
-      ?.addEventListener('click', () =>
-        scrollTo({ top: 0, behavior: 'smooth' })
-      );
+    }, { passive:true });
+    document.getElementById('toTop')?.addEventListener('click', () => scrollTo({ top:0, behavior:'smooth' }));
   </script>
 
-
-    <!-- Dải MỚI CẬP NHẬT + JSON-LD ItemList (products.json) -->
+  <!-- Dải MỚI CẬP NHẬT + JSON-LD ItemList (products.json) -->
   <script>
-    (function () {
-      const updatedWrap  = document.getElementById('updated-list');
-      const updatedEmpty = document.getElementById('updated-empty');
+    (function(){
+      const updatedWrap   = document.getElementById('updated-list');
+      const updatedEmpty  = document.getElementById('updated-empty');
       if (!updatedWrap) return;
 
       const money = n =>
         Number.isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
-      const esc = s =>
-        String(s || '').replace(/[&<>"']/g, c =>
-          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
-        );
+      const esc   = s =>
+        String(s||'').replace(/[&<>"']/g, c => (
+          {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+        ));
 
-      const abs = (u) => {
+      const abs   = (u) => {
         if (!u) return '';
         try {
           const url = new URL(u, location.origin);
@@ -620,65 +618,47 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
             return 'https://mxd210.github.io' + u;
           }
           return url.href;
-        } catch {
-          return '';
-        }
+        } catch { return ''; }
       };
+      const parseDate = s => { const t = Date.parse(s); return isNaN(t) ? null : t; };
 
-      const parseDate = s => {
-        const t = Date.parse(s);
-        return isNaN(t) ? null : t;
-      };
-
-      function render(list) {
-        if (!list.length) {
-          updatedEmpty.style.display = 'block';
-          updatedWrap.innerHTML = '';
+      function render(list){
+        if (!list.length){
+          updatedEmpty.style.display='block';
+          updatedWrap.innerHTML='';
           return;
         }
-
-        updatedWrap.innerHTML = list.map(p => {
-          const sku  = (p.sku || '').toLowerCase();
-          const name = p.name || sku || 'Sản phẩm';
-
+        updatedWrap.innerHTML = list.map(p=>{
+          const sku       = (p.sku||'').toLowerCase();
+          const name      = p.name || sku || 'Sản phẩm';
           const rawOrigin =
-            p.origin || p.origin_url || p.url || p.link || '';
+            p.origin_url || p.origin || p.url || p.link || p.deeplink || '';
           const origin = window.MXD_NORMALIZE_ORIGIN
             ? window.MXD_NORMALIZE_ORIGIN(rawOrigin)
             : (rawOrigin || '#');
 
-          const merchant  = (p.merchant || '').toLowerCase();
-          const buy       = origin || '#'; // luôn dùng link gốc; mxd-affiliate sẽ rewrite
+          const buy       = origin || '#';
           const priceHtml = Number.isFinite(+p.price)
             ? `<div class="price">${money(+p.price)}</div>`
             : '';
           const img = p.image || `/assets/img/products/${sku}.webp`;
+          const merchant = (p.merchant || '').toLowerCase();
 
           return `
             <article class="card">
-              <!-- product-meta ẩn để affiliate script đọc dữ liệu -->
+              <!-- product-meta ẩn để affiliate script có dữ liệu nếu cần -->
               <a class="product-meta sr-only"
                  href="${buy}"
                  data-merchant="${merchant}"
                  data-sku="${sku}"
                  data-img="${img}">${esc(name)}</a>
 
-              <a href="${buy}"
-                 target="_blank"
-                 rel="nofollow sponsored noopener"
-                 aria-label="Mua ${esc(name)}">
-                <img loading="lazy"
-                     decoding="async"
-                     src="${esc(img)}"
-                     alt="${esc(name)}"
+              <a href="${buy}" target="_blank" rel="nofollow sponsored noopener" aria-label="Mua ${esc(name)}">
+                <img loading="lazy" decoding="async" src="${esc(img)}" alt="${esc(name)}"
                      onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
               </a>
               <div class="body">
-                <h3 class="name">
-                  <a href="${buy}" target="_blank" rel="nofollow noopener">
-                    ${esc(name)}
-                  </a>
-                </h3>
+                <h3 class="name"><a href="${buy}" target="_blank" rel="nofollow noopener">${esc(name)}</a></h3>
                 ${priceHtml}
                 <div class="actions">
                   <a class="buy"
@@ -690,80 +670,66 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
               </div>
             </article>`;
         }).join('');
-
         if (window.mxdAffiliate?.scan) window.mxdAffiliate.scan();
       }
 
-      function injectJSONLD(list) {
+      function injectJSONLD(list){
         if (!list.length) return;
-
         const itemList = {
-          "@context": "https://schema.org",
-          "@type": "ItemList",
-          "name": "Mới cập nhật — MXD",
-          "url": "https://mxd210.github.io/",
+          "@context":"https://schema.org",
+          "@type":"ItemList",
+          "name":"Mới cập nhật — MXD",
+          "url":"https://mxd210.github.io/",
           "itemListElement": list.map((p, i) => {
             const sku       = (p.sku || '').toLowerCase();
             const rawOrigin =
-              p.origin || p.origin_url || p.url || p.link || '';
+              p.origin_url || p.origin || p.url || p.link || p.deeplink || '';
             const origin = window.MXD_NORMALIZE_ORIGIN
               ? window.MXD_NORMALIZE_ORIGIN(rawOrigin)
               : (rawOrigin || 'https://mxd210.github.io/');
 
-            const productUrl = origin || 'https://mxd210.github.io/';
-
+            const url = origin || 'https://mxd210.github.io/';
             const product = {
-              "@type": "Product",
+              "@type":"Product",
               "name": p.name || p.sku || "Sản phẩm",
               "image": abs(p.image || `/assets/img/products/${sku}.webp`),
-              "url": productUrl
+              "url": url
             };
-
             if (Number.isFinite(+p.price)) {
               product.offers = {
-                "@type": "Offer",
-                "priceCurrency": "VND",
+                "@type":"Offer",
+                "priceCurrency":"VND",
                 "price": String(+p.price),
-                "availability": "https://schema.org/InStock",
-                "url": productUrl
+                "availability":"https://schema.org/InStock",
+                "url": url
               };
             }
-            if (p.brand) {
-              product.brand = { "@type": "Brand", "name": String(p.brand) };
-            }
-
-            return {
-              "@type": "ListItem",
-              "position": i + 1,
-              "url": productUrl,
-              "item": product
-            };
+            if (p.brand) product.brand = { "@type":"Brand", "name": String(p.brand) };
+            return { "@type":"ListItem", "position": i+1, "url": url, "item": product };
           })
         };
-
         const tag = document.createElement('script');
         tag.type = 'application/ld+json';
         tag.textContent = JSON.stringify(itemList);
         document.head.appendChild(tag);
       }
 
-      fetch('/products.json', { cache: 'no-store' })
+      fetch('/products.json', { cache:'no-store' })
         .then(r => r.ok ? r.json() : [])
         .then(all => {
           const list = (Array.isArray(all) ? all : [])
             .filter(p => p && p.status && parseDate(p.updated_at));
-          list.sort((a, b) => parseDate(b.updated_at) - parseDate(a.updated_at));
+          list.sort((a,b) => parseDate(b.updated_at) - parseDate(a.updated_at));
           const top = list.slice(0, 8);
           render(top);
           injectJSONLD(top);
         })
         .catch(() => {
-          updatedEmpty.style.display = 'block';
-          updatedWrap.innerHTML = '';
+          updatedEmpty.style.display='block';
+          updatedWrap.innerHTML='';
         });
     })();
   </script>
-
 
   <!-- Nếu file ngoài cũng tạo floating-contacts, vẫn chỉ giữ 1 block -->
   <script defer src="/assets/js/floating-contact.js"></script>
