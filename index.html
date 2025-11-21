@@ -48,10 +48,9 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         --card:#14181d; --shadow:0 10px 28px rgba(0,0,0,.35);
       }
       /* === MXD COLOR ENHANCE v2025-10-13 =============================== */
-      /* Palette mở rộng cho hiệu ứng màu */
       :root{
-        --brand-2:#ffb703;      /* cam vàng phối */
-        --brand-3:#ff914d;      /* cam nhạt để đổ bóng */
+        --brand-2:#ffb703;
+        --brand-3:#ff914d;
         --chip-bg:linear-gradient(135deg, rgba(255,106,0,.10), rgba(255,183,3,.10));
         --chip-border:#ffd9c4;
         --chip-shadow:0 8px 22px rgba(0,0,0,.12);
@@ -64,7 +63,6 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         }
       }
 
-      /* 1) NAV — tab có màu, active nổi khối */
       .site-nav .nav-link{
         border:1px solid transparent;
         border-radius:12px;
@@ -82,7 +80,6 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         box-shadow:0 8px 20px rgba(255,106,0,.18);
       }
 
-      /* 2) CHIPS/METRICS — thẻ có nền chuyển sắc, icon mang màu thương hiệu */
       .metrics .metric{
         background:var(--chip-bg);
         border-color:var(--chip-border);
@@ -215,13 +212,13 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       --brand-3:#ff914d;
       --chip-bg:linear-gradient(135deg, rgba(255,106,0,.12), rgba(255,183,3,.10));
       --chip-border:#ffcfb6;
-      --chip-shadow:0 8px 22px rgba(255,106,0,.16);
+      --chip-shadow:0 8px 22px rgba(0,0,0,.16);
     }
     @media (prefers-color-scheme: dark){
       :root{
         --chip-bg:linear-gradient(135deg, rgba(255,106,0,.10), rgba(255,183,3,.08));
         --chip-border:#3b2a1f;
-        --chip-shadow:0 10px 28px rgba(255,106,0,.22);
+        --chip-shadow:0 10px 28px rgba(0,0,0,.22);
       }
     }
 
@@ -291,11 +288,9 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
 
   <!-- 1) GA4 -->
   <script defer src="/assets/analytics.js"></script>
-  <!-- 2) Renderer (home) -->
-  <script defer src="/assets/js/render-products.js"></script>
-  <!-- 3) Affiliate -->
+  <!-- 2) Affiliate -->
   <script defer src="/assets/mxd-affiliate.js"></script>
-  <!-- 4) Engine store -->
+  <!-- 3) Engine store (cho các trang mục, không ảnh hưởng index) -->
   <script defer src="/assets/mxd-store.v2.js"></script>
 
   <!-- JSON-LD Organization -->
@@ -444,11 +439,17 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   <!-- Render sản phẩm (affiliates.json) -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      const wrap = document.querySelector('#product-list');
+      const wrap  = document.querySelector('#product-list');
       const empty = document.getElementById('empty');
       if (!wrap) return;
 
-      // BỎ QUA MXD.renderProducts để chủ động kiểm soát deeplink
+      const money = n => Number.isFinite(+n)
+        ? new Intl.NumberFormat('vi-VN').format(+n) + '₫'
+        : '';
+      const esc = s => String(s || '').replace(/[&<>"']/g, c => (
+        {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+      ));
+
       wrap.innerHTML = Array.from({length: 6}).map(() => `
         <article class="card">
           <div class="skeleton" style="height:200px"></div>
@@ -470,58 +471,70 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           }
 
           const LIMIT = (window.MXD_RENDER && window.MXD_RENDER.limit) || 30;
-          const fmt = n => isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
 
           wrap.innerHTML = arr.slice(0, LIMIT).map(p => {
             const rawSku  = (p.sku || '').toString();
             const skuSlug = rawSku.toLowerCase();
             const name    = p.name || rawSku || 'Sản phẩm';
 
-            const originRaw = (p.origin_url || p.origin || p.url || p.link || '').toString().trim();
-            const hasDeeplink = typeof p.deeplink === 'string' &&
-              /go\.isclix\.com\/deep_link/i.test(p.deeplink);
+            // ƯU TIÊN origin_url/origin → deeplink chỉ là Fallback
+            const originFromJson =
+              (p.origin_url || p.origin || p.url || p.link || '').toString().trim();
+            const deeplinkFromJson = (typeof p.deeplink === 'string' &&
+              /go\.isclix\.com\/deep_link/i.test(p.deeplink))
+              ? p.deeplink.toString().trim()
+              : '';
 
-            const hrefInitial = hasDeeplink
-              ? p.deeplink
-              : (originRaw || '#');
+            let hrefInitial = '#';
+            let originAttr  = '';
+            let noAffAttr   = '';
+
+            if (originFromJson) {
+              // Chuẩn MXD: dùng link gốc, để mxd-affiliate.js quấn isclix giống các trang mục & g.html
+              hrefInitial = originFromJson;
+              originAttr  = ` data-origin-url="${originFromJson}"`;
+            } else if (deeplinkFromJson) {
+              // Không có origin → buộc dùng deeplink có sẵn, nhưng nói rõ "đừng quấn nữa"
+              hrefInitial = deeplinkFromJson;
+              noAffAttr   = ' data-no-aff="1"';
+            } else {
+              hrefInitial = '#';
+            }
 
             const merchant   = (p.merchant || '').toLowerCase();
-            const priceHtml  = p.price
-              ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>`
+            const priceVal   = (p.price ?? p.price_vnd ?? p.price_vnd_int);
+            const priceHtml  = Number.isFinite(+priceVal)
+              ? `<div class="price" data-price="${+priceVal}">${money(+priceVal)}</div>`
               : '';
 
             const detailHref = rawSku
               ? `/g.html?sku=${encodeURIComponent(rawSku)}`
               : '#';
 
-            const noAffAttr   = hasDeeplink ? ' data-no-aff="1"' : '';
-            const originAttr  = !hasDeeplink && originRaw
-              ? ` data-origin-url="${originRaw}"`
-              : '';
-
             return `
               <article class="card">
+                <!-- Meta ẩn cho script khác (nếu cần) -->
                 <a class="product-meta sr-only"
-                   href="${hrefInitial}"
-                   data-merchant="${merchant}"
-                   data-sku="${rawSku}"${originAttr}${noAffAttr}>
-                  ${name}
+                   href="${esc(hrefInitial)}"
+                   data-merchant="${esc(merchant)}"
+                   data-sku="${esc(rawSku)}"${originAttr}${noAffAttr}>
+                  ${esc(name)}
                 </a>
 
-                <a href="${detailHref}" aria-label="Xem chi tiết ${name}">
+                <a href="${detailHref}" aria-label="Xem chi tiết ${esc(name)}">
                   <img loading="lazy" decoding="async"
-                       src="/assets/img/products/${skuSlug || 'placeholder'}.webp"
-                       alt="${name}"
+                       src="/assets/img/products/${esc(skuSlug || 'placeholder')}.webp"
+                       alt="${esc(name)}"
                        onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
                 </a>
                 <div class="body">
-                  <h3 class="name"><a href="${detailHref}">${name}</a></h3>
+                  <h3 class="name"><a href="${detailHref}">${esc(name)}</a></h3>
                   ${priceHtml}
                   <div class="actions">
                     <a class="buy"
-                       href="${hrefInitial}"
-                       data-merchant="${merchant}"
-                       data-sku="${rawSku}"${originAttr}${noAffAttr}
+                       href="${esc(hrefInitial)}"
+                       data-merchant="${esc(merchant)}"
+                       data-sku="${esc(rawSku)}"${originAttr}${noAffAttr}
                        target="_blank"
                        rel="nofollow sponsored noopener">
                       Mua ngay
@@ -532,6 +545,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           }).join('');
 
           if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
+            // Quét trong vùng product-list để sinh isclix, giống hệt cách g.html đang làm
             window.mxdAffiliate.scan(wrap);
           }
         })
@@ -540,6 +554,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           wrap.innerHTML = '';
         });
 
+      // DEDUPE floating contacts (nếu script ngoài có inject)
       const fcs = document.querySelectorAll('#floating-contacts,.floating-contacts,.fc');
       if (fcs.length > 1) fcs.forEach((el, i) => i > 0 && el.remove());
     });
@@ -586,21 +601,28 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           const name = p.name || sku || 'Sản phẩm';
 
           const originRaw = (p.origin_url || p.origin || p.url || p.link || '').toString().trim();
-          const hasDeeplink = typeof p.deeplink === 'string' &&
-            /go\.isclix\.com\/deep_link/i.test(p.deeplink);
+          const deeplinkFromJson = (typeof p.deeplink === 'string' &&
+            /go\.isclix\.com\/deep_link/i.test(p.deeplink))
+            ? p.deeplink.toString().trim()
+            : '';
 
-          const buy = hasDeeplink ? p.deeplink : (originRaw || '#');
+          let buy        = '#';
+          let originAttr = '';
+          let noAffAttr  = '';
+
+          if (originRaw) {
+            buy        = originRaw;
+            originAttr = ` data-origin-url="${esc(originRaw)}"`;
+          } else if (deeplinkFromJson) {
+            buy       = deeplinkFromJson;
+            noAffAttr = ' data-no-aff="1"';
+          }
 
           const priceHtml = Number.isFinite(+p.price)
             ? `<div class="price">${money(+p.price)}</div>`
             : '';
           const img          = p.image || `/assets/img/products/${sku}.webp`;
           const merchantAttr = (p.merchant || '').toLowerCase();
-
-          const noAffAttr  = hasDeeplink ? ' data-no-aff="1"' : '';
-          const originAttr = !hasDeeplink && originRaw
-            ? ` data-origin-url="${esc(originRaw)}"`
-            : '';
 
           return `
             <article class="card">
