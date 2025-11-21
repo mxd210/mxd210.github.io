@@ -78,7 +78,8 @@
              class="buy btn-buy"
              href="#"
              data-merchant=""
-             data-sku="">
+             data-sku=""
+             data-origin-url="">
             Mua ngay tại sàn
           </a>
         </div>
@@ -155,12 +156,18 @@ async function initMXDProductPage() {
   renderProductDetail(product);
   updateHeadMeta(product);
   updateProductJsonLd(product);
-
   renderRelatedProducts(data, product);
+
+  // SAU KHI RENDER XONG MỚI GỌI SCAN AFFILIATE
+  if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
+    try {
+      window.mxdAffiliate.scan();
+    } catch (e) {
+      console.error('mxdAffiliate.scan error:', e);
+    }
+  }
 }
-if (window.mxdAffiliate && window.mxdAffiliate.scan) {
-  window.mxdAffiliate.scan();
-}
+
 function renderNotFound(msg) {
   const detailGrid = document.querySelector('.product-detail-grid');
   const errorBox = document.getElementById('product-error');
@@ -223,9 +230,14 @@ function renderProductDetail(p) {
   }
 
   if (buyEl) {
+    // LINK GỐC
     buyEl.href = escapeAttr(origin);
+    // META ĐỂ AFFILIATE SCRIPT DÙNG
     buyEl.dataset.merchant = merchant;
     buyEl.dataset.sku = sku;
+    buyEl.dataset.originUrl = origin;
+    buyEl.setAttribute('data-origin-url', origin);
+
     if (merchantLabel) {
       buyEl.textContent = `Mua ngay trên ${merchantLabel}`;
     } else {
@@ -302,7 +314,6 @@ function updateProductJsonLd(p) {
       "availability": "https://schema.org/InStock"
     }
   };
-  // xoá key undefined cho gọn
   if (!json.brand) delete json.brand;
 
   const el = document.getElementById('product-jsonld');
@@ -327,19 +338,17 @@ function renderRelatedProducts(allProducts, current) {
     return (p.category || '') === category;
   });
 
-  // fallback: nếu cùng category quá ít, mở rộng nhẹ
   if (list.length < 4) {
     const extra = allProducts.filter(p => {
       const status = (p.status || 'active').toString().toLowerCase();
       if (['archived', 'hidden', 'draft'].includes(status)) return false;
       if (String(p.sku || '') === currentSku) return false;
-      if ((p.category || '') === category) return false; // tránh trùng
+      if ((p.category || '') === category) return false;
       return true;
     });
     list = list.concat(extra).slice(0, 8);
   }
 
-  // sort: featured trước, sau đó updated_at mới trước
   list.sort((a, b) => {
     const fa = a.featured ? 1 : 0;
     const fb = b.featured ? 1 : 0;
@@ -396,7 +405,8 @@ function renderRelatedCard(p) {
         <a class="buy btn-buy"
            href="${escapeAttr(origin)}"
            data-merchant="${escapeAttr(merchantRaw)}"
-           data-sku="${sku}">
+           data-sku="${sku}"
+           data-origin-url="${escapeAttr(origin)}">
           Mua ngay
         </a>
       </div>
@@ -406,6 +416,7 @@ function renderRelatedCard(p) {
 }
 
 // ========== HELPERS ==========
+
 function getTime(val) {
   if (!val) return 0;
   const t = new Date(val).getTime();
