@@ -158,7 +158,9 @@ async function initMXDProductPage() {
 
   renderRelatedProducts(data, product);
 }
-
+if (window.mxdAffiliate && window.mxdAffiliate.scan) {
+  window.mxdAffiliate.scan();
+}
 function renderNotFound(msg) {
   const detailGrid = document.querySelector('.product-detail-grid');
   const errorBox = document.getElementById('product-error');
