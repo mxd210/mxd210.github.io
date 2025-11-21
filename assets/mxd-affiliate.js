@@ -1,8 +1,8 @@
 // REPLACE WHOLE FILE: /assets/mxd-affiliate.js
-// MXD Affiliate v2.1 — rewrite link sang isclix cho Shopee / Lazada / Tiki / TikTok
+// MXD Affiliate v2.2 — rewrite link sang isclix cho Shopee / Lazada / Tiki / TikTok
 
 (() => {
-  // === BASE isclix (đúng với bộ cậu vừa sửa) ===
+  // === BASE isclix (đúng với bộ cậu đang dùng) ===
   const AFF_BASE = {
     shopee: "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=",
     lazada: "https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=",
@@ -32,7 +32,7 @@
   // - tự thêm https:// nếu thiếu
   function normalizeOrigin(url) {
     if (!url) return null;
-    let clean = url.trim();
+    let clean = String(url).trim();
 
     // Đã là link isclix thì thôi, không quấn lại
     if (/go\.isclix\.com\/deep_link/i.test(clean)) {
@@ -129,4 +129,16 @@
 
     observer.observe(document.body, { childList: true, subtree: true });
   });
+
+  // Expose hook global để các trang động (g.html, tool, v.v.) có thể gọi lại sau khi render
+  if (typeof window !== "undefined") {
+    window.mxdAffiliate = window.mxdAffiliate || {};
+    window.mxdAffiliate.scan = (root) => {
+      try {
+        rewriteAnchors(root || document);
+      } catch (e) {
+        console.error("mxdAffiliate.scan error:", e);
+      }
+    };
+  }
 })();
