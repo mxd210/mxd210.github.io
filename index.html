@@ -433,7 +433,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   <script>
     window.MXD_RENDER = window.MXD_RENDER || {};
     window.MXD_RENDER.source = '/assets/data/affiliates.json';
-    window.MXD_RENDER.limit = 30;
+    window.MXD_RENDER.limit = 60;
   </script>
 
   <!-- Render sản phẩm (affiliates.json) -->
@@ -460,89 +460,92 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         </article>
       `).join('');
 
-      fetch('/assets/data/affiliates.json', { cache: 'no-store' })
-        .then(r => r.ok ? r.json() : [])
-        .then(all => {
-          const arr = Array.isArray(all) ? all : (all.items || []);
-          if (!arr.length) {
-            if (empty) empty.style.display = 'block';
-            wrap.innerHTML = '';
-            return;
-          }
+fetch('/assets/data/affiliates.json', { cache: 'no-store' })
+  .then(r => r.ok ? r.json() : [])
+  .then(all => {
+    const arr = Array.isArray(all) ? all : (all.items || []);
+    if (!arr.length) {
+      if (empty) empty.style.display = 'block';
+      wrap.innerHTML = '';
+      return;
+    }
 
-          const LIMIT = (window.MXD_RENDER && window.MXD_RENDER.limit) || 30;
+    const LIMIT = (window.MXD_RENDER && window.MXD_RENDER.limit) || 60;
+    const fmt = n => isFinite(+n)
+      ? new Intl.NumberFormat('vi-VN').format(+n) + '₫'
+      : '';
 
-          wrap.innerHTML = arr.slice(0, LIMIT).map(p => {
-            const rawSku  = (p.sku || '').toString();
-            const skuSlug = rawSku.toLowerCase();
-            const name    = p.name || rawSku || 'Sản phẩm';
+    // 🔥 NEW: đảo mảng để ưu tiên sản phẩm mới thêm (thường nằm cuối file)
+    const list = arr.slice().reverse();
 
-            // ƯU TIÊN origin_url/origin → deeplink chỉ là Fallback
-            const originFromJson =
-              (p.origin_url || p.origin || p.url || p.link || '').toString().trim();
-            const deeplinkFromJson = (typeof p.deeplink === 'string' &&
-              /go\.isclix\.com\/deep_link/i.test(p.deeplink))
-              ? p.deeplink.toString().trim()
-              : '';
+    wrap.innerHTML = list.slice(0, LIMIT).map(p => {
+      const rawSku  = (p.sku || '').toString();
+      const skuSlug = rawSku.toLowerCase();
+      const name    = p.name || rawSku || 'Sản phẩm';
 
-            let hrefInitial = '#';
-            let originAttr  = '';
-            let noAffAttr   = '';
+      const originRaw = (p.origin_url || p.origin || p.url || p.link || '').toString().trim();
+      const hasDeeplink = typeof p.deeplink === 'string' &&
+        /go\.isclix\.com\/deep_link/i.test(p.deeplink);
 
-            if (originFromJson) {
-              // Chuẩn MXD: dùng link gốc, để mxd-affiliate.js quấn isclix giống các trang mục & g.html
-              hrefInitial = originFromJson;
-              originAttr  = ` data-origin-url="${originFromJson}"`;
-            } else if (deeplinkFromJson) {
-              // Không có origin → buộc dùng deeplink có sẵn, nhưng nói rõ "đừng quấn nữa"
-              hrefInitial = deeplinkFromJson;
-              noAffAttr   = ' data-no-aff="1"';
-            } else {
-              hrefInitial = '#';
-            }
+      const hrefInitial = hasDeeplink
+        ? p.deeplink
+        : (originRaw || '#');
 
-            const merchant   = (p.merchant || '').toLowerCase();
-            const priceVal   = (p.price ?? p.price_vnd ?? p.price_vnd_int);
-            const priceHtml  = Number.isFinite(+priceVal)
-              ? `<div class="price" data-price="${+priceVal}">${money(+priceVal)}</div>`
-              : '';
+      const merchant   = (p.merchant || '').toLowerCase();
+      const priceHtml  = p.price
+        ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>`
+        : '';
 
-            const detailHref = rawSku
-              ? `/g.html?sku=${encodeURIComponent(rawSku)}`
-              : '#';
+      const detailHref = rawSku
+        ? `/g.html?sku=${encodeURIComponent(rawSku)}`
+        : '#';
 
-            return `
-              <article class="card">
-                <!-- Meta ẩn cho script khác (nếu cần) -->
-                <a class="product-meta sr-only"
-                   href="${esc(hrefInitial)}"
-                   data-merchant="${esc(merchant)}"
-                   data-sku="${esc(rawSku)}"${originAttr}${noAffAttr}>
-                  ${esc(name)}
-                </a>
+      const noAffAttr   = hasDeeplink ? ' data-no-aff="1"' : '';
+      const originAttr  = !hasDeeplink && originRaw
+        ? ` data-origin-url="${originRaw}"`
+        : '';
 
-                <a href="${detailHref}" aria-label="Xem chi tiết ${esc(name)}">
-                  <img loading="lazy" decoding="async"
-                       src="/assets/img/products/${esc(skuSlug || 'placeholder')}.webp"
-                       alt="${esc(name)}"
-                       onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-                </a>
-                <div class="body">
-                  <h3 class="name"><a href="${detailHref}">${esc(name)}</a></h3>
-                  ${priceHtml}
-                  <div class="actions">
-                    <a class="buy"
-                       href="${esc(hrefInitial)}"
-                       data-merchant="${esc(merchant)}"
-                       data-sku="${esc(rawSku)}"${originAttr}${noAffAttr}
-                       target="_blank"
-                       rel="nofollow sponsored noopener">
-                      Mua ngay
-                    </a>
-                  </div>
-                </div>
-              </article>`;
-          }).join('');
+      return `
+        <article class="card">
+          <a class="product-meta sr-only"
+             href="${hrefInitial}"
+             data-merchant="${merchant}"
+             data-sku="${rawSku}"${originAttr}${noAffAttr}>
+            ${name}
+          </a>
+
+          <a href="${detailHref}" aria-label="Xem chi tiết ${name}">
+            <img loading="lazy" decoding="async"
+                 src="/assets/img/products/${skuSlug || 'placeholder'}.webp"
+                 alt="${name}"
+                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+          </a>
+          <div class="body">
+            <h3 class="name"><a href="${detailHref}">${name}</a></h3>
+            ${priceHtml}
+            <div class="actions">
+              <a class="buy"
+                 href="${hrefInitial}"
+                 data-merchant="${merchant}"
+                 data-sku="${rawSku}"${originAttr}${noAffAttr}
+                 target="_blank"
+                 rel="nofollow sponsored noopener">
+                Mua ngay
+              </a>
+            </div>
+          </div>
+        </article>`;
+    }).join('');
+
+    if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
+      window.mxdAffiliate.scan(wrap);
+    }
+  })
+  .catch(() => {
+    if (empty) empty.style.display = 'block';
+    wrap.innerHTML = '';
+  });
+
 
           if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
             // Quét trong vùng product-list để sinh isclix, giống hệt cách g.html đang làm
