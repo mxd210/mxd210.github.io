@@ -21,6 +21,34 @@
 
   <link rel="stylesheet" href="/assets/site.css"/>
 
+  <!-- TAGS UI (nhẹ, chỉ dùng cho trang chi tiết) -->
+  <style>
+    .product-tags{
+      margin:10px 0 4px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .product-tag{
+      display:inline-block;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(23,70,255,.03);
+      font-size:11px;
+      line-height:1.2;
+      color:#555;
+      white-space:nowrap;
+    }
+    @media (prefers-color-scheme: dark){
+      .product-tag{
+        border-color:rgba(255,255,255,.18);
+        color:#ddd;
+        background:rgba(80,120,255,.12);
+      }
+    }
+  </style>
+
   <!-- Google Analytics 4 -->
   <script defer src="/assets/analytics.js"></script>
   <!-- Affiliate rewrite (bắt buộc sau GA4) -->
@@ -66,6 +94,9 @@
         <p class="product-price" id="product-price"></p>
 
         <div class="product-short" id="product-short"></div>
+
+        <!-- TAGS chi tiết sản phẩm -->
+        <div class="product-tags" id="product-tags"></div>
 
         <div class="product-meta">
           <span id="product-merchant"></span>
@@ -201,6 +232,7 @@ function renderProductDetail(p) {
   const nameEl = document.getElementById('product-name');
   const priceEl = document.getElementById('product-price');
   const shortEl = document.getElementById('product-short');
+  const tagsEl = document.getElementById('product-tags');
   const merchantEl = document.getElementById('product-merchant');
   const brandEl = document.getElementById('product-brand');
   const updatedEl = document.getElementById('product-updated');
@@ -215,6 +247,27 @@ function renderProductDetail(p) {
   if (shortEl) {
     shortEl.textContent = shortDesc || 'Đang cập nhật mô tả chi tiết cho sản phẩm này.';
   }
+
+  // TAGS chi tiết: lấy từ p.tags (nếu có)
+  if (tagsEl) {
+    tagsEl.innerHTML = '';
+    const tags = Array.isArray(p.tags) ? p.tags : [];
+    const cleaned = tags
+      .map(t => (t || '').toString().trim())
+      .filter(Boolean);
+    if (cleaned.length) {
+      cleaned.slice(0, 10).forEach(tag => {
+        const span = document.createElement('span');
+        span.className = 'product-tag';
+        span.textContent = '#' + tag.replace(/-/g, ' ');
+        tagsEl.appendChild(span);
+      });
+      tagsEl.style.display = '';
+    } else {
+      tagsEl.style.display = 'none';
+    }
+  }
+
   if (merchantEl) {
     merchantEl.textContent = merchantLabel ? `Mua trên: ${merchantLabel}` : '';
   }
@@ -254,11 +307,16 @@ function updateHeadMeta(p) {
   const origin = window.location.origin || 'https://mxd210.github.io';
   const canonical = `${origin}/g.html?sku=${encodeURIComponent(sku)}`;
 
+  const seoTitle = (p.seo_title || '').toString().trim();
+  const seoDesc  = (p.seo_description || '').toString().trim();
+  const baseTitle = seoTitle || (p.name || 'Chi tiết sản phẩm');
+  const fullTitle = `${baseTitle} | MXD210`;
+  const desc = seoDesc || buildDescription(p);
+
   // title
-  document.title = `${p.name || 'Chi tiết sản phẩm'} | MXD210`;
+  document.title = fullTitle;
 
   // meta description
-  const desc = buildDescription(p);
   let metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) {
     metaDesc.setAttribute('content', desc);
@@ -275,7 +333,7 @@ function updateHeadMeta(p) {
 
   // OG
   const ogTitle = document.querySelector('meta[property="og:title"]');
-  if (ogTitle) ogTitle.setAttribute('content', `${p.name || ''} | MXD210`);
+  if (ogTitle) ogTitle.setAttribute('content', fullTitle);
 
   const ogDesc = document.querySelector('meta[property="og:description"]');
   if (ogDesc) ogDesc.setAttribute('content', desc);
@@ -296,14 +354,22 @@ function updateProductJsonLd(p) {
 
   const priceValue = getPrice(p);
   const imgSrc = p.image || `/assets/img/products/${encodeURIComponent(p.sku || 'placeholder')}.webp`;
+
+  const seoDesc  = (p.seo_description || '').toString().trim();
   const shortDesc = (p.short_desc || p.description || p.name || '').toString().trim();
+  const desc = seoDesc || shortDesc;
+
+  const tagsArr = Array.isArray(p.tags)
+    ? p.tags.map(t => (t || '').toString().trim()).filter(Boolean)
+    : [];
+  const keywords = tagsArr.length ? tagsArr.join(', ') : '';
 
   const json = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": p.name || "",
     "image": [absUrl(imgSrc)],
-    "description": shortDesc,
+    "description": desc,
     "sku": p.sku || "",
     "brand": p.brand ? { "@type": "Brand", "name": p.brand } : undefined,
     "offers": {
@@ -315,6 +381,7 @@ function updateProductJsonLd(p) {
     }
   };
   if (!json.brand) delete json.brand;
+  if (keywords) json.keywords = keywords;
 
   const el = document.getElementById('product-jsonld');
   if (el) {
@@ -479,7 +546,7 @@ function absUrl(path) {
 }
 
 function buildDescription(p) {
-  const base = (p.short_desc || p.description || p.name || '').toString().trim();
+  const base = (p.seo_description || p.short_desc || p.description || p.name || '').toString().trim();
   if (base) return base;
   const brand = (p.brand || '').toString().trim();
   if (brand) return `${p.name || 'Sản phẩm'} của ${brand}, được MXD210 chọn lọc từ các sàn thương mại điện tử.`;
