@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MXD Importer v4.4.0 — PRO + Multi-format + Size Presets + Auto-Compress + TikTok/Tiki + ClearAll</title>
+  <title>MXD Importer Tự Sinh SEO + Multi-format + Size Presets + Auto-Compress + TikTok/Tiki + ClearAll</title>
   <meta name="robots" content="noindex,follow"/>
   <style>
     :root{
@@ -86,7 +86,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>MXD Importer v4.4.0 <span class="pill">PRO</span> <span class="pill">Multi-format</span> <span class="pill">Size Presets</span> <span class="pill">Auto-Compress</span> <span class="pill">TikTok/Tiki</span></h1>
+  <h1>MXD Importer seo-tag <span class="pill">PRO</span> <span class="pill">Multi-format</span> <span class="pill">Size Presets</span> <span class="pill">Auto-Compress</span> <span class="pill">TikTok/Tiki</span></h1>
   <div class="small">Hỗ trợ webp/png/jpg, preset kích thước & W×H tuỳ chỉnh, auto-compress theo dung lượng mục tiêu. Deep-link: Shopee/Lazada/Tiki/TikTok.</div>
 
   <div class="card">
@@ -331,15 +331,18 @@ function writeSettings(s){ localStorage.setItem(LS_KEY, JSON.stringify(s)); }
 
 /* UTILS */
 const slugify = s => s.toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+
 function toast(msg,cls=''){ const t=$("#toast"); t.innerHTML=msg; t.className='toast show '+cls; setTimeout(()=>t.className='toast',4500); }
 function log(msg){ const d=$("#debugLog"); d.textContent = (d.textContent && d.textContent!=='–' ? d.textContent + "\n" : "") + msg; d.scrollTop = d.scrollHeight; }
 function updateToastOffset(){ const bar=document.querySelector('.sticky-actions'); const bottom=bar?(bar.offsetHeight+16):12; document.documentElement.style.setProperty('--toast-bottom', bottom+'px'); }
 window.addEventListener('load', updateToastOffset); window.addEventListener('resize', updateToastOffset); if('ResizeObserver'in window){ new ResizeObserver(updateToastOffset).observe(document.querySelector('.sticky-actions')); }
 
+/* 🔧 aff template mặc định (đã sửa Lazada đúng base) */
 const DEFAULT_TPL_SHOPEE = 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
-const DEFAULT_TPL_LAZADA = 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
+const DEFAULT_TPL_LAZADA = 'https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
 const DEFAULT_TPL_TIKI   = 'https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
 const DEFAULT_TPL_TIKTOK = 'https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
+
 function cleanUrl(u){
   let s = (u || '').trim();
   // bỏ bớt " và , thừa ở đầu/cuối nếu có
@@ -449,7 +452,8 @@ function makeTagsFromFields(obj){
   if(obj.category) add(String(obj.category).trim());
   // Merchant theo sàn
   if(obj.merchant) add(String(obj.merchant).toLowerCase());
-  return out;
+  // giới hạn tối đa 10 tag giống normalizer
+  return out.slice(0, 10);
 }
 
 /* CATEGORY MAP (giữ nguyên + có thể mở rộng sau) */
@@ -1190,6 +1194,7 @@ function installClearers(){
       continue;
     }
     const wrap=document.createElement('div'); wrap.className='input-wrap'+(el.tagName==='TEXTAREA'?' textarea':'');
+
     el.parentNode.insertBefore(wrap,el); wrap.appendChild(el); addClearButton(wrap, el);
   }
 }
