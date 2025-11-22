@@ -226,7 +226,7 @@
     </div>
   </footer>
 
-  <!-- Render sản phẩm từ affiliates.json (đa sàn + isclix) -->
+  <!-- Render sản phẩm từ affiliates.json (đa sàn + deeplink isclix) -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
       const wrap  = document.getElementById('product-list');
@@ -241,7 +241,61 @@
         {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
       ));
 
-      // Lấy limit từ query (?limit=1000) nếu có
+      // aff_base MXD210
+      const AFF_BASE = {
+        shopee: 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=',
+        lazada: 'https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=',
+        tiki:   'https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url=',
+        tiktok: 'https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url='
+      };
+
+      const normalizeOrigin = raw => {
+        let u = (raw || '').toString().trim();
+        if (!u) return '';
+        if (u.startsWith('//')) u = 'https:' + u;
+        if (!/^https?:\/\//i.test(u)) {
+          u = 'https://' + u.replace(/^\/+/, '');
+        }
+        return u;
+      };
+
+      const guessMerchant = (p, originUrl) => {
+        let m = (p.merchant || '').toString().toLowerCase().trim();
+        if (!m && originUrl) {
+          if (/shopee\.vn/i.test(originUrl)) m = 'shopee';
+          else if (/lazada\.vn/i.test(originUrl)) m = 'lazada';
+          else if (/tiki\.vn/i.test(originUrl)) m = 'tiki';
+          else if (/tiktok\.com/i.test(originUrl)) m = 'tiktok';
+        }
+        if (m === 'shopee-kol' || m === 'shopee_kol') m = 'shopee';
+        return m;
+      };
+
+      const buildLink = p => {
+        const originUrl = normalizeOrigin(
+          p.origin_url || p.origin || p.url || p.link || ''
+        );
+        const deeplinkRaw = (p.deeplink || '').toString().trim();
+        const merchant = guessMerchant(p, originUrl);
+
+        // Nếu JSON đã có deeplink isclix chuẩn thì giữ nguyên
+        if (/^https?:\/\//i.test(deeplinkRaw) &&
+            /go\.isclix\.com\/deep_link/i.test(deeplinkRaw)) {
+          return { href: deeplinkRaw, originUrl, merchant, noAff:true };
+        }
+
+        // Tự sinh deeplink từ origin_url + merchant
+        const base = AFF_BASE[merchant];
+        if (base && originUrl) {
+          const href = base + encodeURIComponent(originUrl);
+          return { href, originUrl, merchant, noAff:true };
+        }
+
+        // Fallback: không có deeplink, dùng origin_url luôn
+        return { href: originUrl || '#', originUrl, merchant, noAff:false };
+      };
+
+      // Lấy limit từ query (?limit=...) nếu có
       const qs   = new URLSearchParams(location.search);
       const limQ = Number.parseInt(qs.get('limit') || '', 10);
       const LIMIT = Number.isFinite(limQ) ? limQ : 1000;
@@ -256,7 +310,6 @@
           </div>
         </article>
       `).join('');
-
       if (empty) empty.style.display = 'none';
 
       fetch('/assets/data/affiliates.json', { cache: 'no-store' })
@@ -271,7 +324,7 @@
 
           const list = arr
             .slice()
-            .reverse()                 // ưu tiên mới thêm
+            .reverse()                 // ưu tiên sản phẩm mới thêm
             .filter(p => p && p.status !== false);
 
           wrap.innerHTML = list.slice(0, LIMIT).map(p => {
@@ -279,25 +332,7 @@
             const skuSlug = rawSku.toLowerCase();
             const name    = p.name || rawSku || 'Sản phẩm';
 
-            const originRaw = (
-              p.origin_url ||
-              p.origin     ||
-              p.url        ||
-              p.link       ||
-              ''
-            ).toString().trim();
-
-            const deeplinkRaw = typeof p.deeplink === 'string'
-              ? p.deeplink.toString().trim()
-              : '';
-
-            const hasDeeplink = /go\.isclix\.com\/deep_link/i.test(deeplinkRaw);
-
-            const hrefInitial = hasDeeplink
-              ? deeplinkRaw
-              : (originRaw || '#');
-
-            const merchant = (p.merchant || '').toLowerCase();
+            const { href, originUrl, merchant, noAff } = buildLink(p);
 
             const priceHtml = Number.isFinite(+p.price)
               ? `<div class="price" data-price="${p.price}">${fmtPrice(p.price)}</div>`
@@ -307,9 +342,9 @@
               ? `/g.html?sku=${encodeURIComponent(rawSku)}`
               : '#';
 
-            const noAffAttr  = hasDeeplink ? ' data-no-aff="1"' : '';
-            const originAttr = !hasDeeplink && originRaw
-              ? ` data-origin-url="${esc(originRaw)}"`
+            const noAffAttr  = noAff ? ' data-no-aff="1"' : '';
+            const originAttr = originUrl
+              ? ` data-origin-url="${esc(originUrl)}"`
               : '';
 
             const imgSrc = p.image ||
@@ -318,8 +353,8 @@
             return `
               <article class="card">
                 <a class="sr-only"
-                   href="${esc(hrefInitial)}"
-                   data-merchant="${esc(merchant)}"
+                   href="${esc(href)}"
+                   data-merchant="${esc(merchant || '')}"
                    data-sku="${esc(rawSku)}"${originAttr}${noAffAttr}>
                   ${esc(name)}
                 </a>
@@ -336,8 +371,8 @@
                   </h3>
                   ${priceHtml}
                   <a class="buy"
-                     href="${esc(hrefInitial)}"
-                     data-merchant="${esc(merchant)}"
+                     href="${esc(href)}"
+                     data-merchant="${esc(merchant || '')}"
                      data-sku="${esc(rawSku)}"${originAttr}${noAffAttr}
                      target="_blank"
                      rel="nofollow sponsored noopener">
@@ -347,6 +382,7 @@
               </article>`;
           }).join('');
 
+          // Ở store mình đã build sẵn deeplink rồi, nên scan() nếu có cũng sẽ bỏ qua các thẻ có data-no-aff="1"
           if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
             window.mxdAffiliate.scan(wrap);
           }
