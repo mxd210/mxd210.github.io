@@ -135,6 +135,7 @@
     Chuẩn hoá schema AFF + soát deeplink + sinh mô tả/SEO/tag cho <strong>mxd210</strong>.<br>
     • Đổi <code>price_vnd → price</code>, chuẩn hoá <code>origin</code> + <code>origin_url</code><br>
     • Tách URL gốc nếu <code>origin/origin_url/deeplink</code> đang là link isclix<br>
+    • Cắt đuôi tracking Lazada/Shopee/Tiki để URL gọn mà không 404<br>
     • Ép deeplink về aff-base mxd210 (Shopee/Lazada/Tiki/TikTok)<br>
     • Sinh <code>short_desc</code>, <code>seo_title</code>, <code>seo_description</code>, <code>tags</code> nếu thiếu
   </div>
@@ -200,6 +201,41 @@
         s = "https://" + s.replace(/^\/+/, "");
       }
       return s;
+    }
+
+    // Cắt đuôi tracking cho Lazada / Shopee / Tiki nhưng vẫn an toàn
+    function cleanProductUrl(u) {
+      if (!u) return "";
+      let s = String(u).trim();
+      try {
+        const url = new URL(s);
+        const host = (url.hostname || "").toLowerCase();
+        const origin = url.origin;
+        const path = url.pathname || "/";
+
+        // Lazada + Tiki: giữ origin + path, bỏ hết query
+        if (host.includes("lazada.vn") || host.includes("tiki.vn")) {
+          return origin + path;
+        }
+
+        // Shopee: giữ origin + path, chỉ giữ sp_atk + xptdk nếu có
+        if (host.includes("shopee.vn")) {
+          const keysToKeep = ["sp_atk", "xptdk"];
+          const params = new URLSearchParams();
+          url.searchParams.forEach((val, key) => {
+            if (keysToKeep.includes(key)) {
+              params.append(key, val);
+            }
+          });
+          const qs = params.toString();
+          return qs ? origin + path + "?" + qs : origin + path;
+        }
+
+        // Các host khác: không đụng để tránh 404
+        return s;
+      } catch (e) {
+        return s;
+      }
     }
 
     function extractOriginFromDeeplink(dl) {
@@ -434,10 +470,11 @@ Gợi ý nhanh:
           }
         }
 
-        // 2) origin / origin_url chuẩn hoá
+        // 2) origin / origin_url chuẩn hoá + cắt đuôi tracking an toàn
         let origin = item.origin || "";
         if (!origin && item.origin_url) {
           origin = ensureHttps(item.origin_url);
+          origin = cleanProductUrl(origin);
           stats.originFromOriginUrl++;
           changed = true;
         }
@@ -446,10 +483,10 @@ Gợi ý nhanh:
         if (origin && origin.includes("go.isclix.com")) {
           const orig = extractOriginFromDeeplink(origin);
           if (orig) {
-            origin = orig;
+            origin = cleanProductUrl(orig);
             stats.originFromIsclix++;
             changed = true;
-            reportLines.push(`${tag}: origin đang là deeplink isclix → đã tách URL gốc.`);
+            reportLines.push(`${tag}: origin đang là deeplink isclix → đã tách & cắt đuôi URL gốc.`);
           }
         }
 
@@ -457,15 +494,16 @@ Gợi ý nhanh:
         if (!origin && item.deeplink && item.deeplink.includes("go.isclix.com")) {
           const orig = extractOriginFromDeeplink(item.deeplink);
           if (orig) {
-            origin = orig;
+            origin = cleanProductUrl(orig);
             stats.originFromDeeplink++;
             changed = true;
-            reportLines.push(`${tag}: thiếu origin, đã lấy URL gốc từ deeplink.`);
+            reportLines.push(`${tag}: thiếu origin, đã lấy & cắt đuôi URL gốc từ deeplink.`);
           }
         }
 
         if (origin) {
           origin = ensureHttps(origin);
+          origin = cleanProductUrl(origin);
           if (item.origin !== origin) {
             item.origin = origin;
             changed = true;
@@ -578,7 +616,7 @@ Gợi ý nhanh:
         if (item.deeplink) {
           let dl = String(item.deeplink).trim();
           if (base && item.origin) {
-            const safeOrigin = ensureHttps(item.origin);
+            const safeOrigin = ensureHttps(cleanProductUrl(item.origin));
             const newDl = base + encodeURIComponent(safeOrigin);
             if (!dl.startsWith(base)) {
               item.deeplink = newDl;
@@ -587,7 +625,7 @@ Gợi ý nhanh:
               reportLines.push(`${tag}: deeplink KHÁC aff-base mxd210 (${merchant}) → đã rewrite.`);
             } else {
               const fromDl = extractOriginFromDeeplink(dl);
-              if (fromDl && fromDl !== safeOrigin) {
+              if (fromDl && cleanProductUrl(fromDl) !== safeOrigin) {
                 item.deeplink = newDl;
                 stats.deeplinkRewritten++;
                 changed = true;
@@ -602,7 +640,7 @@ Gợi ý nhanh:
           }
         } else {
           if (base && item.origin) {
-            const safeOrigin = ensureHttps(item.origin);
+            const safeOrigin = ensureHttps(cleanProductUrl(item.origin));
             item.deeplink = base + encodeURIComponent(safeOrigin);
             stats.deeplinkGenerated++;
             changed = true;
@@ -684,15 +722,12 @@ Gợi ý nhanh:
     "image": "/assets/img/product/pijama-xinh.webp"
   },
   {
-    "sku": "ao-croptop-ba-lo-nu-toptify",
-    "name": "Áo croptop ba lỗ nữ TOPTIFY",
-    "price": "99.000",
-    "origin": "https://shopee.vn/Ao-croptop-ba-lo-nu-TOPTIFY-...",
-    "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FAo-croptop-ba-lo-nu-TOPTIFY-...",
-    "merchant": "shopee-kol",
-    "brand": "TOPTIFY",
-    "category": "Thời trang nữ",
-    "image": "/assets/img/products/ao-croptop-ba-lo-nu-toptify.webp"
+    "sku": "dien-thoai-5g-gia-re-samsung-galaxy-note-10-5g-2sim-ram-12g-256g",
+    "name": "Điện thoại 5G giá rẻ Samsung Galaxy Note 10 5G 2sim ram 12G/256G",
+    "price": 3799000,
+    "origin": "https://www.lazada.vn/products/pdp-i3213678156-s15377919337.html?c=&channelLpJumpArgs=...",
+    "merchant": "lazada",
+    "image": "/assets/img/products/dien-thoai-5g-gia-re-samsung-galaxy-note-10-5g-2sim-ram-12g-256g.webp"
   }
 ]`;
     }
