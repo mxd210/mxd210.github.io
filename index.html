@@ -284,77 +284,6 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       color:#fff !important;
     }
 
-    /* === HOME GLOBAL SEARCH v1 (index) ========================= */
-    .home-search{
-      margin:16px 0 8px;
-      padding:12px 14px;
-      border-radius:16px;
-      border:1px solid var(--border);
-      background:var(--card);
-      box-shadow:var(--shadow);
-    }
-    .home-search-main{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    .home-search-main input[type="search"]{
-      flex:1;
-      min-width:0;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background:var(--bg);
-      color:var(--text);
-      font-size:14px;
-    }
-    .home-search-main input[type="search"]:focus{
-      outline:2px solid #1746ff55;
-      outline-offset:1px;
-    }
-    .home-search-main button{
-      padding:8px 14px;
-      border-radius:999px;
-      border:none;
-      background:var(--brand);
-      color:var(--brand-contrast);
-      font-weight:700;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .home-search-main button:hover{
-      filter:brightness(1.05);
-    }
-    .home-search-tabs{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top:8px;
-    }
-    .home-search-tabs label{
-      display:flex;
-      align-items:center;
-      gap:4px;
-      font-size:13px;
-      color:var(--muted);
-      padding:4px 8px;
-      border-radius:999px;
-      background:rgba(0,0,0,.02);
-    }
-    .home-search-tabs input[type="radio"]{
-      accent-color:var(--brand);
-    }
-    .home-search-hint{
-      margin-top:6px;
-      font-size:12px;
-      color:var(--muted);
-    }
-    @media (prefers-color-scheme: dark){
-      .home-search-tabs label{
-        background:rgba(255,255,255,.03);
-      }
-    }
   </style>
 
   <!-- 1) GA4 -->
@@ -413,35 +342,6 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         img.src = '/assets/img/hero/home-hero.webp';
       })();
     </script>
-
-    <!-- GLOBAL SEARCH (Sản phẩm + Bài viết) -->
-    <section class="home-search" aria-label="Tìm kiếm nhanh">
-      <form id="mxd-global-search-form" action="/store.html" method="get">
-        <div class="home-search-main">
-          <input
-            id="mxd-global-search-input"
-            type="search"
-            name="q"
-            placeholder="Tìm sản phẩm, bài viết, SKU, tags…"
-            autocomplete="off"
-          />
-          <button type="submit">Tìm kiếm</button>
-        </div>
-        <div class="home-search-tabs">
-          <label>
-            <input type="radio" name="mxd-search-type" value="product" checked>
-            Sản phẩm
-          </label>
-          <label>
-            <input type="radio" name="mxd-search-type" value="post">
-            Bài viết
-          </label>
-        </div>
-        <p class="home-search-hint">
-          Gõ từ khoá (ví dụ: <strong>máy khoan</strong>, <strong>áo phản quang</strong>, <strong>điện thoại</strong>, <strong>review xay dựng</strong>…).
-        </p>
-      </form>
-    </section>
 
     <!-- METRICS -->
     <section class="metrics" aria-label="Chỉ số dịch vụ">
@@ -529,37 +429,6 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     </div>
   </footer>
 
-  <!-- GLOBAL SEARCH JS (chuyển hướng sang store / Google) -->
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const form  = document.getElementById('mxd-global-search-form');
-      const input = document.getElementById('mxd-global-search-input');
-      if (!form || !input) return;
-
-      form.addEventListener('submit', (ev) => {
-        ev.preventDefault();
-        const raw = (input.value || '').trim();
-        if (!raw) {
-          input.focus();
-          return;
-        }
-        const typeEl = form.querySelector('input[name="mxd-search-type"]:checked');
-        const type   = typeEl ? typeEl.value : 'product';
-
-        if (type === 'post') {
-          // Tìm bài viết / nội dung bằng Google, giới hạn domain MXD
-          const q = 'site:mxd210.github.io ' + raw;
-          const url = 'https://www.google.com/search?q=' + encodeURIComponent(q);
-          window.location.href = url;
-        } else {
-          // Tìm sản phẩm trong store.html (đã có ?q= search)
-          const url = '/store.html?q=' + encodeURIComponent(raw);
-          window.location.href = url;
-        }
-      });
-    });
-  </script>
-
   <script>
     // cấu hình (số sản phẩm hiển thị trên HOME)
     window.MXD_RENDER = window.MXD_RENDER || {};
@@ -613,7 +482,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
             <div class="skeleton" style="height:16px;width:40%;margin-top:8px"></div>
           </div>
         </article>
-      `).join('`);
+      `).join('');
       if (empty) empty.style.display = 'none';
 
       fetch('/assets/data/affiliates.json', { cache: 'no-store' })
