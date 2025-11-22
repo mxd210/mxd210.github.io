@@ -119,7 +119,31 @@
       display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
       overflow:hidden;min-height:2.7em;
     }
-    .price{font-weight:800;margin:4px 0 10px}
+    .price{font-weight:800;margin:4px 0 8px}
+
+    /* TAGS — MXD-TAGS v1 */
+    .product-tags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:4px;
+      margin-bottom:8px;
+    }
+    .tag-chip{
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(23,70,255,.03);
+      padding:3px 8px;
+      font-size:11px;
+      line-height:1.2;
+      color:var(--muted);
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .tag-chip:hover{
+      background:rgba(23,70,255,.08);
+      color:var(--text);
+    }
+
     .buy{
       display:inline-block;width:100%;text-align:center;
       padding:10px 12px;border-radius:12px;
@@ -397,6 +421,24 @@
           const imgSrc = p.image ||
             `/assets/img/products/${skuSlug || 'placeholder'}.webp`;
 
+          // TAGS HTML — MXD-TAGS v1
+          const tagsHtml = (() => {
+            const tagsArr = Array.isArray(p.tags) ? p.tags.slice(0, 4) : [];
+            if (!tagsArr.length) return '';
+            const chips = tagsArr.map(tag => {
+              const raw = String(tag || '').trim();
+              if (!raw) return '';
+              return `
+                <button type="button"
+                        class="tag-chip"
+                        data-tag="${esc(raw)}">
+                  #${esc(raw).replace(/-/g, ' ')}
+                </button>`;
+            }).join('');
+            if (!chips.trim()) return '';
+            return `<div class="product-tags">${chips}</div>`;
+          })();
+
           return `
             <article class="card">
               <a class="sr-only"
@@ -417,6 +459,7 @@
                   <a href="${esc(detailHref)}">${esc(name)}</a>
                 </h3>
                 ${priceHtml}
+                ${tagsHtml}
                 <a class="buy"
                    href="${esc(baseHref)}"
                    data-merchant="${esc(merchant || '')}"
@@ -436,6 +479,19 @@
 
         updateSearchCount();
       };
+
+      // CLICK TAG → GÁN VÀO Ô SEARCH
+      wrap.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('.tag-chip');
+        if (!btn) return;
+        const raw = btn.getAttribute('data-tag') || btn.textContent || '';
+        const q = raw.replace(/^#/, '').replace(/-/g, ' ').trim();
+        if (!searchInput) return;
+        searchInput.value = q;
+        const e2 = new Event('input', { bubbles: true });
+        searchInput.dispatchEvent(e2);
+        searchInput.focus();
+      });
 
       fetch('/assets/data/affiliates.json', { cache: 'no-store' })
         .then(r => r.ok ? r.json() : [])
