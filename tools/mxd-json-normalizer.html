@@ -22,7 +22,7 @@
     .subtitle {
       font-size: 13px;
       color: #aaa;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     .layout {
       display: grid;
@@ -90,11 +90,11 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     }
     .controls {
-      margin: 12px 0;
+      margin: 10px 0 12px;
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
+      gap: 10px;
+      align-items: flex-start;
     }
     .log {
       margin-top: 8px;
@@ -127,25 +127,116 @@
       margin-bottom: 4px;
       color: #ccc;
     }
+    .aff-base-group {
+      width: 100%;
+      margin-top: 6px;
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid #23263a;
+      background: #080b18;
+    }
+    .aff-base-title {
+      font-size: 11px;
+      color: #bbb;
+      margin-bottom: 6px;
+    }
+    .field-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .field-row label {
+      display: flex;
+      flex: 1 1 220px;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11px;
+      color: #aaa;
+    }
+    .field-row input[type="text"] {
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid #333a52;
+      background: #050714;
+      color: #f5f5f5;
+      font-size: 11px;
+    }
+    .field-row input[type="text"]:focus {
+      outline: none;
+      border-color: #ff4fa3;
+      box-shadow: 0 0 0 1px #ff4fa3;
+    }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 12px;
+    }
+    .options label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .options input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      accent-color: #ff4fa3;
+    }
+    .controls-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-left: auto;
+    }
   </style>
 </head>
 <body>
   <h1>MXD JSON Normalizer</h1>
   <div class="subtitle">
-    Chuẩn hoá schema + soát deeplink + sinh mô tả/SEO/tag cho <strong>mxd210</strong>.<br>
-    • Đổi <code>price_vnd → price</code>, <code>origin_url → origin</code><br>
-    • Tách URL gốc nếu <code>origin/deeplink</code> đang là link isclix<br>
-    • Ép deeplink về aff-base mxd210 (Shopee/Lazada/Tiki/TikTok)<br>
-    • Sinh <code>short_desc</code>, <code>seo_title</code>, <code>seo_description</code>, <code>tags</code> nếu thiếu
+    Chuẩn hoá schema + soát deeplink + sinh mô tả/SEO/tag cho <strong>affiliates.json</strong> (mxd210 và các repo cùng chuẩn).<br>
+    • Chuẩn hoá <code>price_vnd → price</code> (số) <br>
+    • Chuẩn hoá <code>origin_url</code> (thêm <code>https://</code>, bóc URL gốc nếu đang là link isclix) và đồng bộ sang <code>origin</code><br>
+    • Ép <code>deeplink</code> về aff-base (Shopee/Lazada/Tiki/TikTok) theo cấu hình bên dưới<br>
+    • Tự sinh <code>short_desc</code>, <code>seo_title</code>, <code>seo_description</code>, <code>tags</code> nếu thiếu
   </div>
 
   <div class="controls">
     <span class="badge">
-      <span>●</span> aff-base mxd210 (AccessTrade)
+      <span>●</span> aff-base (có thể chỉnh để dùng cho repo khác)
     </span>
-    <span class="hint">
-      Dán <code>affiliates.json</code> hoặc block sản phẩm → bấm nút → copy output → dán lại vào repo.
-    </span>
+    <div class="aff-base-group">
+      <div class="aff-base-title">Aff-base AccessTrade (mặc định là của mxd210, có thể sửa lại):</div>
+      <div class="field-row">
+        <label>
+          Shopee
+          <input id="aff-shopee" type="text"
+                 value="https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=">
+        </label>
+        <label>
+          Lazada
+          <input id="aff-lazada" type="text"
+                 value="https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=">
+        </label>
+      </div>
+      <div class="field-row" style="margin-top:6px">
+        <label>
+          TikTok
+          <input id="aff-tiktok" type="text"
+                 value="https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url=">
+        </label>
+        <label>
+          Tiki
+          <input id="aff-tiki" type="text"
+                 value="https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url=">
+        </label>
+      </div>
+    </div>
+    <div class="controls-right">
+      <span class="hint">
+        Dán <code>affiliates.json</code> hoặc block sản phẩm → bấm nút → copy output → dán lại vào repo.
+      </span>
+    </div>
   </div>
 
   <div class="layout">
@@ -161,7 +252,7 @@
 
     <div>
       <div class="panel-title">
-        <span>Output JSON (đã chuẩn hoá, sạch deeplink lạ & có meta):</span>
+        <span>Output JSON (đã chuẩn hoá):</span>
         <div style="display:flex;gap:6px;align-items:center;">
           <button type="button" class="secondary" onclick="copyOutput()">Copy output</button>
         </div>
@@ -176,22 +267,26 @@
   </div>
 
   <div class="controls">
-    <button type="button" onclick="normalizeForMXD210()">
-      ⚙️ Chuẩn hoá + soát deeplink + sinh meta cho mxd210
-    </button>
+    <div class="options">
+      <label>
+        <input type="checkbox" id="opt-seo" checked>
+        <span>Sinh meta SEO (short_desc, seo_title, seo_description, tags)</span>
+      </label>
+      <label>
+        <input type="checkbox" id="opt-deeplink" checked>
+        <span>Chuẩn hoá + sinh deeplink theo aff-base ở trên</span>
+      </label>
+    </div>
+    <div class="controls-right">
+      <button type="button" onclick="normalizeForMXD210()">
+        ⚙️ Chuẩn hoá JSON + soát deeplink
+      </button>
+    </div>
   </div>
 
   <div id="log" class="log"></div>
 
   <script>
-    // aff-base chính thức của mxd210 (AccessTrade)
-    const AFF_BASE = {
-      shopee: "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237/4751584435713464237?url=",
-      lazada: "https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=",
-      tiktok: "https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url=",
-      tiki:   "https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url="
-    };
-
     function ensureHttps(u) {
       if (!u) return "";
       let s = String(u).trim();
@@ -309,11 +404,28 @@
       return Array.from(tags).slice(0, 10);
     }
 
+    function getAffBaseConfig() {
+      const pick = (id) => {
+        const el = document.getElementById(id);
+        return el && el.value.trim() ? el.value.trim() : "";
+      };
+      return {
+        shopee: pick("aff-shopee"),
+        lazada: pick("aff-lazada"),
+        tiktok: pick("aff-tiktok"),
+        tiki: pick("aff-tiki")
+      };
+    }
+
     function normalizeForMXD210() {
       const inputEl  = document.getElementById("input");
       const outputEl = document.getElementById("output");
       const logEl    = document.getElementById("log");
       const reportEl = document.getElementById("report");
+
+      const optSeo      = document.getElementById("opt-seo")?.checked !== false;
+      const optDeeplink = document.getElementById("opt-deeplink")?.checked !== false;
+      const AFF_BASE    = getAffBaseConfig();
 
       let raw = (inputEl.value || "").trim();
       if (!raw) {
@@ -365,7 +477,7 @@
         const sku = (item.sku || "").toString();
         const tag = sku || ("#"+(idx+1));
 
-        // 1) price_vnd -> price
+        // 1) price_vnd -> price (số)
         if (typeof item.price === "undefined" && typeof item.price_vnd !== "undefined") {
           if (typeof item.price_vnd === "string") {
             const digits = item.price_vnd.replace(/[^\d]/g, "");
@@ -388,49 +500,57 @@
           }
         }
 
-        // 2) origin_url -> origin
-        if (!item.origin && item.origin_url) {
-          item.origin = ensureHttps(item.origin_url);
-          delete item.origin_url;
-          stats.originFromOriginUrl++;
-          changed = true;
+        // 2) Chuẩn hoá origin_url + origin, bóc nếu là isclix
+        let originUrl = "";
+        let originSource = "";
+
+        if (item.origin_url) {
+          originUrl = ensureHttps(item.origin_url);
+          originSource = "origin_url";
         } else if (item.origin) {
-          item.origin = ensureHttps(item.origin);
+          originUrl = ensureHttps(item.origin);
+          originSource = "origin";
         }
 
-        // 3) origin là deeplink isclix -> tách URL gốc
-        if (item.origin && item.origin.includes("go.isclix.com")) {
-          const orig = extractOriginFromDeeplink(item.origin);
+        if (originUrl && originUrl.includes("go.isclix.com")) {
+          const orig = extractOriginFromDeeplink(originUrl);
           if (orig) {
-            item.origin = orig;
+            originUrl = ensureHttps(orig);
             stats.originFromIsclix++;
             changed = true;
-            reportLines.push(`${tag}: origin đang là deeplink isclix → đã tách URL gốc.`);
+            reportLines.push(`${tag}: origin/origin_url đang là deeplink isclix → đã tách URL gốc.`);
           }
         }
 
-        // 4) chưa có origin nhưng có deeplink isclix -> tách URL gốc
-        if (!item.origin && item.deeplink && item.deeplink.includes("go.isclix.com")) {
+        if (!originUrl && item.deeplink && String(item.deeplink).includes("go.isclix.com")) {
           const orig = extractOriginFromDeeplink(item.deeplink);
           if (orig) {
-            item.origin = orig;
+            originUrl = ensureHttps(orig);
             stats.originFromDeeplink++;
             changed = true;
             reportLines.push(`${tag}: thiếu origin, đã lấy URL gốc từ deeplink.`);
           }
         }
 
-        if (item.origin) {
-          item.origin = ensureHttps(item.origin);
+        if (originUrl) {
+          if (item.origin_url !== originUrl) {
+            item.origin_url = originUrl;
+            stats.originFromOriginUrl++;
+            changed = true;
+          }
+          if (!item.origin || item.origin !== originUrl) {
+            item.origin = originUrl;
+            changed = true;
+          }
         }
 
-        // 5) merchant
+        // 3) merchant
         let merchant = "";
         if (item.merchant) {
           merchant = String(item.merchant).toLowerCase().trim();
         }
         if (!merchant) {
-          const src = item.origin || item.deeplink || "";
+          const src = originUrl || item.deeplink || "";
           const guessed = detectMerchantFromUrl(src);
           if (guessed) {
             merchant = guessed;
@@ -441,7 +561,7 @@
           }
         }
 
-        // 6) meta cơ bản
+        // 4) meta cơ bản
         if (!item.sub1 && item.sku) {
           item.sub1 = item.sku;
           changed = true;
@@ -459,63 +579,69 @@
           changed = true;
         }
 
-        // 7) SEO / mô tả / tags
-        if (!item.short_desc) {
-          item.short_desc = genShortDesc(item);
-          stats.shortDescGenerated++;
-          changed = true;
-        }
-        if (!item.seo_title) {
-          item.seo_title = genSeoTitle(item);
-          stats.seoTitleGenerated++;
-          changed = true;
-        }
-        if (!item.seo_description) {
-          item.seo_description = genSeoDesc(item);
-          stats.seoDescGenerated++;
-          changed = true;
-        }
-        if (!item.tags || !Array.isArray(item.tags) || !item.tags.length) {
-          item.tags = genTags(item);
-          stats.tagsGenerated++;
-          changed = true;
+        // 5) SEO / mô tả / tags (có thể bật/tắt)
+        if (optSeo) {
+          if (!item.short_desc) {
+            item.short_desc = genShortDesc(item);
+            stats.shortDescGenerated++;
+            changed = true;
+          }
+          if (!item.seo_title) {
+            item.seo_title = genSeoTitle(item);
+            stats.seoTitleGenerated++;
+            changed = true;
+          }
+          if (!item.seo_description) {
+            item.seo_description = genSeoDesc(item);
+            stats.seoDescGenerated++;
+            changed = true;
+          }
+          if (!item.tags || !Array.isArray(item.tags) || !item.tags.length) {
+            item.tags = genTags(item);
+            stats.tagsGenerated++;
+            changed = true;
+          }
         }
 
-        // 8) Deeplink sanitizer
-        const base = merchant && AFF_BASE[merchant] ? AFF_BASE[merchant] : null;
+        // 6) Deeplink sanitizer (có thể bật/tắt)
+        if (optDeeplink) {
+          const base = merchant && AFF_BASE[merchant] ? AFF_BASE[merchant] : null;
+          const originForDeeplink = originUrl || "";
 
-        if (item.deeplink) {
-          let dl = String(item.deeplink).trim();
-          if (base && item.origin) {
-            const safeOrigin = ensureHttps(item.origin);
-            const newDl = base + encodeURIComponent(safeOrigin);
-            if (!dl.startsWith(base)) {
-              item.deeplink = newDl;
-              stats.deeplinkRewritten++;
-              changed = true;
-              reportLines.push(`${tag}: deeplink KHÁC aff-base mxd210 (${merchant}) → đã rewrite.`);
-            } else {
-              const fromDl = extractOriginFromDeeplink(dl);
-              if (fromDl && fromDl !== safeOrigin) {
+          if (item.deeplink) {
+            let dl = String(item.deeplink).trim();
+            if (base && originForDeeplink) {
+              const safeOrigin = ensureHttps(originForDeeplink);
+              const newDl = base + encodeURIComponent(safeOrigin);
+
+              if (!dl.startsWith(base)) {
                 item.deeplink = newDl;
                 stats.deeplinkRewritten++;
                 changed = true;
-                reportLines.push(`${tag}: deeplink đúng base nhưng URL gốc khác origin → đã đồng bộ lại.`);
+                reportLines.push(`${tag}: deeplink KHÁC aff-base (${merchant}) → đã rewrite.`);
+              } else {
+                const fromDl = extractOriginFromDeeplink(dl);
+                if (fromDl && fromDl !== safeOrigin) {
+                  item.deeplink = newDl;
+                  stats.deeplinkRewritten++;
+                  changed = true;
+                  reportLines.push(`${tag}: deeplink đúng base nhưng URL gốc khác origin → đã đồng bộ lại.`);
+                }
               }
+            } else {
+              delete item.deeplink;
+              stats.deeplinkDropped++;
+              changed = true;
+              reportLines.push(`${tag}: deeplink bị xoá (không đủ thông tin hoặc không có aff-base phù hợp).`);
             }
           } else {
-            delete item.deeplink;
-            stats.deeplinkDropped++;
-            changed = true;
-            reportLines.push(`${tag}: deeplink bị xoá (không đủ thông tin để rewrite an toàn).`);
-          }
-        } else {
-          if (base && item.origin) {
-            const safeOrigin = ensureHttps(item.origin);
-            item.deeplink = base + encodeURIComponent(safeOrigin);
-            stats.deeplinkGenerated++;
-            changed = true;
-            reportLines.push(`${tag}: không có deeplink → đã tự sinh deeplink mxd210 (${merchant}).`);
+            if (base && originForDeeplink) {
+              const safeOrigin = ensureHttps(originForDeeplink);
+              item.deeplink = base + encodeURIComponent(safeOrigin);
+              stats.deeplinkGenerated++;
+              changed = true;
+              reportLines.push(`${tag}: không có deeplink → đã tự sinh deeplink (${merchant}).`);
+            }
           }
         }
 
@@ -535,22 +661,23 @@
         `✅ Đã xử lý ${stats.total} sản phẩm.`,
         `• Chuẩn hoá / cập nhật: ${stats.normalized}`,
         `• price_vnd → price: ${stats.priceFromVnd}`,
-        `• origin_url → origin: ${stats.originFromOriginUrl}`,
-        `• origin từ deeplink isclix: ${stats.originFromDeeplink + stats.originFromIsclix}`,
+        `• origin_url/origin chuẩn hoá: ${stats.originFromOriginUrl}`,
+        `• origin tách từ deeplink isclix: ${stats.originFromDeeplink + stats.originFromIsclix}`,
         `• merchant đoán từ URL: ${stats.merchantDetected}`,
-        `• Deeplink rewrite theo aff-base mxd210: ${stats.deeplinkRewritten}`,
+        `• Deeplink rewrite theo aff-base: ${stats.deeplinkRewritten}`,
         `• Deeplink bị xoá: ${stats.deeplinkDropped}`,
         `• Deeplink sinh mới: ${stats.deeplinkGenerated}`,
         `• short_desc sinh mới: ${stats.shortDescGenerated}`,
         `• seo_title sinh mới: ${stats.seoTitleGenerated}`,
         `• seo_description sinh mới: ${stats.seoDescGenerated}`,
-        `• tags sinh mới: ${stats.tagsGenerated}`
+        `• tags sinh mới: ${stats.tagsGenerated}`,
+        `• SEO: ${optSeo ? "ON" : "OFF"} | Deeplink: ${optDeeplink ? "ON" : "OFF"}`
       ].join(" | ");
 
       logEl.textContent = summary;
       reportEl.value = reportLines.length
         ? reportLines.join("\n")
-        : "Không có thay đổi đáng chú ý về deeplink / merchant. Meta SEO đã được sinh nếu thiếu.";
+        : "Không có thay đổi đáng chú ý về deeplink / merchant. Meta SEO đã được sinh nếu thiếu (nếu đang bật chế độ SEO).";
     }
 
     function copyOutput() {
@@ -594,7 +721,7 @@
     "sku": "ao-croptop-ba-lo-nu-toptify",
     "name": "Áo croptop ba lỗ nữ TOPTIFY",
     "price": "99.000",
-    "origin": "https://shopee.vn/Ao-croptop-ba-lo-nu-TOPTIFY-...",
+    "origin_url": "https://shopee.vn/Ao-croptop-ba-lo-nu-TOPTIFY-...",
     "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/9999999999999999999?url=https%3A%2F%2Fshopee.vn%2FAo-croptop-ba-lo-nu-TOPTIFY-...",
     "merchant": "shopee",
     "brand": "TOPTIFY",
