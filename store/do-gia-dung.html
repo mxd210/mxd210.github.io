@@ -21,7 +21,7 @@
   <!-- Analytics trước Affiliate -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
-  <script defer src="/assets/mxd-store.v2.js"></script>
+  <!-- KHÔNG dùng mxd-store.v2.js nữa, render inline theo chuẩn mới -->
 </head>
 <body data-nav="store">
   <header class="site-header">
@@ -66,9 +66,10 @@
         </div>
       </div>
 
-      <div class="product-grid">
-        <!-- mxd-store.v2.js sẽ tự render card ở đây -->
-      </div>
+      <div class="product-grid"></div>
+      <p class="muted" data-category-empty style="display:none">
+        Chưa có sản phẩm đồ gia dụng phù hợp trong kho hiện tại.
+      </p>
     </section>
   </main>
 
@@ -77,5 +78,217 @@
       <p>© MXD210 – Chia sẻ kinh nghiệm và gợi ý sản phẩm gần với đời sống thật.</p>
     </div>
   </footer>
+
+  <!-- RENDER DANH MỤC: do-gia-dung (theo affiliates.json, chuẩn aff mới) -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.querySelector('[data-mxd-category-page]');
+    if (!section) return;
+
+    const grid     = section.querySelector('.product-grid');
+    const countEl  = section.querySelector('[data-category-count]');
+    const emptyEl  = section.querySelector('[data-category-empty]');
+    const catSlug  = (section.getAttribute('data-category') || '').toString();
+    const limitRaw = parseInt(section.getAttribute('data-limit') || '', 10);
+    const limit    = Number.isFinite(limitRaw) ? limitRaw : 60;
+    const featuredFirst = (section.getAttribute('data-featured-first') || '').toString() === 'true';
+
+    if (!grid) return;
+
+    const fmtPrice = n =>
+      Number.isFinite(+n) ? new Intl.NumberFormat('vi-VN').format(+n) + '₫' : '';
+
+    const escapeHTML = str => String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+    const escapeAttr = str => escapeHTML(str).replace(/`/g, '&#96;');
+
+    const normalizeOrigin = raw => {
+      let u = (raw || '').toString().trim();
+      if (!u) return '';
+      if (u.startsWith('//')) u = 'https:' + u;
+      if (!/^https?:\/\//i.test(u)) {
+        u = 'https://' + u.replace(/^\/+/, '');
+      }
+      return u;
+    };
+
+    const detectMerchant = url => {
+      try {
+        if (!url) return '';
+        const u = new URL(url.startsWith('http') ? url : 'https://' + url);
+        const host = u.hostname.toLowerCase();
+        if (host.includes('shopee')) return 'shopee';
+        if (host.includes('lazada')) return 'lazada';
+        if (host.includes('tiki'))   return 'tiki';
+        if (host.includes('tiktok')) return 'tiktok';
+        return '';
+      } catch {
+        return '';
+      }
+    };
+
+    const merchantLabelFor = m => {
+      switch (m) {
+        case 'shopee': return 'Shopee';
+        case 'lazada': return 'Lazada';
+        case 'tiki':   return 'Tiki';
+        case 'tiktok': return 'TikTok Shop';
+        default:       return '';
+      }
+    };
+
+    const getTime = val => {
+      if (!val) return 0;
+      const t = new Date(val).getTime();
+      return Number.isFinite(t) ? t : 0;
+    };
+
+    const getPrice = p => {
+      const v = p.price ?? p.price_vnd ?? p.price_vnd_int;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    const matchesCategory = (p, slug) => {
+      if (!slug) return true;
+      const cat = (p.category || '').toString().toLowerCase().trim();
+      if (cat === slug) return true;
+      // Nếu sau này có many-category, vẫn match được
+      if (cat.split(/[,\s]+/).includes(slug)) return true;
+      return false;
+    };
+
+    const renderCard = p => {
+      const name      = escapeHTML(p.name || '');
+      const sku       = escapeAttr(p.sku || '');
+      const shortDesc = escapeHTML(
+        (p.short_desc || p.description || p.name || '').toString().trim()
+      );
+      const priceVal  = getPrice(p);
+      const priceText = priceVal != null ? escapeHTML(fmtPrice(priceVal)) : '';
+
+      const originRaw = (p.origin || p.origin_url || '').toString().trim();
+      const origin    = normalizeOrigin(originRaw) || '#';
+
+      const merchantRaw   = (p.merchant || detectMerchant(origin)).toString().toLowerCase();
+      const merchantLabel = merchantLabelFor(merchantRaw);
+
+      const imgSrc = escapeAttr(
+        p.image || `/assets/img/products/${encodeURIComponent(p.sku || 'placeholder')}.webp`
+      );
+      const detailHref = `/g.html?sku=${encodeURIComponent(p.sku || '')}`;
+
+      return `
+        <article class="product-card" data-sku="${sku}">
+          <a href="${detailHref}">
+            <div class="thumb">
+              <img src="${imgSrc}"
+                   alt="${name}"
+                   loading="lazy"
+                   onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp';">
+              <div class="product-hover">
+                <p>${shortDesc}</p>
+              </div>
+            </div>
+          </a>
+          <div class="body">
+            <div class="product-title title">
+              <a href="${detailHref}">${name}</a>
+            </div>
+            <div class="price">${priceText}</div>
+            <div class="actions">
+              <a class="buy btn-buy"
+                 href="${escapeAttr(origin)}"
+                 data-merchant="${escapeAttr(merchantRaw)}"
+                 data-sku="${sku}"
+                 data-origin-url="${escapeAttr(origin)}">
+                ${merchantLabel ? 'Mua ngay trên ' + merchantLabel : 'Mua ngay'}
+              </a>
+            </div>
+          </div>
+        </article>
+      `;
+    };
+
+    // Skeleton đơn giản
+    grid.innerHTML = Array.from({ length: 6 }).map(() => `
+      <article class="product-card">
+        <div class="thumb">
+          <div class="skeleton" style="width:100%;height:200px;border-radius:12px"></div>
+        </div>
+        <div class="body">
+          <div class="skeleton" style="height:18px;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:16px;width:40%;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:32px;width:60%;border-radius:999px"></div>
+        </div>
+      </article>
+    `).join('');
+
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    fetch('/assets/data/affiliates.json', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : [])
+      .then(all => {
+        let arr = Array.isArray(all) ? all : (all.items || []);
+        if (!arr.length) {
+          grid.innerHTML = '';
+          if (emptyEl) emptyEl.style.display = 'block';
+          if (countEl) countEl.textContent = '';
+          return;
+        }
+
+        arr = arr.filter(p => {
+          if (!p) return false;
+          const status = (p.status || 'active').toString().toLowerCase();
+          if (['archived', 'hidden', 'draft'].includes(status)) return false;
+          return matchesCategory(p, catSlug);
+        });
+
+        if (!arr.length) {
+          grid.innerHTML = '';
+          if (emptyEl) emptyEl.style.display = 'block';
+          if (countEl) countEl.textContent = '0 sản phẩm';
+          return;
+        }
+
+        // Sắp xếp: featured trước, rồi updated_at mới → cũ
+        arr.sort((a, b) => {
+          if (featuredFirst) {
+            const fa = a.featured ? 1 : 0;
+            const fb = b.featured ? 1 : 0;
+            if (fb !== fa) return fb - fa;
+          }
+          const ta = getTime(a.updated_at);
+          const tb = getTime(b.updated_at);
+          return tb - ta;
+        });
+
+        const list = arr.slice(0, limit);
+
+        grid.innerHTML = list.map(renderCard).join('');
+        if (countEl) countEl.textContent = list.length + ' sản phẩm';
+
+        // Cho affiliate scan để sinh deeplink isclix
+        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
+          try {
+            window.mxdAffiliate.scan(grid);
+          } catch (e) {
+            console.error('mxdAffiliate.scan error (do-gia-dung):', e);
+          }
+        }
+      })
+      .catch(err => {
+        console.error('MXD category do-gia-dung error:', err);
+        grid.innerHTML = '';
+        if (emptyEl) emptyEl.style.display = 'block';
+        if (countEl) countEl.textContent = '';
+      });
+  });
+  </script>
 </body>
 </html>
