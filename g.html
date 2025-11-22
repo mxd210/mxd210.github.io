@@ -39,12 +39,20 @@
       line-height:1.2;
       color:#555;
       white-space:nowrap;
+      text-decoration:none;
+    }
+    .product-tag:hover{
+      background:rgba(23,70,255,.08);
+      text-decoration:none;
     }
     @media (prefers-color-scheme: dark){
       .product-tag{
         border-color:rgba(255,255,255,.18);
         color:#ddd;
         background:rgba(80,120,255,.12);
+      }
+      .product-tag:hover{
+        background:rgba(80,120,255,.22);
       }
     }
   </style>
@@ -248,19 +256,24 @@ function renderProductDetail(p) {
     shortEl.textContent = shortDesc || 'Đang cập nhật mô tả chi tiết cho sản phẩm này.';
   }
 
-  // TAGS chi tiết: lấy từ p.tags (nếu có)
+  // TAGS chi tiết: lấy từ p.tags (nếu có) → link sang store với ?q=
   if (tagsEl) {
     tagsEl.innerHTML = '';
     const tags = Array.isArray(p.tags) ? p.tags : [];
     const cleaned = tags
       .map(t => (t || '').toString().trim())
       .filter(Boolean);
+
     if (cleaned.length) {
+      const baseUrl = '/store.html';
       cleaned.slice(0, 10).forEach(tag => {
-        const span = document.createElement('span');
-        span.className = 'product-tag';
-        span.textContent = '#' + tag.replace(/-/g, ' ');
-        tagsEl.appendChild(span);
+        const raw = tag;
+        const label = '#' + raw.replace(/-/g, ' ');
+        const a = document.createElement('a');
+        a.className = 'product-tag';
+        a.textContent = label;
+        a.href = baseUrl + '?q=' + encodeURIComponent(raw);
+        tagsEl.appendChild(a);
       });
       tagsEl.style.display = '';
     } else {
