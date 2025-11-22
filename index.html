@@ -443,13 +443,15 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       const empty = document.getElementById('empty');
       if (!wrap) return;
 
-      const money = n => Number.isFinite(+n)
+      const fmtPrice = n => Number.isFinite(+n)
         ? new Intl.NumberFormat('vi-VN').format(+n) + '₫'
         : '';
+
       const esc = s => String(s || '').replace(/[&<>"']/g, c => (
         {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
       ));
 
+      // Skeleton trong lúc tải
       wrap.innerHTML = Array.from({length: 6}).map(() => `
         <article class="card">
           <div class="skeleton" style="height:200px"></div>
@@ -460,114 +462,125 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         </article>
       `).join('');
 
-fetch('/assets/data/affiliates.json', { cache: 'no-store' })
-  .then(r => r.ok ? r.json() : [])
-  .then(all => {
-    const arr = Array.isArray(all) ? all : (all.items || []);
-    if (!arr.length) {
-      if (empty) empty.style.display = 'block';
-      wrap.innerHTML = '';
-      return;
-    }
+      if (empty) empty.style.display = 'none';
 
-    const LIMIT = (window.MXD_RENDER && window.MXD_RENDER.limit) || 60;
-    const fmt = n => isFinite(+n)
-      ? new Intl.NumberFormat('vi-VN').format(+n) + '₫'
-      : '';
+      fetch('/assets/data/affiliates.json', { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : [])
+        .then(all => {
+          const arr = Array.isArray(all) ? all : (all.items || []);
+          if (!arr.length) {
+            if (empty) empty.style.display = 'block';
+            wrap.innerHTML = '';
+            return;
+          }
 
-    // 🔥 NEW: đảo mảng để ưu tiên sản phẩm mới thêm (thường nằm cuối file)
-    const list = arr.slice().reverse();
+          const LIMIT = (window.MXD_RENDER && window.MXD_RENDER.limit) || 60;
 
-    wrap.innerHTML = list.slice(0, LIMIT).map(p => {
-      const rawSku  = (p.sku || '').toString();
-      const skuSlug = rawSku.toLowerCase();
-      const name    = p.name || rawSku || 'Sản phẩm';
+          const list = arr
+            .slice()
+            .reverse()               // ưu tiên sản phẩm mới add
+            .filter(p => p && p.status !== false);
 
-      const originRaw = (p.origin_url || p.origin || p.url || p.link || '').toString().trim();
-      const hasDeeplink = typeof p.deeplink === 'string' &&
-        /go\.isclix\.com\/deep_link/i.test(p.deeplink);
+          wrap.innerHTML = list.slice(0, LIMIT).map(p => {
+            const rawSku  = (p.sku || '').toString();
+            const skuSlug = rawSku.toLowerCase();
+            const name    = p.name || rawSku || 'Sản phẩm';
 
-      const hrefInitial = hasDeeplink
-        ? p.deeplink
-        : (originRaw || '#');
+            const originRaw = (
+              p.origin_url ||
+              p.origin     ||
+              p.url        ||
+              p.link       ||
+              ''
+            ).toString().trim();
 
-      const merchant   = (p.merchant || '').toLowerCase();
-      const priceHtml  = p.price
-        ? `<div class="price" data-price="${p.price}">${fmt(p.price)}</div>`
-        : '';
+            const deeplinkRaw = typeof p.deeplink === 'string'
+              ? p.deeplink.toString().trim()
+              : '';
 
-      const detailHref = rawSku
-        ? `/g.html?sku=${encodeURIComponent(rawSku)}`
-        : '#';
+            const hasDeeplink = /go\.isclix\.com\/deep_link/i.test(deeplinkRaw);
 
-      const noAffAttr   = hasDeeplink ? ' data-no-aff="1"' : '';
-      const originAttr  = !hasDeeplink && originRaw
-        ? ` data-origin-url="${originRaw}"`
-        : '';
+            const hrefInitial = hasDeeplink
+              ? deeplinkRaw
+              : (originRaw || '#');
 
-      return `
-        <article class="card">
-          <a class="product-meta sr-only"
-             href="${hrefInitial}"
-             data-merchant="${merchant}"
-             data-sku="${rawSku}"${originAttr}${noAffAttr}>
-            ${name}
-          </a>
+            const merchant = (p.merchant || '').toLowerCase();
 
-          <a href="${detailHref}" aria-label="Xem chi tiết ${name}">
-            <img loading="lazy" decoding="async"
-                 src="/assets/img/products/${skuSlug || 'placeholder'}.webp"
-                 alt="${name}"
-                 onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-          </a>
-          <div class="body">
-            <h3 class="name"><a href="${detailHref}">${name}</a></h3>
-            ${priceHtml}
-            <div class="actions">
-              <a class="buy"
-                 href="${hrefInitial}"
-                 data-merchant="${merchant}"
-                 data-sku="${rawSku}"${originAttr}${noAffAttr}
-                 target="_blank"
-                 rel="nofollow sponsored noopener">
-                Mua ngay
-              </a>
-            </div>
-          </div>
-        </article>`;
-    }).join('');
+            const priceHtml = Number.isFinite(+p.price)
+              ? `<div class="price" data-price="${p.price}">${fmtPrice(p.price)}</div>`
+              : '';
 
-    if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
-      window.mxdAffiliate.scan(wrap);
-    }
-  })
-  .catch(() => {
-    if (empty) empty.style.display = 'block';
-    wrap.innerHTML = '';
-  });
+            const detailHref = rawSku
+              ? `/g.html?sku=${encodeURIComponent(rawSku)}`
+              : '#';
 
+            const noAffAttr  = hasDeeplink ? ' data-no-aff="1"' : '';
+            const originAttr = !hasDeeplink && originRaw
+              ? ` data-origin-url="${esc(originRaw)}"`
+              : '';
+
+            const imgSrc = p.image ||
+              `/assets/img/products/${skuSlug || 'placeholder'}.webp`;
+
+            return `
+              <article class="card">
+                <a class="product-meta sr-only"
+                   href="${esc(hrefInitial)}"
+                   data-merchant="${esc(merchant)}"
+                   data-sku="${esc(rawSku)}"${originAttr}${noAffAttr}>
+                  ${esc(name)}
+                </a>
+
+                <a href="${esc(detailHref)}" aria-label="Xem chi tiết ${esc(name)}">
+                  <img loading="lazy" decoding="async"
+                       src="${esc(imgSrc)}"
+                       alt="${esc(name)}"
+                       onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+                </a>
+                <div class="body">
+                  <h3 class="name">
+                    <a href="${esc(detailHref)}">${esc(name)}</a>
+                  </h3>
+                  ${priceHtml}
+                  <div class="actions">
+                    <a class="buy"
+                       href="${esc(hrefInitial)}"
+                       data-merchant="${esc(merchant)}"
+                       data-sku="${esc(rawSku)}"${originAttr}${noAffAttr}
+                       target="_blank"
+                       rel="nofollow sponsored noopener">
+                      Mua ngay
+                    </a>
+                  </div>
+                </div>
+              </article>`;
+          }).join('');
 
           if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
-            // Quét trong vùng product-list để sinh isclix, giống hệt cách g.html đang làm
             window.mxdAffiliate.scan(wrap);
           }
         })
-        .catch(() => {
+        .catch(err => {
+          if (typeof console !== 'undefined' && console.error) {
+            console.error('MXD index affiliates error', err);
+          }
           if (empty) empty.style.display = 'block';
           wrap.innerHTML = '';
         });
 
-      // DEDUPE floating contacts (nếu script ngoài có inject)
+      // DEDUPE floating contacts (nếu script ngoài có inject nhiều lần)
       const fcs = document.querySelectorAll('#floating-contacts,.floating-contacts,.fc');
       if (fcs.length > 1) fcs.forEach((el, i) => i > 0 && el.remove());
-    });
 
-    addEventListener('scroll', () => {
+      // Scroll-to-top nếu có nút #toTop
       const toTop = document.getElementById('toTop');
-      if (!toTop) return;
-      toTop.style.display = scrollY > 400 ? 'flex' : 'none';
-    }, { passive:true });
-    document.getElementById('toTop')?.addEventListener('click', () => scrollTo({ top:0, behavior:'smooth' }));
+      if (toTop) {
+        addEventListener('scroll', () => {
+          toTop.style.display = window.scrollY > 400 ? 'flex' : 'none';
+        }, { passive:true });
+        toTop.addEventListener('click', () => scrollTo({ top:0, behavior:'smooth' }));
+      }
+    });
   </script>
 
   <!-- MỚI CẬP NHẬT + JSON-LD ItemList (products.json) -->
@@ -716,8 +729,6 @@ fetch('/assets/data/affiliates.json', { cache: 'no-store' })
         });
     })();
   </script>
-
-  <script defer src="/assets/js/floating-contact.js"></script>
 
   <script>
   if ('serviceWorker' in navigator) {
