@@ -241,7 +241,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
     .metrics .metric{
       background:var(--chip-bg) !important;
       border-color:var(--chip-border) !important;
-      box-shadow:var(--chip-shadow) !important;
+      box-shadow:var(--chip-shadow) !Important;
       position:relative;
     }
     .metrics .metric svg{ color:var(--brand) !important; }
@@ -288,10 +288,8 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
 
   <!-- 1) GA4 -->
   <script defer src="/assets/analytics.js"></script>
-  <!-- 2) Affiliate -->
+  <!-- 2) Affiliate (vẫn load để các trang khác dùng, nhưng index tự build deeplink) -->
   <script defer src="/assets/mxd-affiliate.js"></script>
-  <!-- 3) Engine store (cho các trang mục, không ảnh hưởng index) -->
-  <script defer src="/assets/mxd-store.v2.js"></script>
 
   <!-- JSON-LD Organization -->
   <script type="application/ld+json">
@@ -431,6 +429,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   </footer>
 
   <script>
+    // cấu hình (số sản phẩm hiển thị trên HOME)
     window.MXD_RENDER = window.MXD_RENDER || {};
     window.MXD_RENDER.source = '/assets/data/affiliates.json';
     window.MXD_RENDER.limit = 60;
@@ -451,7 +450,57 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
       ));
 
-      // Skeleton trong lúc tải
+      const AFF_BASE = {
+        shopee: 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=',
+        lazada: 'https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=',
+        tiki:   'https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url=',
+        tiktok: 'https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url='
+      };
+
+      const normalizeOrigin = raw => {
+        let u = (raw || '').toString().trim();
+        if (!u) return '';
+        if (u.startsWith('//')) u = 'https:' + u;
+        if (!/^https?:\/\//i.test(u)) {
+          u = 'https://' + u.replace(/^\/+/, '');
+        }
+        return u;
+      };
+
+      const guessMerchant = (p, originUrl) => {
+        let m = (p.merchant || '').toString().toLowerCase().trim();
+        if (!m && originUrl) {
+          if (/shopee\.vn/i.test(originUrl)) m = 'shopee';
+          else if (/lazada\.vn/i.test(originUrl)) m = 'lazada';
+          else if (/tiki\.vn/i.test(originUrl)) m = 'tiki';
+          else if (/tiktok\.com/i.test(originUrl)) m = 'tiktok';
+        }
+        if (m === 'shopee-kol' || m === 'shopee_kol') m = 'shopee';
+        return m;
+      };
+
+      const buildLink = p => {
+        const originUrl = normalizeOrigin(
+          p.origin_url || p.origin || p.url || p.link || ''
+        );
+        const deeplinkRaw = (p.deeplink || '').toString().trim();
+        const merchant = guessMerchant(p, originUrl);
+
+        if (/^https?:\/\//i.test(deeplinkRaw) &&
+            /go\.isclix\.com\/deep_link/i.test(deeplinkRaw)) {
+          return { href: deeplinkRaw, originUrl, merchant, noAff:true };
+        }
+
+        const base = AFF_BASE[merchant];
+        if (base && originUrl) {
+          const href = base + encodeURIComponent(originUrl);
+          return { href, originUrl, merchant, noAff:true };
+        }
+
+        return { href: originUrl || '#', originUrl, merchant, noAff:false };
+      };
+
+      // Skeleton
       wrap.innerHTML = Array.from({length: 6}).map(() => `
         <article class="card">
           <div class="skeleton" style="height:200px"></div>
@@ -461,7 +510,6 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           </div>
         </article>
       `).join('');
-
       if (empty) empty.style.display = 'none';
 
       fetch('/assets/data/affiliates.json', { cache: 'no-store' })
@@ -478,7 +526,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
 
           const list = arr
             .slice()
-            .reverse()               // ưu tiên sản phẩm mới add
+            .reverse()
             .filter(p => p && p.status !== false);
 
           wrap.innerHTML = list.slice(0, LIMIT).map(p => {
@@ -486,25 +534,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
             const skuSlug = rawSku.toLowerCase();
             const name    = p.name || rawSku || 'Sản phẩm';
 
-            const originRaw = (
-              p.origin_url ||
-              p.origin     ||
-              p.url        ||
-              p.link       ||
-              ''
-            ).toString().trim();
-
-            const deeplinkRaw = typeof p.deeplink === 'string'
-              ? p.deeplink.toString().trim()
-              : '';
-
-            const hasDeeplink = /go\.isclix\.com\/deep_link/i.test(deeplinkRaw);
-
-            const hrefInitial = hasDeeplink
-              ? deeplinkRaw
-              : (originRaw || '#');
-
-            const merchant = (p.merchant || '').toLowerCase();
+            const { href, originUrl, merchant, noAff } = buildLink(p);
 
             const priceHtml = Number.isFinite(+p.price)
               ? `<div class="price" data-price="${p.price}">${fmtPrice(p.price)}</div>`
@@ -514,9 +544,9 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
               ? `/g.html?sku=${encodeURIComponent(rawSku)}`
               : '#';
 
-            const noAffAttr  = hasDeeplink ? ' data-no-aff="1"' : '';
-            const originAttr = !hasDeeplink && originRaw
-              ? ` data-origin-url="${esc(originRaw)}"`
+            const noAffAttr  = noAff ? ' data-no-aff="1"' : '';
+            const originAttr = originUrl
+              ? ` data-origin-url="${esc(originUrl)}"`
               : '';
 
             const imgSrc = p.image ||
@@ -525,8 +555,8 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
             return `
               <article class="card">
                 <a class="product-meta sr-only"
-                   href="${esc(hrefInitial)}"
-                   data-merchant="${esc(merchant)}"
+                   href="${esc(href)}"
+                   data-merchant="${esc(merchant || '')}"
                    data-sku="${esc(rawSku)}"${originAttr}${noAffAttr}>
                   ${esc(name)}
                 </a>
@@ -544,8 +574,8 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
                   ${priceHtml}
                   <div class="actions">
                     <a class="buy"
-                       href="${esc(hrefInitial)}"
-                       data-merchant="${esc(merchant)}"
+                       href="${esc(href)}"
+                       data-merchant="${esc(merchant || '')}"
                        data-sku="${esc(rawSku)}"${originAttr}${noAffAttr}
                        target="_blank"
                        rel="nofollow sponsored noopener">
@@ -555,10 +585,6 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
                 </div>
               </article>`;
           }).join('');
-
-          if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
-            window.mxdAffiliate.scan(wrap);
-          }
         })
         .catch(err => {
           if (typeof console !== 'undefined' && console.error) {
@@ -568,11 +594,10 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           wrap.innerHTML = '';
         });
 
-      // DEDUPE floating contacts (nếu script ngoài có inject nhiều lần)
+      // DEDUPE floating contacts
       const fcs = document.querySelectorAll('#floating-contacts,.floating-contacts,.fc');
       if (fcs.length > 1) fcs.forEach((el, i) => i > 0 && el.remove());
 
-      // Scroll-to-top nếu có nút #toTop
       const toTop = document.getElementById('toTop');
       if (toTop) {
         addEventListener('scroll', () => {
@@ -606,6 +631,56 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       };
       const parseDate = s => { const t = Date.parse(s); return isNaN(t) ? null : t; };
 
+      const AFF_BASE = {
+        shopee: 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=',
+        lazada: 'https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=',
+        tiki:   'https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url=',
+        tiktok: 'https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url='
+      };
+
+      const normalizeOrigin = raw => {
+        let u = (raw || '').toString().trim();
+        if (!u) return '';
+        if (u.startsWith('//')) u = 'https:' + u;
+        if (!/^https?:\/\//i.test(u)) {
+          u = 'https://' + u.replace(/^\/+/, '');
+        }
+        return u;
+      };
+
+      const guessMerchant = (p, originUrl) => {
+        let m = (p.merchant || '').toString().toLowerCase().trim();
+        if (!m && originUrl) {
+          if (/shopee\.vn/i.test(originUrl)) m = 'shopee';
+          else if (/lazada\.vn/i.test(originUrl)) m = 'lazada';
+          else if (/tiki\.vn/i.test(originUrl)) m = 'tiki';
+          else if (/tiktok\.com/i.test(originUrl)) m = 'tiktok';
+        }
+        if (m === 'shopee-kol' || m === 'shopee_kol') m = 'shopee';
+        return m;
+      };
+
+      const buildLink = p => {
+        const originUrl = normalizeOrigin(
+          p.origin_url || p.origin || p.url || p.link || ''
+        );
+        const deeplinkRaw = (p.deeplink || '').toString().trim();
+        const merchant = guessMerchant(p, originUrl);
+
+        if (/^https?:\/\//i.test(deeplinkRaw) &&
+            /go\.isclix\.com\/deep_link/i.test(deeplinkRaw)) {
+          return { href: deeplinkRaw, originUrl, merchant, noAff:true };
+        }
+
+        const base = AFF_BASE[merchant];
+        if (base && originUrl) {
+          const href = base + encodeURIComponent(originUrl);
+          return { href, originUrl, merchant, noAff:true };
+        }
+
+        return { href: originUrl || '#', originUrl, merchant, noAff:false };
+      };
+
       function render(list){
         if (!list.length){
           updatedEmpty.style.display='block';
@@ -616,55 +691,43 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           const sku  = (p.sku||'').toLowerCase();
           const name = p.name || sku || 'Sản phẩm';
 
-          const originRaw = (p.origin_url || p.origin || p.url || p.link || '').toString().trim();
-          const deeplinkFromJson = (typeof p.deeplink === 'string' &&
-            /go\.isclix\.com\/deep_link/i.test(p.deeplink))
-            ? p.deeplink.toString().trim()
-            : '';
-
-          let buy        = '#';
-          let originAttr = '';
-          let noAffAttr  = '';
-
-          if (originRaw) {
-            buy        = originRaw;
-            originAttr = ` data-origin-url="${esc(originRaw)}"`;
-          } else if (deeplinkFromJson) {
-            buy       = deeplinkFromJson;
-            noAffAttr = ' data-no-aff="1"';
-          }
+          const { href, originUrl, merchant, noAff } = buildLink(p);
 
           const priceHtml = Number.isFinite(+p.price)
             ? `<div class="price">${money(+p.price)}</div>`
             : '';
           const img          = p.image || `/assets/img/products/${sku}.webp`;
-          const merchantAttr = (p.merchant || '').toLowerCase();
+
+          const originAttr = originUrl
+            ? ` data-origin-url="${esc(originUrl)}"`
+            : '';
+          const noAffAttr  = noAff ? ' data-no-aff="1"' : '';
 
           return `
             <article class="card">
-              <a href="${esc(buy)}"
+              <a href="${esc(href)}"
                  target="_blank"
                  rel="nofollow sponsored noopener"
                  aria-label="Mua ${esc(name)}"
-                 data-merchant="${esc(merchantAttr)}"${originAttr}${noAffAttr}>
+                 data-merchant="${esc(merchant || '')}"${originAttr}${noAffAttr}>
                 <img loading="lazy" decoding="async"
                      src="${esc(img)}" alt="${esc(name)}"
                      onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
               </a>
               <div class="body">
                 <h3 class="name">
-                  <a href="${esc(buy)}"
+                  <a href="${esc(href)}"
                      target="_blank"
                      rel="nofollow noopener"
-                     data-merchant="${esc(merchantAttr)}"${originAttr}${noAffAttr}>
+                     data-merchant="${esc(merchant || '')}"${originAttr}${noAffAttr}>
                     ${esc(name)}
                   </a>
                 </h3>
                 ${priceHtml}
                 <div class="actions">
                   <a class="buy"
-                     data-merchant="${esc(merchantAttr)}"
-                     href="${esc(buy)}"
+                     data-merchant="${esc(merchant || '')}"
+                     href="${esc(href)}"
                      target="_blank"
                      rel="nofollow sponsored noopener"${originAttr}${noAffAttr}>
                     Mua ngay
@@ -673,10 +736,6 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
               </div>
             </article>`;
         }).join('');
-
-        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
-          window.mxdAffiliate.scan(updatedWrap);
-        }
       }
 
       function injectJSONLD(list){
@@ -687,7 +746,8 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           "name":"Mới cập nhật — MXD",
           "url":"https://mxd210.github.io/",
           "itemListElement": list.map((p, i) => {
-            const url = p.deeplink || p.origin || 'https://mxd210.github.io/';
+            const { href } = buildLink(p);
+            const url = href || 'https://mxd210.github.io/';
             const product = {
               "@type":"Product",
               "name": p.name || p.sku || "Sản phẩm",
