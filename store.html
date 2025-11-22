@@ -58,6 +58,34 @@
     .qnav-item:hover{background:rgba(23,70,255,.06)}
     .quick-nav img{width:28px;height:28px;border-radius:8px}
 
+    /* SEARCH BAR — MXD-SEARCH v1 */
+    .store-search{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      margin:8px 0 4px;
+    }
+    .store-search input[type="search"]{
+      flex:1;
+      min-width:0;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:var(--card);
+      color:var(--text);
+      font-size:14px;
+    }
+    .store-search input[type="search"]:focus{
+      outline:2px solid #1746ff55;
+      outline-offset:1px;
+    }
+    .search-count{
+      font-size:13px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
     /* GRID & CARD */
     .grid{
       display:grid;
@@ -211,6 +239,15 @@
     <!-- MTE deals mount point -->
     <!-- MTE:DEALS-BLOCK -->
 
+    <!-- THANH TÌM KIẾM — MXD-SEARCH v1 -->
+    <section class="store-search" aria-label="Tìm kiếm sản phẩm">
+      <input id="mxd-search-input"
+             type="search"
+             placeholder="Tìm theo tên, SKU, thương hiệu, tags…"
+             autocomplete="off">
+      <span id="mxd-search-count" class="search-count"></span>
+    </section>
+
     <!-- Danh sách sản phẩm -->
     <!-- MTE:AB-CARD -->
     <div id="product-list" class="grid" aria-live="polite"></div>
@@ -231,6 +268,8 @@
     window.addEventListener('DOMContentLoaded', () => {
       const wrap  = document.getElementById('product-list');
       const empty = document.getElementById('empty');
+      const searchInput = document.getElementById('mxd-search-input');
+      const searchCount = document.getElementById('mxd-search-count');
       if (!wrap) return;
 
       const fmtPrice = n => Number.isFinite(+n)
@@ -263,6 +302,34 @@
         return m;
       };
 
+      // MXD-SEARCH helpers
+      const removeAccents = (str) => {
+        const s = (str || '').toString();
+        return s.normalize
+          ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          : s;
+      };
+
+      const normalizeText = (str) => {
+        return removeAccents(str || '')
+          .toLowerCase()
+          .replace(/\s+/g, ' ')
+          .trim();
+      };
+
+      const buildSearchField = (p) => {
+        const tags = Array.isArray(p.tags) ? p.tags.join(' ') : '';
+        const bits = [
+          p.name,
+          p.sku,
+          p.brand,
+          p.category,
+          p.short_desc,
+          tags
+        ].join(' ');
+        return normalizeText(bits);
+      };
+
       // Lấy limit từ query (?limit=...) nếu có
       const qs   = new URLSearchParams(location.search);
       const limQ = Number.parseInt(qs.get('limit') || '', 10);
@@ -280,90 +347,145 @@
       `).join('');
       if (empty) empty.style.display = 'none';
 
+      // Danh sách gốc & danh sách đang hiển thị (sau search)
+      let baseList = [];
+      let visibleList = [];
+
+      const updateSearchCount = () => {
+        if (!searchCount) return;
+        if (!baseList.length) {
+          searchCount.textContent = '';
+          return;
+        }
+        const shown = (visibleList && visibleList.length) || 0;
+        searchCount.textContent = `${shown} / ${baseList.length} sản phẩm`;
+      };
+
+      const render = (list) => {
+        if (!Array.isArray(list) || !list.length) {
+          if (empty) empty.style.display = 'block';
+          wrap.innerHTML = '';
+          updateSearchCount();
+          return;
+        }
+
+        if (empty) empty.style.display = 'none';
+
+        wrap.innerHTML = list.map(p => {
+          const rawSku  = (p.sku || '').toString();
+          const skuSlug = rawSku.toLowerCase();
+          const name    = p.name || rawSku || 'Sản phẩm';
+
+          const originUrl = normalizeOrigin(
+            p.origin_url || p.origin || p.url || p.link || ''
+          );
+          const merchant  = guessMerchant(p, originUrl);
+          const baseHref  = originUrl || '#';
+
+          const priceHtml = Number.isFinite(+p.price)
+            ? `<div class="price" data-price="${p.price}">${fmtPrice(p.price)}</div>`
+            : '';
+
+          const detailHref = rawSku
+            ? `/g.html?sku=${encodeURIComponent(rawSku)}`
+            : '#';
+
+          const originAttr = originUrl
+            ? ` data-origin-url="${esc(originUrl)}"`
+            : '';
+
+          const imgSrc = p.image ||
+            `/assets/img/products/${skuSlug || 'placeholder'}.webp`;
+
+          return `
+            <article class="card">
+              <a class="sr-only"
+                 href="${esc(baseHref)}"
+                 data-merchant="${esc(merchant || '')}"
+                 data-sku="${esc(rawSku)}"${originAttr}>
+                ${esc(name)}
+              </a>
+
+              <a href="${esc(detailHref)}" aria-label="Xem chi tiết ${esc(name)}">
+                <img loading="lazy" decoding="async"
+                     src="${esc(imgSrc)}"
+                     alt="${esc(name)}"
+                     onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
+              </a>
+              <div class="body">
+                <h3 class="name">
+                  <a href="${esc(detailHref)}">${esc(name)}</a>
+                </h3>
+                ${priceHtml}
+                <a class="buy"
+                   href="${esc(baseHref)}"
+                   data-merchant="${esc(merchant || '')}"
+                   data-sku="${esc(rawSku)}"${originAttr}
+                   target="_blank"
+                   rel="nofollow sponsored noopener">
+                  Mua ngay
+                </a>
+              </div>
+            </article>`;
+        }).join('');
+
+        // Gọi lại scan để sinh deeplink isclix
+        if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
+          window.mxdAffiliate.scan(wrap);
+        }
+
+        updateSearchCount();
+      };
+
       fetch('/assets/data/affiliates.json', { cache: 'no-store' })
         .then(r => r.ok ? r.json() : [])
         .then(all => {
           const arr = Array.isArray(all) ? all : (all.items || []);
           if (!arr.length) {
+            baseList = [];
+            visibleList = [];
             if (empty) empty.style.display = 'block';
             wrap.innerHTML = '';
+            updateSearchCount();
             return;
           }
 
-          const list = arr
+          baseList = arr
             .slice()
             .reverse()                 // ưu tiên sản phẩm mới thêm
-            .filter(p => p && p.status !== false);
+            .filter(p => p && p.status !== false)
+            .map(p => {
+              p._search = buildSearchField(p);
+              return p;
+            });
 
-          wrap.innerHTML = list.slice(0, LIMIT).map(p => {
-            const rawSku  = (p.sku || '').toString();
-            const skuSlug = rawSku.toLowerCase();
-            const name    = p.name || rawSku || 'Sản phẩm';
+          visibleList = baseList.slice(0, LIMIT);
+          render(visibleList);
 
-            const originUrl = normalizeOrigin(
-              p.origin_url || p.origin || p.url || p.link || ''
-            );
-            const merchant  = guessMerchant(p, originUrl);
-            const baseHref  = originUrl || '#';
-
-            const priceHtml = Number.isFinite(+p.price)
-              ? `<div class="price" data-price="${p.price}">${fmtPrice(p.price)}</div>`
-              : '';
-
-            const detailHref = rawSku
-              ? `/g.html?sku=${encodeURIComponent(rawSku)}`
-              : '#';
-
-            const originAttr = originUrl
-              ? ` data-origin-url="${esc(originUrl)}"`
-              : '';
-
-            const imgSrc = p.image ||
-              `/assets/img/products/${skuSlug || 'placeholder'}.webp`;
-
-            return `
-              <article class="card">
-                <a class="sr-only"
-                   href="${esc(baseHref)}"
-                   data-merchant="${esc(merchant || '')}"
-                   data-sku="${esc(rawSku)}"${originAttr}>
-                  ${esc(name)}
-                </a>
-
-                <a href="${esc(detailHref)}" aria-label="Xem chi tiết ${esc(name)}">
-                  <img loading="lazy" decoding="async"
-                       src="${esc(imgSrc)}"
-                       alt="${esc(name)}"
-                       onerror="this.onerror=null;this.src='/assets/img/products/placeholder.webp'">
-                </a>
-                <div class="body">
-                  <h3 class="name">
-                    <a href="${esc(detailHref)}">${esc(name)}</a>
-                  </h3>
-                  ${priceHtml}
-                  <a class="buy"
-                     href="${esc(baseHref)}"
-                     data-merchant="${esc(merchant || '')}"
-                     data-sku="${esc(rawSku)}"${originAttr}
-                     target="_blank"
-                     rel="nofollow sponsored noopener">
-                    Mua ngay
-                  </a>
-                </div>
-              </article>`;
-          }).join('');
-
-          // Gọi lại scan để sinh deeplink isclix
-          if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
-            window.mxdAffiliate.scan(wrap);
+          // Gắn search sau khi đã có baseList
+          if (searchInput) {
+            searchInput.addEventListener('input', () => {
+              const q = normalizeText(searchInput.value || '');
+              if (!q) {
+                visibleList = baseList.slice(0, LIMIT);
+              } else {
+                visibleList = baseList.filter(p =>
+                  p && typeof p._search === 'string' && p._search.includes(q)
+                ).slice(0, LIMIT);
+              }
+              render(visibleList);
+            });
           }
         })
         .catch(err => {
           if (typeof console !== 'undefined' && console.error) {
             console.error('MXD store render error', err);
           }
+          baseList = [];
+          visibleList = [];
           if (empty) empty.style.display = 'block';
           wrap.innerHTML = '';
+          updateSearchCount();
         });
 
       // DEDUPE floating contacts nếu bị inject nhiều lần
