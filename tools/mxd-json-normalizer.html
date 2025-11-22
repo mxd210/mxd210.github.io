@@ -132,9 +132,9 @@
 <body>
   <h1>MXD JSON Normalizer</h1>
   <div class="subtitle">
-    Chuẩn hoá schema + soát deeplink + sinh mô tả/SEO/tag cho <strong>mxd210</strong>.<br>
-    • Đổi <code>price_vnd → price</code>, <code>origin_url → origin</code><br>
-    • Tách URL gốc nếu <code>origin/deeplink</code> đang là link isclix<br>
+    Chuẩn hoá schema AFF + soát deeplink + sinh mô tả/SEO/tag cho <strong>mxd210</strong>.<br>
+    • Đổi <code>price_vnd → price</code>, chuẩn hoá <code>origin</code> + <code>origin_url</code><br>
+    • Tách URL gốc nếu <code>origin/origin_url/deeplink</code> đang là link isclix<br>
     • Ép deeplink về aff-base mxd210 (Shopee/Lazada/Tiki/TikTok)<br>
     • Sinh <code>short_desc</code>, <code>seo_title</code>, <code>seo_description</code>, <code>tags</code> nếu thiếu
   </div>
@@ -184,12 +184,12 @@
   <div id="log" class="log"></div>
 
   <script>
-    // aff-base chính thức của mxd210 (AccessTrade) – đã sửa Shopee cho đúng base
+    // aff-base chính thức của mxd210 (AccessTrade)
     const AFF_BASE = {
       shopee: "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=",
       lazada: "https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=",
-      tiktok: "https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url=",
-      tiki:   "https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url="
+      tiki:   "https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url=",
+      tiktok: "https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url="
     };
 
     function ensureHttps(u) {
@@ -207,7 +207,10 @@
       try {
         const url = new URL(ensureHttps(dl));
         const params = url.searchParams;
-        const inner = params.get("url") || params.get("u") || params.get("redirect");
+        const inner =
+          params.get("url") ||
+          params.get("u") ||
+          params.get("redirect");
         return inner ? ensureHttps(inner) : "";
       } catch (e) {
         return "";
@@ -306,6 +309,13 @@
       if (merchant) tags.add(merchant.toString().toLowerCase());
       if (brand) tags.add(slugify(brand));
 
+      // thêm vài từ khoá từ name
+      if (item.name) {
+        slugify(item.name).split("-").forEach(t => {
+          if (t.length >= 3) tags.add(t);
+        });
+      }
+
       return Array.from(tags).slice(0, 10);
     }
 
@@ -324,7 +334,7 @@
       let data;
       let wrapped = false;
 
-      // ======== Bước 1: thử parse chuẩn =========
+      // Bước 1: thử parse JSON thẳng
       try {
         let text = raw;
         if (!text.trim().startsWith("[") && !text.trim().startsWith("{")) {
@@ -333,24 +343,18 @@
         }
         data = JSON.parse(text);
       } catch (e1) {
-        // ======== Bước 2: thử auto-fix các lỗi thường gặp =========
+        // Bước 2: auto-fix lỗi thường gặp (thiếu dấu phẩy, dư dấu phẩy cuối…)
         try {
           let text = raw;
-
-          // đảm bảo là array
           if (!text.trim().startsWith("[")) {
             text = "[" + text + "]";
             wrapped = true;
           }
-
-          // thiếu dấu phẩy giữa các object: `}{` -> `},{`
+          // }{ -> },{
           text = text.replace(/}\s*{/g, "},{");
-
-          // xoá dấu phẩy thừa trước ] hoặc }
+          // ,} hoặc ,] -> } ]
           text = text.replace(/,\s*([}\]])/g, "$1");
-
           data = JSON.parse(text);
-          // ghi chú nhẹ vào log chi tiết
           reportEl.value = "Đã tự sửa 1 số lỗi cú pháp JSON thường gặp (thêm dấu ',' giữa các phần tử hoặc xoá dấu ',' thừa trước ]/}).\n\n" +
             (reportEl.value || "");
         } catch (e2) {
@@ -358,8 +362,8 @@
           reportEl.value =
 `Tool không sửa được vì JSON đang lỗi cú pháp.
 
-Gợi ý:
-- Mở affiliates.json bằng VS Code / Notepad++.
+Gợi ý nhanh:
+- Mở file bằng VS Code / Notepad++.
 - Tới gần dòng mà thông báo lỗi báo.
 - Kiểm tra:
   • Giữa hai dấu '}' và '{' có dấu phẩy ',' ở giữa không.
@@ -387,15 +391,25 @@ Gợi ý:
         shortDescGenerated: 0,
         seoTitleGenerated: 0,
         seoDescGenerated: 0,
-        tagsGenerated: 0
+        tagsGenerated: 0,
+        skuGenerated: 0,
+        imageNormalized: 0
       };
       const reportLines = [];
 
       data.forEach((item, idx) => {
         if (!item || typeof item !== "object") return;
         let changed = false;
+
+        // 0) Đảm bảo có sku
+        if (!item.sku && item.name) {
+          item.sku = slugify(item.name);
+          stats.skuGenerated++;
+          changed = true;
+          reportLines.push(`#${idx+1}: thiếu sku → auto slug từ name: ${item.sku}`);
+        }
         const sku = (item.sku || "").toString();
-        const tag = sku || ("#"+(idx+1));
+        const tag = sku || ("#" + (idx + 1));
 
         // 1) price_vnd -> price
         if (typeof item.price === "undefined" && typeof item.price_vnd !== "undefined") {
@@ -420,49 +434,62 @@ Gợi ý:
           }
         }
 
-        // 2) origin_url -> origin
-        if (!item.origin && item.origin_url) {
-          item.origin = ensureHttps(item.origin_url);
-          delete item.origin_url;
+        // 2) origin / origin_url chuẩn hoá
+        let origin = item.origin || "";
+        if (!origin && item.origin_url) {
+          origin = ensureHttps(item.origin_url);
           stats.originFromOriginUrl++;
           changed = true;
-        } else if (item.origin) {
-          item.origin = ensureHttps(item.origin);
         }
 
-        // 3) origin là deeplink isclix -> tách URL gốc
-        if (item.origin && item.origin.includes("go.isclix.com")) {
-          const orig = extractOriginFromDeeplink(item.origin);
+        // origin đang là deeplink isclix -> tách URL gốc
+        if (origin && origin.includes("go.isclix.com")) {
+          const orig = extractOriginFromDeeplink(origin);
           if (orig) {
-            item.origin = orig;
+            origin = orig;
             stats.originFromIsclix++;
             changed = true;
             reportLines.push(`${tag}: origin đang là deeplink isclix → đã tách URL gốc.`);
           }
         }
 
-        // 4) chưa có origin nhưng có deeplink isclix -> tách URL gốc
-        if (!item.origin && item.deeplink && item.deeplink.includes("go.isclix.com")) {
+        // chưa có origin nhưng deeplink là isclix
+        if (!origin && item.deeplink && item.deeplink.includes("go.isclix.com")) {
           const orig = extractOriginFromDeeplink(item.deeplink);
           if (orig) {
-            item.origin = orig;
+            origin = orig;
             stats.originFromDeeplink++;
             changed = true;
             reportLines.push(`${tag}: thiếu origin, đã lấy URL gốc từ deeplink.`);
           }
         }
 
-        if (item.origin) {
-          item.origin = ensureHttps(item.origin);
+        if (origin) {
+          origin = ensureHttps(origin);
+          if (item.origin !== origin) {
+            item.origin = origin;
+            changed = true;
+          }
+          if (item.origin_url !== origin) {
+            item.origin_url = origin;
+            changed = true;
+          }
         }
 
-        // 5) merchant
+        // 3) merchant
         let merchant = "";
         if (item.merchant) {
           merchant = String(item.merchant).toLowerCase().trim();
         }
+        if (merchant === "shopee-kol" || merchant === "shopee_kol") {
+          merchant = "shopee";
+          item.merchant = merchant;
+          changed = true;
+          reportLines.push(`${tag}: merchant "${item.merchant}" → chuẩn hoá thành "shopee".`);
+        }
+
         if (!merchant) {
-          const src = item.origin || item.deeplink || "";
+          const src = item.origin || item.origin_url || item.deeplink || "";
           const guessed = detectMerchantFromUrl(src);
           if (guessed) {
             merchant = guessed;
@@ -471,17 +498,45 @@ Gợi ý:
             changed = true;
             reportLines.push(`${tag}: merchant trống → đoán từ URL là "${merchant}".`);
           }
+        } else if (item.merchant !== merchant) {
+          // đồng bộ lại chữ thường
+          item.merchant = merchant;
+          changed = true;
         }
 
-        // 6) meta cơ bản
+        // 4) image chuẩn: /assets/img/products/<sku>.webp
+        if (item.image) {
+          const fixed = String(item.image)
+            .replace("/assets/img/product/", "/assets/img/products/");
+          if (fixed !== item.image) {
+            item.image = fixed;
+            stats.imageNormalized++;
+            changed = true;
+            reportLines.push(`${tag}: image path đã chuẩn hoá về /assets/img/products/...`);
+          }
+        } else if (item.sku) {
+          item.image = `/assets/img/products/${item.sku}.webp`;
+          stats.imageNormalized++;
+          changed = true;
+          reportLines.push(`${tag}: thiếu image → set /assets/img/products/${item.sku}.webp`);
+        }
+
+        // 5) meta cơ bản canonical
         if (!item.sub1 && item.sku) {
           item.sub1 = item.sku;
           changed = true;
         }
-        if (!item.status) {
+
+        // status: string canonical (active | draft | archived)
+        if (typeof item.status === "boolean") {
+          item.status = item.status ? "active" : "archived";
+          changed = true;
+        }
+        if (item.status === undefined || item.status === null || item.status === "") {
           item.status = "active";
           changed = true;
         }
+
         if (typeof item.featured === "undefined") {
           item.featured = false;
           changed = true;
@@ -490,8 +545,12 @@ Gợi ý:
           item.updated_at = nowIso;
           changed = true;
         }
+        if (typeof item.notes === "undefined") {
+          item.notes = "";
+          changed = true;
+        }
 
-        // 7) SEO / mô tả / tags
+        // 6) SEO / mô tả / tags
         if (!item.short_desc) {
           item.short_desc = genShortDesc(item);
           stats.shortDescGenerated++;
@@ -513,7 +572,7 @@ Gợi ý:
           changed = true;
         }
 
-        // 8) Deeplink sanitizer
+        // 7) Deeplink sanitizer (chuẩn aff-base mxd210)
         const base = merchant && AFF_BASE[merchant] ? AFF_BASE[merchant] : null;
 
         if (item.deeplink) {
@@ -565,18 +624,19 @@ Gợi ý:
 
       const summary = [
         `✅ Đã xử lý ${stats.total} sản phẩm.`,
-        `• Chuẩn hoá / cập nhật: ${stats.normalized}`,
-        `• price_vnd → price: ${stats.priceFromVnd}`,
-        `• origin_url → origin: ${stats.originFromOriginUrl}`,
-        `• origin từ deeplink isclix: ${stats.originFromDeeplink + stats.originFromIsclix}`,
-        `• merchant đoán từ URL: ${stats.merchantDetected}`,
-        `• Deeplink rewrite theo aff-base mxd210: ${stats.deeplinkRewritten}`,
-        `• Deeplink bị xoá: ${stats.deeplinkDropped}`,
-        `• Deeplink sinh mới: ${stats.deeplinkGenerated}`,
-        `• short_desc sinh mới: ${stats.shortDescGenerated}`,
-        `• seo_title sinh mới: ${stats.seoTitleGenerated}`,
-        `• seo_description sinh mới: ${stats.seoDescGenerated}`,
-        `• tags sinh mới: ${stats.tagsGenerated}`
+        `Chuẩn hoá/ cập nhật: ${stats.normalized}`,
+        `price_vnd → price: ${stats.priceFromVnd}`,
+        `origin/origin_url chuẩn hoá: ${stats.originFromOriginUrl + stats.originFromDeeplink + stats.originFromIsclix}`,
+        `merchant đoán từ URL: ${stats.merchantDetected}`,
+        `deeplink rewrite: ${stats.deeplinkRewritten}`,
+        `deeplink xoá: ${stats.deeplinkDropped}`,
+        `deeplink sinh mới: ${stats.deeplinkGenerated}`,
+        `short_desc sinh mới: ${stats.shortDescGenerated}`,
+        `seo_title sinh mới: ${stats.seoTitleGenerated}`,
+        `seo_description sinh mới: ${stats.seoDescGenerated}`,
+        `tags sinh mới: ${stats.tagsGenerated}`,
+        `SKU auto: ${stats.skuGenerated}`,
+        `image chuẩn hoá: ${stats.imageNormalized}`
       ].join(" | ");
 
       logEl.textContent = summary;
@@ -621,7 +681,7 @@ Gợi ý:
     "price_vnd": "57.000",
     "origin_url": "shopee.vn/Pijama-Xinh-Tay-Dai-Quan-Dai",
     "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FPijama-Xinh-Tay-Dai-Quan-Dai",
-    "image": "/assets/img/products/pijama-xinh.webp"
+    "image": "/assets/img/product/pijama-xinh.webp"
   },
   {
     "sku": "ao-croptop-ba-lo-nu-toptify",
@@ -629,7 +689,7 @@ Gợi ý:
     "price": "99.000",
     "origin": "https://shopee.vn/Ao-croptop-ba-lo-nu-TOPTIFY-...",
     "deeplink": "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=https%3A%2F%2Fshopee.vn%2FAo-croptop-ba-lo-nu-TOPTIFY-...",
-    "merchant": "shopee",
+    "merchant": "shopee-kol",
     "brand": "TOPTIFY",
     "category": "Thời trang nữ",
     "image": "/assets/img/products/ao-croptop-ba-lo-nu-toptify.webp"
