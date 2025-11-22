@@ -1,144 +1,86 @@
-// REPLACE WHOLE FILE: /assets/mxd-affiliate.js
-// MXD Affiliate v2.2 — rewrite link sang isclix cho Shopee / Lazada / Tiki / TikTok
+// MXD Affiliate v2025-11-22
+// Sinh deeplink isclix từ origin_url + merchant
+(function (window, document) {
+  'use strict';
 
-(() => {
-  // === BASE isclix (đúng với bộ cậu đang dùng) ===
-  const AFF_BASE = {
-    shopee: "https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=",
-    lazada: "https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=",
-    tiktok: "https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url=",
-    tiki:   "https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url="
+  // aff_base MXD210 (có thể override bằng window.MXD_AFF_BASE)
+  const DEFAULT_BASE = {
+    shopee: 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=',
+    lazada: 'https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=',
+    tiki:   'https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url=',
+    tiktok: 'https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url='
   };
 
-  // Nhận diện sàn từ URL
-  const MERCHANT_PATTERNS = {
-    shopee: /(?:^https?:\/\/)?(?:\w+\.)?shopee\.vn/i,
-    lazada: /(?:^https?:\/\/)?(?:\w+\.)?lazada\.vn/i,
-    tiki:   /(?:^https?:\/\/)?(?:\w+\.)?tiki\.vn/i,
-    tiktok: /(?:^https?:\/\/)?(?:\w+\.)?tiktok\.com/i
-  };
-
-  function detectMerchant(url) {
-    if (!url) return null;
-    for (const [name, re] of Object.entries(MERCHANT_PATTERNS)) {
-      if (re.test(url)) return name;
+  function normalizeOrigin(raw) {
+    let u = (raw || '').toString().trim();
+    if (!u) return '';
+    if (u.startsWith('//')) u = 'https:' + u;
+    if (!/^https?:\/\//i.test(u)) {
+      u = 'https://' + u.replace(/^\/+/, '');
     }
-    return null;
+    return u;
   }
 
-  // Chuẩn hoá URL gốc:
-  // - bỏ khoảng trắng
-  // - bỏ qua link đã là isclix
-  // - tự thêm https:// nếu thiếu
-  function normalizeOrigin(url) {
-    if (!url) return null;
-    let clean = String(url).trim();
-
-    // Đã là link isclix thì thôi, không quấn lại
-    if (/go\.isclix\.com\/deep_link/i.test(clean)) {
-      return null;
-    }
-
-    if (clean === "#" || clean === "/") return null;
-
-    if (!/^https?:\/\//i.test(clean)) {
-      // Ví dụ: shopee.vn/...  -> https://shopee.vn/...
-      clean = "https://" + clean.replace(/^\/+/, "");
-    }
-
-    return clean;
+  function guessMerchantFromUrl(url) {
+    const u = url || '';
+    if (/shopee\.vn/i.test(u)) return 'shopee';
+    if (/lazada\.vn/i.test(u)) return 'lazada';
+    if (/tiki\.vn/i.test(u)) return 'tiki';
+    if (/tiktok\.com/i.test(u)) return 'tiktok';
+    return '';
   }
 
-  function buildAffiliateLink(originUrl, explicitMerchant) {
-    const normalized = normalizeOrigin(originUrl);
-    if (!normalized) return null;
-
-    const merchant = (explicitMerchant || detectMerchant(normalized) || "").toLowerCase();
-    const base = AFF_BASE[merchant];
-    if (!base) return null;
-
-    // isclix yêu cầu url= là URL đã encode
-    return base + encodeURIComponent(normalized);
+  function isIsclix(url) {
+    return /go\.isclix\.com\/deep_link/i.test(url || '');
   }
 
-  // Quét & rewrite link trong 1 vùng (hoặc cả document)
-  function rewriteAnchors(root) {
+  function buildDeeplink(originUrl, merchant, baseMap) {
+    const clean = normalizeOrigin(originUrl);
+    if (!clean) return '';
+
+    const m = (merchant || '').toLowerCase().trim() || guessMerchantFromUrl(clean);
+    const base = baseMap[m];
+    if (!base) return '';
+
+    // Accesstrade yêu cầu url= phải là URL-encoded
+    return base + encodeURIComponent(clean);
+  }
+
+  function scan(root) {
     const scope = root || document;
+    const baseMap = Object.assign({}, DEFAULT_BASE, window.MXD_AFF_BASE || {});
+    const links = scope.querySelectorAll('a[data-merchant]');
 
-    const anchors = scope.querySelectorAll(
-      [
-        "a[data-merchant]",
-        "a[data-origin-url]",
-        "a[data-origin]",
-        "a[data-affiliate]",
-        'a[href*="shopee.vn"]',
-        'a[href*="lazada.vn"]',
-        'a[href*="tiki.vn"]',
-        'a[href*="tiktok.com"]'
-      ].join(",")
-    );
+    links.forEach(a => {
+      // Đã được xử lý rồi thì thôi
+      if (a.dataset.noAff === '1') return;
 
-    anchors.forEach(a => {
-      if (a.dataset.noAff === "1") return;
+      const currentHref = a.getAttribute('href') || '';
+      if (!currentHref) return;
 
-      let origin =
-        a.dataset.originUrl ||
-        a.getAttribute("data-origin-url") ||
-        a.dataset.origin ||
-        a.getAttribute("data-origin") ||
-        a.getAttribute("data-href") ||
-        a.href;
+      // Nếu đã là isclix thì chỉ đánh dấu noAff
+      if (isIsclix(currentHref)) {
+        a.dataset.noAff = '1';
+        return;
+      }
 
-      const merchant = a.dataset.merchant;
-      const aff = buildAffiliateLink(origin, merchant);
-      if (!aff) return;
+      const originAttr = a.getAttribute('data-origin-url') || currentHref;
+      const deeplink = buildDeeplink(originAttr, a.getAttribute('data-merchant'), baseMap);
+      if (!deeplink) return;
 
-      a.href = aff;
-
-      // Thêm rel cho an toàn & SEO
-      const rel = (a.getAttribute("rel") || "").split(/\s+/);
-      ["nofollow", "noopener", "noreferrer"].forEach(token => {
-        if (!rel.includes(token)) rel.push(token);
-      });
-      a.setAttribute("rel", rel.join(" ").trim());
+      a.setAttribute('data-origin-url', normalizeOrigin(originAttr));
+      a.setAttribute('href', deeplink);
+      a.dataset.noAff = '1';
     });
   }
 
-  function onReady(fn) {
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", fn);
-    } else {
-      fn();
-    }
+  window.mxdAffiliate = window.mxdAffiliate || {};
+  window.mxdAffiliate.scan = scan;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => scan(document));
+  } else {
+    scan(document);
   }
 
-  onReady(() => {
-    // Lần đầu: quét toàn trang
-    rewriteAnchors(document);
-
-    // Nếu sau này JS khác render thêm sản phẩm thì observer sẽ quét tiếp
-    const observer = new MutationObserver(mutations => {
-      for (const m of mutations) {
-        for (const node of m.addedNodes) {
-          if (node.nodeType === 1) {
-            rewriteAnchors(node);
-          }
-        }
-      }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-  });
-
-  // Expose hook global để các trang động (g.html, tool, v.v.) có thể gọi lại sau khi render
-  if (typeof window !== "undefined") {
-    window.mxdAffiliate = window.mxdAffiliate || {};
-    window.mxdAffiliate.scan = (root) => {
-      try {
-        rewriteAnchors(root || document);
-      } catch (e) {
-        console.error("mxdAffiliate.scan error:", e);
-      }
-    };
-  }
-})();
+})(window, document);
