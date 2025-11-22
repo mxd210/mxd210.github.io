@@ -340,10 +340,34 @@ const DEFAULT_TPL_SHOPEE = 'https://go.isclix.com/deep_link/6803097511817356947/
 const DEFAULT_TPL_LAZADA = 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
 const DEFAULT_TPL_TIKI   = 'https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
 const DEFAULT_TPL_TIKTOK = 'https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}';
+function cleanUrl(u){
+  let s = (u || '').trim();
+  // bỏ bớt " và , thừa ở đầu/cuối nếu có
+  s = s.replace(/^["']+|["',]+$/g, '');
+
+  if (!s) return '';
+
+  // nếu chỉ là "lazada.vn/..." thì tự thêm https://
+  if (/^lazada\.vn\//i.test(s)) {
+    s = 'https://www.' + s.replace(/^lazada\.vn\//i, 'lazada.vn/');
+  }
+
+  // chuẩn hoá lazada: cắt mọi thứ sau .html, giữ lại host chuẩn
+  if (/^https?:\/\/(www\.)?lazada\.vn\//i.test(s)) {
+    const lower = s.toLowerCase();
+    const idx = lower.indexOf('.html');
+    if (idx !== -1) {
+      s = s.slice(0, idx + 5); // giữ nguyên đến hết ".html"
+    }
+    // ép host thành https://www.lazada.vn/
+    s = s.replace(/^https?:\/\/(www\.)?lazada\.vn\//i, 'https://www.lazada.vn/');
+  }
+
+  return s;
+}
 
 function computeSubs(sku, merchant){ return { sub1: sku||'sku', sub2:(merchant||'merchant').toLowerCase(), sub3:'tool', sub4:'mxd210' }; }
 function ensureSubsInUrl(u, subs){ const has = k => new RegExp(`[?&]${k}=`,`i`).test(u); const qs=[]; for(const k of ['sub1','sub2','sub3','sub4']) if(!has(k)) qs.push(`${k}=${encodeURIComponent(subs[k])}`); return qs.length?(u+(u.includes('?')?'&':'?')+qs.join('&')):u; }
-function cleanUrl(u){ return (u||'').trim().replace(/^["']+|["',]+$/g,''); }
 function vn(s){ return (s||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase(); }
 function sanitizeFolder(p){ if(!p) return '/assets/img/'; p=p.trim(); if(!p.startsWith('/')) p='/'+p; if(!p.endsWith('/')) p+='/'; return p; }
 
