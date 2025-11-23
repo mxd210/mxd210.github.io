@@ -1,5 +1,5 @@
 // REPLACE WHOLE FILE: /assets/mxd-affiliate.js
-// MXD-AFFILIATE v2025-11-22 — universal scanner (index, store, danh mục, blog)
+// MXD-AFFILIATE v2025-11-23 — universal scanner (index, store, danh mục, blog) + auto buy label
 
 // Cấu hình base isclix cho MXD210
 const MXD_AFF_BASE = {
@@ -9,18 +9,18 @@ const MXD_AFF_BASE = {
   tiktok: 'https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url='
 };
 
-(function(global){
+(function (global) {
   'use strict';
 
-  function normalizeUrl(raw){
+  function normalizeUrl(raw) {
     if (!raw) return '';
     let u = String(raw).trim();
     if (!u) return '';
     // bỏ javascript: mailto:, tel:
     if (/^(javascript:|mailto:|tel:)/i.test(u)) return '';
-    try{
+    try {
       // hỗ trợ link tương đối / domain trần
-      if (!/^https?:\/\//i.test(u)){
+      if (!/^https?:\/\//i.test(u)) {
         if (u.startsWith('//')) {
           u = 'https:' + u;
         } else {
@@ -28,24 +28,24 @@ const MXD_AFF_BASE = {
         }
       }
       return u;
-    }catch(e){
+    } catch (e) {
       return '';
     }
   }
 
-  function guessMerchantFromUrl(url, hint){
+  function guessMerchantFromUrl(url, hint) {
     let m = (hint || '').toString().toLowerCase().trim();
-    if (!m && url){
-      if (/shopee\.vn/i.test(url))      m = 'shopee';
-      else if (/lazada\.vn/i.test(url)) m = 'lazada';
-      else if (/tiki\.vn/i.test(url))   m = 'tiki';
-      else if (/tiktok\.com/i.test(url))m = 'tiktok';
+    if (!m && url) {
+      if (/shopee\.vn/i.test(url))       m = 'shopee';
+      else if (/lazada\.vn/i.test(url))  m = 'lazada';
+      else if (/tiki\.vn/i.test(url))    m = 'tiki';
+      else if (/tiktok\.com/i.test(url)) m = 'tiktok';
     }
     if (m === 'shopee-kol' || m === 'shopee_kol') m = 'shopee';
     return m;
   }
 
-  function appendRel(existing, more){
+  function appendRel(existing, more) {
     const set = new Set(
       String(existing || '')
         .split(/\s+/)
@@ -58,16 +58,58 @@ const MXD_AFF_BASE = {
     return Array.from(set).join(' ');
   }
 
-  function isIsclix(href){
+  function isIsclix(href) {
     return /go\.isclix\.com\/deep_link/i.test(href || '');
   }
 
-  // === CORE: scan một root (document hoặc container) ===
-  function scan(root){
+  // === AUTO LABEL NÚT MUA THEO MERCHANT ===
+
+  function getBuyLabel(merchant) {
+    merchant = (merchant || '').toLowerCase();
+    if (merchant === 'shopee') return 'Mua Shopee';
+    if (merchant === 'lazada') return 'Mua Lazada';
+    if (merchant === 'tiki')   return 'Mua Tiki';
+    if (merchant === 'tiktok') return 'Mua TikTok Shop';
+    return '';
+  }
+
+  /**
+   * Đổi text nút mua:
+   * - Chỉ đổi nếu hiện đang là "Mua ngay" (tránh phá mấy nút đặc biệt kiểu "Mua 1 (Shopee)")
+   * - Merchant ưu tiên lấy từ data-merchant; nếu thiếu thì đoán từ origin_url / href
+   */
+  function relabelBuyButtons(root) {
     root = root || global.document;
     if (!root || !root.querySelectorAll) return;
 
-    /** 
+    const btns = root.querySelectorAll('a.buy, a.btn-buy, a.mxd-buy');
+
+    btns.forEach(function (btn) {
+      if (!btn) return;
+
+      const currentText = (btn.textContent || '').trim().toLowerCase();
+      // chỉ đụng tới nút generic "Mua ngay" (hoặc bỏ trống)
+      if (currentText && currentText !== 'mua ngay') return;
+
+      let merchant = (btn.dataset.merchant || '').trim().toLowerCase();
+      if (!merchant) {
+        const origin = btn.dataset.originUrl || btn.getAttribute('href') || '';
+        merchant = guessMerchantFromUrl(origin, '');
+      }
+
+      const label = getBuyLabel(merchant);
+      if (label) {
+        btn.textContent = label;
+      }
+    });
+  }
+
+  // === CORE: scan một root (document hoặc container) ===
+  function scan(root) {
+    root = root || global.document;
+    if (!root || !root.querySelectorAll) return;
+
+    /**
      * Chỉ xử lý:
      *  - a[data-origin-url]
      *  - hoặc a.buy / a[data-sku] / a[data-merchant]
@@ -127,21 +169,39 @@ const MXD_AFF_BASE = {
       a.setAttribute('rel', appendRel(a.getAttribute('rel'), 'nofollow sponsored noopener'));
       a.setAttribute('target', '_blank');
     });
+
+    // Sau khi scan xong thì gắn luôn label nút mua
+    relabelBuyButtons(root);
   }
 
   // === AUTO SCAN on DOMContentLoaded ===
-  if (global.document && !global.mxdAffiliateAutoBound){
+  if (global.document && !global.mxdAffiliateAutoBound) {
     global.mxdAffiliateAutoBound = true;
-    global.document.addEventListener('DOMContentLoaded', function(){
-      try{ scan(global.document); }catch(e){ /* ignore */ }
+    global.document.addEventListener('DOMContentLoaded', function () {
+      try {
+        scan(global.document);
+      } catch (e) {
+        // ignore
+      }
     });
   }
 
   // === Export API ===
   global.mxdAffiliate = global.mxdAffiliate || {};
-  global.mxdAffiliate.scan = function(root){
-    try{ scan(root || global.document); }catch(e){ /* ignore */ }
+  global.mxdAffiliate.scan = function (root) {
+    try {
+      scan(root || global.document);
+    } catch (e) {
+      // ignore
+    }
   };
-  global.mxdAffiliate.version = 'mxd-aff-universal-v2025-11-22';
+  global.mxdAffiliate.applyBuyLabels = function (root) {
+    try {
+      relabelBuyButtons(root || global.document);
+    } catch (e) {
+      // ignore
+    }
+  };
+  global.mxdAffiliate.version = 'mxd-aff-universal-v2025-11-23-buylabel';
 
 })(window);
