@@ -1,69 +1,206 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tư vấn – MXD</title><link rel="stylesheet" href="/assets/site.css">
-<script src="/assets/analytics.js"></script>
-<meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o" />
+<!-- REPLACE WHOLE FILE: /tu-van.html -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <title>Tư vấn / Đăng ký – MXD</title>
+  <meta name="description"
+        content="Đăng ký tư vấn và đặt lịch cho mảng xây dựng (chống thấm, sơn bả, sửa chữa cải tạo) và đăng ký tham gia MXD AFF Academy, làm webshop affiliate đa sàn.">
+  <link rel="canonical" href="https://mxd210.github.io/tu-van.html"/>
+  <meta name="robots" content="index,follow"/>
+
+  <!-- OG -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Tư vấn / Đăng ký – MXD"/>
+  <meta property="og:description"
+        content="Một nơi cho cả chủ nhà và người làm affiliate đăng ký tư vấn, đặt lịch thi công và tham gia MXD AFF Academy."/>
+  <meta property="og:url" content="https://mxd210.github.io/tu-van.html"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/home.webp"/>
+
+  <meta name="google-site-verification" content="84L0tRVs_wNPAyXii38-OaeGi8TyJdMlkZXVIHcnj0o"/>
+
+  <link rel="stylesheet" href="/assets/site.css"/>
+
+  <!-- GA4 trước affiliate -->
+  <script defer src="/assets/analytics.js"></script>
+  <script defer src="/assets/mxd-affiliate.js"></script>
+  <script defer src="/assets/js/floating-contact.js"></script>
 </head>
 <body>
-  <nav class="mxd-topbar">
-  <a class="brand" href="/">MXD</a>
-  <div class="links">
-    <a href="/">Trang chủ</a>
-    <a href="/store/">Cửa hàng</a>  <!-- nếu site bạn là /store.html, đổi href thành /store.html -->
-    <a href="/blog/">Tin tức</a>
-    <a href="/tu-van.html">Tư vấn</a>
-    <a href="/lien-he.html">Liên hệ</a>
-  </div>
-</nav>
+  <!-- HEADER -->
+  <header style="position:sticky;top:0;z-index:50;background:var(--bg, #fff);backdrop-filter:blur(6px)">
+    <div class="container" style="max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border,#e5e7eb)">
+      <a href="/" class="brand" style="font-weight:900;font-size:20px;color:var(--text,#111);text-decoration:none">MXD</a>
+      <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
+        <a href="/"                  class="nav-link">Trang chủ</a>
+        <a href="/store.html"        class="nav-link">Cửa hàng</a>
+        <a href="/blog-xay-dung.html"   class="nav-link">Góc xây dựng</a>
+        <a href="/mxd-aff-academy.html" class="nav-link">MXD AFF Academy</a>
+        <a href="/tu-van.html"       class="nav-link" aria-current="page">Tư vấn / Đăng ký</a>
+        <!-- MXD-ANCHOR:NAV-CONG-CU -->
+        <a href="/cong-cu/"          class="nav-link">Công cụ</a>
+        <a href="/lien-he.html"      class="nav-link">Liên hệ</a>
+      </nav>
+    </div>
+  </header>
 
-<style>
-  /* tối thiểu để hiển thị đẹp ngay, không đụng style cũ */
-  .mxd-topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid #eee}
-  .mxd-topbar .brand{font-weight:700;text-decoration:none;color:inherit}
-  .mxd-topbar .links a{margin-left:12px;text-decoration:none;color:inherit}
-  .mxd-topbar .links a.active{font-weight:700;text-decoration:underline}
-</style>
+  <main class="mxd-section">
+    <div class="wrap" style="max-width:960px;margin:0 auto;padding:16px">
 
-<script>
-  // đánh dấu mục đang xem là active
-  (function(){
-    var p = location.pathname.replace(/\/index\.html$/,'') || '/';
-    document.querySelectorAll('.mxd-topbar .links a').forEach(function(a){
-      var href = a.getAttribute('href');
-      if (href === p || href === p + '/' ) a.classList.add('active');
-    });
-  })();
-</script>
+      <!-- HERO -->
+      <section style="margin-bottom:24px">
+        <h1 style="font-size:26px;margin:0 0 8px">Tư vấn / Đăng ký làm việc với MXD</h1>
+        <p style="margin:0;color:var(--muted,#6b7280)">
+          Một form cho chủ nhà cần sửa chữa – chống thấm – sơn bả, một form cho anh em muốn làm affiliate / webshop.
+        </p>
+      </section>
 
-  <header class="mxd-header"><div class="wrap"><a class="brand" href="/">MXD</a></div></header>
-<main class="mxd-section"><div class="wrap">
-  <h1>Nhận tư vấn bộ vật tư</h1>
-  <p>Chọn checklist phù hợp, điền số liệu cơ bản, chúng tôi gợi ý bộ vật tư đủ dùng – đúng chuẩn.</p>
-  <ul>
-    <li><a id="ve-sinh-4m2">Ốp lát phòng vệ sinh 4m²</a></li>
-    <li><a id="san-khach-20m2">Lát sàn phòng khách 20m²</a></li>
-    <li><a id="ban-cong-6m2">Chống thấm ban công 6m²</a></li>
-  </ul>
-  <form class="lead-form" action="https://formspree.io/f/your_form_id" method="POST">
-    <input name="name" placeholder="Họ tên" required>
-    <input name="phone" placeholder="Số điện thoại" required>
-    <input name="area" placeholder="Diện tích (m²)">
-    <textarea name="note" placeholder="Mô tả hiện trạng / bề mặt / mục tiêu"></textarea>
-    <button class="btn btn-primary" type="submit">Gửi yêu cầu</button>
-  </form>
-</div></main>
-<footer class="mxd-footer"><div class="wrap"><p>© MXD</p></div></footer>
-  <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!window.__swRld) { window.__swRld = true; location.reload(); }
-  });
-  navigator.serviceWorker.ready.then(reg => {
-    if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-  });
-}
-</script>
-<script src="/assets/analytics.js" defer></script>
-<script src="/assets/mxd-affiliate.js"></script>
-  <script src="/assets/js/floating-contact.js" defer></script>
+      <!-- MẢNG XÂY DỰNG -->
+      <section aria-labelledby="xd-heading" style="margin-bottom:32px;padding:16px;border-radius:16px;border:1px solid var(--border,#e5e7eb);background:var(--card,#fff)">
+        <h2 id="xd-heading" style="margin-top:0;margin-bottom:8px">Đăng ký tư vấn / đặt lịch – Mảng xây dựng</h2>
+        <p style="margin-top:0;margin-bottom:16px;color:var(--muted,#6b7280)">
+          Dành cho <strong>chủ nhà</strong> hoặc <strong>quản lý công trình nhỏ</strong> đang cần:
+          chống thấm, sửa chữa – cải tạo, sơn bả, làm / sửa WC, lát gạch, xử lý ẩm mốc…
+          Cứ điền thông tin thật rõ, bên mình sẽ liên hệ lại để trao đổi thêm trước khi thi công.
+        </p>
 
-</body></html>
+        <form class="lead-form" action="https://formspree.io/f/your_form_id" method="POST" style="display:grid;gap:10px">
+          <!-- hidden để phân loại form -->
+          <input type="hidden" name="segment" value="xay-dung"/>
+
+          <label>
+            Họ tên chủ nhà *
+            <input name="name" required placeholder="VD: Nguyễn Văn A" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb)"/>
+          </label>
+
+          <label>
+            Số điện thoại *
+            <input name="phone" required placeholder="VD: 09xx xxx xxx" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb)"/>
+          </label>
+
+          <label>
+            Địa chỉ công trình (quận/huyện, tỉnh/thành) *
+            <input name="address" required placeholder="VD: Hoàng Mai, Hà Nội" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb)"/>
+          </label>
+
+          <label>
+            Hạng mục chính cần làm *
+            <select name="scope" required style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb)">
+              <option value="">— Chọn hạng mục —</option>
+              <option value="chong-tham">Chống thấm (WC, sân, ban công…)</option>
+              <option value="son-ba">Sơn bả, làm mới tường / trần</option>
+              <option value="wc">Làm mới / sửa WC, nhà tắm</option>
+              <option value="lat-gach">Lát gạch (WC, phòng khách, ban công…)</option>
+              <option value="sua-chua-khac">Sửa chữa / cải tạo hạng mục khác</option>
+            </select>
+          </label>
+
+          <label>
+            Thời gian mong muốn bắt đầu
+            <input name="time" placeholder="VD: Trong tháng 12, giờ hành chính, cuối tuần..." style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb)"/>
+          </label>
+
+          <label>
+            Ngân sách dự kiến (nếu có)
+            <input name="budget" placeholder="VD: Khoảng 20–30 triệu" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb)"/>
+          </label>
+
+          <label>
+            Mô tả hiện trạng & mong muốn *
+            <textarea name="note" required rows="4"
+                      placeholder="VD: WC tầng 2 đang bị thấm xuống trần tầng 1, đã sửa 1 lần nhưng vẫn còn ẩm..."
+                      style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb);resize:vertical"></textarea>
+          </label>
+
+          <button type="submit"
+                  style="margin-top:4px;padding:10px 14px;border-radius:999px;border:none;background:#ff6a00;color:#fff;font-weight:700;cursor:pointer">
+            Gửi yêu cầu tư vấn xây dựng
+          </button>
+
+          <p style="margin:8px 0 0;font-size:13px;color:var(--muted,#6b7280)">
+            Hoặc nhắn trực tiếp qua Zalo: 
+            <a href="https://zalo.me/0338328898" target="_blank" rel="noopener">0338 328 898</a>.
+            Bạn có thể chụp ảnh khu vực cần làm, gửi kèm để bọn mình dễ tư vấn hơn.
+          </p>
+        </form>
+      </section>
+
+      <!-- MẢNG AFFILIATE -->
+      <section aria-labelledby="aff-heading" style="margin-bottom:16px;padding:16px;border-radius:16px;border:1px solid var(--border,#e5e7eb);background:var(--card,#fff)">
+        <h2 id="aff-heading" style="margin-top:0;margin-bottom:8px">Đăng ký MXD AFF / Webshop affiliate</h2>
+        <p style="margin-top:0;margin-bottom:16px;color:var(--muted,#6b7280)">
+          Dành cho anh em muốn: học affiliate theo kiểu thực chiến, xây webshop đa sàn (Shopee, Lazada, TikTok, Tiki…),
+          hoặc đang bị rối vụ rơi đơn – không tracking được traffic.
+        </p>
+
+        <form class="lead-form" action="https://formspree.io/f/your_form_id" method="POST" style="display:grid;gap:10px">
+          <!-- hidden để phân loại form -->
+          <input type="hidden" name="segment" value="affiliate"/>
+
+          <label>
+            Họ tên *
+            <input name="name" required placeholder="VD: Trần Thị B" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb)"/>
+          </label>
+
+          <label>
+            Số điện thoại / Zalo *
+            <input name="phone" required placeholder="SĐT dùng Zalo" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb)"/>
+          </label>
+
+          <label>
+            Kinh nghiệm hiện tại với affiliate
+            <select name="exp" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb)">
+              <option value="">— Chọn —</option>
+              <option value="chua-biet-gi">Chưa biết gì, mới tò mò</option>
+              <option value="dang-lam-kol">Đang làm KOL (Shopee/TikTok…)</option>
+              <option value="dang-lam-web">Đang có website / landing</option>
+              <option value="da-thu-nhieu-kenh">Đã thử nhiều kênh nhưng chưa ra kết quả</option>
+            </select>
+          </label>
+
+          <label>
+            Mục tiêu khi đăng ký MXD-AFF *
+            <textarea name="goal" rows="3" required
+                      placeholder="VD: Muốn vừa làm KOL vừa có 1 webshop gom link đa sàn để sau này đỡ rơi đơn..."
+                      style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb);resize:vertical"></textarea>
+          </label>
+
+          <label>
+            Kênh hiện đang làm (nếu có)
+            <input name="channels" placeholder="VD: Shopee Video, TikTok Shop, Facebook cá nhân..." style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb)"/>
+          </label>
+
+          <label>
+            Ghi chú thêm
+            <textarea name="note" rows="3"
+                      placeholder="VD: Từng bị khoá KOL 1 lần, đang sợ làm lại cũng rơi đơn..."
+                      style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#e5e7eb);resize:vertical"></textarea>
+          </label>
+
+          <button type="submit"
+                  style="margin-top:4px;padding:10px 14px;border-radius:999px;border:none;background:#1a94ff;color:#fff;font-weight:700;cursor:pointer">
+            Gửi đăng ký MXD AFF / Webshop
+          </button>
+
+          <p style="margin:8px 0 0;font-size:13px;color:var(--muted,#6b7280)">
+            Hoặc nhắn nhanh qua Zalo: 
+            <a href="https://zalo.me/0338328898" target="_blank" rel="noopener">0338 328 898</a> 
+            với nội dung: <strong>“Đăng ký MXD-AFF”</strong> và mình sẽ hỏi thêm vài thông tin trước khi bắt đầu.
+          </p>
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="mxd-footer">
+    <div class="wrap" style="max-width:1180px;margin:0 auto;padding:16px">
+      © MXD · <a href="/chinh-sach/bao-mat.html">Bảo mật</a> ·
+      <a href="/chinh-sach/doi-tra.html">Đổi trả</a> ·
+      <a href="/chinh-sach/bao-hanh.html">Bảo hành</a>
+    </div>
+  </footer>
+</body>
+</html>
