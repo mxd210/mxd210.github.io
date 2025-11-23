@@ -226,7 +226,82 @@
         <div><label>Link gốc (origin)</label><input id="origin" data-clear placeholder="https://shopee.vn/… | https://tiki.vn/… | https://www.tiktok.com/…"/></div>
         <div class="row">
           <div><label>Ảnh (đường dẫn)</label><input id="image" data-clear placeholder="/assets/img/products/dekton-dk-ag950s.webp"/></div>
-          <div><label>Danh mục (category)</label><input id="category" data-clear placeholder="may-khoan-duc-vit / may-cat / phu-kien-may"/></div>
+          <div>
+            <label>Danh mục (category)</label>
+            <input id="category" data-clear placeholder="may-khoan-duc-vit / may-cat / phu-kien-may"/>
+            <!-- PRESET DANH MỤC MỞ RỘNG -->
+            <select id="categoryPreset" style="margin-top:6px">
+              <option value="">-- Chọn nhanh danh mục --</option>
+              <optgroup label="MÁY MÓC &amp; XÂY DỰNG">
+                <option value="may-khoan-duc-vit">Máy khoan, bắt vít</option>
+                <option value="may-cat">Máy cắt, cưa, mài</option>
+                <option value="phu-kien-may">Phụ kiện máy</option>
+                <option value="may-han">Máy hàn</option>
+                <option value="may-nen-khi">Máy nén khí</option>
+                <option value="may-bom-nuoc">Máy bơm nước</option>
+                <option value="dung-cu-thu-cong">Dụng cụ cầm tay</option>
+                <option value="do-bao-ho-lao-dong">Đồ bảo hộ lao động</option>
+                <option value="vat-lieu-xay-dung">Vật liệu xây dựng</option>
+                <option value="thiet-bi-ve-sinh">Thiết bị vệ sinh</option>
+                <option value="den-chieu-sang">Đèn chiếu sáng</option>
+                <option value="thang-day-gia-do">Thang, dây, giá đỡ</option>
+                <option value="noi-that-xay-dung">Nội thất công trình</option>
+              </optgroup>
+              <optgroup label="ĐIỆN TỬ &amp; CÔNG NGHỆ">
+                <option value="do-dien-tu">Đồ điện - điện tử</option>
+                <option value="dien-thoai">Điện thoại</option>
+                <option value="phu-kien-dien-thoai">Phụ kiện điện thoại</option>
+                <option value="laptop">Laptop</option>
+                <option value="phu-kien-cong-nghe">Phụ kiện công nghệ</option>
+                <option value="thiet-bi-mang">Thiết bị mạng</option>
+                <option value="tivi-am-thanh">TV &amp; âm thanh</option>
+                <option value="do-choi-cong-nghe">Đồ chơi công nghệ</option>
+              </optgroup>
+              <optgroup label="THỜI TRANG &amp; LÀM ĐẸP">
+                <option value="thoi-trang-nu">Thời trang nữ</option>
+                <option value="thoi-trang-nam">Thời trang nam</option>
+                <option value="do-lot-do-ngu">Đồ lót, đồ ngủ</option>
+                <option value="giay-dep">Giày dép</option>
+                <option value="tui-vi-balo">Túi ví, balo</option>
+                <option value="phu-kien-thoi-trang">Phụ kiện thời trang</option>
+                <option value="trang-suc">Trang sức</option>
+                <option value="my-pham">Mỹ phẩm</option>
+                <option value="cham-soc-da">Chăm sóc da</option>
+                <option value="cham-soc-toc">Chăm sóc tóc</option>
+                <option value="makeup">Makeup / Trang điểm</option>
+                <option value="nuoc-hoa">Nước hoa</option>
+              </optgroup>
+              <optgroup label="MẸ &amp; BÉ">
+                <option value="me-va-be">Mẹ &amp; Bé tổng hợp</option>
+                <option value="do-choi-tre-em">Đồ chơi trẻ em</option>
+                <option value="do-so-sinh">Đồ sơ sinh</option>
+                <option value="sua-bim">Sữa, bỉm, tã</option>
+              </optgroup>
+              <optgroup label="GIA DỤNG &amp; NHÀ CỬA">
+                <option value="do-gia-dung">Gia dụng tổng hợp</option>
+                <option value="nha-bep">Nhà bếp, nấu nướng</option>
+                <option value="thiet-bi-nha-bep-dien">Thiết bị nhà bếp điện</option>
+                <option value="noi-chao">Nồi, chảo, bộ nồi</option>
+                <option value="hop-dung-bao-quan">Hộp đựng, bảo quản</option>
+                <option value="do-ve-sinh-nha-cua">Đồ vệ sinh nhà cửa</option>
+              </optgroup>
+              <optgroup label="THỰC PHẨM &amp; SỨC KHỎE">
+                <option value="thuc-pham-do-an-vat">Thực phẩm, đồ ăn vặt</option>
+                <option value="do-uong">Đồ uống</option>
+                <option value="suc-khoe">Sức khỏe</option>
+                <option value="thuc-pham-chuc-nang">Thực phẩm chức năng</option>
+              </optgroup>
+              <optgroup label="KHÁC &amp; BỔ SUNG SAU NÀY">
+                <option value="the-thao-da-ngoai">Thể thao &amp; dã ngoại</option>
+                <option value="thu-cung">Đồ cho thú cưng</option>
+                <option value="sach-vo-but">Sách, vở, bút</option>
+                <option value="do-van-phong">Đồ văn phòng</option>
+                <option value="phu-kien-oto-xe-may">Phụ kiện ô tô - xe máy</option>
+                <option value="other">Khác (other)</option>
+              </optgroup>
+            </select>
+            <div class="small">Có thể chọn nhanh ở trên hoặc gõ tay slug riêng. Tool vẫn chuẩn hoá lại khi xuất JSON.</div>
+          </div>
         </div>
         <div><label>Thương hiệu (brand)</label><input id="brand" data-clear placeholder="dekton, bosch, makuta…"/></div>
         <div class="row">
@@ -345,24 +420,19 @@ const DEFAULT_TPL_TIKTOK = 'https://go.isclix.com/deep_link/6803097511817356947/
 
 function cleanUrl(u){
   let s = (u || '').trim();
-  // bỏ bớt " và , thừa ở đầu/cuối nếu có
   s = s.replace(/^["']+|["',]+$/g, '');
-
   if (!s) return '';
 
-  // nếu chỉ là "lazada.vn/..." thì tự thêm https://
   if (/^lazada\.vn\//i.test(s)) {
     s = 'https://www.' + s.replace(/^lazada\.vn\//i, 'lazada.vn/');
   }
 
-  // chuẩn hoá lazada: cắt mọi thứ sau .html, giữ lại host chuẩn
   if (/^https?:\/\/(www\.)?lazada\.vn\//i.test(s)) {
     const lower = s.toLowerCase();
     const idx = lower.indexOf('.html');
     if (idx !== -1) {
-      s = s.slice(0, idx + 5); // giữ nguyên đến hết ".html"
+      s = s.slice(0, idx + 5);
     }
-    // ép host thành https://www.lazada.vn/
     s = s.replace(/^https?:\/\/(www\.)?lazada\.vn\//i, 'https://www.lazada.vn/');
   }
 
@@ -374,7 +444,7 @@ function ensureSubsInUrl(u, subs){ const has = k => new RegExp(`[?&]${k}=`,`i`).
 function vn(s){ return (s||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase(); }
 function sanitizeFolder(p){ if(!p) return '/assets/img/'; p=p.trim(); if(!p.startsWith('/')) p='/'+p; if(!p.endsWith('/')) p+='/'; return p; }
 
-/* === SEO + DESC + TAGS HELPERS (tự sinh từ name/price/merchant/brand/category) === */
+/* === SEO + DESC + TAGS HELPERS === */
 function formatPriceVnd(n){
   const v = Number(n);
   if(!v || !isFinite(v)) return '';
@@ -444,19 +514,14 @@ function makeTagsFromFields(obj){
       add(tok);
     });
   }
-  // Từ SKU / name
   pushTokens(obj.sku || obj.name || '');
-  // Từ brand
   pushTokens(obj.brand || '');
-  // Category slug
   if(obj.category) add(String(obj.category).trim());
-  // Merchant theo sàn
   if(obj.merchant) add(String(obj.merchant).toLowerCase());
-  // giới hạn tối đa 10 tag giống normalizer
   return out.slice(0, 10);
 }
 
-/* CATEGORY MAP (giữ nguyên + có thể mở rộng sau) */
+/* CATEGORY MAP (tự đoán) */
 function normCategory(raw){
   const base = vn(raw).replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
 
@@ -668,7 +733,7 @@ $("#btnProbePublish").onclick=async()=>{
   }
 };
 
-/* 🔧 FIX: Test upload dùng cùng logic fallback như upload thật */
+/* 🔧 Test upload */
 $("#btnTestUpload").onclick=async()=>{
   const s=readSettings();
   if(!s.workerUrl){ toast("Chưa cấu hình Worker.","warn"); return; }
@@ -682,7 +747,6 @@ $("#btnTestUpload").onclick=async()=>{
   const path='/assets/img/test/ping.webp';
 
   try{
-    // Lần 1: gửi full dataURL (giống upload hiện tại)
     let r=await fetch(base+'/upload-image',{
       method:'POST',
       mode:'cors',
@@ -691,7 +755,6 @@ $("#btnTestUpload").onclick=async()=>{
     });
     let text=await r.text().catch(()=>'');
 
-    // Nếu Worker chỉ nhận pure base64 → thử lần 2 giống uploadItem
     if(!r.ok){
       const {mime,base64}=splitDataUrl(dataUrl);
       r=await fetch(base+'/upload-image',{
@@ -770,7 +833,6 @@ function getImageOpts(){
   const targetKB=Number($("#targetKBNum").value||0);
   return { preset, w, h, fmt, q, targetKB };
 }
-/* Resize with contain; pad if needed (jpg pads white, webp/png transparent) */
 async function resizeContainToBlob(img, opts){
   let outW, outH, canvasW, canvasH;
   if(opts.preset==='max'){
@@ -792,7 +854,6 @@ async function resizeContainToBlob(img, opts){
   let q = opts.fmt==='png'?1.0:opts.q;
   let blob = await new Promise(res=>c.toBlob(res,mime,q));
   if(opts.targetKB>0 && blob && blob.size/1024>opts.targetKB && mime!=='image/png'){
-    // auto-compress loop
     let step=0; while(blob.size/1024>opts.targetKB && q>0.4 && step<10){
       q = Math.max(0.4, q-0.06); step++;
       blob = await new Promise(res=>c.toBlob(res,mime,q));
@@ -1139,6 +1200,17 @@ $("#btnUploadImg").onclick=async()=>{
   }
 };
 
+/* CATEGORY PRESET → FILL INPUT */
+const categoryPresetEl = $("#categoryPreset");
+if(categoryPresetEl){
+  categoryPresetEl.addEventListener('change', ()=>{
+    const v = categoryPresetEl.value;
+    if(!v) return;
+    $("#category").value = v;
+    runDiag();
+  });
+}
+
 /* PRODUCT form helpers */
 function runDiag(){
   const sku=$("#sku").value.trim();
@@ -1180,6 +1252,7 @@ $("#btnClearAllFields").onclick=()=>{
   $("#featured").checked=false;
   $("#status").checked=true;
   $("#merchant").value='shopee';
+  if(categoryPresetEl) categoryPresetEl.value='';
   $("#diag").innerHTML='';
   toast("Đã xoá toàn bộ thông tin sản phẩm.","ok");
 };
@@ -1269,7 +1342,7 @@ $("#openOrigin").onclick=()=>{ const u=$("#originOut").value.trim()||$("#origin"
 $("#copyDeeplink").onclick=()=>{ const t=$("#deeplink"); t.select(); document.execCommand('copy'); toast("Đã copy Deep-link."); };
 $("#btnOpenDeeplink").onclick=()=>{ const u=$("#deeplink").value.trim(); if(u){ window.open(u,'_blank'); } else { toast("Chưa có Deep-link.","warn"); } };
 
-/* VERIFY + JSON + PUBLISH (buildJson đã nâng cấp thêm short_desc/seo/tags/sub1) */
+/* VERIFY + JSON + PUBLISH */
 $("#btnVerify").onclick=async()=>{
   const sku=$("#sku").value.trim();
   if(!sku){ toast("Chưa có SKU để kiểm tra.","warn"); return; }
@@ -1306,18 +1379,15 @@ function buildJson(){
     origin:cleanUrl($("#origin").value.trim())
   };
 
-  // sub1 dùng chính sku (fallback sang slug name)
   obj.sub1 = obj.sku || slugify(obj.name||'');
 
   const dl=$("#deeplink").value.trim();
   if(dl) obj.deeplink=dl;
 
-  // Tự sinh mô tả & SEO
   obj.short_desc = makeShortDesc(obj.name, obj.price, obj.merchant);
   obj.seo_title = makeSeoTitle(obj.name, obj.category);
   obj.seo_description = makeSeoDescription(obj.name, obj.price, obj.merchant, obj.short_desc);
 
-  // Tự sinh tags từ SKU/name + brand + category + merchant
   obj.tags = makeTagsFromFields(obj);
 
   $("#jsonOut").value=JSON.stringify([obj],null,2);
@@ -1373,6 +1443,25 @@ async function doPublish(forceFeatured){
   a.download='affiliates.append.json';
   a.click();
 }
+
+/* GEN COMMIT MESSAGE */
+$("#btnGenCommit").onclick=()=>{
+  const sku=$("#sku").value.trim();
+  const name=$("#name").value.trim();
+  const merchant=$("#merchant").value;
+  const category=$("#category").value.trim();
+  const featured=$("#featured").checked;
+
+  let scope='affiliates';
+  if(category) scope += '/'+category;
+  const type = featured ? 'feat' : 'chore';
+  const baseSku = sku || (name ? slugify(name) : 'product');
+  const title = name || 'sản phẩm mới';
+
+  const msg = `${type}(${scope}): add ${baseSku} – ${title} [${merchant}]`;
+  $("#commitMsg").value = msg;
+  toast("Đã tạo commit message.","ok");
+};
 
 /* INIT */
 function updateOriginMirror(){ $("#originOut").value=cleanUrl($("#origin").value); }
