@@ -1,0 +1,361 @@
+<!-- REPLACE WHOLE FILE: /huong-dan-dung-mxd-importer.html -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+  <meta name="format-detection" content="telephone=no"/>
+
+  <title>Hướng dẫn dùng MXD Importer – tải ảnh WebP + JSON sản phẩm lên repo | MXD210</title>
+  <meta name="description"
+        content="Giáo trình chi tiết cách dùng tool MXD Importer: tạo ảnh WebP đúng chuẩn, đặt tên theo SKU, sinh JSON sản phẩm và upload ảnh + JSON lên repo GitHub cho Webshop MXD."/>
+  <link rel="canonical" href="https://mxd210.github.io/huong-dan-dung-mxd-importer.html"/>
+  <meta name="robots" content="index,follow"/>
+
+  <!-- OPEN GRAPH -->
+  <meta property="og:title" content="Hướng dẫn dùng MXD Importer – tải ảnh WebP + JSON sản phẩm lên repo"/>
+  <meta property="og:description"
+        content="Xem video 2 phút + giáo trình chi tiết: dùng MXD Importer để tạo ảnh WebP, sinh JSON sản phẩm và đưa lên Webshop MXD."/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://mxd210.github.io/huong-dan-dung-mxd-importer.html"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/og/huong-dan-mxd-importer.webp"/>
+
+  <link rel="stylesheet" href="/assets/site.css"/>
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png"/>
+
+  <script src="/assets/analytics.js" defer></script>
+</head>
+<body class="page page-aff-academy">
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo">MXD210</a>
+    <nav class="main-nav">
+      <a href="/store.html">Cửa hàng</a>
+      <a href="/blog-xay-dung.html">Góc xây dựng</a>
+      <a href="/mxd-aff-academy.html">AFF Academy</a>
+      <a href="/dang-ky.html">Đăng ký</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top" class="page-main">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">MXD TOOL SERIES</p>
+      <h1>Hướng dẫn dùng MXD Importer:<br/>tải ảnh WebP + JSON sản phẩm lên repo</h1>
+      <p class="hero-lead">
+        Bài này đi đúng kiểu “cầm tay chỉ chuột”: từ lúc lấy ảnh gốc, đặt tên chuẩn theo SKU,
+        dùng MXD Importer để convert sang WebP, sinh JSON sản phẩm, cho đến khi ảnh &amp; JSON
+        nằm gọn trong Webshop MXD.
+      </p>
+    </div>
+  </section>
+
+  <!-- QUICK NAV -->
+  <section class="section section-quick-nav">
+    <div class="container">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <a href="/lo-trinh-webshop-affiliate.html"
+           style="flex:1 1 45%;text-align:center;padding:8px 10px;border-radius:999px;border:1px solid #ddd;text-decoration:none;font-size:.9rem;">
+          ← Lộ trình Webshop Affiliate
+        </a>
+        <a href="#video-mxd-importer"
+           style="flex:1 1 45%;text-align:center;padding:8px 10px;border-radius:999px;border:1px solid #ddd;text-decoration:none;font-size:.9rem;">
+          Xem video hướng dẫn nhanh
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO -->
+  <section id="video-mxd-importer" class="section">
+    <div class="container">
+      <h2>Video 2 phút: dùng MXD Importer để tải ảnh + JSON lên repo</h2>
+      <p>
+        Nếu bạn thích xem làm thật trước khi đọc chữ: xem video này.
+        Trong video, Mai minh họa trực tiếp cách dùng tool MXD Importer v4.4.0 PRO
+        để convert ảnh, sinh JSON và upload lên repo.
+      </p>
+      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:16px;max-width:100%;box-shadow:0 8px 24px rgba(0,0,0,.12);">
+        <iframe
+          src="https://www.youtube.com/embed/ueYM83ty4AY"
+          title="Hướng dẫn dùng MXD Importer: tải ảnh WebP + JSON sản phẩm lên repo"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <p style="font-size:.85rem;margin-top:8px;">
+        Link trực tiếp trên YouTube: 
+        <a href="https://youtu.be/ueYM83ty4AY" target="_blank" rel="noopener">
+          https://youtu.be/ueYM83ty4AY
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- PHẦN 1: Ảnh nào – thư mục nào -->
+  <section class="section section-step">
+    <div class="container">
+      <h2>1. Ảnh loại nào thì nằm ở thư mục nào?</h2>
+      <p>Để tool không lộn xộn, MXD quy ước rõ:</p>
+      <div class="step-box">
+        <ul>
+          <li><strong>Ảnh sản phẩm</strong> (thẻ sản phẩm, g.html, store…)
+            <br/>→ <code>/assets/img/products/</code>
+            <br/>→ tên file = <strong>SKU</strong> + <code>.webp</code>
+            <br/>Ví dụ: <code>/assets/img/products/may-khoan-bosch-gsb13.webp</code>
+          </li>
+          <li><strong>Ảnh đại diện bài blog / AFF Academy</strong>
+            <br/>→ <code>/assets/img/tin-tuc/</code>
+            <br/>Ví dụ: <code>/assets/img/tin-tuc/lo-trinh-webshop-affiliate.webp</code>
+          </li>
+          <li><strong>Ảnh OG khi share Facebook/Zalo</strong>
+            <br/>→ <code>/assets/img/og/</code>
+            <br/>Ví dụ: <code>/assets/img/og/dang-ky-mxd.webp</code>
+          </li>
+          <li><strong>Ảnh icon danh mục</strong> (hình tròn trong store, quick-nav)
+            <br/>→ <code>/assets/img/categories/</code>
+            <br/>Ví dụ: <code>/assets/img/categories/do-gia-dung.webp</code>
+          </li>
+        </ul>
+      </div>
+      <p>
+        Quy tắc đơn giản: <strong>sản phẩm → /products/</strong>, 
+        <strong>bài/landing → /tin-tuc/ hoặc /og/</strong>, 
+        <strong>danh mục → /categories/</strong>.
+      </p>
+    </div>
+  </section>
+
+  <!-- PHẦN 2: Điền tên + tạo SKU -->
+  <section class="section section-step">
+    <div class="container">
+      <h2>2. Điền tên sản phẩm &amp; tạo SKU tự động</h2>
+      <p>Giả sử bạn đã có ảnh gốc của 1 sản phẩm muốn đưa lên Webshop.</p>
+
+      <div class="step-box">
+        <h3>2.1. Điền tên sản phẩm</h3>
+        <ol>
+          <li>Mở ảnh sản phẩm trên máy để nhớ tên / loại sản phẩm.</li>
+          <li>Trong block <strong>3) Thông tin sản phẩm</strong>, ô <em>Tên sản phẩm</em>:
+            nhập tên rút gọn, ví dụ:<br/>
+            <code>Máy khoan Bosch GSB13 RE 650W – Hàng chính hãng</code>
+          </li>
+        </ol>
+      </div>
+
+      <div class="step-box">
+        <h3>2.2. Bấm “Điền auto từ tên” để tạo SKU</h3>
+        <ol>
+          <li>Nhìn ngay dưới ô Tên sản phẩm, bấm nút 
+             <strong>“Điền auto từ tên”</strong>.</li>
+          <li>Tool sẽ tự điền vào ô 
+             <strong>SKU (bắt buộc cho publish; có thể trống khi chỉ upload ảnh)</strong>
+             một chuỗi không dấu, nối bằng gạch ngang, ví dụ:
+            <br/><code>may-khoan-bosch-gsb13-re-650w</code>
+          </li>
+          <li>Từ đây, <strong>SKU chính là “mã chuẩn”</strong> để:
+            <ul>
+              <li>Đặt tên file ảnh: <code>SKU.webp</code>.</li>
+              <li>Điền vào trường <code>sku</code> trong JSON.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 3: Dùng MXD Importer để xử lý ảnh -->
+  <section class="section section-step">
+    <div class="container">
+      <h2>3. Dùng MXD Importer để tạo ảnh WebP đúng chuẩn</h2>
+
+      <div class="step-box">
+        <h3>3.1. Cấu hình block “2) Ảnh sản phẩm”</h3>
+        <ol>
+          <li>Trong tool, tới phần <strong>2) Ảnh sản phẩm (đơn lẻ)</strong>.</li>
+          <li><strong>Định dạng xuất</strong>: chọn <code>webp</code>.</li>
+          <li><strong>Preset kích thước</strong>: chọn <em>Vuông</em> (ví dụ 1200×1200).
+              Nếu không có preset, đặt:
+            <ul>
+              <li><em>Max side / Width</em>: <code>1200</code></li>
+              <li><em>Height</em>: <code>1200</code></li>
+            </ul>
+          </li>
+          <li><strong>Chất lượng</strong>: kéo khoảng <code>0.9–0.95</code> cho nét.</li>
+          <li><strong>Thư mục mặc định</strong>:
+            <ul>
+              <li>Nếu là ảnh sản phẩm: chọn <code>/assets/img/products/</code>.</li>
+              <li>Nếu là ảnh bài blog: <code>/assets/img/tin-tuc/</code>.</li>
+              <li>Nếu là ảnh OG khi share: <code>/assets/img/og/</code>.</li>
+            </ul>
+          </li>
+          <li>Đảm bảo ô <strong>Đường dẫn tuỳ chỉnh</strong> kết thúc bằng dấu <code>/</code>,
+              ví dụ: <code>/assets/img/products/</code>.</li>
+          <li>Tích chọn <strong>“Dùng tên file SKU trống”</strong>  
+              → để nếu ô “Ảnh (đường dẫn)” đang trống, tool sẽ đặt tên file ảnh theo SKU.</li>
+        </ol>
+      </div>
+
+      <div class="step-box">
+        <h3>3.2. Kéo ảnh vào tool &amp; convert</h3>
+        <ol>
+          <li>Ở khung lớn trong block 2), <strong>kéo thả ảnh gốc</strong> từ máy vào
+              (hoặc bấm <em>Chọn ảnh</em> rồi chọn file).</li>
+          <li>Kiểm tra lại: định dạng = webp, kích thước vuông, thư mục đúng.</li>
+          <li>Bấm nút <strong>Convert / Nén</strong>:
+            <ul>
+              <li>Tool sẽ xử lý ảnh, cắt/cân về đúng kích thước &amp; nén.</li>
+            </ul>
+          </li>
+          <li>Nếu muốn <strong>lưu ảnh về máy</strong>:
+            bấm nút <em>Tải ảnh</em> (browser sẽ tải file về).</li>
+          <li>Nếu muốn <strong>upload thẳng lên repo</strong> (khi tool đã kết nối Worker):
+            bấm nút <em>Upload ảnh → /assets/img/…</em>.</li>
+          <li>Có nhiều ảnh muốn xử lý một lượt:
+            sau khi convert xong mỗi ảnh, bấm <em>Thêm ảnh hiện tại vào hàng đợi</em>,  
+            cuối cùng mới upload cả hàng đợi.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 4: Điền đường dẫn ảnh + JSON -->
+  <section class="section section-step">
+    <div class="container">
+      <h2>4. Điền đúng đường dẫn ảnh &amp; sinh JSON sản phẩm</h2>
+
+      <div class="step-box">
+        <h3>4.1. Điền đường dẫn ảnh</h3>
+        <ol>
+          <li>Quay lại block <strong>3) Thông tin sản phẩm</strong>.</li>
+          <li>Ô <em>Ảnh (đường dẫn)</em>:
+            <ul>
+              <li>Nếu đã bật “Dùng tên file SKU trống”, tool thường tự điền:
+                  <code>/assets/img/products/&lt;SKU&gt;.webp</code>.</li>
+              <li>Nếu chưa tự điền, bạn gõ tay:
+                  <code>/assets/img/products/may-khoan-bosch-gsb13-re-650w.webp</code>.</li>
+            </ul>
+          </li>
+          <li>Kiểm tra:
+            <ul>
+              <li>Tên file = đúng SKU + <code>.webp</code>.</li>
+              <li>Đường dẫn đúng thư mục (products / tin-tuc / og / categories).</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+
+      <div class="step-box">
+        <h3>4.2. Sinh JSON sản phẩm</h3>
+        <ol>
+          <li>Sau khi đã điền xong:
+            <ul>
+              <li>Tên sản phẩm</li>
+              <li>SKU</li>
+              <li>Giá</li>
+              <li>Merchant (shopee, lazada, tiki, tiktok...)</li>
+              <li>Link gốc (origin_url)</li>
+              <li>Ảnh (đường dẫn)</li>
+              <li>Danh mục, brand, featured, status…</li>
+            </ul>
+          </li>
+          <li>Nhấn nút <strong>Thêm sản phẩm</strong> / <strong>+ Thêm</strong> để đưa vào danh sách.</li>
+          <li>Sau khi đã thêm đủ 10–20 sản phẩm, nhấn nút
+              <strong>Xuất JSON / Generate affiliates.json</strong>.</li>
+          <li>Tool sẽ:
+            <ul>
+              <li>Hiển thị khối JSON trên màn hình <strong>hoặc</strong></li>
+              <li>Tải file <code>affiliates.json</code> về máy.</li>
+            </ul>
+          </li>
+          <li>Nếu chỉ hiển thị trên màn hình: bấm <em>Copy</em> hoặc bôi đen &gt; Copy.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 5: Upload lên repo + lỗi thường gặp -->
+  <section class="section section-step">
+    <div class="container">
+      <h2>5. Upload ảnh + JSON lên repo &amp; những lỗi thường gặp</h2>
+
+      <div class="step-box">
+        <h3>5.1. Upload ảnh lên GitHub</h3>
+        <ol>
+          <li>Mở repo Webshop trên GitHub.</li>
+          <li>Vào thư mục ảnh đúng với loại ảnh:
+            <ul>
+              <li>Sản phẩm: <code>/assets/img/products/</code></li>
+              <li>Bài blog: <code>/assets/img/tin-tuc/</code></li>
+              <li>OG: <code>/assets/img/og/</code></li>
+              <li>Danh mục: <code>/assets/img/categories/</code></li>
+            </ul>
+          </li>
+          <li>Nhấn <strong>Add file → Upload files</strong>.</li>
+          <li>Kéo các file WebP đã convert từ máy vào &gt; kéo xuống dưới,  
+              điền ghi chú commit ngắn (ví dụ: <em>add product images</em>) &gt; 
+              bấm <strong>Commit changes</strong>.</li>
+        </ol>
+      </div>
+
+      <div class="step-box">
+        <h3>5.2. Dán JSON vào <code>affiliates.json</code></h3>
+        <ol>
+          <li>Trong repo, vào <code>/assets/data/affiliates.json</code>.</li>
+          <li>Nhấn cây bút <strong>Edit this file</strong>.</li>
+          <li>Chọn <em>Select all</em> &gt; xóa nội dung cũ (hoặc dán thêm vào đúng vị trí nếu bạn đã biết cách ghép).</li>
+          <li>Dán khối JSON mới từ MXD Importer vào.</li>
+          <li>Cuộn xuống cuối &gt; ghi chú commit (ví dụ: <em>add 20 new products</em>) &gt; bấm <strong>Commit changes</strong>.</li>
+          <li>Đợi vài phút cho GitHub build lại, sau đó:
+            <ul>
+              <li>Mở <code>/store.html</code> và trang danh mục liên quan.</li>
+              <li>Kiểm tra: sản phẩm hiện đúng, ảnh đúng, nút mua chạy sang sàn.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+
+      <div class="step-box">
+        <h3>5.3. Những lỗi thường gặp &amp; cách gỡ</h3>
+        <ul>
+          <li><strong>Ảnh 404</strong>:
+            <ul>
+              <li>Quên upload ảnh lên đúng thư mục.</li>
+              <li>Tên file ảnh khác SKU (ví dụ SKU khác 1–2 ký tự).</li>
+            </ul>
+          </li>
+          <li><strong>Trang trắng / không hiện sản phẩm</strong>:
+            <ul>
+              <li>JSON sai dấu phẩy, dấu ngoặc (thiếu <code>,</code> hoặc <code>}</code>).</li>
+              <li>Dán thêm sản phẩm vào nhưng quên thêm dấu phẩy giữa các item.</li>
+            </ul>
+          </li>
+          <li><strong>Nút mua không chạy isclix</strong>:
+            <ul>
+              <li>Merchant trong JSON không đúng list (ví dụ <code>shope</code> thay vì <code>shopee</code>).</li>
+              <li>Link origin không phải link sản phẩm thật (copy nhầm).</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <p style="text-align:center;margin-top:24px;">
+        <a href="/lo-trinh-webshop-affiliate.html"
+           style="display:inline-block;padding:10px 16px;border-radius:999px;border:1px solid #ddd;text-decoration:none;font-size:.9rem;">
+          ← Quay lại lộ trình Webshop Affiliate
+        </a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; 2025 MXD210 – MXD AFF Academy.</p>
+  </div>
+</footer>
+</body>
+</html>
