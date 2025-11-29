@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MXD Upload cho di động – Import ảnh + JSON lên repo</title>
+  <title>MXD Upload cho di động – Tự sinh SEO + Upload ảnh + Publish JSON</title>
   <meta name="robots" content="noindex,follow"/>
   <style>
     :root{
@@ -87,16 +87,12 @@
 <body>
 <div class="wrap">
   <h1>MXD Upload cho di động <span class="pill">PRO</span> <span class="pill">Multi-format</span> <span class="pill">Size Presets</span> <span class="pill">Auto-Compress</span> <span class="pill">TikTok/Tiki</span></h1>
-  <div class="small">
-    Dùng trên <b>di động</b> hoặc PC:
-    <b>nhấn chọn ảnh</b> (mobile) hoặc <b>kéo-thả</b> (PC),
-    sau đó tool tự nén, đặt tên, upload lên repo và publish JSON qua Worker.
-  </div>
+  <div class="small">Dùng trên di động hoặc PC: chọn ảnh từ thư viện (di động) hoặc kéo–thả (PC), sau đó tool tự nén, đặt tên, rồi upload lên repo và publish JSON qua Worker. Hỗ trợ webp/png/jpg, preset kích thước &amp; W×H tuỳ chỉnh, auto-compress theo dung lượng mục tiêu. Deep-link: Shopee/Lazada/Tiki/TikTok.</div>
 
   <div class="card">
     <h2>1) Cài đặt (lưu vào trình duyệt)</h2>
     <div class="grid g2">
-      <div><label>Worker Base URL</label><input id="workerUrl" placeholder="https://mxd210.mxd6686.workers.dev"/></div>
+      <div><label>Worker Base URL</label><input id="workerUrl" placeholder="https://mxd-control-v2.mxd6686.workers.dev"/></div>
       <div><label>X-Key (header bảo vệ Worker)</label><input id="xKey" placeholder="Ví dụ: mxd210-secret-key"/></div>
 
       <div><label>Shopee template</label><input id="tplShopee" placeholder="https://go.isclix.com/deep_link/ID/ID?url={url}&sub1={sub1}&sub2={sub2}&sub3={sub3}&sub4={sub4}"/></div>
@@ -123,10 +119,7 @@
   <div class="grid g2">
     <div class="card">
       <h2>2) Ảnh sản phẩm (đơn lẻ)</h2>
-      <div id="drop" class="drop">
-        Nhấn vào đây để <b>chọn ảnh từ di động</b><br/>
-        (hoặc kéo <b>một hoặc nhiều</b> ảnh vào nếu dùng máy tính)
-      </div>
+      <div id="drop" class="drop">Nhấn vào đây để chọn ảnh từ di động (hoặc kéo thả nhiều ảnh vào nếu dùng máy tính)</div>
       <input type="file" id="file" accept="image/*" multiple style="display:none"/>
 
       <div class="opts" style="margin-top:10px">
@@ -614,7 +607,7 @@ function autoCategory(text){
 }
 
 /* STATE */
-const state = { workerOk:false, imgBlob:null, imgName:null, imgW:0, imgH:0 };
+const state = { workerOk:false, imgBlob:null, imgName:null, imgW:0, imgH:0, imgAuto:true };
 
 /* SETTINGS UI BIND */
 function uiToSettings(){
@@ -808,6 +801,25 @@ function ensureFolderBase(){
     $("#defaultCustomWrap").style.display='none';
   }
 }
+/* NEW: đồng bộ lại đường dẫn ảnh auto khi SKU / folder / fmt đổi */
+function syncImagePathAuto(){
+  if(!state.imgBlob || !state.imgAuto) return;
+  const folder = getSelectedFolder();
+  const ext = getExt(getSelectedFmt());
+  const sku = $("#sku").value.trim();
+  let base;
+  if(sku){
+    base = slugify(sku);
+  } else if(state.imgName){
+    const s = state.imgName;
+    const i = s.lastIndexOf('.');
+    base = i>0 ? s.slice(0,i) : s;
+  } else {
+    base = 'mxd';
+  }
+  $("#image").value = `${folder}${base}.${ext}`;
+}
+
 function updateSingleUploadCta(){
   const folder=getSelectedFolder();
   const sku=($("#sku").value.trim()||'<sku>');
@@ -822,10 +834,12 @@ function updateSingleUploadCta(){
     if(id==='qualityNum') $("#quality").value=$("#qualityNum").value;
     if(id==='targetKB') $("#targetKBNum").value=$("#targetKB").value;
     if(id==='targetKBNum') $("#targetKB").value=$("#targetKBNum").value;
-    saveSettings(); updateSingleUploadCta();
+    saveSettings();
+    syncImagePathAuto();
+    updateSingleUploadCta();
   });
 });
-$("#defaultFolder").addEventListener('change', ()=>{ ensureFolderBase(); updateSingleUploadCta(); saveSettings(); });
+$("#defaultFolder").addEventListener('change', ()=>{ ensureFolderBase(); syncImagePathAuto(); updateSingleUploadCta(); saveSettings(); });
 
 function getImageOpts(){
   const s=readSettings();
@@ -902,6 +916,7 @@ function renderPreview(name, blob, w, h){
   state.imgBlob=blob; state.imgW=w; state.imgH=h;
   const ext=getExt(getSelectedFmt());
   state.imgName=`${name}.${ext}`;
+  state.imgAuto=true;
   const folder=getSelectedFolder();
   if($("#sku").value.trim()){
     $("#image").value=`${folder}${slugify($("#sku").value.trim())}.${ext}`;
@@ -1200,7 +1215,10 @@ $("#btnUploadImg").onclick=async()=>{
     }
     log(`[single upload ${path}] ${r.status} ${r.ok?'OK':'FAIL'} — ${text.slice(0,160)}`);
     toast(r.ok?"Đã upload ảnh lên repo.":"Upload ảnh lỗi "+r.status, r.ok?"ok":"err");
-    if(r.ok) $("#image").value=path;
+    if(r.ok){
+      state.imgAuto = true;
+      $("#image").value=path;
+    }
   }catch(e){
     log("[single upload] EXC: "+e.message);
     toast("Upload ảnh lỗi: "+e.message,"err");
@@ -1234,20 +1252,49 @@ function runDiag(){
   $("#diag").innerHTML=msgs.length?msgs.map(x=>`<div>${x}</div>`).join(""):'<span class="ok">Tạm ổn.</span>';
   $("#originOut").value=origin;
 }
+function onSkuChanged(){
+  const sku = $("#sku").value.trim();
+  if(state.imgBlob && state.imgAuto){
+    syncImagePathAuto();
+    const ext = getExt(getSelectedFmt());
+    if(sku){
+      state.imgName = `${slugify(sku)}.${ext}`;
+      imgName.textContent = state.imgName;
+    }
+  }
+  runDiag();
+  updateSingleUploadCta();
+}
 $("#btnAuto").onclick=()=>{
   const name=$("#name").value.trim();
   const skuNow=$("#sku").value.trim();
   if(name && !skuNow) $("#sku").value=slugify(name);
   const folder=getSelectedFolder();
   const baseSku=$("#sku").value.trim()||'...';
-  if($("#sku").value && !$("#image").value) $("#image").value=`${folder}${slugify(baseSku)}.`+getExt(getSelectedFmt());
+  if($("#sku").value && !$("#image").value){
+    $("#image").value=`${folder}${slugify(baseSku)}.`+getExt(getSelectedFmt());
+    state.imgAuto = true;
+  }
   $("#originOut").value=cleanUrl($("#origin").value.trim());
   const g=autoCategory(`${name} ${$("#brand").value} ${$("#origin").value}`);
   if(g && !$("#category").value.trim()) $("#category").value=g;
   runDiag();
   updateSingleUploadCta();
 };
-["name","sku","origin","image","merchant"].forEach(id=>$("#"+id).addEventListener('input', ()=>{ runDiag(); if(id==='sku') updateSingleUploadCta(); }));
+/* sửa listener input để phân biệt user gõ tay vs script */
+["name","sku","origin","image","merchant"].forEach(id=>{
+  const el=$("#"+id);
+  el.addEventListener('input', ev=>{
+    if(id==='image' && ev.isTrusted){
+      state.imgAuto = false;
+    }
+    if(id==='sku'){
+      onSkuChanged();
+    } else {
+      runDiag();
+    }
+  });
+});
 
 /* CLEAR ALL */
 $("#btnClearAllFields").onclick=()=>{
@@ -1261,6 +1308,7 @@ $("#btnClearAllFields").onclick=()=>{
   $("#merchant").value='shopee';
   if(categoryPresetEl) categoryPresetEl.value='';
   $("#diag").innerHTML='';
+  state.imgAuto = true;
   toast("Đã xoá toàn bộ thông tin sản phẩm.","ok");
 };
 
