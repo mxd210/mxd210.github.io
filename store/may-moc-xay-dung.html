@@ -21,7 +21,7 @@
   <!-- Analytics trước Affiliate -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
-  <script defer src="/assets/mxd-store.v2.js"></script>
+  <!-- Trang này tự render sản phẩm, không dùng mxd-store.v2.js -->
 </head>
 <body data-nav="store">
   <header class="site-header">
@@ -54,13 +54,7 @@
       </div>
     </section>
 
-    <section class="category-products container"
-         data-mxd-category-page
-         data-category="may-moc-xay-dung"
-         data-category-alt="may-moc,may-duc,may-laze,may-lazer,may-khoan,may-ban-vit,may-vit,may-khoan-pin,may-duc-pin,may-thoi,may-thoi-la,maycat,may-mai,may-mai-goc,may-duc-hoi,may-rung,may-rung-be-tong,may-rung-betong,may-op-lat,may-cat-gach,may-cat-lat,may-ban-day,ban-day,may-day-tay,day-tay"
-         data-limit="600"
-         data-featured-first="true">
-
+    <section class="category-products container">
       <div class="category-toolbar">
         <div class="category-info">
           <strong>Máy móc xây dựng</strong>
@@ -68,9 +62,45 @@
         </div>
       </div>
 
-      <div class="product-grid">
-        <!-- mxd-store.v2.js sẽ tự render card ở đây -->
-      </div>
+      <!-- Quick-nav 3 nhóm -->
+      <nav class="subcat-nav" aria-label="Nhóm sản phẩm trong Máy móc xây dựng">
+        <a href="#dung-cu-cam-tay">Dụng cụ cầm tay</a>
+        <a href="#do-bao-ho-lao-dong">Đồ bảo hộ lao động</a>
+        <a href="#phu-kien-may">Phụ kiện máy</a>
+      </nav>
+
+      <!-- 1. DỤNG CỤ CẦM TAY -->
+      <section id="dung-cu-cam-tay" class="subcat-section">
+        <h2>Dụng cụ cầm tay</h2>
+        <p>
+          Máy khoan, máy cắt, máy mài, bắn vít, thước laser, nivo… những món anh em phải cầm trên tay hằng ngày.
+        </p>
+        <div class="product-grid" id="grid-dung-cu-cam-tay">
+          <!-- JS sẽ đổ card sản phẩm vào đây -->
+        </div>
+      </section>
+
+      <!-- 2. ĐỒ BẢO HỘ LAO ĐỘNG -->
+      <section id="do-bao-ho-lao-dong" class="subcat-section">
+        <h2>Đồ bảo hộ lao động</h2>
+        <p>
+          Giày, mũ, găng tay, kính, khẩu trang, quần áo bảo hộ… để đi công trình an toàn, đỡ lo đinh, sắt, bụi, tia lửa.
+        </p>
+        <div class="product-grid" id="grid-do-bao-ho-lao-dong">
+          <!-- JS sẽ đổ card sản phẩm vào đây -->
+        </div>
+      </section>
+
+      <!-- 3. PHỤ KIỆN MÁY -->
+      <section id="phu-kien-may" class="subcat-section">
+        <h2>Phụ kiện máy</h2>
+        <p>
+          Đá cắt, lưỡi cưa, mũi khoan, chổi than, đĩa mài… những món nhỏ nhưng thiếu là máy “đứng hình”.
+        </p>
+        <div class="product-grid" id="grid-phu-kien-may">
+          <!-- JS sẽ đổ card sản phẩm vào đây -->
+        </div>
+      </section>
     </section>
   </main>
 
@@ -79,5 +109,138 @@
       <p>© MXD210 – Đồng hành cùng anh em ngoài công trình lẫn trong nhà.</p>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const GRID_HAND   = document.getElementById('grid-dung-cu-cam-tay');
+      const GRID_SAFE   = document.getElementById('grid-do-bao-ho-lao-dong');
+      const GRID_ACCESS = document.getElementById('grid-phu-kien-may');
+      const COUNT_EL    = document.querySelector('[data-category-count]');
+
+      if (!GRID_HAND || !GRID_SAFE || !GRID_ACCESS) return;
+
+      const sources = [
+        '/assets/data/affiliates.json',
+        '/assets/data/products.json',
+        '/products.json'
+      ];
+
+      function formatPrice(vnd) {
+        if (vnd === undefined || vnd === null || vnd === '') return '';
+        try {
+          return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            maximumFractionDigits: 0
+          }).format(vnd);
+        } catch (e) {
+          return String(vnd).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '₫';
+        }
+      }
+
+      function createCard(p) {
+        const article = document.createElement('article');
+        article.className = 'product-card';
+
+        const safeUrl = p.origin_url || '#';
+        const safeMerchant = (p.merchant || '').toLowerCase();
+
+        article.innerHTML = `
+          <a href="${safeUrl}"
+             class="product-link"
+             data-merchant="${safeMerchant}">
+            <div class="product-thumb">
+              <img loading="lazy"
+                   src="${p.image || '/assets/img/products/placeholder.webp'}"
+                   alt="${p.name || 'Sản phẩm máy móc xây dựng'}">
+            </div>
+            <h3 class="product-title">${p.name || 'Sản phẩm chưa đặt tên'}</h3>
+            ${p.price_vnd ? `<p class="product-price">${formatPrice(p.price_vnd)}</p>` : ''}
+            <button class="product-buy-btn">Xem sản phẩm</button>
+          </a>
+        `;
+        return article;
+      }
+
+      async function loadAndRender() {
+        let data = null;
+
+        for (const src of sources) {
+          try {
+            const res = await fetch(src, { cache: 'no-store' });
+            if (!res.ok) continue;
+            data = await res.json();
+            if (data) break;
+          } catch (e) {
+            // thử source tiếp theo
+          }
+        }
+
+        if (!data) {
+          GRID_HAND.textContent = 'Không tải được dữ liệu sản phẩm. Thử lại sau.';
+          return;
+        }
+
+        const list = Array.isArray(data) ? data : (data.products || []);
+        const inCat = list.filter(function (p) {
+          return p
+            && p.category === 'may-moc-xay-dung'
+            && p.origin_url
+            && (p.status !== false);
+        });
+
+        if (COUNT_EL) {
+          COUNT_EL.textContent = inCat.length ? `(${inCat.length} sản phẩm)` : '';
+        }
+
+        const DEFAULT_SUB = 'dung-cu-cam-tay';
+
+        const groupHand   = [];
+        const groupSafety = [];
+        const groupAccess = [];
+
+        inCat.forEach(function (p) {
+          const rawSub = (p.subcat || DEFAULT_SUB).toString().trim();
+
+          if (rawSub === 'do-bao-ho-lao-dong') {
+            groupSafety.push(p);
+          } else if (rawSub === 'phu-kien-may') {
+            groupAccess.push(p);
+          } else {
+            // mọi trường hợp còn lại (hoặc thiếu subcat) = dụng cụ cầm tay
+            groupHand.push(p);
+          }
+        });
+
+        if (!groupHand.length) {
+          GRID_HAND.innerHTML = '<p>Đang bổ sung thêm dụng cụ cầm tay…</p>';
+        } else {
+          groupHand.forEach(function (p) {
+            GRID_HAND.appendChild(createCard(p));
+          });
+        }
+
+        if (!groupSafety.length) {
+          GRID_SAFE.innerHTML = '<p>Đang bổ sung thêm đồ bảo hộ lao động…</p>';
+        } else {
+          groupSafety.forEach(function (p) {
+            GRID_SAFE.appendChild(createCard(p));
+          });
+        }
+
+        if (!groupAccess.length) {
+          GRID_ACCESS.innerHTML = '<p>Đang bổ sung thêm phụ kiện máy…</p>';
+        } else {
+          groupAccess.forEach(function (p) {
+            GRID_ACCESS.appendChild(createCard(p));
+          });
+        }
+      }
+
+      loadAndRender();
+    })();
+  </script>
 </body>
 </html>
