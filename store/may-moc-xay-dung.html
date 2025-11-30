@@ -21,6 +21,7 @@
   <!-- Analytics trước Affiliate -->
   <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/mxd-affiliate.js"></script>
+  <script defer src="/assets/mxd-store.v2.js"></script>
 
   <!-- Style nhỏ riêng cho nút lọc -->
   <style>
@@ -132,71 +133,27 @@
     (function () {
       'use strict';
 
-      const GRID     = document.getElementById('grid-may-moc-xd');
-      const COUNT_EL = document.querySelector('[data-category-count]');
+      const GRID        = document.getElementById('grid-may-moc-xd');
+      const COUNT_EL    = document.querySelector('[data-category-count]');
       const FILTER_BTNS = document.querySelectorAll('.filter-btn');
 
       if (!GRID) return;
 
-      // Các category con thuộc nhóm "Máy móc & Xây dựng"
-      const CATS_HAND = [
-        // mới trong tool
-        'may-khoan-bat-vit',
-        'may-cat-cua-mai',
-        'may-han',
-        'may-nen-khi',
-        'may-bom-nuoc',
-        'dung-cu-cam-tay',
-        // các slug cũ trước đây (giữ lại cho chắc)
-        'may-moc-xay-dung',
-        'may-moc',
-        'may-duc',
-        'may-laze',
-        'may-lazer',
-        'may-khoan',
-        'may-ban-vit',
-        'may-vit',
-        'may-khoan-pin',
-        'may-duc-pin',
-        'may-thoi',
-        'may-thoi-la',
-        'maycat',
-        'may-mai',
-        'may-mai-goc',
-        'may-duc-hoi',
-        'may-rung',
-        'may-rung-be-tong',
-        'may-rung-betong',
-        'may-op-lat',
-        'may-cat-gach',
-        'may-cat-lat',
-        'may-ban-day',
-        'ban-day',
-        'may-day-tay',
-        'day-tay'
-      ];
+      // Bất cứ category nào có những từ này thì coi là "máy móc & thiết bị"
+      const MACHINE_REGEX = /(may|m\u00e1y|khoan|c\u01b0a|c\u1eaft|m\u00e0i|h\u00e0n|nen-khi|n\u00e9n-kh\u00ed|bom-nuoc|b\u01a1m-n\u01b0\u1edbc|dung-cu|d\u1ee5ng-c\u1ee5|bao-ho|b\u1ea3o-h\u1ed9|phu-kien-may|ph\u1ee5-ki\u1ec7n-m\u00e1y)/;
 
-      const CATS_SAFE = [
-        'do-bao-ho-lao-dong'
-      ];
-
-      const CATS_ACCESS = [
-        'phu-kien-may'
-      ];
-
-      const ALL_CATS = CATS_HAND.concat(CATS_SAFE, CATS_ACCESS);
+      function detectGroup(cat) {
+        const c = (cat || '').toLowerCase();
+        if (c.indexOf('bao-ho') !== -1 || c.indexOf('bảo-hộ') !== -1) return 'safe';
+        if (c.indexOf('phu-kien-may') !== -1 || c.indexOf('phụ-kiện-máy') !== -1) return 'access';
+        return 'hand';
+      }
 
       const sources = [
         '/assets/data/affiliates.json',
         '/assets/data/products.json',
         '/products.json'
       ];
-
-      function detectGroup(cat) {
-        if (CATS_SAFE.indexOf(cat) !== -1) return 'safe';
-        if (CATS_ACCESS.indexOf(cat) !== -1) return 'access';
-        return 'hand';
-      }
 
       function formatPrice(vnd) {
         if (vnd === undefined || vnd === null || vnd === '') return '';
@@ -289,11 +246,13 @@
 
         const list = Array.isArray(data) ? data : (data.products || []);
 
+        // Lấy TẤT CẢ sản phẩm có category trông giống máy móc & thiết bị
         allProducts = list.filter(function (p) {
+          const cat = (p && p.category) ? p.category.toString().toLowerCase() : '';
           return p
             && p.origin_url
             && (p.status !== false)
-            && ALL_CATS.indexOf(p.category) !== -1;
+            && MACHINE_REGEX.test(cat);
         });
 
         renderGrid();
