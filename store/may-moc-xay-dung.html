@@ -139,14 +139,75 @@
 
       if (!GRID) return;
 
-      // Bất cứ category nào có những từ này thì coi là "máy móc & thiết bị"
-      const MACHINE_REGEX = /(may|m\u00e1y|khoan|c\u01b0a|c\u1eaft|m\u00e0i|h\u00e0n|nen-khi|n\u00e9n-kh\u00ed|bom-nuoc|b\u01a1m-n\u01b0\u1edbc|dung-cu|d\u1ee5ng-c\u1ee5|bao-ho|b\u1ea3o-h\u1ed9|phu-kien-may|ph\u1ee5-ki\u1ec7n-m\u00e1y)/;
+      // Chuẩn hóa category thành slug: bỏ dấu, thường hóa, thay chuỗi không phải a-z0-9 thành dấu gạch
+      function slugifyCategory(raw) {
+        if (!raw) return '';
+        let s = raw.toString().toLowerCase().trim();
+        try {
+          s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        } catch (e) {
+          // một số browser cũ không có normalize, bỏ qua bước này
+        }
+        s = s.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        return s;
+      }
 
-      function detectGroup(cat) {
-        const c = (cat || '').toLowerCase();
-        if (c.indexOf('bao-ho') !== -1 || c.indexOf('bảo-hộ') !== -1) return 'safe';
-        if (c.indexOf('phu-kien-may') !== -1 || c.indexOf('phụ-kiện-máy') !== -1) return 'access';
+      // Các slug được coi là "máy móc xây dựng"
+      const HAND_SLUGS = [
+        'may-moc-xay-dung',   // cái cậu nói
+        'may-moc',
+        'may-duc',
+        'may-laze',
+        'may-lazer',
+        'may-khoan',
+        'may-khoan-bat-vit',
+        'may-ban-vit',
+        'may-vit',
+        'may-khoan-pin',
+        'may-duc-pin',
+        'may-thoi',
+        'may-thoi-la',
+        'maycat',
+        'may-mai',
+        'may-mai-goc',
+        'may-duc-hoi',
+        'may-rung',
+        'may-rung-be-tong',
+        'may-rung-betong',
+        'may-op-lat',
+        'may-cat-gach',
+        'may-cat-lat',
+        'may-ban-day',
+        'ban-day',
+        'may-day-tay',
+        'day-tay',
+        'may-han',
+        'may-nen-khi',
+        'may-bom-nuoc',
+        'dung-cu-cam-tay'
+      ];
+
+      const SAFE_SLUGS = [
+        'do-bao-ho-lao-dong',
+        'bao-ho-lao-dong'
+      ];
+
+      const ACCESS_SLUGS = [
+        'phu-kien-may'
+      ];
+
+      function detectGroupBySlug(slug) {
+        if (SAFE_SLUGS.indexOf(slug) !== -1) return 'safe';
+        if (ACCESS_SLUGS.indexOf(slug) !== -1) return 'access';
         return 'hand';
+      }
+
+      function belongsToMachine(slug) {
+        return (
+          HAND_SLUGS.indexOf(slug) !== -1 ||
+          SAFE_SLUGS.indexOf(slug) !== -1 ||
+          ACCESS_SLUGS.indexOf(slug) !== -1
+        );
       }
 
       const sources = [
@@ -168,13 +229,13 @@
         }
       }
 
-      function createCard(p) {
+      function createCard(p, slug) {
         const article = document.createElement('article');
         article.className = 'product-card';
 
         const safeUrl = p.origin_url || '#';
         const safeMerchant = (p.merchant || '').toLowerCase();
-        const group = detectGroup(p.category || '');
+        const group = detectGroupBySlug(slug);
 
         article.dataset.group = group;
 
@@ -195,15 +256,21 @@
         return article;
       }
 
-      let allProducts = [];
+      let allProducts = []; // { item, slug }
       let currentFilter = 'all';
 
       function renderGrid() {
         GRID.innerHTML = '';
 
-        const filtered = allProducts.filter(function (p) {
-          if (currentFilter === 'all') return true;
-          const g = detectGroup(p.category || '');
+        const filtered = allProducts.filter(function (entry) {
+          const p = entry.item;
+          const slug = entry.slug;
+
+          if (currentFilter === 'all') {
+            return true;
+          }
+
+          const g = detectGroupBySlug(slug);
           return (
             (currentFilter === 'hand'   && g === 'hand') ||
             (currentFilter === 'safe'   && g === 'safe') ||
@@ -220,8 +287,8 @@
           return;
         }
 
-        filtered.forEach(function (p) {
-          GRID.appendChild(createCard(p));
+        filtered.forEach(function (entry) {
+          GRID.appendChild(createCard(entry.item, entry.slug));
         });
       }
 
@@ -246,13 +313,17 @@
 
         const list = Array.isArray(data) ? data : (data.products || []);
 
-        // Lấy TẤT CẢ sản phẩm có category trông giống máy móc & thiết bị
-        allProducts = list.filter(function (p) {
-          const cat = (p && p.category) ? p.category.toString().toLowerCase() : '';
-          return p
-            && p.origin_url
-            && (p.status !== false)
-            && MACHINE_REGEX.test(cat);
+        allProducts = [];
+
+        list.forEach(function (p) {
+          if (!p || !p.origin_url || p.status === false) return;
+
+          const slug = slugifyCategory(p.category || '');
+          if (!slug) return;
+
+          if (!belongsToMachine(slug)) return;
+
+          allProducts.push({ item: p, slug: slug });
         });
 
         renderGrid();
