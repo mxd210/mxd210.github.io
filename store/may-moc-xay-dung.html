@@ -23,7 +23,7 @@
   <script defer src="/assets/mxd-affiliate.js"></script>
   <script defer src="/assets/mxd-store.v2.js"></script>
 
-  <!-- Style nhỏ riêng cho nút lọc -->
+  <!-- Style nhỏ cho phần nút lọc -->
   <style>
     .category-toolbar {
       display: flex;
@@ -31,6 +31,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 0.75rem;
+      margin-bottom: 0.5rem;
     }
     .category-info span[data-category-count] {
       margin-left: 0.35rem;
@@ -60,293 +61,208 @@
       background: #ffe7c2;
     }
     .category-note {
-      margin: 0.75rem 0 0.5rem;
-      font-size: 0.92rem;
+      margin: 0.5rem 0 0.25rem;
+      font-size: 0.9rem;
       color: #555;
+    }
+    .category-empty {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #666;
+      display: none;
     }
   </style>
 </head>
 <body data-nav="store">
-  <header class="site-header">
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="logo">
+      <span class="logo-main">MXD210</span>
+      <span class="logo-sub">Xây dựng &amp; Affiliate</span>
+    </a>
+
+    <nav class="main-nav">
+      <ul>
+        <li><a href="/" data-nav="home">Trang chủ</a></li>
+        <li><a href="/store.html" data-nav="store">Cửa hàng</a></li>
+        <li><a href="/blog-xay-dung.html" data-nav="blog-xd">Góc xây dựng</a></li>
+        <li><a href="/mxd-aff-academy.html" data-nav="aff-academy">Góc Affiliate</a></li>
+        <li><a href="/contact.html" data-nav="contact">Liên hệ</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="page-main">
+  <section class="category-hero">
     <div class="container">
-      <a href="/" class="logo">
-        <span class="logo-main">MXD210</span>
-        <span class="logo-sub">Xây dựng &amp; Affiliate</span>
-      </a>
-
-      <nav class="main-nav">
-        <ul>
-          <li><a href="/" data-nav="home">Trang chủ</a></li>
-          <li><a href="/store.html" data-nav="store">Cửa hàng</a></li>
-          <li><a href="/blog-xay-dung.html" data-nav="blog-xd">Góc xây dựng</a></li>
-          <li><a href="/mxd-aff-academy.html" data-nav="aff-academy">Góc Affiliate</a></li>
-          <li><a href="/contact.html" data-nav="contact">Liên hệ</a></li>
-        </ul>
-      </nav>
+      <h1>Máy móc &amp; thiết bị cho anh em hiện trường</h1>
+      <p>
+        Những món phục vụ trực tiếp cho thi công, sửa chữa: máy khoan, máy cắt, máy rung bê tông,
+        máy ốp lát, bàn đẩy, thiết bị đo, phụ kiện đi kèm… được chọn dựa trên kinh nghiệm thực tế ngoài công trình.
+      </p>
     </div>
-  </header>
+  </section>
 
-  <main class="page-main">
-    <section class="category-hero">
-      <div class="container">
-        <h1>Máy móc &amp; thiết bị cho anh em hiện trường</h1>
-        <p>
-          Những món phục vụ trực tiếp cho thi công, sửa chữa: máy khoan, máy cắt, máy rung bê tông,
-          máy ốp lát, bàn đẩy, thiết bị đo, phụ kiện đi kèm… được chọn dựa trên kinh nghiệm thực tế ngoài công trình.
-        </p>
-      </div>
-    </section>
+  <!-- vẫn dùng engine cũ: mxd-store.v2.js đọc các data-* này để đổ sản phẩm -->
+  <section class="category-products container"
+           data-mxd-category-page
+           data-category="may-moc-xay-dung"
+           data-category-alt="may-moc,may-duc,may-laze,may-lazer,may-khoan,may-ban-vit,may-vit,may-khoan-pin,may-duc-pin,may-thoi,may-thoi-la,maycat,may-mai,may-mai-goc,may-duc-hoi,may-rung,may-rung-be-tong,may-rung-betong,may-op-lat,may-cat-gach,may-cat-lat,may-ban-day,ban-day,may-day-tay,day-tay,phu-kien-may,do-bao-ho-lao-dong"
+           data-limit="600"
+           data-featured-first="true">
 
-    <section class="category-products container">
-      <div class="category-toolbar">
-        <div class="category-info">
-          <strong>Máy móc xây dựng</strong>
-          <span data-category-count></span>
-        </div>
-
-        <!-- 3 nút lọc + 1 nút Tất cả -->
-        <div class="category-filters" aria-label="Lọc sản phẩm máy móc xây dựng">
-          <button type="button" class="filter-btn is-active" data-filter="all">Tất cả</button>
-          <button type="button" class="filter-btn" data-filter="hand">Dụng cụ cầm tay</button>
-          <button type="button" class="filter-btn" data-filter="safe">Đồ bảo hộ lao động</button>
-          <button type="button" class="filter-btn" data-filter="access">Phụ kiện máy</button>
-        </div>
+    <div class="category-toolbar">
+      <div class="category-info">
+        <strong>Máy móc xây dựng</strong>
+        <span data-category-count></span>
       </div>
 
-      <div class="category-note">
-        Bấm nút bên phải để lọc nhanh theo nhóm, mặc định đang hiển thị toàn bộ sản phẩm máy móc &amp; thiết bị liên quan.
+      <div class="category-filters" aria-label="Lọc sản phẩm máy móc xây dựng">
+        <button type="button" class="filter-btn is-active" data-filter="all">Tất cả</button>
+        <button type="button" class="filter-btn" data-filter="hand">Dụng cụ cầm tay</button>
+        <button type="button" class="filter-btn" data-filter="safe">Đồ bảo hộ lao động</button>
+        <button type="button" class="filter-btn" data-filter="access">Phụ kiện máy</button>
       </div>
-
-      <div class="product-grid" id="grid-may-moc-xd">
-        <!-- JS sẽ render toàn bộ sản phẩm ở đây, sau đó nút lọc chỉ ẩn/hiện theo nhóm -->
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      <p>© MXD210 – Đồng hành cùng anh em ngoài công trình lẫn trong nhà.</p>
     </div>
-  </footer>
 
-  <script>
-    (function () {
-      'use strict';
+    <p class="category-note">
+      Bấm nút bên phải để lọc nhanh theo nhóm. Mặc định hiển thị toàn bộ sản phẩm liên quan tới máy móc &amp; thiết bị.
+    </p>
 
-      const GRID        = document.getElementById('grid-may-moc-xd');
-      const COUNT_EL    = document.querySelector('[data-category-count]');
-      const FILTER_BTNS = document.querySelectorAll('.filter-btn');
+    <div class="product-grid">
+      <!-- mxd-store.v2.js sẽ tự render card ở đây -->
+    </div>
+    <p class="category-empty" data-empty-msg>Chưa có sản phẩm phù hợp với bộ lọc này.</p>
+  </section>
+</main>
 
-      if (!GRID) return;
+<footer class="site-footer">
+  <div class="container">
+    <p>© MXD210 – Đồng hành cùng anh em ngoài công trình lẫn trong nhà.</p>
+  </div>
+</footer>
 
-      // Chuẩn hóa category thành slug: bỏ dấu, thường hóa, thay chuỗi không phải a-z0-9 thành dấu gạch
-      function slugifyCategory(raw) {
-        if (!raw) return '';
-        let s = raw.toString().toLowerCase().trim();
-        try {
-          s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        } catch (e) {
-          // một số browser cũ không có normalize, bỏ qua bước này
-        }
-        s = s.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-        return s;
-      }
+<!-- Script lọc sau khi mxd-store.v2 đã render -->
+<script>
+(function(){
+  'use strict';
 
-      // Các slug được coi là "máy móc xây dựng"
-      const HAND_SLUGS = [
-        'may-moc-xay-dung',   // cái cậu nói
-        'may-moc',
-        'may-duc',
-        'may-laze',
-        'may-lazer',
-        'may-khoan',
-        'may-khoan-bat-vit',
-        'may-ban-vit',
-        'may-vit',
-        'may-khoan-pin',
-        'may-duc-pin',
-        'may-thoi',
-        'may-thoi-la',
-        'maycat',
-        'may-mai',
-        'may-mai-goc',
-        'may-duc-hoi',
-        'may-rung',
-        'may-rung-be-tong',
-        'may-rung-betong',
-        'may-op-lat',
-        'may-cat-gach',
-        'may-cat-lat',
-        'may-ban-day',
-        'ban-day',
-        'may-day-tay',
-        'day-tay',
-        'may-han',
-        'may-nen-khi',
-        'may-bom-nuoc',
-        'dung-cu-cam-tay'
-      ];
+  const section    = document.querySelector('[data-mxd-category-page]');
+  if (!section) return;
 
-      const SAFE_SLUGS = [
-        'do-bao-ho-lao-dong',
-        'bao-ho-lao-dong'
-      ];
+  const grid       = section.querySelector('.product-grid');
+  const countEl    = section.querySelector('[data-category-count]');
+  const emptyEl    = section.querySelector('[data-empty-msg]');
+  const filterBtns = section.querySelectorAll('.filter-btn');
 
-      const ACCESS_SLUGS = [
-        'phu-kien-may'
-      ];
+  let currentFilter = 'all';
 
-      function detectGroupBySlug(slug) {
-        if (SAFE_SLUGS.indexOf(slug) !== -1) return 'safe';
-        if (ACCESS_SLUGS.indexOf(slug) !== -1) return 'access';
-        return 'hand';
-      }
+  function normalize(str){
+    if (!str) return '';
+    let s = str.toString().toLowerCase().trim();
+    try {
+      s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    } catch(e){}
+    s = s.replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+    return s;
+  }
 
-      function belongsToMachine(slug) {
-        return (
-          HAND_SLUGS.indexOf(slug) !== -1 ||
-          SAFE_SLUGS.indexOf(slug) !== -1 ||
-          ACCESS_SLUGS.indexOf(slug) !== -1
-        );
-      }
+  function detectGroup(card){
+    if (card.dataset.group) return card.dataset.group;
 
-      const sources = [
-        '/assets/data/affiliates.json',
-        '/assets/data/products.json',
-        '/products.json'
-      ];
+    const catRaw = card.getAttribute('data-category') || '';
+    const title  = (card.querySelector('.product-title') || {}).textContent || '';
+    const t      = title.toLowerCase();
+    const cat    = normalize(catRaw);
 
-      function formatPrice(vnd) {
-        if (vnd === undefined || vnd === null || vnd === '') return '';
-        try {
-          return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-            maximumFractionDigits: 0
-          }).format(vnd);
-        } catch (e) {
-          return String(vnd).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '₫';
-        }
-      }
+    // mặc định coi là dụng cụ cầm tay
+    let group = 'hand';
 
-      function createCard(p, slug) {
-        const article = document.createElement('article');
-        article.className = 'product-card';
+    // đồ bảo hộ
+    if (
+      cat.includes('bao-ho-lao-dong') ||
+      t.includes('giay bao ho') || t.includes('giày bảo hộ') ||
+      t.includes('gang tay')   || t.includes('găng tay')   ||
+      t.includes('khau trang') || t.includes('khẩu trang') ||
+      t.includes('mu bao ho')  || t.includes('mũ bao hộ')  ||
+      t.includes('ao bao ho')  || t.includes('áo bảo hộ')  ||
+      t.includes('ao phan quang') || t.includes('áo phản quang')
+    ){
+      group = 'safe';
+    }
 
-        const safeUrl = p.origin_url || '#';
-        const safeMerchant = (p.merchant || '').toLowerCase();
-        const group = detectGroupBySlug(slug);
+    // phụ kiện máy
+    if (
+      cat.includes('phu-kien-may') ||
+      t.includes('da cat')   || t.includes('đá cắt') ||
+      t.includes('luoi cua') || t.includes('lưỡi cưa') ||
+      t.includes('mui khoan')|| t.includes('mũi khoan') ||
+      t.includes('dia mai')  || t.includes('đĩa mài') ||
+      t.includes('nham')     || t.includes('nhám')
+    ){
+      group = 'access';
+    }
 
-        article.dataset.group = group;
+    card.dataset.group = group;
+    return group;
+  }
 
-        article.innerHTML = `
-          <a href="${safeUrl}"
-             class="product-link"
-             data-merchant="${safeMerchant}">
-            <div class="product-thumb">
-              <img loading="lazy"
-                   src="${p.image || '/assets/img/products/placeholder.webp'}"
-                   alt="${p.name || 'Sản phẩm máy móc xây dựng'}">
-            </div>
-            <h3 class="product-title">${p.name || 'Sản phẩm chưa đặt tên'}</h3>
-            ${p.price_vnd ? `<p class="product-price">${formatPrice(p.price_vnd)}</p>` : ''}
-            <button class="product-buy-btn">Xem sản phẩm</button>
-          </a>
-        `;
-        return article;
-      }
+  function applyFilter(){
+    const cards = Array.from(grid.children);
+    let visible = 0;
 
-      let allProducts = []; // { item, slug }
-      let currentFilter = 'all';
+    cards.forEach(function(card){
+      const group = detectGroup(card);
 
-      function renderGrid() {
-        GRID.innerHTML = '';
+      const show = (currentFilter === 'all') || (group === currentFilter);
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
 
-        const filtered = allProducts.filter(function (entry) {
-          const p = entry.item;
-          const slug = entry.slug;
+    if (countEl){
+      countEl.textContent = visible ? '(' + visible + ' sản phẩm)' : '(0 sản phẩm)';
+    }
+    if (emptyEl){
+      emptyEl.style.display = visible ? 'none' : 'block';
+    }
+  }
 
-          if (currentFilter === 'all') {
-            return true;
-          }
+  // gắn click cho nút lọc
+  filterBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const f = btn.getAttribute('data-filter');
+      if (!f || f === currentFilter) return;
+      currentFilter = f;
 
-          const g = detectGroupBySlug(slug);
-          return (
-            (currentFilter === 'hand'   && g === 'hand') ||
-            (currentFilter === 'safe'   && g === 'safe') ||
-            (currentFilter === 'access' && g === 'access')
-          );
-        });
-
-        if (COUNT_EL) {
-          COUNT_EL.textContent = filtered.length ? `(${filtered.length} sản phẩm)` : '(0 sản phẩm)';
-        }
-
-        if (!filtered.length) {
-          GRID.innerHTML = '<p>Chưa có sản phẩm phù hợp với bộ lọc này.</p>';
-          return;
-        }
-
-        filtered.forEach(function (entry) {
-          GRID.appendChild(createCard(entry.item, entry.slug));
-        });
-      }
-
-      async function loadData() {
-        let data = null;
-
-        for (const src of sources) {
-          try {
-            const res = await fetch(src, { cache: 'no-store' });
-            if (!res.ok) continue;
-            data = await res.json();
-            if (data) break;
-          } catch (e) {
-            // thử source tiếp theo
-          }
-        }
-
-        if (!data) {
-          GRID.textContent = 'Không tải được dữ liệu sản phẩm. Thử lại sau.';
-          return;
-        }
-
-        const list = Array.isArray(data) ? data : (data.products || []);
-
-        allProducts = [];
-
-        list.forEach(function (p) {
-          if (!p || !p.origin_url || p.status === false) return;
-
-          const slug = slugifyCategory(p.category || '');
-          if (!slug) return;
-
-          if (!belongsToMachine(slug)) return;
-
-          allProducts.push({ item: p, slug: slug });
-        });
-
-        renderGrid();
-      }
-
-      // Gắn sự kiện cho các nút lọc
-      FILTER_BTNS.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          const f = btn.getAttribute('data-filter');
-          if (!f || f === currentFilter) return;
-
-          currentFilter = f;
-
-          FILTER_BTNS.forEach(function (b) {
-            b.classList.toggle('is-active', b === btn);
-          });
-
-          renderGrid();
-        });
+      filterBtns.forEach(function(b){
+        b.classList.toggle('is-active', b === btn);
       });
 
-      loadData();
-    })();
-  </script>
+      applyFilter();
+    });
+  });
+
+  // Quan sát khi mxd-store.v2.js render xong product-card
+  const observer = new MutationObserver(function(mutations){
+    let hasNew = false;
+    mutations.forEach(function(m){
+      if (m.addedNodes && m.addedNodes.length) hasNew = true;
+    });
+    if (hasNew){
+      applyFilter();
+    }
+  });
+
+  if (grid){
+    observer.observe(grid, { childList: true });
+  }
+
+  // phòng trường hợp product đã render sẵn trước khi observer gắn
+  window.addEventListener('load', function(){
+    applyFilter();
+  });
+})();
+</script>
 </body>
 </html>
