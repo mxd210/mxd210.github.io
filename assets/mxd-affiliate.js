@@ -1,7 +1,6 @@
 // REPLACE WHOLE FILE: /assets/mxd-affiliate.js
-// MXD-AFFILIATE v2025-11-23 — universal scanner (index, store, danh mục, blog) + auto buy label
+// MXD-AFFILIATE v2025-12-01 — universal scanner (index, store, danh mục, blog)
 
-// Cấu hình base isclix cho MXD210
 const MXD_AFF_BASE = {
   shopee: 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=',
   lazada: 'https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=',
@@ -14,194 +13,172 @@ const MXD_AFF_BASE = {
 
   function normalizeUrl(raw) {
     if (!raw) return '';
-    let u = String(raw).trim();
+    var u = String(raw).trim();
     if (!u) return '';
-    // bỏ javascript: mailto:, tel:
-    if (/^(javascript:|mailto:|tel:)/i.test(u)) return '';
+
+    // Chuẩn hoá tương đối → tuyệt đối
+    if (u.indexOf('//') === 0) {
+      u = 'https:' + u;
+    } else if (!/^https?:\/\//i.test(u)) {
+      // Nếu chỉ có shopee.vn/..., tiki.vn/... thì thêm https://
+      u = 'https://' + u.replace(/^\/+/, '');
+    }
+
+    return u;
+  }
+
+  function isIsclix(url) {
+    return /go\.isclix\.com/i.test(url || '');
+  }
+
+  function detectMerchantFromUrl(url) {
+    if (!url) return '';
+    var host = '';
+
     try {
-      // hỗ trợ link tương đối / domain trần
-      if (!/^https?:\/\//i.test(u)) {
-        if (u.startsWith('//')) {
-          u = 'https:' + u;
-        } else {
-          u = 'https://' + u.replace(/^\/+/, '');
-        }
-      }
-      return u;
+      host = new URL(url).hostname.toLowerCase();
     } catch (e) {
-      return '';
+      // fallback kiểu “shopee.vn/abc”
+      var m = String(url).toLowerCase().match(/^[a-z]+:\/\/([^/]+)/);
+      if (m && m[1]) host = m[1];
     }
-  }
 
-  function guessMerchantFromUrl(url, hint) {
-    let m = (hint || '').toString().toLowerCase().trim();
-    if (!m && url) {
-      if (/shopee\.vn/i.test(url))       m = 'shopee';
-      else if (/lazada\.vn/i.test(url))  m = 'lazada';
-      else if (/tiki\.vn/i.test(url))    m = 'tiki';
-      else if (/tiktok\.com/i.test(url)) m = 'tiktok';
+    if (!host) {
+      var m2 = String(url).toLowerCase().match(/([^/]+\.[a-z]{2,})(?:\/|$)/);
+      if (m2 && m2[1]) host = m2[1];
     }
-    if (m === 'shopee-kol' || m === 'shopee_kol') m = 'shopee';
-    return m;
-  }
 
-  function appendRel(existing, more) {
-    const set = new Set(
-      String(existing || '')
-        .split(/\s+/)
-        .filter(Boolean)
-    );
-    String(more || '')
-      .split(/\s+/)
-      .filter(Boolean)
-      .forEach(v => set.add(v));
-    return Array.from(set).join(' ');
-  }
+    if (!host) return '';
 
-  function isIsclix(href) {
-    return /go\.isclix\.com\/deep_link/i.test(href || '');
-  }
+    if (host.indexOf('shopee.vn') !== -1) return 'shopee';
+    if (host.indexOf('lazada.vn') !== -1 || host.indexOf('lzd.co') !== -1) return 'lazada';
+    if (host.indexOf('tiki.vn') !== -1) return 'tiki';
+    if (host.indexOf('tiktok.com') !== -1 || host.indexOf('vt.tiktok.com') !== -1) return 'tiktok';
 
-  // === AUTO LABEL NÚT MUA THEO MERCHANT ===
-
-  function getBuyLabel(merchant) {
-    merchant = (merchant || '').toLowerCase();
-    if (merchant === 'shopee') return 'Mua Shopee';
-    if (merchant === 'lazada') return 'Mua Lazada';
-    if (merchant === 'tiki')   return 'Mua Tiki';
-    if (merchant === 'tiktok') return 'Mua TikTok Shop';
     return '';
   }
 
-  /**
-   * Đổi text nút mua:
-   * - Chỉ đổi nếu hiện đang là "Mua ngay" (tránh phá mấy nút đặc biệt kiểu "Mua 1 (Shopee)")
-   * - Merchant ưu tiên lấy từ data-merchant; nếu thiếu thì đoán từ origin_url / href
-   */
-  function relabelBuyButtons(root) {
-    root = root || global.document;
-    if (!root || !root.querySelectorAll) return;
-
-    const btns = root.querySelectorAll('a.buy, a.btn-buy, a.mxd-buy');
-
-    btns.forEach(function (btn) {
-      if (!btn) return;
-
-      const currentText = (btn.textContent || '').trim().toLowerCase();
-      // chỉ đụng tới nút generic "Mua ngay" (hoặc bỏ trống)
-      if (currentText && currentText !== 'mua ngay') return;
-
-      let merchant = (btn.dataset.merchant || '').trim().toLowerCase();
-      if (!merchant) {
-        const origin = btn.dataset.originUrl || btn.getAttribute('href') || '';
-        merchant = guessMerchantFromUrl(origin, '');
-      }
-
-      const label = getBuyLabel(merchant);
-      if (label) {
-        btn.textContent = label;
-      }
-    });
+  function buildDeeplink(merchant, originUrl) {
+    if (!merchant || !MXD_AFF_BASE[merchant]) return '';
+    var cleanOrigin = normalizeUrl(originUrl);
+    if (!cleanOrigin) return '';
+    return MXD_AFF_BASE[merchant] + encodeURIComponent(cleanOrigin);
   }
 
-  // === CORE: scan một root (document hoặc container) ===
-  function scan(root) {
-    root = root || global.document;
-    if (!root || !root.querySelectorAll) return;
+  function shouldSkipLink(a) {
+    if (!a) return true;
+    if (a.dataset && a.dataset.noAff === '1') return true;
+    if (a.dataset && a.dataset.mxdAff === '1') return true;
 
-    /**
-     * Chỉ xử lý:
-     *  - a[data-origin-url]
-     *  - hoặc a.buy / a[data-sku] / a[data-merchant]
-     *  - hoặc a[href chứa shopee.vn / lazada.vn / tiki.vn / tiktok.com]
-     */
-    const anchors = root.querySelectorAll('a[href]');
-    anchors.forEach(a => {
-      if (!a) return;
+    var href = (a.getAttribute('href') || '').trim();
+    if (!href) return true;
 
-      // cho phép cố tình bỏ qua
-      if (a.dataset.noAff === '1') return;
+    var low = href.toLowerCase();
+    if (low.indexOf('javascript:') === 0) return true;
+    if (low.indexOf('mailto:') === 0) return true;
+    if (low.indexOf('tel:') === 0) return true;
+    if (low.charAt(0) === '#') return true;
 
-      const rawHref = a.getAttribute('href') || '';
-      const rawDataOrigin = a.dataset.originUrl || '';
+    // Đã là isclix rồi thì thôi
+    if (isIsclix(href)) return true;
 
-      // Nếu đã là isclix rồi thì không đụng
-      if (isIsclix(rawHref)) {
-        // chuẩn hóa thêm metadata nếu thiếu
-        if (!a.dataset.originUrl) a.dataset.originUrl = '';
-        return;
-      }
+    return false;
+  }
 
-      // Quyết định có nên xử lý link này không
-      const looksLikeProductLink =
-        a.classList.contains('buy') ||
-        a.hasAttribute('data-sku') ||
-        a.hasAttribute('data-origin-url');
+  function affOneLink(a) {
+    if (shouldSkipLink(a)) return;
 
-      let origin = normalizeUrl(rawDataOrigin || rawHref);
-      if (!origin) {
-        if (!looksLikeProductLink) return;
-      }
+    var href = (a.getAttribute('href') || '').trim();
+    var dataOrigin = (a.dataset.originUrl || a.dataset.origin || '').trim();
+    var dataMerchant = (a.dataset.merchant || '').trim();
 
-      // Nếu sau normalize vẫn rỗng → bỏ
-      if (!origin) return;
+    var origin = dataOrigin || href;
+    origin = normalizeUrl(origin);
 
-      // Chỉ ecom domain
-      if (!/shopee\.vn|lazada\.vn|tiki\.vn|tiktok\.com/i.test(origin)) {
-        // Không phải 4 sàn → không động vào (tránh phá nav/contact)
-        return;
-      }
+    var merchant = dataMerchant || detectMerchantFromUrl(origin);
+    if (!merchant || !MXD_AFF_BASE[merchant]) {
+      return; // không thuộc Shopee/Lazada/Tiki/TikTok → bỏ qua
+    }
 
-      const merchant = guessMerchantFromUrl(origin, a.dataset.merchant || '');
+    var deeplink = buildDeeplink(merchant, origin);
+    if (!deeplink) return;
 
-      const base = MXD_AFF_BASE[merchant];
-      if (!base) {
-        // nếu không map được sàn thì thôi, giữ origin
-        return;
-      }
+    a.setAttribute('href', deeplink);
+    a.dataset.merchant = merchant;
+    a.dataset.originUrl = origin;
+    a.dataset.mxdAff = '1';
 
-      const deeplink = base + encodeURIComponent(origin);
+    // Thêm rel cho an toàn + SEO
+    var rel = (a.getAttribute('rel') || '').split(/\s+/).filter(Boolean);
+    ['nofollow', 'noopener', 'noreferrer'].forEach(function (flag) {
+      if (rel.indexOf(flag) === -1) rel.push(flag);
+    });
+    a.setAttribute('rel', rel.join(' '));
 
-      // Cập nhật lại thẻ <a>
-      a.setAttribute('href', deeplink);
-      a.dataset.originUrl = origin;
-      a.dataset.merchant  = merchant;
-      a.setAttribute('rel', appendRel(a.getAttribute('rel'), 'nofollow sponsored noopener'));
+    // Mặc định mở tab mới
+    if (!a.hasAttribute('target') || a.getAttribute('target') === '_self') {
       a.setAttribute('target', '_blank');
-    });
-
-    // Sau khi scan xong thì gắn luôn label nút mua
-    relabelBuyButtons(root);
+    }
   }
 
-  // === AUTO SCAN on DOMContentLoaded ===
-  if (global.document && !global.mxdAffiliateAutoBound) {
-    global.mxdAffiliateAutoBound = true;
-    global.document.addEventListener('DOMContentLoaded', function () {
+  function scanLinks(root) {
+    var scope = root || document;
+    var anchors = scope.querySelectorAll ? scope.querySelectorAll('a[href]') : [];
+
+    for (var i = 0; i < anchors.length; i++) {
       try {
-        scan(global.document);
+        affOneLink(anchors[i]);
       } catch (e) {
-        // ignore
+        // Không crash cả trang chỉ vì 1 link lỗi
+        console && console.warn && console.warn('[MXD-AFFILIATE] link error', e);
       }
-    });
+    }
   }
 
-  // === Export API ===
+  function setupObservers() {
+    try {
+      // Quét lần đầu
+      scanLinks(document);
+
+      // Theo dõi DOM thay đổi (filter, load thêm sản phẩm…)
+      if ('MutationObserver' in global && document.body) {
+        var observer = new MutationObserver(function (mutations) {
+          for (var i = 0; i < mutations.length; i++) {
+            var m = mutations[i];
+            if (!m.addedNodes) continue;
+            for (var j = 0; j < m.addedNodes.length; j++) {
+              var node = m.addedNodes[j];
+              if (!node || node.nodeType !== 1) continue; // ELEMENT_NODE
+              scanLinks(node);
+            }
+          }
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+      }
+    } catch (e) {
+      console && console.error && console.error('[MXD-AFFILIATE] setup error', e);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupObservers);
+  } else {
+    setupObservers();
+  }
+
+  // Hook cho các script khác: mxdAffiliate.scan()
   global.mxdAffiliate = global.mxdAffiliate || {};
   global.mxdAffiliate.scan = function (root) {
     try {
-      scan(root || global.document);
+      scanLinks(root || document);
     } catch (e) {
-      // ignore
+      console && console.error && console.error('[MXD-AFFILIATE] manual scan error', e);
     }
   };
-  global.mxdAffiliate.applyBuyLabels = function (root) {
-    try {
-      relabelBuyButtons(root || global.document);
-    } catch (e) {
-      // ignore
-    }
-  };
-  global.mxdAffiliate.version = 'mxd-aff-universal-v2025-11-23-buylabel';
+  global.mxdAffiliate.normalizeUrl = normalizeUrl;
 
 })(window);
