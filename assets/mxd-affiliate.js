@@ -1,5 +1,6 @@
 // REPLACE WHOLE FILE: /assets/mxd-affiliate.js
-// MXD-AFFILIATE v2025-12-01 — universal scanner (index, store, danh mục, blog)
+// MXD-AFFILIATE v2025-12-02 — universal scanner (index, store, danh mục, blog, g.html)
+// Ý tưởng: hễ thấy link ra Shopee/Lazada/Tiki/TikTok là quấn isclix, bất kể ở đâu.
 
 const MXD_AFF_BASE = {
   shopee: 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=',
@@ -16,11 +17,11 @@ const MXD_AFF_BASE = {
     var u = String(raw).trim();
     if (!u) return '';
 
-    // Chuẩn hoá tương đối → tuyệt đối
+    // //example.com → https://example.com
     if (u.indexOf('//') === 0) {
       u = 'https:' + u;
     } else if (!/^https?:\/\//i.test(u)) {
-      // Nếu chỉ có shopee.vn/..., tiki.vn/... thì thêm https://
+      // shopee.vn/... → https://shopee.vn/...
       u = 'https://' + u.replace(/^\/+/, '');
     }
 
@@ -38,7 +39,7 @@ const MXD_AFF_BASE = {
     try {
       host = new URL(url).hostname.toLowerCase();
     } catch (e) {
-      // fallback kiểu “shopee.vn/abc”
+      // fallback
       var m = String(url).toLowerCase().match(/^[a-z]+:\/\/([^/]+)/);
       if (m && m[1]) host = m[1];
     }
@@ -67,6 +68,8 @@ const MXD_AFF_BASE = {
 
   function shouldSkipLink(a) {
     if (!a) return true;
+
+    // Cho phép tắt aff cho 1 link
     if (a.dataset && a.dataset.noAff === '1') return true;
     if (a.dataset && a.dataset.mxdAff === '1') return true;
 
@@ -74,12 +77,12 @@ const MXD_AFF_BASE = {
     if (!href) return true;
 
     var low = href.toLowerCase();
+
     if (low.indexOf('javascript:') === 0) return true;
     if (low.indexOf('mailto:') === 0) return true;
     if (low.indexOf('tel:') === 0) return true;
     if (low.charAt(0) === '#') return true;
 
-    // Đã là isclix rồi thì thôi
     if (isIsclix(href)) return true;
 
     return false;
@@ -89,33 +92,36 @@ const MXD_AFF_BASE = {
     if (shouldSkipLink(a)) return;
 
     var href = (a.getAttribute('href') || '').trim();
-    var dataOrigin = (a.dataset.originUrl || a.dataset.origin || '').trim();
-    var dataMerchant = (a.dataset.merchant || '').trim();
+    var dataOrigin = (a.dataset && (a.dataset.originUrl || a.dataset.origin)) || '';
+    dataOrigin = dataOrigin.trim();
 
+    // origin ưu tiên data-origin-url, nếu không có thì lấy href
     var origin = dataOrigin || href;
     origin = normalizeUrl(origin);
+    if (!origin) return;
 
-    var merchant = dataMerchant || detectMerchantFromUrl(origin);
-    if (!merchant || !MXD_AFF_BASE[merchant]) {
-      return; // không thuộc Shopee/Lazada/Tiki/TikTok → bỏ qua
-    }
+    var merchant = (a.dataset && a.dataset.merchant) || '';
+    merchant = merchant.trim() || detectMerchantFromUrl(origin);
+    if (!merchant || !MXD_AFF_BASE[merchant]) return;
 
     var deeplink = buildDeeplink(merchant, origin);
     if (!deeplink) return;
 
     a.setAttribute('href', deeplink);
-    a.dataset.merchant = merchant;
-    a.dataset.originUrl = origin;
-    a.dataset.mxdAff = '1';
+    if (a.dataset) {
+      a.dataset.merchant = merchant;
+      a.dataset.originUrl = origin;
+      a.dataset.mxdAff = '1';
+    }
 
-    // Thêm rel cho an toàn + SEO
+    // rel an toàn
     var rel = (a.getAttribute('rel') || '').split(/\s+/).filter(Boolean);
     ['nofollow', 'noopener', 'noreferrer'].forEach(function (flag) {
       if (rel.indexOf(flag) === -1) rel.push(flag);
     });
     a.setAttribute('rel', rel.join(' '));
 
-    // Mặc định mở tab mới
+    // mở tab mới
     if (!a.hasAttribute('target') || a.getAttribute('target') === '_self') {
       a.setAttribute('target', '_blank');
     }
@@ -129,18 +135,19 @@ const MXD_AFF_BASE = {
       try {
         affOneLink(anchors[i]);
       } catch (e) {
-        // Không crash cả trang chỉ vì 1 link lỗi
-        console && console.warn && console.warn('[MXD-AFFILIATE] link error', e);
+        if (global.console && console.warn) {
+          console.warn('[MXD-AFFILIATE] link error', e);
+        }
       }
     }
   }
 
   function setupObservers() {
     try {
-      // Quét lần đầu
+      // Quét 1 lần
       scanLinks(document);
 
-      // Theo dõi DOM thay đổi (filter, load thêm sản phẩm…)
+      // Theo dõi DOM mới thêm (filter, load thêm…)
       if ('MutationObserver' in global && document.body) {
         var observer = new MutationObserver(function (mutations) {
           for (var i = 0; i < mutations.length; i++) {
@@ -148,7 +155,7 @@ const MXD_AFF_BASE = {
             if (!m.addedNodes) continue;
             for (var j = 0; j < m.addedNodes.length; j++) {
               var node = m.addedNodes[j];
-              if (!node || node.nodeType !== 1) continue; // ELEMENT_NODE
+              if (!node || node.nodeType !== 1) continue;
               scanLinks(node);
             }
           }
@@ -159,24 +166,45 @@ const MXD_AFF_BASE = {
           subtree: true
         });
       }
+
+      // Fallback: quét lại sau 1s và 3s (phòng trường hợp DOM load chậm)
+      setTimeout(function () {
+        scanLinks(document);
+      }, 1000);
+
+      setTimeout(function () {
+        scanLinks(document);
+      }, 3000);
+
     } catch (e) {
-      console && console.error && console.error('[MXD-AFFILIATE] setup error', e);
+      if (global.console && console.error) {
+        console.error('[MXD-AFFILIATE] setup error', e);
+      }
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupObservers);
-  } else {
-    setupObservers();
+  // Khởi động
+  try {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupObservers);
+    } else {
+      setupObservers();
+    }
+  } catch (e) {
+    if (global.console && console.error) {
+      console.error('[MXD-AFFILIATE] init error', e);
+    }
   }
 
-  // Hook cho các script khác: mxdAffiliate.scan()
+  // Hook manual: mxdAffiliate.scan()
   global.mxdAffiliate = global.mxdAffiliate || {};
   global.mxdAffiliate.scan = function (root) {
     try {
       scanLinks(root || document);
     } catch (e) {
-      console && console.error && console.error('[MXD-AFFILIATE] manual scan error', e);
+      if (global.console && console.error) {
+        console.error('[MXD-AFFILIATE] manual scan error', e);
+      }
     }
   };
   global.mxdAffiliate.normalizeUrl = normalizeUrl;
