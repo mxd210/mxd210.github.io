@@ -122,10 +122,11 @@
         if (!url) return '';
         const u = new URL(url.startsWith('http') ? url : 'https://' + url);
         const host = u.hostname.toLowerCase();
-        if (host.includes('shopee')) return 'shopee';
-        if (host.includes('lazada')) return 'lazada';
-        if (host.includes('tiki'))   return 'tiki';
-        if (host.includes('tiktok')) return 'tiktok';
+        if (host.includes('shopee'))    return 'shopee';
+        if (host.includes('lazada'))    return 'lazada';
+        if (host.includes('tiki'))      return 'tiki';
+        if (host.includes('tiktok'))    return 'tiktok';
+        if (host.includes('mediamart')) return 'mediamart';
         return '';
       } catch {
         return '';
@@ -134,11 +135,12 @@
 
     const merchantLabelFor = m => {
       switch (m) {
-        case 'shopee': return 'Shopee';
-        case 'lazada': return 'Lazada';
-        case 'tiki':   return 'Tiki';
-        case 'tiktok': return 'TikTok Shop';
-        default:       return '';
+        case 'shopee':    return 'Shopee';
+        case 'lazada':    return 'Lazada';
+        case 'tiki':      return 'Tiki';
+        case 'tiktok':    return 'TikTok Shop';
+        case 'mediamart': return 'MediaMart';
+        default:          return '';
       }
     };
 
@@ -183,6 +185,14 @@
       );
       const detailHref = `/g.html?sku=${encodeURIComponent(p.sku || '')}`;
 
+      let btnText = 'Mua ngay';
+      if (merchantLabel) {
+        btnText = (merchantRaw === 'mediamart'
+          ? 'Mua ngay tại '
+          : 'Mua ngay trên '
+        ) + merchantLabel;
+      }
+
       return `
         <article class="product-card" data-sku="${sku}">
           <a href="${detailHref}">
@@ -207,7 +217,7 @@
                  data-merchant="${escapeAttr(merchantRaw)}"
                  data-sku="${sku}"
                  data-origin-url="${escapeAttr(origin)}">
-                ${merchantLabel ? 'Mua ngay trên ' + merchantLabel : 'Mua ngay'}
+                ${btnText}
               </a>
             </div>
           </div>
