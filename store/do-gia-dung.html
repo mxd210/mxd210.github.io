@@ -79,7 +79,7 @@
     </div>
   </footer>
 
-  <!-- RENDER DANH MỤC: do-gia-dung (theo affiliates.json, chuẩn aff mới) -->
+  <!-- MXD-CATEGORY-LOADER v2025-12-04a — loader dùng chung cho /store/<slug>.html -->
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     const section = document.querySelector('[data-mxd-category-page]');
@@ -288,12 +288,12 @@
           try {
             window.mxdAffiliate.scan(grid);
           } catch (e) {
-            console.error('mxdAffiliate.scan error (do-gia-dung):', e);
+            console.error('mxdAffiliate.scan error (category-page):', e);
           }
         }
       })
       .catch(err => {
-        console.error('MXD category do-gia-dung error:', err);
+        console.error('MXD category-page error:', err);
         grid.innerHTML = '';
         if (emptyEl) emptyEl.style.display = 'block';
         if (countEl) countEl.textContent = '';
