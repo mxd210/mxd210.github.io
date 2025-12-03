@@ -1,4 +1,3 @@
-<!-- REPLACE WHOLE FILE: /index.html -->
 <!-- MXD-CHECK v2025-10-13 [index]
 - Canonical: https://mxd210.github.io/ ; robots=index,follow
 - GA4 (/assets/analytics.js) BEFORE /assets/mxd-affiliate.js (only once)
@@ -161,10 +160,12 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       text-decoration:none; color:#fff; border:1px solid transparent; margin-top:auto;
       background:var(--brand); border-color:var(--brand);
     }
-    .buy[data-merchant="shopee"]{ background:#ee4d2d; border-color:#ee4d2d }
-    .buy[data-merchant="lazada"]{ background:#0f146d; border-color:#0f146d }
-    .buy[data-merchant="tiki"]  { background:#1a94ff; border-color:#1a94ff }
-    .buy[data-merchant="tiktok"]{ background:#000;    border-color:#000 }
+    .buy[data-merchant="shopee"]   { background:#ee4d2d; border-color:#ee4d2d }
+    .buy[data-merchant="lazada"]   { background:#0f146d; border-color:#0f146d }
+    .buy[data-merchant="tiki"]     { background:#1a94ff; border-color:#1a94ff }
+    .buy[data-merchant="tiktok"]   { background:#000;    border-color:#000 }
+    /* MEDIAMART: đỏ đặc trưng */
+    .buy[data-merchant="mediamart"]{ background:#d70018; border-color:#d70018 }
     .buy:hover{ filter:brightness(1.05) }
 
     .quick-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0 0}
@@ -310,22 +311,21 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   <header style="position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(6px)">
     <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)">
       <a href="/" class="brand" style="font-weight:900;font-size:20px;color:var(--text);text-decoration:none">MXD</a>
-    <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
-  <a href="/"                  class="nav-link" aria-current="page">Trang chủ</a>
-  <a href="/store.html"        class="nav-link">Cửa hàng</a>
+      <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
+        <a href="/"                  class="nav-link" aria-current="page">Trang chủ</a>
+        <a href="/store.html"        class="nav-link">Cửa hàng</a>
 
-  <!-- Hai hub nội dung chính -->
-  <a href="/blog-xay-dung.html"   class="nav-link">Góc xây dựng</a>
-  <a href="/mxd-aff-academy.html" class="nav-link">MXD Học làm AFF</a>
+        <!-- Hai hub nội dung chính -->
+        <a href="/blog-xay-dung.html"   class="nav-link">Góc xây dựng</a>
+        <a href="/mxd-aff-academy.html" class="nav-link">MXD Học làm AFF</a>
 
-  <!-- Tư vấn + đăng ký cho cả xây dựng & AFF -->
-  <a href="/tu-van.html"       class="nav-link">Tư vấn / Đăng ký</a>
+        <!-- Tư vấn + đăng ký cho cả xây dựng & AFF -->
+        <a href="/tu-van.html"       class="nav-link">Tư vấn / Đăng ký</a>
 
-  <!-- MXD-ANCHOR:NAV-CONG-CU -->
-  <a href="/cong-cu/"          class="nav-link">Công cụ</a>
-  <a href="/lien-he.html"      class="nav-link">Liên hệ</a>
-</nav>
-
+        <!-- MXD-ANCHOR:NAV-CONG-CU -->
+        <a href="/cong-cu/"          class="nav-link">Công cụ</a>
+        <a href="/lien-he.html"      class="nav-link">Liên hệ</a>
+      </nav>
     </div>
   </header>
 
@@ -403,8 +403,8 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
         <li>
           <a href="/store/do-dien-tu.html" class="qnav-item">
             <img src="/assets/img/categories/do-dien-tu.webp"
-                 alt="Đồ điện tử — MXD" width="28" height="28"
-                 onerror="this.src='/assets/img/categories/placeholder.webp'"> Đồ điện tử
+                 alt="Điện thoại &amp; phụ kiện — MXD" width="28" height="28"
+                 onerror="this.src='/assets/img/categories/placeholder.webp'"> Điện thoại &amp; phụ kiện
           </a>
         </li>
         <li>
@@ -471,10 +471,11 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       const guessMerchant = (p, originUrl) => {
         let m = (p.merchant || '').toString().toLowerCase().trim();
         if (!m && originUrl) {
-          if (/shopee\.vn/i.test(originUrl)) m = 'shopee';
+          if (/shopee\.vn/i.test(originUrl))      m = 'shopee';
           else if (/lazada\.vn/i.test(originUrl)) m = 'lazada';
-          else if (/tiki\.vn/i.test(originUrl)) m = 'tiki';
-          else if (/tiktok\.com/i.test(originUrl)) m = 'tiktok';
+          else if (/tiki\.vn/i.test(originUrl))   m = 'tiki';
+          else if (/tiktok\.com/i.test(originUrl))m = 'tiktok';
+          else if (/mediamart\.vn/i.test(originUrl)) m = 'mediamart';
         }
         if (m === 'shopee-kol' || m === 'shopee_kol') m = 'shopee';
         return m;
@@ -632,10 +633,11 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       const guessMerchant = (p, originUrl) => {
         let m = (p.merchant || '').toString().toLowerCase().trim();
         if (!m && originUrl) {
-          if (/shopee\.vn/i.test(originUrl)) m = 'shopee';
+          if (/shopee\.vn/i.test(originUrl))      m = 'shopee';
           else if (/lazada\.vn/i.test(originUrl)) m = 'lazada';
-          else if (/tiki\.vn/i.test(originUrl)) m = 'tiki';
-          else if (/tiktok\.com/i.test(originUrl)) m = 'tiktok';
+          else if (/tiki\.vn/i.test(originUrl))   m = 'tiki';
+          else if (/tiktok\.com/i.test(originUrl))m = 'tiktok';
+          else if (/mediamart\.vn/i.test(originUrl)) m = 'mediamart';
         }
         if (m === 'shopee-kol' || m === 'shopee_kol') m = 'shopee';
         return m;
@@ -763,21 +765,21 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
   </script>
 
   <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
-      .then(reg => {
-        if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-        reg.addEventListener('updatefound', () => {
-          const nw = reg.installing;
-          nw && nw.addEventListener('statechange', () => {
-            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              reg.waiting && reg.waiting.postMessage('SKIP_WAITING');
-            }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+        .then(reg => {
+          if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+          reg.addEventListener('updatefound', () => {
+            const nw = reg.installing;
+            nw && nw.addEventListener('statechange', () => {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                reg.waiting && reg.waiting.postMessage('SKIP_WAITING');
+              }
+            });
           });
         });
-      });
-    navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
-  }
+      navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+    }
   </script>
 
   <!-- MTE:TRACKING -->
