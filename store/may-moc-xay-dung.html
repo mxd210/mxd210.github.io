@@ -142,18 +142,20 @@
   </div>
 </footer>
 
-<!-- MXD-CATEGORY-LOADER v2025-12-04a — loader dùng chung cho /store/<slug>.html -->
+<!-- MXD-CATEGORY-LOADER v2025-12-04c — loader dùng chung + hỗ trợ category-alt -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const section = document.querySelector('[data-mxd-category-page]');
   if (!section) return;
 
-  const grid     = section.querySelector('.product-grid');
-  const countEl  = section.querySelector('[data-category-count]');
-  const emptyEl  = section.querySelector('[data-category-empty]');
-  const catSlug  = (section.getAttribute('data-category') || '').toString();
-  const limitRaw = parseInt(section.getAttribute('data-limit') || '', 10);
-  const limit    = Number.isFinite(limitRaw) ? limitRaw : 600;
+  const grid        = section.querySelector('.product-grid');
+  const countEl     = section.querySelector('[data-category-count]');
+  const emptyEl     = section.querySelector('[data-category-empty]');
+  const catSlug     = (section.getAttribute('data-category') || '').toString().toLowerCase();
+  const catAltRaw   = (section.getAttribute('data-category-alt') || '').toString();
+  const catAltList  = catAltRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  const limitRaw    = parseInt(section.getAttribute('data-limit') || '', 10);
+  const limit       = Number.isFinite(limitRaw) ? limitRaw : 600;
   const featuredFirst = (section.getAttribute('data-featured-first') || '').toString() === 'true';
 
   if (!grid) return;
@@ -219,11 +221,29 @@ document.addEventListener('DOMContentLoaded', () => {
     return Number.isFinite(n) ? n : null;
   };
 
-  const matchesCategory = (p, slug) => {
-    if (!slug) return true;
+  const matchesCategory = p => {
+    if (!catSlug && !catAltList.length) return true;
+
     const cat = (p.category || '').toString().toLowerCase().trim();
-    if (cat === slug) return true;
-    if (cat.split(/[,\s]+/).includes(slug)) return true;
+    if (!cat) return false;
+
+    const tokens = cat.split(/[,\s]+/);
+
+    // match slug chính
+    if (catSlug) {
+      if (cat === catSlug) return true;
+      if (tokens.includes(catSlug)) return true;
+    }
+
+    // match theo danh sách alt
+    if (catAltList.length) {
+      for (const key of catAltList) {
+        if (!key) continue;
+        if (cat === key) return true;
+        if (tokens.includes(key)) return true;
+      }
+    }
+
     return false;
   };
 
@@ -320,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!p) return false;
         const status = (p.status || 'active').toString().toLowerCase();
         if (['archived', 'hidden', 'draft'].includes(status)) return false;
-        return matchesCategory(p, catSlug);
+        return matchesCategory(p);
       });
 
       if (!arr.length) {
@@ -352,12 +372,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           window.mxdAffiliate.scan(grid);
         } catch (e) {
-          console.error('mxdAffiliate.scan error (category-page):', e);
+          console.error('mxdAffiliate.scan error (may-moc-xay-dung):', e);
         }
       }
     })
     .catch(err => {
-      console.error('MXD category-page error:', err);
+      console.error('MXD category may-moc-xay-dung error:', err);
       grid.innerHTML = '';
       if (emptyEl) emptyEl.style.display = 'block';
       if (countEl) countEl.textContent = '';
@@ -480,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
     observer.observe(grid, { childList: true });
   }
 
-  // phòng trường hợp product đã render sẵn trước khi observer gắn
+  // Phòng trường hợp product đã render sẵn trước khi observer gắn
   window.addEventListener('load', function(){
     applyFilter();
   });
