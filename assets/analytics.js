@@ -1,4 +1,4 @@
-// /assets/analytics.js
+// REPLACE WHOLE FILE: /assets/analytics.js
 (() => {
   // Tránh khởi tạo trùng nếu file bị nhúng 2 lần
   if (window.__mxdGA_INIT__) return;
@@ -54,7 +54,8 @@
     };
   };
 
-  const isAffHost = (h) => /(^|\.)lazada\.vn$|(^|\.)shopee\.vn$|(^|\.)tiki\.vn$/.test(h);
+  const isAffHost = (h) =>
+    /(^|\.)lazada\.vn$|(^|\.)shopee\.vn$|(^|\.)tiki\.vn$|(^|\.)mediamart\.vn$|(^|\.)thegioidienmay\.com$/.test(h || '');
 
   // --- 1) View item list (các danh sách sản phẩm phổ biến) -------
   document.addEventListener('DOMContentLoaded', () => {
@@ -71,7 +72,7 @@
           list.querySelectorAll('li, .card, article, .product-card, .item')
         );
 
-        // Chỉ giữ thẻ có dấu hiệu là sản phẩm (có .price, có data-merchant hoặc link tới lazada/shopee/tiki)
+        // Chỉ giữ thẻ có dấu hiệu là sản phẩm (có .price, có data-merchant hoặc link tới lazada/shopee/tiki/mediamart)
         const cards = allCandidates.filter(el => {
           if (el.querySelector('.price,[data-price],a[data-merchant]')) return true;
           const href = el.querySelector('a')?.href || '';
@@ -127,7 +128,7 @@
           try { return new URL(href, location.href).hostname; } catch { return ''; }
         })();
 
-      // Chỉ log khi là link affiliate hoặc trỏ ra lazada/shopee/tiki
+      // Chỉ log khi là link affiliate hoặc trỏ ra lazada/shopee/tiki/mediamart
       if (a.hasAttribute('data-merchant') || isAffHost(merchant)) {
         gtag('event', 'affiliate_click', {
           merchant,
