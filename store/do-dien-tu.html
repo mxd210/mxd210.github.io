@@ -1,3 +1,4 @@
+<!-- REPLACE WHOLE FILE: /store/do-dien-tu.html -->
 <!doctype html>
 <html lang="vi">
 <head>
@@ -74,7 +75,7 @@
   </div>
 </footer>
 
-<!-- RENDER DANH MỤC: do-dien-tu (theo affiliates.json, chuẩn aff mới) -->
+<!-- MXD-CATEGORY-LOADER v2025-12-04a — loader dùng chung cho /store/<slug>.html -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const section = document.querySelector('[data-mxd-category-page]');
@@ -117,10 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!url) return '';
       const u = new URL(url.startsWith('http') ? url : 'https://' + url);
       const host = u.hostname.toLowerCase();
-      if (host.includes('shopee')) return 'shopee';
-      if (host.includes('lazada')) return 'lazada';
-      if (host.includes('tiki'))   return 'tiki';
-      if (host.includes('tiktok')) return 'tiktok';
+      if (host.includes('shopee'))    return 'shopee';
+      if (host.includes('lazada'))    return 'lazada';
+      if (host.includes('tiki'))      return 'tiki';
+      if (host.includes('tiktok'))    return 'tiktok';
+      if (host.includes('mediamart')) return 'mediamart';
       return '';
     } catch {
       return '';
@@ -129,11 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const merchantLabelFor = m => {
     switch (m) {
-      case 'shopee': return 'Shopee';
-      case 'lazada': return 'Lazada';
-      case 'tiki':   return 'Tiki';
-      case 'tiktok': return 'TikTok Shop';
-      default:       return '';
+      case 'shopee':    return 'Shopee';
+      case 'lazada':    return 'Lazada';
+      case 'tiki':      return 'Tiki';
+      case 'tiktok':    return 'TikTok Shop';
+      case 'mediamart': return 'MediaMart';
+      default:          return '';
     }
   };
 
@@ -178,6 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     const detailHref = `/g.html?sku=${encodeURIComponent(p.sku || '')}`;
 
+    let btnText = 'Mua ngay';
+    if (merchantLabel) {
+      btnText = (merchantRaw === 'mediamart'
+        ? 'Mua ngay tại '
+        : 'Mua ngay trên '
+      ) + merchantLabel;
+    }
+
     return `
       <article class="product-card" data-sku="${sku}">
         <a href="${detailHref}">
@@ -202,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
                data-merchant="${escapeAttr(merchantRaw)}"
                data-sku="${sku}"
                data-origin-url="${escapeAttr(origin)}">
-              ${merchantLabel ? 'Mua ngay trên ' + merchantLabel : 'Mua ngay'}
+              ${btnText}
             </a>
           </div>
         </div>
@@ -210,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   };
 
-  // Skeleton đơn giản (tận dụng CSS sẵn nếu có)
+  // Skeleton đơn giản
   grid.innerHTML = Array.from({ length: 6 }).map(() => `
     <article class="product-card">
       <div class="thumb">
@@ -273,12 +284,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           window.mxdAffiliate.scan(grid);
         } catch (e) {
-          console.error('mxdAffiliate.scan error (do-dien-tu):', e);
+          console.error('mxdAffiliate.scan error (category-page):', e);
         }
       }
     })
     .catch(err => {
-      console.error('MXD category do-dien-tu error:', err);
+      console.error('MXD category-page error:', err);
       grid.innerHTML = '';
       if (emptyEl) emptyEl.style.display = 'block';
       if (countEl) countEl.textContent = '';
