@@ -1,12 +1,14 @@
 // REPLACE WHOLE FILE: /assets/mxd-affiliate.js
-// MXD-AFFILIATE v2025-12-02 — universal scanner (index, store, danh mục, blog, g.html)
-// Ý tưởng: hễ thấy link ra Shopee/Lazada/Tiki/TikTok là quấn isclix, bất kể ở đâu.
+// MXD-AFFILIATE v2025-12-03 — universal scanner (index, store, danh mục, blog, g.html)
+// Ý tưởng: hễ thấy link ra Shopee/Lazada/Tiki/TikTok/Mediamart là quấn isclix, bất kể ở đâu.
 
 const MXD_AFF_BASE = {
   shopee: 'https://go.isclix.com/deep_link/6803097511817356947/4751584435713464237?url=',
   lazada: 'https://go.isclix.com/deep_link/6803097511817356947/5127144557053758578?url=',
   tiki:   'https://go.isclix.com/deep_link/6803097511817356947/4348614231480407268?url=',
-  tiktok: 'https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url='
+  tiktok: 'https://go.isclix.com/deep_link/6803097511817356947/6648523843406889655?url=',
+  // TODO: thay REPLACE_MEDIAMART_CAMPAIGN_ID bằng campaignId thật của chiến dịch Mediamart trên Accesstrade
+  mediamart: 'https://go.isclix.com/deep_link/6803097511817356947/6009072433920808367?url='
 };
 
 (function (global) {
@@ -54,6 +56,7 @@ const MXD_AFF_BASE = {
     if (host.indexOf('shopee.vn') !== -1) return 'shopee';
     if (host.indexOf('lazada.vn') !== -1 || host.indexOf('lzd.co') !== -1) return 'lazada';
     if (host.indexOf('tiki.vn') !== -1) return 'tiki';
+    if (host.indexOf('mediamart.vn') !== -1 || host.indexOf('thegioidienmay.com') !== -1) return 'mediamart';
     if (host.indexOf('tiktok.com') !== -1 || host.indexOf('vt.tiktok.com') !== -1) return 'tiktok';
 
     return '';
