@@ -149,7 +149,7 @@
 </footer>
 
 <script>
-// ================== MXD PRODUCT DETAIL v2 ==================
+// ================== MXD PRODUCT DETAIL v2 + mediamart ==================
 
 document.addEventListener('DOMContentLoaded', () => {
   initMXDProductPage().catch(err => {
@@ -200,7 +200,7 @@ async function initMXDProductPage() {
   // SAU KHI RENDER XONG MỚI GỌI SCAN AFFILIATE
   if (window.mxdAffiliate && typeof window.mxdAffiliate.scan === 'function') {
     try {
-      window.mxdAffiliate.scan();
+      window.mxdAffiliate.scan(document);
     } catch (e) {
       console.error('mxdAffiliate.scan error:', e);
     }
@@ -229,7 +229,7 @@ function renderProductDetail(p) {
   const brand = (p.brand || '').toString().trim();
   const updated = (p.updated_at || '').toString().trim();
   const originRaw = (p.origin || p.origin_url || '').toString().trim();
-  const origin = originRaw || '#';
+  const origin = normalizeOrigin(originRaw) || '#';
 
   const merchant = (p.merchant || detectMerchant(origin)).toString().toLowerCase();
   const merchantLabel = merchantLabelFor(merchant);
@@ -296,7 +296,7 @@ function renderProductDetail(p) {
   }
 
   if (buyEl) {
-    // LINK GỐC
+    // LINK GỐC (đã normalize)
     buyEl.href = escapeAttr(origin);
     // META ĐỂ AFFILIATE SCRIPT DÙNG
     buyEl.dataset.merchant = merchant;
@@ -305,7 +305,10 @@ function renderProductDetail(p) {
     buyEl.setAttribute('data-origin-url', origin);
 
     if (merchantLabel) {
-      buyEl.textContent = `Mua ngay trên ${merchantLabel}`;
+      buyEl.textContent = (merchant === 'mediamart'
+        ? `Mua ngay tại ${merchantLabel}`
+        : `Mua ngay trên ${merchantLabel}`
+      );
     } else {
       buyEl.textContent = 'Mua ngay tại sàn';
     }
@@ -453,7 +456,7 @@ function renderRelatedCard(p) {
   const name = escapeHTML(p.name || '');
   const sku = escapeHTML(p.sku || '');
   const originRaw = (p.origin || p.origin_url || '').toString().trim();
-  const origin = originRaw || '#';
+  const origin = normalizeOrigin(originRaw) || '#';
   const imgSrc = p.image || `/assets/img/products/${encodeURIComponent(p.sku || 'placeholder')}.webp`;
   const shortDesc = escapeHTML(
     (p.short_desc || p.description || p.name || '').toString().trim()
@@ -461,7 +464,16 @@ function renderRelatedCard(p) {
   const priceValue = getPrice(p);
   const priceText = priceValue != null ? escapeHTML(formatVND(priceValue)) : '';
   const merchantRaw = (p.merchant || detectMerchant(origin)).toString().toLowerCase();
+  const merchantLabel = merchantLabelFor(merchantRaw);
   const detailHref = `/g.html?sku=${encodeURIComponent(p.sku || '')}`;
+
+  let btnText = 'Mua ngay';
+  if (merchantLabel) {
+    btnText = (merchantRaw === 'mediamart'
+      ? 'Mua ngay tại '
+      : 'Mua ngay trên '
+    ) + merchantLabel;
+  }
 
   return `
   <article class="product-card" data-sku="${sku}">
@@ -487,7 +499,7 @@ function renderRelatedCard(p) {
            data-merchant="${escapeAttr(merchantRaw)}"
            data-sku="${sku}"
            data-origin-url="${escapeAttr(origin)}">
-          Mua ngay
+          ${btnText}
         </a>
       </div>
     </div>
@@ -526,15 +538,26 @@ function escapeAttr(str) {
   return escapeHTML(str).replace(/`/g, '&#96;');
 }
 
+function normalizeOrigin(raw){
+  let u = (raw || '').toString().trim();
+  if (!u) return '';
+  if (u.startsWith('//')) u = 'https:' + u;
+  if (!/^https?:\/\//i.test(u)) {
+    u = 'https://' + u.replace(/^\/+/, '');
+  }
+  return u;
+}
+
 function detectMerchant(url) {
   try {
     if (!url) return '';
-    const u = new URL(url.startsWith('http') ? url : 'https://' + url);
+    const u = new URL(normalizeOrigin(url));
     const host = u.hostname.toLowerCase();
-    if (host.includes('shopee')) return 'shopee';
-    if (host.includes('lazada')) return 'lazada';
-    if (host.includes('tiki')) return 'tiki';
-    if (host.includes('tiktok')) return 'tiktok';
+    if (host.includes('shopee'))    return 'shopee';
+    if (host.includes('lazada'))    return 'lazada';
+    if (host.includes('tiki'))      return 'tiki';
+    if (host.includes('tiktok'))    return 'tiktok';
+    if (host.includes('mediamart')) return 'mediamart';
     return '';
   } catch {
     return '';
@@ -543,11 +566,12 @@ function detectMerchant(url) {
 
 function merchantLabelFor(m) {
   switch (m) {
-    case 'shopee': return 'Shopee';
-    case 'lazada': return 'Lazada';
-    case 'tiki':   return 'Tiki';
-    case 'tiktok': return 'TikTok Shop';
-    default:       return '';
+    case 'shopee':    return 'Shopee';
+    case 'lazada':    return 'Lazada';
+    case 'tiki':      return 'Tiki';
+    case 'tiktok':    return 'TikTok Shop';
+    case 'mediamart': return 'MediaMart';
+    default:          return '';
   }
 }
 
