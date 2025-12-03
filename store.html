@@ -157,6 +157,7 @@
     .buy[data-merchant="lazada"]{ background:#0f146d; border-color:#0f146d }
     .buy[data-merchant="tiki"]{ background:#1a94ff; border-color:#1a94ff }
     .buy[data-merchant="tiktok"]{ background:#111; border-color:#111 }
+    .buy[data-merchant="mediamart"]{ background:#c6000f; border-color:#c6000f }
     .buy:hover{ filter:brightness(1.05) }
 
     .skeleton{
@@ -253,13 +254,12 @@
         </li>
         <li>
           <a href="/store/do-dien-tu.html" class="qnav-item">
-  <img src="/assets/img/categories/do-dien-tu.webp"
-       alt="Điện thoại &amp; phụ kiện — MXD"
-       width="28" height="28"
-       onerror="this.src='/assets/img/categories/placeholder.webp'">
-  Điện thoại &amp; phụ kiện
-</a>
-
+            <img src="/assets/img/categories/do-dien-tu.webp"
+                 alt="Điện thoại &amp; phụ kiện — MXD"
+                 width="28" height="28"
+                 onerror="this.src='/assets/img/categories/placeholder.webp'">
+            Điện thoại &amp; phụ kiện
+          </a>
         </li>
       </ul>
     </section>
@@ -320,14 +320,27 @@
 
       const guessMerchant = (p, originUrl) => {
         let m = (p.merchant || '').toString().toLowerCase().trim();
-        if (!m && originUrl) {
-          if (/shopee\.vn/i.test(originUrl)) m = 'shopee';
-          else if (/lazada\.vn/i.test(originUrl)) m = 'lazada';
-          else if (/tiki\.vn/i.test(originUrl)) m = 'tiki';
-          else if (/tiktok\.com/i.test(originUrl)) m = 'tiktok';
+        const url = originUrl || '';
+        if (!m && url) {
+          if (/shopee\.vn/i.test(url))      m = 'shopee';
+          else if (/lazada\.vn/i.test(url)) m = 'lazada';
+          else if (/tiki\.vn/i.test(url))   m = 'tiki';
+          else if (/tiktok\.com/i.test(url)) m = 'tiktok';
+          else if (/mediamart\.vn/i.test(url)) m = 'mediamart';
         }
         if (m === 'shopee-kol' || m === 'shopee_kol') m = 'shopee';
         return m;
+      };
+
+      const merchantLabelFor = (m) => {
+        switch (m) {
+          case 'shopee':    return 'Shopee';
+          case 'lazada':    return 'Lazada';
+          case 'tiki':      return 'Tiki';
+          case 'tiktok':    return 'TikTok Shop';
+          case 'mediamart': return 'MediaMart';
+          default:          return '';
+        }
       };
 
       // MXD-SEARCH helpers
@@ -408,6 +421,7 @@
             p.origin_url || p.origin || p.url || p.link || ''
           );
           const merchant  = guessMerchant(p, originUrl);
+          const merchantLabel = merchantLabelFor(merchant);
           const baseHref  = originUrl || '#';
 
           const priceHtml = Number.isFinite(+p.price)
@@ -443,6 +457,14 @@
             return `<div class="product-tags">${chips}</div>`;
           })();
 
+          let btnText = 'Mua ngay';
+          if (merchantLabel) {
+            btnText = (merchant === 'mediamart'
+              ? 'Mua ngay tại '
+              : 'Mua ngay trên '
+            ) + merchantLabel;
+          }
+
           return `
             <article class="card">
               <a class="sr-only"
@@ -470,7 +492,7 @@
                    data-sku="${esc(rawSku)}"${originAttr}
                    target="_blank"
                    rel="nofollow sponsored noopener">
-                  Mua ngay
+                  ${esc(btnText)}
                 </a>
               </div>
             </article>`;
