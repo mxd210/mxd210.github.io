@@ -1,0 +1,483 @@
+<!-- REPLACE WHOLE FILE: /blog/buoc-3-cai-ga4-doc-so-lieu-webshop.html -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+  <meta name="format-detection" content="telephone=no"/>
+
+  <title>Bước 3 – Cài GA4 và đọc những con số đầu tiên trên Webshop</title>
+  <meta name="description"
+        content="Bước 3 trong lộ trình Webshop MXD: cài Google Analytics 4 (GA4) cho Webshop, kiểm tra xem đã nhận dữ liệu chưa và đọc những con số cơ bản đầu tiên về traffic.">
+  <link rel="canonical" href="https://mxd210.github.io/blog/buoc-3-cai-ga4-doc-so-lieu-webshop.html"/>
+  <meta name="robots" content="index,follow"/>
+
+  <!-- OG -->
+  <meta property="og:type" content="article"/>
+  <meta property="og:title" content="Bước 3 – Cài GA4 và đọc những con số đầu tiên trên Webshop"/>
+  <meta property="og:description"
+        content="Hướng dẫn cài GA4 cho Webshop MXD, test realtime và đọc những con số cơ bản: lượt truy cập, trang xem nhiều, nguồn traffic… để không làm web trong mù mịt."/>
+  <meta property="og:url" content="https://mxd210.github.io/blog/buoc-3-cai-ga4-doc-so-lieu-webshop.html"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/blog/buoc-3-cai-ga4-doc-so-lieu-webshop.webp"/>
+  <meta property="og:site_name" content="MXD Webshop"/>
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Bước 3 – Cài GA4 và đọc những con số đầu tiên trên Webshop"/>
+  <meta name="twitter:description"
+        content="Checklist cài GA4 cho Webshop: tạo property, thêm mã vào đúng chỗ, test realtime và đọc các chỉ số cơ bản để hiểu web mình đang hoạt động thế nào."/>
+  <meta name="twitter:image" content="https://mxd210.github.io/assets/img/blog/buoc-3-cai-ga4-doc-so-lieu-webshop.webp"/>
+
+  <!-- JSON-LD Article + Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Bước 3 – Cài GA4 và đọc những con số đầu tiên trên Webshop",
+    "description": "Bước 3 trong lộ trình Webshop MXD: cài Google Analytics 4 (GA4) cho Webshop, kiểm tra xem đã nhận dữ liệu chưa và đọc những con số cơ bản đầu tiên về traffic.",
+    "author": {
+      "@type": "Person",
+      "name": "MXD"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MXD Webshop",
+      "url": "https://mxd210.github.io/"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://mxd210.github.io/blog/buoc-3-cai-ga4-doc-so-lieu-webshop.html"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Trang chủ",
+        "item": "https://mxd210.github.io/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "MXD AFF Academy",
+        "item": "https://mxd210.github.io/mxd-aff-academy.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Bước 3 – Cài GA4 và đọc số liệu Webshop",
+        "item": "https://mxd210.github.io/blog/buoc-3-cai-ga4-doc-so-lieu-webshop.html"
+      }
+    ]
+  }
+  </script>
+
+  <!-- GA4 TRƯỚC affiliate -->
+  <script src="/assets/analytics.js" defer></script>
+  <script src="/assets/mxd-affiliate.js" defer></script>
+
+  <link rel="stylesheet" href="/assets/css/site.css"/>
+  <style>
+    .mxd-article-page {
+      background:#020617;
+      color:#e5e7eb;
+      min-height:100vh;
+    }
+    .mxd-article-container {
+      max-width:760px;
+      margin:0 auto;
+      padding:1.5rem 1.25rem 3rem;
+    }
+    .mxd-article-eyebrow {
+      font-size:.8rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:#9ca3af;
+      margin-bottom:.35rem;
+    }
+    .mxd-article-title {
+      font-size:1.6rem;
+      line-height:1.25;
+      margin-bottom:.5rem;
+    }
+    @media (min-width:768px){
+      .mxd-article-title{font-size:1.9rem;}
+    }
+    .mxd-article-meta {
+      font-size:.8rem;
+      color:#9ca3af;
+      margin-bottom:1.2rem;
+    }
+    .mxd-article-meta span+span::before {
+      content:"·";
+      margin:0 .4rem;
+    }
+    .mxd-article-body p {
+      font-size:.96rem;
+      line-height:1.8;
+      margin-bottom:.9rem;
+      color:#e5e7eb;
+    }
+    .mxd-article-body h2 {
+      font-size:1.12rem;
+      margin:1.6rem 0 .6rem;
+    }
+    .mxd-article-body h3 {
+      font-size:1rem;
+      margin:1.2rem 0 .4rem;
+    }
+    .mxd-article-body strong {
+      color:#fde68a;
+      font-weight:600;
+    }
+    .mxd-article-body em {
+      color:#93c5fd;
+      font-style:normal;
+    }
+    .mxd-article-body ul,
+    .mxd-article-body ol {
+      padding-left:1.2rem;
+      margin-bottom:.9rem;
+    }
+    .mxd-article-body li {
+      font-size:.94rem;
+      line-height:1.7;
+      margin-bottom:.35rem;
+    }
+    .mxd-article-callout {
+      border-radius:.75rem;
+      border:1px solid #4b5563;
+      background:#020617;
+      padding:.8rem .9rem;
+      font-size:.9rem;
+      margin:1rem 0 1.1rem;
+    }
+    .mxd-article-callout--note {
+      border-color:#22c55e;
+      background:radial-gradient(circle at top left,rgba(34,197,94,.12),transparent 60%),#020617;
+    }
+    .mxd-article-callout-title {
+      font-size:.86rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#bbf7d0;
+      margin-bottom:.3rem;
+    }
+    .mxd-article-footer {
+      margin-top:2rem;
+      font-size:.83rem;
+      color:#9ca3af;
+      border-top:1px solid #111827;
+      padding-top:1rem;
+    }
+    .mxd-article-footer a {
+      color:#93c5fd;
+      text-decoration:none;
+    }
+    .mxd-article-footer a:hover {
+      text-decoration:underline;
+    }
+    a{color:#93c5fd;text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    .mxd-steps {
+      counter-reset: step;
+      margin:1rem 0;
+      padding-left:0;
+    }
+    .mxd-steps li{
+      list-style:none;
+      margin-bottom:.7rem;
+      padding-left:2rem;
+      position:relative;
+      font-size:.94rem;
+      line-height:1.7;
+    }
+    .mxd-steps li::before{
+      counter-increment:step;
+      content:counter(step);
+      position:absolute;
+      left:0;
+      top:.1rem;
+      width:1.4rem;
+      height:1.4rem;
+      border-radius:999px;
+      border:1px solid #4ade80;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:.78rem;
+      color:#bbf7d0;
+    }
+    code{
+      font-size:.85rem;
+      background:#020617;
+      padding:.08rem .3rem;
+      border-radius:.25rem;
+      border:1px solid #111827;
+    }
+  </style>
+</head>
+<body class="mxd-article-page">
+  <main class="mxd-article-container">
+    <header>
+      <div class="mxd-article-eyebrow">MXD AFF Academy · Lộ trình nền tảng</div>
+      <h1 class="mxd-article-title">Bước 3 – Cài GA4 và đọc những con số đầu tiên trên Webshop</h1>
+      <div class="mxd-article-meta">
+        <span>Lộ trình Webshop MXD</span>
+        <span>Thời gian đọc ~ 12 phút</span>
+      </div>
+    </header>
+
+    <article class="mxd-article-body">
+      <p>
+        Nhiều người làm Webshop giống kiểu: dựng xong, up sản phẩm, chia link… rồi <strong>không biết có ai ghé hay không</strong>.
+        Đến lúc hỏi: “Web mình có người vào chưa?” thì… chịu.
+      </p>
+      <p>
+        Bước 3 trong lộ trình của MXD là: <strong>cài GA4 (Google Analytics 4)</strong> để Webshop không phải chạy trong bóng tối.
+        Từ đây trở đi, mọi click, mọi lượt xem đều có ghi nhận.
+      </p>
+
+      <div class="mxd-article-callout mxd-article-callout--note">
+        <div class="mxd-article-callout-title">Mục tiêu của Bước 3</div>
+        <p>
+          Sau bài này, cậu sẽ:
+          <strong>(1)</strong> có GA4 gắn đúng chuẩn MXD trên Webshop,
+          <strong>(2)</strong> test được realtime xem dữ liệu đã về chưa
+          và <strong>(3)</strong> đọc được vài con số cơ bản: lượng truy cập, trang xem nhiều, nguồn traffic.
+        </p>
+      </div>
+
+      <h2>1. Vì sao phải cài GA4 trước khi đổ traffic?</h2>
+      <p>
+        Làm Webshop mà không có GA4 thì giống như mở quán ngoài đường mà bịt mắt:
+        không biết khách vào cửa chính hay cửa sau, đứng bao lâu, đi đâu tiếp.
+      </p>
+      <p>Một vài lý do nên cài GA4 từ sớm:</p>
+      <ul>
+        <li><strong>Đo được người thật sự ghé web</strong>, không phải đo cảm giác.</li>
+        <li>Thấy trang nào được xem nhiều, trang nào vắng, để tập trung nâng cấp.</li>
+        <li>Nhìn được nguồn traffic: Facebook, Zalo, Google, TikTok, Shopee Video…</li>
+        <li>Về sau khi chạy thêm tool MXD (log click, đo nút mua…), GA4 làm nền rất tốt.</li>
+      </ul>
+      <p>
+        Vậy nên, trước khi hô hào mọi người vào xem Webshop, hãy dành 1 buổi làm gọn Bước 3 này.
+      </p>
+
+      <h2>2. Tạo GA4 property cho Webshop</h2>
+      <p>
+        Nếu cậu chưa từng tạo GA4, có thể làm theo flow cơ bản sau (trên máy tính cho dễ):
+      </p>
+      <ol class="mxd-steps">
+        <li>
+          Đăng nhập <strong>Google Analytics</strong> bằng Gmail trung tâm đã chuẩn bị ở
+          <a href="/blog/buoc-0-chuan-bi-tai-khoan-cong-cu-webshop-affiliate.html">Bước 0</a>.
+        </li>
+        <li>
+          Tạo <em>Account</em> (nếu chưa có), sau đó tạo <strong>Property mới</strong> cho Webshop MXD
+          – đặt tên kiểu: <em>“MXD Webshop – GA4”</em>.
+        </li>
+        <li>
+          Chọn múi giờ &amp; tiền tệ phù hợp (thường là Việt Nam / VND).
+        </li>
+        <li>
+          Tạo <strong>Web Data Stream</strong> cho domain Webshop, ví dụ:
+          <code>https://mxd210.github.io</code>.
+        </li>
+        <li>
+          Ghi lại <strong>Measurement ID</strong> dạng <code>G-XXXXXXX</code> – lát nữa sẽ cần cho file GA4 của MXD.
+        </li>
+      </ol>
+      <p>
+        Nếu sau này cậu có nhiều Webshop, có thể:
+        mỗi Webshop một property riêng, hoặc gộp trong một account lớn nhưng mỗi site là một stream.
+      </p>
+
+      <h2>3. Gắn GA4 vào Webshop theo chuẩn MXD</h2>
+      <p>
+        Template MXD dùng một file riêng: <code>/assets/analytics.js</code> để chứa đoạn cài GA4.
+        Mục tiêu là:
+        <strong>GA4 luôn được load trước</strong> <code>/assets/mxd-affiliate.js</code>
+        và chỉ khai báo một lần duy nhất trên mỗi trang.
+      </p>
+
+      <h3>3.1. Đảm bảo thứ tự script trong &lt;head&gt;</h3>
+      <p>
+        Ở phần <code>&lt;head&gt;</code> của các trang chính (index, store, bài blog, Academy…),
+        cấu trúc chuẩn MXD sẽ là:
+      </p>
+      <ul>
+        <li><code>&lt;script src="/assets/analytics.js" defer&gt;&lt;/script&gt;</code></li>
+        <li><code>&lt;script src="/assets/mxd-affiliate.js" defer&gt;&lt;/script&gt;</code></li>
+      </ul>
+      <p>
+        Bước này rất quan trọng: đừng để <code>mxd-affiliate.js</code> lên trước,
+        cũng không gọi <code>analytics.js</code> nhiều lần lung tung.
+      </p>
+
+      <h3>3.2. Điền Measurement ID GA4 vào analytics.js</h3>
+      <p>
+        Trong file <code>/assets/analytics.js</code> (đã có sẵn trong repo MXD),
+        thường sẽ có một chỗ để cậu điền <code>G-XXXXXXX</code>.  
+        Ý tưởng là:
+      </p>
+      <ul>
+        <li>Không copy code GA4 lẻ tẻ vào từng trang.</li>
+        <li>Chỉ cấu hình một lần trong <code>analytics.js</code>, mọi trang sẽ dùng chung.</li>
+      </ul>
+      <p>
+        Sau khi điền đúng Measurement ID và commit/publish,
+        Webshop sẽ bắt đầu gửi dữ liệu về GA4 mỗi khi có người truy cập.
+      </p>
+
+      <h2>4. Test realtime: xem GA4 đã “bắt tín hiệu” chưa</h2>
+      <p>
+        Sau khi cài xong, tuyệt đối đừng “để đó cho vui”.  
+        Hãy test ngay để chắc chắn là Bước 3 đã hoàn thành, không bị thiếu bước.
+      </p>
+
+      <h3>4.1. Cách test nhanh</h3>
+      <ol class="mxd-steps">
+        <li>
+          Mở GA4, vào mục <strong>Realtime</strong> (Thời gian thực).
+        </li>
+        <li>
+          Trên một tab/thiết bị khác, mở Webshop:
+          <code>https://mxd210.github.io</code> (hoặc domain của cậu).
+        </li>
+        <li>
+          Click qua vài trang: <code>/store.html</code>, một trang danh mục, một bài blog bất kỳ.
+        </li>
+        <li>
+          Quay lại màn hình Realtime, xem phần <em>Users in last 30 minutes</em> có hiển thị phiên truy cập không.
+        </li>
+      </ol>
+      <p>
+        Nếu cậu thấy chấm xanh (người dùng) xuất hiện, xin chúc mừng:
+        GA4 đã bắt đầu ghi nhận Webshop của cậu rồi.
+      </p>
+
+      <h3>4.2. Nếu không thấy dữ liệu realtime?</h3>
+      <p>Thường là do một trong các nguyên nhân:</p>
+      <ul>
+        <li>Chưa nhập đúng Measurement ID trong <code>analytics.js</code>.</li>
+        <li>Chưa deploy/publish bản có GA4 lên GitHub Pages.</li>
+        <li>Dán nhầm vị trí script, hoặc chặn JS (do extension, ad-block…).</li>
+        <li>Đang xem nhầm property hoặc nhầm data stream trong GA4.</li>
+      </ul>
+      <p>
+        Cách xử lý: kiểm tra từng mục một, chỉnh lại rồi test lại sau vài phút.
+      </p>
+
+      <h2>5. Đọc những con số cơ bản đầu tiên trong GA4</h2>
+      <p>
+        Khi GA4 đã chạy ổn, chưa cần đào sâu quá phức tạp.
+        Ở giai đoạn đầu, chỉ cần nắm 3 nhóm số này:
+      </p>
+
+      <h3>5.1. Lượt truy cập &amp; phiên (Users, Sessions)</h3>
+      <p>
+        Mỗi tuần, cậu có thể nhìn:
+      </p>
+      <ul>
+        <li><strong>Users</strong> – có bao nhiêu người khác nhau ghé Webshop.</li>
+        <li><strong>Sessions</strong> – tổng số “lượt ghé” (1 người có thể ghé nhiều lần).</li>
+        <li><strong>Average engagement time</strong> – thời gian trung bình người dùng ở lại.</li>
+      </ul>
+      <p>
+        Mục tiêu không phải là “số càng to càng tốt” ngay lập tức,
+        mà là <strong>thấy xu hướng</strong>: tuần này có hơn tuần trước không,
+        khi cậu chia thêm vài link thì con số có nhúc nhích không.
+      </p>
+
+      <h3>5.2. Trang nào được xem nhiều nhất (Top pages)</h3>
+      <p>
+        Phần báo cáo theo trang (Pages &amp; screens) sẽ cho cậu thấy:
+      </p>
+      <ul>
+        <li>Trang chủ có bao nhiêu lượt xem.</li>
+        <li>Trang cửa hàng /store.html và từng danh mục hoạt động thế nào.</li>
+        <li>Các bài blog/Lộ trình/AFF Academy có lượt xem ra sao.</li>
+      </ul>
+      <p>
+        Từ đây, cậu sẽ biết:
+      </p>
+      <ul>
+        <li>Bài nào đang hút người → xứng đáng được nâng cấp, thêm CTA, thêm nút mua.</li>
+        <li>Bài nào ít view → sau này có thể “truyền máu” thêm (chia link, sửa title…).</li>
+      </ul>
+
+      <h3>5.3. Nguồn traffic (đến từ đâu?)</h3>
+      <p>
+        Một Webshop khỏe thường không chỉ sống bằng “1 nguồn duy nhất”.
+        GA4 giúp cậu nhìn được:
+      </p>
+      <ul>
+        <li>Direct – người gõ thẳng hoặc bấm bookmark.</li>
+        <li>Organic search – tìm kiếm Google rồi vào.</li>
+        <li>Social – Facebook, TikTok, Zalo…</li>
+        <li>Referral – từ các site khác dẫn về.</li>
+      </ul>
+      <p>
+        Khi cậu bắt đầu đẩy Webshop lên Facebook cá nhân, group, Zalo…,
+        phần “Social” sẽ nhích lên – đó là dấu hiệu tốt để tiếp tục.
+      </p>
+
+      <h2>6. Những lỗi cài GA4 thường gặp khi làm Webshop MXD</h2>
+      <p>
+        Tổng kết lại, đây là vài lỗi phổ biến mà Bước 3 muốn giúp né luôn:
+      </p>
+      <ul>
+        <li><strong>Gắn GA4 trực tiếp trên từng trang</strong>, mỗi trang một đoạn – sau bị trùng, rối.</li>
+        <li><strong>Để mxd-affiliate.js đứng trước GA4</strong>, khiến việc đo đạc khó kiểm soát.</li>
+        <li><strong>Quên publish GitHub Pages</strong> sau khi sửa <code>analytics.js</code>.</li>
+        <li><strong>Dùng Gmail này tạo GA4, Gmail khác dùng Webshop</strong>, sau khó lần lại property.</li>
+        <li><strong>Không bao giờ mở GA4 lên xem</strong>, cài xong để đó như vật trang trí.</li>
+      </ul>
+      <p>
+        Nếu tránh được 5 lỗi này, coi như cậu đã đi trước một lượng lớn người chỉ “dựng web cho vui”.
+     lường
+      <p>
+        và mình cũng sẽ cùng bạn kiểm soát nó , đo lường
+      </p>
+      <div class="mxd-article-callout">
+        <p>
+          Hãy nhớ: Webshop không chỉ là chỗ trưng bày sản phẩm.
+          Với GA4, cậu đang biến nó thành <strong>một hệ thống có dữ liệu</strong>.
+          Dữ liệu không phải để ngắm, mà để ra quyết định: nên viết thêm bài nào, nên đẩy danh mục nào.
+        </p>
+      </div>
+
+      <h2>7. Sau Bước 3: chuyển sang Bước 4 – chọn 10–20 sản phẩm đầu tiên</h2>
+      <p>
+        Khi Webshop đã được gắn GA4, bước tiếp theo là “có hàng lên kệ”:
+        chọn 10–20 sản phẩm để bắt đầu thật sự bán, chứ không chỉ nói lý thuyết.
+      </p>
+      <p>
+        Bài kế tiếp trong lộ trình nền tảng là:
+        <a href="/blog/buoc-4-chon-20-san-pham-dau-tien-cho-webshop.html">
+          Bước 4 – Cách chọn 10–20 sản phẩm đầu tiên để up lên Webshop
+        </a>.
+        Từ đó, mỗi lượt traffic đo được trong GA4 sẽ gắn với những món cụ thể cậu muốn giới thiệu.
+      </p>
+    </article>
+
+    <footer class="mxd-article-footer">
+      <p>
+        Bài viết này thuộc nhóm <strong>Lộ trình nền tảng</strong> trong
+        <a href="/mxd-aff-academy.html">MXD AFF Academy</a>.
+      </p>
+      <p style="margin-top:.25rem;">
+        Khi Bước 3 đã làm xong, hãy đánh dấu lại trong checklist lộ trình
+        để biết Webshop của cậu đã chính thức “có mắt, có tai” trên dữ liệu.
+      </p>
+    </footer>
+  </main>
+</body>
+</html>
