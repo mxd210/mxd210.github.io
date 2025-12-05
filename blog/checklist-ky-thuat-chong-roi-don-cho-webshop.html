@@ -1,0 +1,504 @@
+<!-- REPLACE WHOLE FILE: /blog/checklist-ky-thuat-chong-roi-don-cho-webshop.html -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+  <meta name="format-detection" content="telephone=no"/>
+
+  <title>Checklist kỹ thuật chống rơi đơn cho Webshop (dành cho người không rành code)</title>
+  <meta name="description"
+        content="Một checklist kỹ thuật đơn giản để chống rơi đơn cho Webshop: từ cấu hình domain, GA4 & mxd-affiliate, aff_base, deeplink cho tới test nút mua, log click và kiểm tra định kỳ. Viết cho người không rành code nhưng muốn Webshop chạy ổn.">
+  <link rel="canonical" href="https://mxd210.github.io/blog/checklist-ky-thuat-chong-roi-don-cho-webshop.html"/>
+  <meta name="robots" content="index,follow"/>
+
+  <!-- OG -->
+  <meta property="og:type" content="article"/>
+  <meta property="og:title" content="Checklist kỹ thuật chống rơi đơn cho Webshop (dành cho người không rành code)"/>
+  <meta property="og:description"
+        content="5 nhóm kiểm tra kỹ thuật để Webshop đỡ rơi đơn: domain & HTTPS, GA4 & mxd-affiliate, aff_base & deeplink, nút mua theo sàn, log click & kiểm tra định kỳ.">
+  <meta property="og:url" content="https://mxd210.github.io/blog/checklist-ky-thuat-chong-roi-don-cho-webshop.html"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/blog/checklist-ky-thuat-chong-roi-don-cho-webshop.webp"/>
+  <meta property="og:site_name" content="MXD Webshop"/>
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Checklist kỹ thuật chống rơi đơn cho Webshop (dành cho người không rành code)"/>
+  <meta name="twitter:description"
+        content="Checklist kỹ thuật chống rơi đơn cho Webshop theo kiểu MXD: từng bước cụ thể, dễ tick, không cần giỏi code vẫn tự kiểm được.">
+  <meta name="twitter:image" content="https://mxd210.github.io/assets/img/blog/checklist-ky-thuat-chong-roi-don-cho-webshop.webp"/>
+
+  <!-- JSON-LD Article + Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Checklist kỹ thuật chống rơi đơn cho Webshop (dành cho người không rành code)",
+    "description": "Một checklist kỹ thuật đơn giản để chống rơi đơn cho Webshop: từ cấu hình domain, GA4 & mxd-affiliate, aff_base, deeplink cho tới test nút mua, log click và kiểm tra định kỳ. Viết cho người không rành code nhưng muốn Webshop chạy ổn.",
+    "author": {
+      "@type": "Person",
+      "name": "MXD"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MXD Webshop",
+      "url": "https://mxd210.github.io/"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://mxd210.github.io/blog/checklist-ky-thuat-chong-roi-don-cho-webshop.html"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Trang chủ",
+        "item": "https://mxd210.github.io/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "MXD AFF Academy",
+        "item": "https://mxd210.github.io/mxd-aff-academy.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Checklist kỹ thuật chống rơi đơn cho Webshop (dành cho người không rành code)",
+        "item": "https://mxd210.github.io/blog/checklist-ky-thuat-chong-roi-don-cho-webshop.html"
+      }
+    ]
+  }
+  </script>
+
+  <!-- GA4 TRƯỚC affiliate -->
+  <script src="/assets/analytics.js" defer></script>
+  <script src="/assets/mxd-affiliate.js" defer></script>
+
+  <link rel="stylesheet" href="/assets/css/site.css"/>
+  <style>
+    .mxd-article-page {
+      background:#020617;
+      color:#e5e7eb;
+      min-height:100vh;
+    }
+    .mxd-article-container {
+      max-width:760px;
+      margin:0 auto;
+      padding:1.5rem 1.25rem 3rem;
+    }
+    .mxd-article-eyebrow {
+      font-size:.8rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:#9ca3af;
+      margin-bottom:.35rem;
+    }
+    .mxd-article-title {
+      font-size:1.6rem;
+      line-height:1.25;
+      margin-bottom:.5rem;
+    }
+    @media (min-width:768px){
+      .mxd-article-title{font-size:1.9rem;}
+    }
+    .mxd-article-meta {
+      font-size:.8rem;
+      color:#9ca3af;
+      margin-bottom:1.2rem;
+    }
+    .mxd-article-meta span+span::before {
+      content:"·";
+      margin:0 .4rem;
+    }
+    .mxd-article-body p {
+      font-size:.96rem;
+      line-height:1.8;
+      margin-bottom:.9rem;
+      color:#e5e7eb;
+    }
+    .mxd-article-body h2 {
+      font-size:1.12rem;
+      margin:1.6rem 0 .6rem;
+    }
+    .mxd-article-body h3 {
+      font-size:1rem;
+      margin:1.2rem 0 .4rem;
+    }
+    .mxd-article-body strong {
+      color:#fde68a;
+      font-weight:600;
+    }
+    .mxd-article-body em {
+      color:#93c5fd;
+      font-style:normal;
+    }
+    .mxd-article-body ul,
+    .mxd-article-body ol {
+      padding-left:1.2rem;
+      margin-bottom:.9rem;
+    }
+    .mxd-article-body li {
+      font-size:.94rem;
+      line-height:1.7;
+      margin-bottom:.35rem;
+    }
+    .mxd-article-callout {
+      border-radius:.75rem;
+      border:1px solid #4b5563;
+      background:#020617;
+      padding:.8rem .9rem;
+      font-size:.9rem;
+      margin:1rem 0 1.1rem;
+    }
+    .mxd-article-callout--note {
+      border-color:#22c55e;
+      background:radial-gradient(circle at top left,rgba(34,197,94,.12),transparent 60%),#020617;
+    }
+    .mxd-article-callout--warn {
+      border-color:#f97316;
+      background:radial-gradient(circle at top left,rgba(248,113,113,.12),transparent 60%),#020617;
+    }
+    .mxd-article-callout-title {
+      font-size:.86rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      margin-bottom:.3rem;
+    }
+    .mxd-article-callout--note .mxd-article-callout-title{
+      color:#bbf7d0;
+    }
+    .mxd-article-callout--warn .mxd-article-callout-title{
+      color:#fed7aa;
+    }
+    .mxd-article-footer {
+      margin-top:2rem;
+      font-size:.83rem;
+      color:#9ca3af;
+      border-top:1px solid #111827;
+      padding-top:1rem;
+    }
+    .mxd-article-footer a {
+      color:#93c5fd;
+      text-decoration:none;
+    }
+    .mxd-article-footer a:hover {
+      text-decoration:underline;
+    }
+    a{color:#93c5fd;text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    .mxd-btn-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.5rem;
+      margin:1rem 0 1.4rem;
+    }
+    .mxd-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:.55rem 1.1rem;
+      border-radius:999px;
+      font-size:.86rem;
+      font-weight:600;
+      border:1px solid #4b5563;
+      text-decoration:none;
+      cursor:pointer;
+      background:#020617;
+    }
+    .mxd-btn-primary{
+      border-color:#f97316;
+      background:linear-gradient(135deg,#f97316,#ea580c);
+      color:#fff;
+    }
+    .mxd-btn-outline{
+      color:#e5e7eb;
+    }
+    .mxd-code-inline{
+      font-family:ui-monospace,Menlo,monospace;
+      font-size:.85rem;
+      padding:.08rem .3rem;
+      border-radius:.25rem;
+      background:#020617;
+      border:1px solid #374151;
+    }
+  </style>
+</head>
+<body class="mxd-article-page">
+  <main class="mxd-article-container">
+    <header>
+      <div class="mxd-article-eyebrow">
+        MXD AFF Academy · Seri 1 – Một địa chỉ, không rơi đơn
+      </div>
+      <h1 class="mxd-article-title">
+        Checklist kỹ thuật chống rơi đơn cho Webshop (dành cho người không rành code)
+      </h1>
+      <div class="mxd-article-meta">
+        <span>Seri 1 – Một địa chỉ, không rơi đơn</span>
+        <span>Thời gian đọc ~ 15–20 phút</span>
+      </div>
+    </header>
+
+    <article class="mxd-article-body">
+      <p>
+        Sau khi nói về triết lý <a href="/blog/aff-mot-dia-chi-khong-roi-don.html">Một địa chỉ, không rơi đơn</a>,
+        rồi mổ xẻ <a href="/blog/khong-roi-don-khi-dung-nhieu-link-va-kenh-ban.html">luồng click</a>
+        và <a href="/blog/5-kieu-roi-don-khi-khach-di-vong.html">tâm lý khách</a>,
+        còn một mảng nữa không thể bỏ qua:
+        <strong>kỹ thuật Webshop</strong>.
+      </p>
+      <p>
+        Bài này là một checklist để cậu tự hỏi – tự tick:
+        nếu một ngày thấy đơn “lạ lạ”, hãy quay lại đây kiểm từng mục.
+      </p>
+
+      <div class="mxd-btn-row">
+        <a class="mxd-btn mxd-btn-primary" href="/mxd-aff-academy.html">
+          Quay về MXD AFF Academy
+        </a>
+        <a class="mxd-btn mxd-btn-outline" href="/store.html">
+          Xem Webshop mẫu của MXD
+        </a>
+      </div>
+
+      <div class="mxd-article-callout mxd-article-callout--note">
+        <div class="mxd-article-callout-title">Nguyên tắc khi dùng checklist</div>
+        <p>
+          Không cần đọc thuộc lòng. Mỗi lần dựng Webshop mới hoặc sau khi sửa code lớn,
+          cậu chỉ cần mở lại bài này, đi từ trên xuống dưới,
+          tick những mục đã ok, ghi chú những mục cần nhờ “người rành kỹ thuật” hỗ trợ.
+        </p>
+      </div>
+
+      <h2>1. Nhóm A – Nền tảng Webshop: domain, HTTPS, canonical</h2>
+      <p>
+        Nếu nền tảng sai, mọi thứ phía sau đều méo. 3 câu hỏi đầu tiên:
+      </p>
+      <ul>
+        <li><strong>A.1 – HTTPS đã xanh chưa?</strong>  
+          Webshop phải chạy <span class="mxd-code-inline">https://</span>, không để bản
+          <span class="mxd-code-inline">http://</span> hoạt động song song.
+        </li>
+        <li><strong>A.2 – Canonical có thống nhất?</strong>  
+          Mỗi trang chính (home, store, bài blog, Academy…) đều cần thẻ
+          <span class="mxd-code-inline">&lt;link rel="canonical" href="..."/&gt;</span>  
+          trỏ về đúng URL chuẩn, không dắt Google đi vòng.
+        </li>
+        <li><strong>A.3 – 404 &amp; redirect có ổn?</strong>  
+          Khi gõ nhầm link, Webshop trả về trang 404 có nút về trang chủ và cửa hàng,
+          không để khách lạc trong “hố đen”.</li>
+      </ul>
+
+      <h3>Một đoạn chuyện của Mai</h3>
+      <p>
+        Có giai đoạn Mai test cấu hình, lỡ để cả bản <span class="mxd-code-inline">http</span> lẫn
+        <span class="mxd-code-inline">https</span> cùng chạy.  
+        Kết quả là: một số link cũ trỏ về <span class="mxd-code-inline">http</span>,
+        khách bấm vẫn mở được, nhưng cookie &amp; tracking thì lệch.  
+        Sau khi ép redirect hết về <span class="mxd-code-inline">https</span>,
+        số liệu trong GA4 &amp; mạng aff mới “khớp miếng”.
+      </p>
+
+      <h2>2. Nhóm B – Đo lường &amp; affiliate: GA4, mxd-affiliate, aff_base</h2>
+      <p>
+        Đây là phần “tim mạch” của Webshop: nếu đo lường hoặc aff-base sai,
+        cậu có thể đang làm khá tốt nhưng không hề hay biết.
+      </p>
+
+      <h3>B.1 – GA4 có nằm trước mxd-affiliate không?</h3>
+      <ul>
+        <li>Trong <span class="mxd-code-inline">&lt;head&gt;</span>,
+          script GA4 (ví dụ <span class="mxd-code-inline">/assets/analytics.js</span>)
+          phải được load <strong>trước</strong>
+          <span class="mxd-code-inline">/assets/mxd-affiliate.js</span>.</li>
+        <li>Lý do: các sự kiện click từ <span class="mxd-code-inline">mxd-affiliate.js</span> thường gửi lên GA4.
+          Nếu GA4 chưa sẵn, event dễ bị rơi.</li>
+      </ul>
+
+      <h3>B.2 – aff_base &amp; deeplink đã khớp template từng sàn?</h3>
+      <ul>
+        <li>Trong hệ MXD, mỗi sàn (Shopee, Lazada, Tiki, TikTok Shop, Mediamart…) có một
+          <span class="mxd-code-inline">aff_base</span> riêng.</li>
+        <li>Checklist nhanh:
+          <ul>
+            <li>URL aff_base có đúng ID chiến dịch / đối tác của cậu không?</li>
+            <li>Các biến <span class="mxd-code-inline">?url=</span> hoặc tương đương có giữ nguyên cấu trúc?</li>
+            <li>Khi thay token, có test lại ít nhất 1–2 sản phẩm mỗi sàn chưa?</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>B.3 – Deeplink được sinh đúng cho từng sản phẩm?</h3>
+      <ul>
+        <li>Trong <span class="mxd-code-inline">affiliates.json</span> (hoặc file tương đương),
+          mỗi sản phẩm nên có:
+          <span class="mxd-code-inline">origin_url</span>, <span class="mxd-code-inline">merchant</span>,
+          <span class="mxd-code-inline">deeplink</span> (hoặc để tool tự sinh lúc render).</li>
+        <li>Cần test:
+          <ul>
+            <li>Bấm nút “Xem &amp; mua tại Shopee/Lazada/…” từ Webshop mở đúng sản phẩm.</li>
+            <li>Không có sản phẩm nào vẫn trỏ về <strong>link trần</strong> không aff (trừ khi cố ý).</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h2>3. Nhóm C – Nút mua &amp; luồng click trên từng trang</h2>
+      <p>
+        Nhóm này quyết định cảm giác của khách khi bấm mua:
+        rõ hay rối, tin tưởng hay hoang mang.
+      </p>
+
+      <h3>C.1 – Nút mua đã ghi rõ “Xem &amp; mua tại…”?</h3>
+      <ul>
+        <li>Trên trang sản phẩm hoặc danh mục,
+          text nút nên rõ: “Xem &amp; mua tại Shopee”, “Xem &amp; mua tại Lazada”…</li>
+        <li>Tránh dùng mỗi chữ “Mua ngay” mà không ghi nơi → khách dễ tưởng là giỏ riêng của Webshop,
+          sau đó hụt cảm xúc khi bị đẩy sang sàn.</li>
+      </ul>
+
+      <h3>C.2 – Một sản phẩm, nhiều sàn: UI có rõ?</h3>
+      <ul>
+        <li>Nếu một sản phẩm có nhiều sàn, nút nên xếp theo hàng ngang/dọc rõ ràng,
+          không chồng chéo.</li>
+        <li>Thứ tự gợi ý (ví dụ Shopee trước, Lazada sau…) nên nhất quán để khách quen mắt.</li>
+      </ul>
+
+      <h3>C.3 – Trang 404/nội dung không có sản phẩm: có lối thoát?</h3>
+      <ul>
+        <li>Nếu một sản phẩm hết hàng hoặc bị set <span class="mxd-code-inline">status=false</span>,
+          Webshop không nên để khách rơi vào trang trắng.</li>
+        <li>Nên có:
+          <ul>
+            <li>Thông báo ngắn: “Sản phẩm này tạm thời ngưng bán”.</li>
+            <li>Gợi ý 2–3 sản phẩm tương tự.</li>
+            <li>Nút quay lại danh mục / store.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h2>4. Nhóm D – Log click &amp; kiểm tra chéo với mạng aff</h2>
+      <p>
+        Một trong những “vũ khí” lớn nhất của hệ MXD là: <strong>có log click của riêng mình</strong>.
+        Không phải để cãi nhau với ai, mà để khỏi phải đoán mò.
+      </p>
+
+      <h3>D.1 – Script ghi log có đang chạy?</h3>
+      <ul>
+        <li>Kiểm tra xem <span class="mxd-code-inline">mxd-affiliate.js</span>
+          hoặc script tương đương có bị lỗi JS nào không (mở DevTools &gt; Console).</li>
+        <li>Thử bấm vài nút mua, xem trong GA4 hoặc hệ log có ghi lại event tương ứng chưa.</li>
+      </ul>
+
+      <h3>D.2 – Log &amp; báo cáo aff có khớp “tương đối”?</h3>
+      <ul>
+        <li>Không cần khớp 100%, vì mỗi hệ đếm cách khác nhau,
+          nhưng nếu Webshop ghi 100 click mà mạng aff chỉ nhận 5–10 click,
+          thì có gì đó sai.</li>
+        <li>Trong trường hợp chênh lệch lớn, quay lại kiểm:
+          <ul>
+            <li>aff_base có đúng?</li>
+            <li>Deeplink có bị encode sai ký tự đặc biệt?</li>
+            <li>Có test trên mobile + app sàn chứ không chỉ trên web không?</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>D.3 – Có lưu lại “case lạ” để sau này học?</h3>
+      <p>
+        Mai hay ghi chú riêng những ngày có biến động:
+        hoa hồng tụt bất thường, một chiến dịch dừng ngang, click tăng đột biến…  
+        Những ghi chú đó giúp nhìn lại:  
+        đôi khi không phải Webshop lỗi, mà là sàn hoặc mạng aff đang thử luật chơi mới.
+      </p>
+
+      <h2>5. Nhóm E – Checklist sau mỗi lần “đại tu” Webshop</h2>
+      <p>
+        Mỗi lần sửa code lớn (đổi giao diện, đổi cách load JSON, đổi logic nút mua…),
+        nên đi lại một vòng checklist rút gọn:
+      </p>
+      <ul>
+        <li><strong>E.1 – Trang chủ &amp; store:</strong>
+          <ul>
+            <li>Mở <span class="mxd-code-inline">/</span> và <span class="mxd-code-inline">/store.html</span>
+              trên cả mobile &amp; desktop.</li>
+            <li>Test ít nhất 3–5 sản phẩm khác nhau, mỗi sàn 1–2 sản phẩm.</li>
+          </ul>
+        </li>
+        <li><strong>E.2 – Bài blog &amp; Academy:</strong>
+          <ul>
+            <li>Vào một số bài chính trong MXD AFF, bấm các link nội bộ xem có 404 nào lạc không.</li>
+            <li>Kiểm tra các nút “Xem lộ trình”, “Quay lại Academy”, “Xem Webshop mẫu”.</li>
+          </ul>
+        </li>
+        <li><strong>E.3 – Thiết bị &amp; trình duyệt:</strong>
+          <ul>
+            <li>Ít nhất dùng 2 trình duyệt (Chrome, Safari/Edge).</li>
+            <li>Test trên một máy khác ngoài máy đang code, để tránh cache “ảo tưởng”.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h2>6. Một chút về cách Mai dùng checklist này cho chính mình</h2>
+      <p>
+        Mỗi khi mở một repo Webshop mới, Mai thường:
+      </p>
+      <ul>
+        <li>Làm xong bản giao diện đầu tiên.</li>
+        <li>Ngồi mở bài này, lấy giấy bút hoặc file note, đi từng nhóm A→E, tick dần.</li>
+        <li>Chỗ nào không tự làm được thì ghi “để nhờ người rành code”,  
+          nhưng <strong>vẫn hiểu mình đang muốn kiểm cái gì</strong>, chứ không ném hết cho kỹ thuật.</li>
+      </ul>
+      <p>
+        Cảm giác rất khác giữa việc “hy vọng nó chạy” và “biết mình đã check xong 80–90% lỗi phổ biến”.
+      </p>
+
+      <h2>7. Kết nối lại với toàn bộ Seri 1</h2>
+      <p>
+        Nếu ghép lại:
+      </p>
+      <ul>
+        <li><a href="/blog/aff-mot-dia-chi-khong-roi-don.html">
+          Một địa chỉ, không rơi đơn
+          </a> – cho cậu bức tranh lớn.</li>
+        <li><a href="/blog/khong-roi-don-khi-dung-nhieu-link-va-kenh-ban.html">
+          Không rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn
+          </a> – cho luồng click &amp; thiết kế Webshop.</li>
+        <li><a href="/blog/5-kieu-roi-don-khi-khach-di-vong.html">
+          5 kiểu rơi đơn khi khách đi vòng (tâm lý)
+          </a> – cho cách nói chuyện &amp; nội dung.</li>
+        <li>Bài checklist này – cho phần kỹ thuật nền tảng.</li>
+      </ul>
+      <p>
+        Bốn mảnh ghép đó kết lại thành một hệ:  
+        cậu có nhà riêng, có luồng click rõ, hiểu người vào nhà,
+        và có checklist để đảm bảo nhà không bị “rò rỉ” đơn.
+      </p>
+
+      <div class="mxd-btn-row">
+        <a class="mxd-btn mxd-btn-primary" href="/mxd-aff-academy.html">Quay lại MXD AFF Academy</a>
+        <a class="mxd-btn mxd-btn-outline" href="/lo-trinh-webshop-affiliate.html">
+          Xem lộ trình làm Webshop từ đầu
+        </a>
+      </div>
+    </article>
+
+    <footer class="mxd-article-footer">
+      <p>
+        Bài viết này thuộc <strong>Seri 1 – Một địa chỉ, không rơi đơn</strong> trong
+        <a href="/mxd-aff-academy.html">MXD AFF Academy</a>.
+      </p>
+      <p style="margin-top:.25rem;">
+        Mỗi lần cậu mở thêm một Webshop mới, hãy coi checklist này như bản “khám sức khỏe đầu vào”,
+        để khi bắt đầu kéo traffic, cậu yên tâm rằng phần kỹ thuật đã đủ vững để giữ lại những đơn đáng lẽ thuộc về mình.
+      </p>
+    </footer>
+  </main>
+</body>
+</html>
