@@ -1,0 +1,532 @@
+<!-- REPLACE WHOLE FILE: /blog/khong-roi-don-khi-dung-nhieu-link-va-kenh-ban.html -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+  <meta name="format-detection" content="telephone=no"/>
+
+  <title>Làm thế nào để không rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn?</title>
+  <meta name="description"
+        content="Giải thích vì sao dễ rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn cùng lúc – và cách gom về một địa chỉ, thiết kế luồng click để hạn chế tối đa việc mất đơn. Có kèm vài câu chuyện thật của Mai.">
+  <link rel="canonical" href="https://mxd210.github.io/blog/khong-roi-don-khi-dung-nhieu-link-va-kenh-ban.html"/>
+  <meta name="robots" content="index,follow"/>
+
+  <!-- OG -->
+  <meta property="og:type" content="article"/>
+  <meta property="og:title" content="Làm thế nào để không rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn?"/>
+  <meta property="og:description"
+        content="Từ trải nghiệm của Mai: vì sao càng dùng nhiều link, nhiều kênh, nhiều sàn lại càng dễ rơi đơn – và cách thiết kế một địa chỉ trung tâm để kiểm soát luồng click.">
+  <meta property="og:url" content="https://mxd210.github.io/blog/khong-roi-don-khi-dung-nhieu-link-va-kenh-ban.html"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/blog/khong-roi-don-khi-dung-nhieu-link-va-kenh-ban.webp"/>
+  <meta property="og:site_name" content="MXD Webshop"/>
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Làm thế nào để không rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn?"/>
+  <meta name="twitter:description"
+        content="Checklist tránh rơi đơn khi dùng nhiều link & kênh: hiểu last-click, gom về một địa chỉ trung tâm, thiết kế luồng “xem – chọn – mua” rõ ràng và ghi log click.">
+  <meta name="twitter:image" content="https://mxd210.github.io/assets/img/blog/khong-roi-don-khi-dung-nhieu-link-va-kenh-ban.webp"/>
+
+  <!-- JSON-LD Article + Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Làm thế nào để không rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn?",
+    "description": "Giải thích vì sao dễ rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn cùng lúc – và cách gom về một địa chỉ, thiết kế luồng click để hạn chế tối đa việc mất đơn. Có kèm vài câu chuyện thật của Mai.",
+    "author": {
+      "@type": "Person",
+      "name": "MXD"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MXD Webshop",
+      "url": "https://mxd210.github.io/"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://mxd210.github.io/blog/khong-roi-don-khi-dung-nhieu-link-va-kenh-ban.html"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Trang chủ",
+        "item": "https://mxd210.github.io/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "MXD AFF Academy",
+        "item": "https://mxd210.github.io/mxd-aff-academy.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Làm thế nào để không rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn?",
+        "item": "https://mxd210.github.io/blog/khong-roi-don-khi-dung-nhieu-link-va-kenh-ban.html"
+      }
+    ]
+  }
+  </script>
+
+  <!-- GA4 TRƯỚC affiliate -->
+  <script src="/assets/analytics.js" defer></script>
+  <script src="/assets/mxd-affiliate.js" defer></script>
+
+  <link rel="stylesheet" href="/assets/css/site.css"/>
+  <style>
+    .mxd-article-page {
+      background:#020617;
+      color:#e5e7eb;
+      min-height:100vh;
+    }
+    .mxd-article-container {
+      max-width:760px;
+      margin:0 auto;
+      padding:1.5rem 1.25rem 3rem;
+    }
+    .mxd-article-eyebrow {
+      font-size:.8rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:#9ca3af;
+      margin-bottom:.35rem;
+    }
+    .mxd-article-title {
+      font-size:1.6rem;
+      line-height:1.25;
+      margin-bottom:.5rem;
+    }
+    @media (min-width:768px){
+      .mxd-article-title{font-size:1.9rem;}
+    }
+    .mxd-article-meta {
+      font-size:.8rem;
+      color:#9ca3af;
+      margin-bottom:1.2rem;
+    }
+    .mxd-article-meta span+span::before {
+      content:"·";
+      margin:0 .4rem;
+    }
+    .mxd-article-body p {
+      font-size:.96rem;
+      line-height:1.8;
+      margin-bottom:.9rem;
+      color:#e5e7eb;
+    }
+    .mxd-article-body h2 {
+      font-size:1.12rem;
+      margin:1.6rem 0 .6rem;
+    }
+    .mxd-article-body h3 {
+      font-size:1rem;
+      margin:1.2rem 0 .4rem;
+    }
+    .mxd-article-body strong {
+      color:#fde68a;
+      font-weight:600;
+    }
+    .mxd-article-body em {
+      color:#93c5fd;
+      font-style:normal;
+    }
+    .mxd-article-body ul,
+    .mxd-article-body ol {
+      padding-left:1.2rem;
+      margin-bottom:.9rem;
+    }
+    .mxd-article-body li {
+      font-size:.94rem;
+      line-height:1.7;
+      margin-bottom:.35rem;
+    }
+    .mxd-article-callout {
+      border-radius:.75rem;
+      border:1px solid #4b5563;
+      background:#020617;
+      padding:.8rem .9rem;
+      font-size:.9rem;
+      margin:1rem 0 1.1rem;
+    }
+    .mxd-article-callout--note {
+      border-color:#22c55e;
+      background:radial-gradient(circle at top left,rgba(34,197,94,.12),transparent 60%),#020617;
+    }
+    .mxd-article-callout--warn {
+      border-color:#f97316;
+      background:radial-gradient(circle at top left,rgba(248,113,113,.12),transparent 60%),#020617;
+    }
+    .mxd-article-callout-title {
+      font-size:.86rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      margin-bottom:.3rem;
+    }
+    .mxd-article-callout--note .mxd-article-callout-title{
+      color:#bbf7d0;
+    }
+    .mxd-article-callout--warn .mxd-article-callout-title{
+      color:#fed7aa;
+    }
+    .mxd-article-footer {
+      margin-top:2rem;
+      font-size:.83rem;
+      color:#9ca3af;
+      border-top:1px solid #111827;
+      padding-top:1rem;
+    }
+    .mxd-article-footer a {
+      color:#93c5fd;
+      text-decoration:none;
+    }
+    .mxd-article-footer a:hover {
+      text-decoration:underline;
+    }
+    a{color:#93c5fd;text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    .mxd-btn-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.5rem;
+      margin:1rem 0 1.4rem;
+    }
+    .mxd-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:.55rem 1.1rem;
+      border-radius:999px;
+      font-size:.86rem;
+      font-weight:600;
+      border:1px solid #4b5563;
+      text-decoration:none;
+      cursor:pointer;
+      background:#020617;
+    }
+    .mxd-btn-primary{
+      border-color:#f97316;
+      background:linear-gradient(135deg,#f97316,#ea580c);
+      color:#fff;
+    }
+    .mxd-btn-outline{
+      color:#e5e7eb;
+    }
+  </style>
+</head>
+<body class="mxd-article-page">
+  <main class="mxd-article-container">
+    <header>
+      <div class="mxd-article-eyebrow">
+        MXD AFF Academy · Seri 1 – Một địa chỉ, không rơi đơn
+      </div>
+      <h1 class="mxd-article-title">
+        Làm thế nào để không rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn?
+      </h1>
+      <div class="mxd-article-meta">
+        <span>Seri 1 – Một địa chỉ, không rơi đơn</span>
+        <span>Thời gian đọc ~ 15 phút</span>
+      </div>
+    </header>
+
+    <article class="mxd-article-body">
+      <p>
+        Càng làm lâu, cậu càng có xu hướng “mở rộng”: thêm kênh mới, thêm sàn mới, thêm kiểu link mới.
+        Nghe thì có vẻ là đang “đa dạng hóa thu nhập”, nhưng nếu luồng click không được thiết kế cho rõ ràng,
+        cảm giác rất giống… <strong>đi rải tờ rơi trong đêm mất điện</strong>.
+      </p>
+      <p>
+        Câu hỏi nhiều bạn hỏi mình (và Mai cũng từng hỏi chính mình):  
+        <strong>“Dùng nhiều link, nhiều kênh, nhiều sàn thì làm sao để không rơi đơn?”</strong>.
+        Bài này là để trả lời câu đó – từ góc nhìn kỹ thuật lẫn mấy câu chuyện hơi đau ví của Mai.
+      </p>
+
+      <div class="mxd-btn-row">
+        <a class="mxd-btn mxd-btn-primary" href="/blog/aff-mot-dia-chi-khong-roi-don.html">
+          Đọc trước: Một địa chỉ, không rơi đơn
+        </a>
+        <a class="mxd-btn mxd-btn-outline" href="/blog/kol-shopee-hoa-hong-0d.html">
+          KOL Shopee &amp; hoa hồng 0đ
+        </a>
+      </div>
+
+      <div class="mxd-article-callout mxd-article-callout--note">
+        <div class="mxd-article-callout-title">Ý chính của bài</div>
+        <p>
+          Không rơi đơn khi dùng nhiều link không phải là “cầu may”,
+          mà là kết quả của: <strong>(1)</strong> hiểu cơ chế last-click &amp; cookie,
+          <strong>(2)</strong> gom về một địa chỉ trung tâm (Webshop),
+          <strong>(3)</strong> thiết kế luồng “xem – chọn – mua” rõ ràng
+          và <strong>(4)</strong> ghi lại click để có gì còn lần.
+        </p>
+      </div>
+
+      <h2>1. Một câu chuyện của Mai: “Rải link như rải thính, xong không biết đơn về đâu”</h2>
+      <p>
+        Đợt đầu Mai làm, tư duy rất đơn giản:  
+        “Cứ có link là rải, càng nhiều link càng nhiều cơ hội”.
+      </p>
+      <p>
+        Kết quả là:
+      </p>
+      <ul>
+        <li>Trong 1 khung chat, Mai gửi 3–4 link: nào Shopee, nào TikTok, nào Lazada.</li>
+        <li>Lên Facebook thì một post đính kèm 2–3 link khác nhau.</li>
+        <li>Trên story lại thêm 1 cái QR dẫn đi chỗ khác.</li>
+      </ul>
+      <p>
+        Đơn vẫn về, nhưng:
+      </p>
+      <ul>
+        <li>Có đơn bị “về tay” một link khác vì khách… tự đi tìm lại sản phẩm rồi bấm vào link người khác.</li>
+        <li>Có đơn của khách quen nhưng không thấy ghi nhận, vì lúc chốt người ta dùng app ở thiết bị khác.</li>
+        <li>Cuối tháng nhìn bảng hoa hồng, cảm giác giống như “mình rải thính hộ cả thế giới”.</li>
+      </ul>
+      <p>
+        Chính từ loạt cú “đau ví” đó, Mai mới đi theo hướng:
+        <a href="/blog/aff-mot-dia-chi-khong-roi-don.html">gom về một địa chỉ, không rơi đơn</a>,
+        rồi dần dần xây cả hệ MXD Webshop như bây giờ.
+      </p>
+
+      <h2>2. Vì sao dùng nhiều link lại dễ rơi đơn hơn – nếu không có thiết kế?</h2>
+      <p>
+        Lý do cốt lõi nằm ở 3 chữ: <strong>last-click wins</strong> – bên nào là click cuối trước khi khách đặt,
+        bên đó ăn hoa hồng.  
+        Khi cậu dùng nhiều link mà không kiểm soát luồng, sẽ dễ gặp:
+      </p>
+      <ul>
+        <li>Khách bấm link của cậu trên kênh A, nhưng đến lúc đặt lại bấm một link khác trên kênh B.</li>
+        <li>Khách xem sản phẩm cậu gửi, nhưng tự đi tìm lại bằng ô search, rồi bấm vào shop chạy ads.</li>
+        <li>Khách dùng mã giảm giá hoặc voucher gắn với KOL/aff khác ở bước cuối.</li>
+      </ul>
+      <p>
+        Cộng thêm việc:
+      </p>
+      <ul>
+        <li>Khách chuyển thiết bị (xem trên điện thoại, đặt trên iPad/PC).</li>
+        <li>Khách thêm vào giỏ, vài ngày sau mới thanh toán, lúc đó cookie hoặc chiến dịch đã đổi.</li>
+      </ul>
+      <p>
+        Tất cả làm cho đơn <strong>“rơi khỏi tay”</strong> dù người ta thực sự mua
+        vì nội dung cậu làm.
+      </p>
+
+      <h2>3. Nguyên tắc gốc: Một địa chỉ trung tâm, nhiều cửa phụ</h2>
+      <p>
+        Một trong những phát hiện quan trọng nhất của Mai là:
+      </p>
+      <div class="mxd-article-callout mxd-article-callout--note">
+        <p>
+          <strong>Càng nhiều kênh, càng cần một địa chỉ trung tâm để gom lại.</strong>  
+          Đó là lý do MXD đẩy mô hình Webshop: mọi thứ đi vòng vòng rồi cũng quay về một nhà.
+        </p>
+      </div>
+      <p>
+        Cách nhìn này:
+      </p>
+      <ul>
+        <li>TikTok, Facebook, Zalo… là <strong>cửa phụ</strong> – nơi thu hút người mới.</li>
+        <li>Webshop là <strong>nhà chính</strong> – nơi cậu sắp xếp sản phẩm, gắn link, kể chuyện.</li>
+        <li>Các sàn (Shopee, Lazada, Tiki, TikTok Shop, Mediamart…) là <strong>kho hàng</strong>.</li>
+      </ul>
+      <p>
+        Việc của cậu không phải là rải link kho hàng khắp nơi,  
+        mà là dẫn khách về nhà chính, rồi từ nhà chính dẫn đi kho theo luồng mình kiểm soát.
+      </p>
+
+      <h2>4. Câu chuyện của Mai: từ “gửi link loạn xạ” sang “gửi một trang Webshop”</h2>
+      <p>
+        Có một dạo, Mai nhận ra một điều khá buồn cười:
+      </p>
+      <ul>
+        <li>Khi Mai gửi 4–5 link khác nhau cho cùng một nhu cầu:  
+          “Chị xem đi, em thấy mấy cái này cũng ổn nè…”  
+          → Tỉ lệ chốt thấp, khách hoang mang.</li>
+        <li>Khi Mai gửi <strong>1 link duy nhất</strong> là một trang Webshop đã lọc sẵn 3 sản phẩm và
+          viết vài dòng so sánh:  
+          “Em gom sẵn cho chị 3 món, em nghĩ hợp nhất, chị xem ở đây nè…”  
+          → Khách thấy nhẹ đầu, tỉ lệ chốt cao hơn hẳn.</li>
+      </ul>
+      <p>
+        Cùng một người tư vấn, cùng một tệp khách, nhưng:
+        <strong>cách sắp xếp link khác nhau</strong> → kết quả khác hẳn.
+      </p>
+
+      <h2>5. Thiết kế luồng “xem – chọn – mua” khi dùng nhiều sàn</h2>
+      <p>
+        Dùng nhiều sàn không xấu. Vấn đề là phải thiết kế cho rõ:
+      </p>
+      <ul>
+        <li><strong>Bước 1 – Xem:</strong> khách xem ở đâu đầu tiên? (TikTok, Facebook, Webshop?)</li>
+        <li><strong>Bước 2 – Chọn:</strong> khách so sánh ở đâu? (một trang Webshop, hay tự đi mò trên sàn?)</li>
+        <li><strong>Bước 3 – Mua:</strong> khách bấm “Xem &amp; mua tại Shopee/Lazada/Tiki…” từ đâu?</li>
+      </ul>
+      <p>
+        Một luồng mà MXD hay khuyến nghị:
+      </p>
+      <ul>
+        <li>Video/post trên kênh &rarr; dẫn về <strong>1 trang Webshop</strong> đã gom sẵn sản phẩm.</li>
+        <li>Trang Webshop đó có <strong>nút xem &amp; mua theo từng sàn</strong>, rõ chữ, không lẫn lộn.</li>
+        <li>Webshop ghi log click (bằng script dạng <code>mxd-affiliate.js</code>), để có gì còn xem lại.</li>
+      </ul>
+      <p>
+        Như vậy, dù cậu dùng nhiều sàn, <strong>click cuối vẫn đi qua nhà của cậu</strong> trước khi đến kho.
+      </p>
+
+      <h2>6. Dùng nhiều kênh: tránh 3 kiểu “tự tay làm rơi đơn”</h2>
+      <p>
+        Khi làm trên nhiều kênh (TikTok, Facebook, Zalo, group…), Mai thấy 3 kiểu rơi đơn quen thuộc:
+      </p>
+      <h3>6.1. Kiểu 1 – “Gửi thêm link cho chắc”, ai ngờ link đó… cướp đơn</h3>
+      <p>
+        Khách bảo: “Cho chị thêm cái link khác giá mềm hơn được không?”.  
+        Mai mở sàn, tìm thêm một món khác, gửi link mới – <strong>nhưng quên</strong> chuyển qua link đã gắn aff của mình.  
+        Kết quả: khách vẫn mua, nhưng hoa hồng thì không về.
+      </p>
+      <p>
+        Cách tránh:
+      </p>
+      <ul>
+        <li>Lập thói quen: <strong>mọi link gửi cho khách đều đi qua Webshop</strong> hoặc qua tool aff của mình.</li>
+        <li>Hạn chế chuyện “gửi thêm cho chắc” quá nhiều. Thà lọc kỹ, gửi ít mà rõ.</li>
+      </ul>
+
+      <h3>6.2. Kiểu 2 – Khách tự đi tìm lại, vô tình bấm vào link người khác</h3>
+      <p>
+        Nhiều khách có thói quen: xem link cậu gửi, nhưng đến lúc đặt lại gõ tên sản phẩm trong app,
+        rồi bấm vào sản phẩm “giống giống” đang chạy quảng cáo hoặc đang có mã của KOL khác.
+      </p>
+      <p>
+        Cách giảm rủi ro:
+      </p>
+      <ul>
+        <li>Trên Webshop, ghi rõ: “Cậu bấm nút <strong>Xem &amp; mua</strong> ở đây để mình không bị mất hoa hồng nhé”.</li>
+        <li>Khi tư vấn, nhắc nhỏ: “Cậu bấm đúng link mình gửi nhé, vì mình có chỉnh lại sản phẩm cho chuẩn rồi”.</li>
+        <li>Nếu được, dùng ảnh chụp màn hình sản phẩm + chèn chữ/ghi chú để khách dễ nhận ra đúng món.</li>
+      </ul>
+
+      <h3>6.3. Kiểu 3 – Dùng mã của người khác chồng lên link của mình</h3>
+      <p>
+        Có những chiến dịch KOL/mã giảm giá được thiết kế kiểu:
+        nhập mã là “ghi công” cho một KOL cụ thể. Khi đó:
+      </p>
+      <ul>
+        <li>Khách xem nội dung của cậu, bấm link aff của cậu.</li>
+        <li>Nhưng đến bước cuối lại dùng mã của người khác vì “thấy giảm thêm được vài nghìn”.</li>
+      </ul>
+      <p>
+        Không phải lúc nào cũng xử lý được, nhưng:
+      </p>
+      <ul>
+        <li>Cậu có thể giải thích nhẹ: “Nếu cậu dùng link/mã của mình thì nó giúp mình có chút hoa hồng để tiếp tục làm nội dung cho cậu xem”.</li>
+        <li>Đôi khi chính khách sẽ chủ động hỏi: “Có mã của cậu không để tớ dùng ủng hộ?”.  
+          Lúc đó lại quay về câu chuyện: <strong>cậu có nhà riêng &amp; hệ thống đủ rõ để họ nhớ tới hay không</strong>.</li>
+      </ul>
+
+      <h2>7. Ghi log click: không phải để bắt bẻ, mà để hiểu luồng</h2>
+      <p>
+        Một phần rất quan trọng trong hệ MXD là: <strong>ghi lại click</strong>.
+        Script như <code>/assets/mxd-affiliate.js</code> thường làm nhiệm vụ:
+      </p>
+      <ul>
+        <li>Ghi lại: ai bấm, bấm vào sản phẩm nào, từ trang nào.</li>
+        <li>Đôi khi ghi cả thiết bị, thời gian… để so với log từ mạng aff.</li>
+      </ul>
+      <p>
+        Lý do:
+      </p>
+      <ul>
+        <li>Nếu một ngày hoa hồng tụt bất thường, cậu có chỗ để đối chiếu: click vẫn có, sao hoa hồng không về?</li>
+        <li>Biết được bài nào, trang nào, sản phẩm nào thực sự kéo click.</li>
+        <li>Có dữ liệu để chỉnh Webshop: đưa sản phẩm hay được bấm lên cao hơn, đổi CTA cho dễ hiểu hơn.</li>
+      </ul>
+      <p>
+        Không cần quá “hack não”: chỉ cần thiết lập một hệ thống log vừa phải,
+        để mỗi lần thấy khác thường, cậu không phải đoán mò.
+      </p>
+
+      <h2>8. Checklist tránh rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn</h2>
+      <p>Gom lại cho gọn, cậu có thể tự check:</p>
+      <ul>
+        <li>Có <strong>một địa chỉ trung tâm</strong> (Webshop) mà mọi kênh đều dẫn về chưa?</li>
+        <li>Trên Webshop, các nút <strong>“Xem &amp; mua tại…”</strong> đã rõ, dễ bấm, không gây nhầm lẫn chưa?</li>
+        <li>Đã hạn chế việc gửi 4–5 link loạn xạ cho cùng một nhu cầu chưa?</li>
+        <li>Có nhắc khách: “Bấm đúng link mình gửi để mình không bị rơi hoa hồng nhé” chưa?</li>
+        <li>Đã bật <strong>log click</strong> (qua script hoặc tool) để có dữ liệu đối chiếu chưa?</li>
+        <li>Mỗi tuần có xem lại: trang nào/câu chuyện nào kéo click tốt nhất chưa?</li>
+      </ul>
+
+      <h2>9. Một chút nữa về “câu chuyện của Mai”</h2>
+      <p>
+        Mai từng nghĩ: “Khi nào mình ổn hơn, nhiều tiền hơn, rảnh hơn… mình sẽ làm Webshop,  
+        chứ giờ cứ làm KOL, rải link từng nơi cũng được mà”.
+      </p>
+      <p>
+        Rồi đến một đợt:
+      </p>
+      <ul>
+        <li>Thuật toán siết lại, view thấp hẳn.</li>
+        <li>Một chiến dịch chính bị dừng, hoa hồng tụt rõ.</li>
+        <li>Một vài đơn khách quen phản hồi “chị đặt đó mà sao em bảo không thấy đơn?”.</li>
+      </ul>
+      <p>
+        Đó là lúc Mai nhận ra: <strong>mình đang đứng trên đất của người khác hơi nhiều</strong>.
+        Và từ đó, việc xây Webshop, MXD AFF, gom câu hỏi, gom case… không còn là “dự định sau này”
+        mà trở thành việc phải làm ngay.
+      </p>
+      <p>
+        Bây giờ, kể cả khi có giai đoạn ít quay video hơn, ít nhận deal hơn,
+        Mai vẫn có cảm giác bớt bất an,
+        vì biết là mình đã có một “nhà riêng” để người ta tìm đến.
+      </p>
+
+      <h2>10. Đọc tiếp gì sau bài này?</h2>
+      <p>
+        Nếu cậu thấy mình trong những câu chuyện ở trên, có thể đi tiếp theo mạch này:
+      </p>
+      <ul>
+        <li>
+          <a href="/blog/aff-mot-dia-chi-khong-roi-don.html">
+            Một địa chỉ, không rơi đơn: vì sao phải làm web đa sàn?
+          </a>
+        </li>
+        <li>
+          <a href="/blog/webshop-kiem-tien-5-nguon-thu.html">
+            Webshop kiếm tiền như thế nào? 5 nguồn thu không ngờ tới
+          </a>
+        </li>
+        <li>
+          <a href="/lo-trinh-webshop-affiliate.html">
+            Lộ trình làm affiliate với Webshop | MXD AFF Academy
+          </a>
+        </li>
+      </ul>
+
+      <div class="mxd-btn-row">
+        <a class="mxd-btn mxd-btn-primary" href="/mxd-aff-academy.html">Quay lại MXD AFF Academy</a>
+        <a class="mxd-btn mxd-btn-outline" href="/store.html">Xem Webshop & sản phẩm mẫu</a>
+      </div>
+    </article>
+
+    <footer class="mxd-article-footer">
+      <p>
+        Bài viết này thuộc <strong>Seri 1 – Một địa chỉ, không rơi đơn</strong> trong
+        <a href="/mxd-aff-academy.html">MXD AFF Academy</a>.
+      </p>
+      <p style="margin-top:.25rem;">
+        Mỗi khi cậu thấy mình bắt đầu “rải link loạn xạ”, hãy quay lại nguyên tắc:
+        gom về một nhà, rõ luồng click, có dữ liệu để kiểm tra – đó là cách đơn ở lại với người đã thật sự bỏ công sức tạo ra chúng.
+      </p>
+    </footer>
+  </main>
+</body>
+</html>
