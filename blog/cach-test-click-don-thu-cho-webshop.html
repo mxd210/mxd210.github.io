@@ -1,0 +1,515 @@
+<!-- REPLACE WHOLE FILE: /blog/cach-test-click-don-thu-cho-webshop.html -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+  <meta name="format-detection" content="telephone=no"/>
+
+  <title>Cách test click & đơn thử cho Webshop (an toàn, dễ kiểm)</title>
+  <meta name="description"
+        content="Hướng dẫn cách test click và đơn thử cho Webshop theo kiểu MXD: từ test link khô, test đơn giá rẻ, kiểm tra GA4 và mạng affiliate, đến ghi log & chụp màn hình để về sau có gì đối chiếu. Viết cho người không rành kỹ thuật.">
+  <link rel="canonical" href="https://mxd210.github.io/blog/cach-test-click-don-thu-cho-webshop.html"/>
+  <meta name="robots" content="index,follow"/>
+
+  <!-- OG -->
+  <meta property="og:type" content="article"/>
+  <meta property="og:title" content="Cách test click & đơn thử cho Webshop (an toàn, dễ kiểm)"/>
+  <meta property="og:description"
+        content="Checklist 4 bước test click & đơn thử cho Webshop: chọn sản phẩm giá rẻ, test click khô, test đơn thật, so sánh log giữa Webshop – GA4 – mạng affiliate để yên tâm kéo traffic.">
+  <meta property="og:url" content="https://mxd210.github.io/blog/cach-test-click-don-thu-cho-webshop.html"/>
+  <meta property="og:image" content="https://mxd210.github.io/assets/img/blog/cach-test-click-don-thu-cho-webshop.webp"/>
+  <meta property="og:site_name" content="MXD Webshop"/>
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Cách test click & đơn thử cho Webshop (an toàn, dễ kiểm)"/>
+  <meta name="twitter:description"
+        content="Bài hướng dẫn chi tiết cách test click và đơn thử cho Webshop để biết hệ tracking hoạt động ổn trước khi chạy traffic thật.">
+  <meta name="twitter:image" content="https://mxd210.github.io/assets/img/blog/cach-test-click-don-thu-cho-webshop.webp"/>
+
+  <!-- JSON-LD Article + Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Cách test click & đơn thử cho Webshop (an toàn, dễ kiểm)",
+    "description": "Hướng dẫn cách test click và đơn thử cho Webshop theo kiểu MXD: từ test link khô, test đơn giá rẻ, kiểm tra GA4 và mạng affiliate, đến ghi log & chụp màn hình để về sau có gì đối chiếu.",
+    "author": {
+      "@type": "Person",
+      "name": "MXD"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MXD Webshop",
+      "url": "https://mxd210.github.io/"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://mxd210.github.io/blog/cach-test-click-don-thu-cho-webshop.html"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Trang chủ",
+        "item": "https://mxd210.github.io/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "MXD AFF Academy",
+        "item": "https://mxd210.github.io/mxd-aff-academy.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Cách test click & đơn thử cho Webshop (an toàn, dễ kiểm)",
+        "item": "https://mxd210.github.io/blog/cach-test-click-don-thu-cho-webshop.html"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Scripts: GA4 TRƯỚC affiliate -->
+  <script src="/assets/analytics.js" defer></script>
+  <script src="/assets/mxd-affiliate.js" defer></script>
+
+  <link rel="stylesheet" href="/assets/css/site.css"/>
+  <style>
+    .mxd-article-page {
+      background:#020617;
+      color:#e5e7eb;
+      min-height:100vh;
+    }
+    .mxd-article-container {
+      max-width:760px;
+      margin:0 auto;
+      padding:1.5rem 1.25rem 3rem;
+    }
+    .mxd-article-eyebrow {
+      font-size:.8rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:#9ca3af;
+      margin-bottom:.35rem;
+    }
+    .mxd-article-title {
+      font-size:1.6rem;
+      line-height:1.25;
+      margin-bottom:.5rem;
+    }
+    @media (min-width:768px){
+      .mxd-article-title{font-size:1.9rem;}
+    }
+    .mxd-article-meta {
+      font-size:.8rem;
+      color:#9ca3af;
+      margin-bottom:1.2rem;
+    }
+    .mxd-article-meta span+span::before {
+      content:"·";
+      margin:0 .4rem;
+    }
+    .mxd-article-body p {
+      font-size:.96rem;
+      line-height:1.8;
+      margin-bottom:.9rem;
+      color:#e5e7eb;
+    }
+    .mxd-article-body h2 {
+      font-size:1.12rem;
+      margin:1.6rem 0 .6rem;
+    }
+    .mxd-article-body h3 {
+      font-size:1rem;
+      margin:1.2rem 0 .4rem;
+    }
+    .mxd-article-body strong {
+      color:#fde68a;
+      font-weight:600;
+    }
+    .mxd-article-body em {
+      color:#93c5fd;
+      font-style:normal;
+    }
+    .mxd-article-body ul,
+    .mxd-article-body ol {
+      padding-left:1.2rem;
+      margin-bottom:.9rem;
+    }
+    .mxd-article-body li {
+      font-size:.94rem;
+      line-height:1.7;
+      margin-bottom:.35rem;
+    }
+    .mxd-article-callout {
+      border-radius:.75rem;
+      border:1px solid #4b5563;
+      background:#020617;
+      padding:.8rem .9rem;
+      font-size:.9rem;
+      margin:1rem 0 1.1rem;
+    }
+    .mxd-article-callout--note {
+      border-color:#22c55e;
+      background:radial-gradient(circle at top left,rgba(34,197,94,.12),transparent 60%),#020617;
+    }
+    .mxd-article-callout--warn {
+      border-color:#f97316;
+      background:radial-gradient(circle at top left,rgba(248,113,113,.12),transparent 60%),#020617;
+    }
+    .mxd-article-callout-title {
+      font-size:.86rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      margin-bottom:.3rem;
+    }
+    .mxd-article-callout--note .mxd-article-callout-title{
+      color:#bbf7d0;
+    }
+    .mxd-article-callout--warn .mxd-article-callout-title{
+      color:#fed7aa;
+    }
+    .mxd-article-footer {
+      margin-top:2rem;
+      font-size:.83rem;
+      color:#9ca3af;
+      border-top:1px solid #111827;
+      padding-top:1rem;
+    }
+    .mxd-article-footer a {
+      color:#93c5fd;
+      text-decoration:none;
+    }
+    .mxd-article-footer a:hover {
+      text-decoration:underline;
+    }
+    a{color:#93c5fd;text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    .mxd-btn-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.5rem;
+      margin:1rem 0 1.4rem;
+    }
+    .mxd-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:.55rem 1.1rem;
+      border-radius:999px;
+      font-size:.86rem;
+      font-weight:600;
+      border:1px solid #4b5563;
+      text-decoration:none;
+      cursor:pointer;
+      background:#020617;
+    }
+    .mxd-btn-primary{
+      border-color:#f97316;
+      background:linear-gradient(135deg,#f97316,#ea580c);
+      color:#fff;
+    }
+    .mxd-btn-outline{
+      color:#e5e7eb;
+    }
+    .mxd-step-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:1.4rem;
+      height:1.4rem;
+      border-radius:999px;
+      border:1px solid #f97316;
+      font-size:.75rem;
+      margin-right:.4rem;
+      color:#fed7aa;
+    }
+    .mxd-code-inline{
+      font-family:ui-monospace,Menlo,monospace;
+      font-size:.85rem;
+      padding:.08rem .3rem;
+      border-radius:.25rem;
+      background:#020617;
+      border:1px solid #374151;
+    }
+  </style>
+</head>
+<body class="mxd-article-page">
+  <main class="mxd-article-container">
+    <header>
+      <div class="mxd-article-eyebrow">
+        MXD AFF Academy · Seri 1 – Một địa chỉ, không rơi đơn
+      </div>
+      <h1 class="mxd-article-title">
+        Cách test click &amp; đơn thử cho Webshop (an toàn, dễ kiểm)
+      </h1>
+      <div class="mxd-article-meta">
+        <span>Seri 1 – Một địa chỉ, không rơi đơn</span>
+        <span>Thời gian đọc ~ 15 phút</span>
+      </div>
+    </header>
+
+    <article class="mxd-article-body">
+      <p>
+        Sau khi dựng xong Webshop, ai cũng có cùng một nỗi lo:
+        <strong>“Liệu khách bấm vào có lên click – lên đơn đàng hoàng không?”</strong>.
+      </p>
+      <p>
+        Bài này là hướng dẫn chi tiết cách test click &amp; đơn thử theo kiểu MXD:
+        đi từ test link khô, tới test đơn giá rẻ, đối chiếu log giữa
+        <strong>Webshop → GA4 → mạng affiliate</strong>,
+        để trước khi kéo traffic lớn, cậu yên tâm là “máy đã nổ”.
+      </p>
+
+      <div class="mxd-btn-row">
+        <a class="mxd-btn mxd-btn-primary" href="/blog/checklist-ky-thuat-chong-roi-don-cho-webshop.html">
+          Bài 9: Checklist kỹ thuật chống rơi đơn
+        </a>
+        <a class="mxd-btn mxd-btn-outline" href="/blog/5-kieu-roi-don-khi-khach-di-vong.html">
+          Bài 8: 5 kiểu rơi đơn khi khách đi vòng
+        </a>
+      </div>
+
+      <div class="mxd-article-callout mxd-article-callout--warn">
+        <div class="mxd-article-callout-title">Lưu ý về đơn thử &amp; chính sách</div>
+        <p>
+          Mỗi mạng affiliate, mỗi sàn đều có <strong>quy định riêng</strong> về việc tự mua, mua chéo, đơn test…
+          Trước khi làm đơn thử, hãy đọc kỹ điều khoản và coi đây là <strong>bước kiểm tra một vài đơn đầu</strong>,
+          không phải chiến lược “cày đơn”.  
+          Nếu không chắc, có thể nhờ bạn bè/người thân đặt hộ, tránh lạm dụng.
+        </p>
+      </div>
+
+      <h2><span class="mxd-step-badge">0</span>Chuẩn bị trước khi test</h2>
+      <ul>
+        <li>1 Webshop đã gắn <strong>mxd-affiliate</strong>, aff_base cho các sàn.</li>
+        <li>1–2 sản phẩm giá rẻ (ví dụ dưới 50–100k) ở mỗi sàn cậu muốn test.</li>
+        <li>1 thiết bị phụ (điện thoại khác hoặc máy tính) để test như khách thật.</li>
+        <li>Tài khoản đăng nhập sàn &amp; tài khoản mạng affiliate/Accesstrade để xem log.</li>
+      </ul>
+
+      <h2><span class="mxd-step-badge">1</span>Test click khô: xem link có chạy đúng chưa</h2>
+      <p>
+        Mục tiêu bước này: <strong>không cần đơn</strong>, chỉ cần biết click đã đi đúng đường:
+        Webshop → aff_base → trang sản phẩm trên sàn → GA4 &amp; mạng aff.
+      </p>
+
+      <h3>1.1 – Mở Webshop như khách bình thường</h3>
+      <ul>
+        <li>Mở cửa sổ ẩn danh / trình duyệt khác.</li>
+        <li>Vào trang Webshop, tìm tới sản phẩm muốn test.</li>
+        <li>Đảm bảo đang đăng nhập tài khoản sàn (nếu dùng app).</li>
+      </ul>
+
+      <h3>1.2 – Bấm thử từng nút “Xem &amp; mua…”</h3>
+      <ul>
+        <li>Bấm nút “Xem &amp; mua tại Shopee/Lazada/…” trên Webshop.</li>
+        <li>Kiểm tra URL đang mở:
+          <ul>
+            <li>Với hệ MXD, thường đi qua một link dạng <span class="mxd-code-inline">isclix.com</span>
+              hoặc domain tracking của mạng aff.</li>
+            <li>Sau đó mới chuyển về app/web của sàn.</li>
+          </ul>
+        </li>
+        <li>Nếu link nhảy thẳng tới sản phẩm, không qua aff_base,
+          nhiều khả năng là <strong>deeplink chưa được gắn đúng</strong>.</li>
+      </ul>
+
+      <h3>1.3 – Kiểm tra GA4 &amp; log click</h3>
+      <ul>
+        <li>Mở GA4, xem phần “Realtime” hoặc “DebugView” để xem event click có ghi lại không.</li>
+        <li>Vào dashboard mạng affiliate, chờ vài phút rồi kiểm tra:
+          <ul>
+            <li>Tab Clicks / Reports có ghi nhận click mới chưa.</li>
+            <li>Thời gian click gần trùng với lúc mình bấm.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="mxd-article-callout mxd-article-callout--note">
+        <div class="mxd-article-callout-title">Nếu chưa thấy click?</div>
+        <p>
+          Quay lại kiểm tra các mục trong
+          <a href="/blog/checklist-ky-thuat-chong-roi-don-cho-webshop.html">Checklist kỹ thuật chống rơi đơn</a>:
+          GA4 có đứng trước <span class="mxd-code-inline">mxd-affiliate.js</span> không,
+          aff_base đã đúng mẫu chưa, deeplink ở JSON có bị thiếu hoặc sai ký tự đặc biệt không.
+        </p>
+      </div>
+
+      <h2><span class="mxd-step-badge">2</span>Test đơn thử: đặt một đơn thật để “soi đường đi”</h2>
+      <p>
+        Khi click khô đã ổn, bước tiếp theo là đặt <strong>1–2 đơn giá rẻ</strong>
+        để xem toàn bộ đường đi: click → đơn → hoa hồng.
+      </p>
+
+      <h3>2.1 – Chọn sản phẩm &amp; kịch bản test</h3>
+      <ul>
+        <li>Ưu tiên sản phẩm rẻ, dễ dùng (ví dụ đồ gia dụng nhỏ, văn phòng phẩm).</li>
+        <li>Có thể test 2 kịch bản:
+          <ul>
+            <li><strong>Tự đặt</strong> (nếu chính sách cho phép, hoặc để hiểu cách hệ thống hoạt động).</li>
+            <li><strong>Nhờ bạn/ người thân đặt</strong>, mình gửi link Webshop cho họ như khách thật.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>2.2 – Đặt đơn từ Webshop</h3>
+      <ul>
+        <li>Mở Webshop, bấm nút “Xem &amp; mua tại …” như bình thường.</li>
+        <li>Trên app/web sàn, thêm vào giỏ và đặt hàng.</li>
+        <li>Ghi lại:
+          <ul>
+            <li>Giờ đặt hàng (ví dụ: 21:37).</li>
+            <li>Giá trị đơn &amp; tên sản phẩm.</li>
+            <li>Mã đơn hàng (order ID) trên sàn.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>2.3 – Chờ đồng bộ &amp; đối chiếu trong mạng affiliate</h3>
+      <ul>
+        <li>Mỗi mạng sẽ có thời gian cập nhật khác nhau (có nơi gần realtime, có nơi 15–30 phút hoặc vài giờ).</li>
+        <li>Sau một khoảng thời gian hợp lý, vào tab “Conversions/Orders” để kiểm tra:</li>
+        <li>
+          <ul>
+            <li>Có đơn mới xuất hiện không?</li>
+            <li>Thời gian đơn có “gần giống” thời gian đặt trên sàn không?</li>
+            <li>Giá trị đơn có tương đồng (có thể chênh chút do trừ mã, phí …)?</li>
+          </ul>
+        </li>
+      </ul>
+
+      <p>
+        Nếu đơn test xuất hiện đúng như vậy, cậu đã có một “mốc chuẩn” để sau này đối chiếu
+        khi có đơn thật từ khách.
+      </p>
+
+      <h2><span class="mxd-step-badge">3</span>Test nhiều sàn &amp; nhiều vị trí nút trong Webshop</h2>
+      <p>
+        Webshop MXD thường có sản phẩm từ nhiều sàn và nhiều vị trí hiển thị (trang chủ, store, blog, Academy…).
+        Mỗi chỗ nên được test ít nhất 1 lần.
+      </p>
+
+      <h3>3.1 – Test mỗi sàn 1–2 sản phẩm</h3>
+      <ul>
+        <li>Shopee: 1 sản phẩm test từ Webshop.</li>
+        <li>Lazada, TikTok Shop, Tiki, Mediamart…: mỗi sàn 1 sản phẩm.</li>
+        <li>Không cần đơn test ở tất cả sàn ngay lập tức, nhưng ít nhất nên có <strong>click test</strong> cho đủ.</li>
+      </ul>
+
+      <h3>3.2 – Test các vị trí khác nhau trong Webshop</h3>
+      <ul>
+        <li>Nút mua trong <strong>trang sản phẩm chi tiết</strong>.</li>
+        <li>Nút mua trong <strong>trang danh mục</strong> (grid sản phẩm).</li>
+        <li>Nút/ link trong <strong>bài blog</strong> hoặc <strong>MXD AFF Academy</strong> dẫn sang Webshop.</li>
+      </ul>
+      <p>
+        Lý do: đôi khi một loại nút dùng HTML/JS khác (ví dụ anchor thường vs. nút JS),
+        nếu chỉ test một chỗ, cậu có thể bỏ sót lỗi ở chỗ còn lại.
+      </p>
+
+      <h2><span class="mxd-step-badge">4</span>Ghi log &amp; chụp màn hình – “sổ khám sức khỏe” cho Webshop</h2>
+      <p>
+        Mỗi lần test, Mai hay ghi lại vài dòng, nhìn tưởng nhỏ nhưng sau này cực hữu ích khi cần so sánh.
+      </p>
+
+      <h3>4.1 – Ghi lại những gì?</h3>
+      <ul>
+        <li>Ngày, giờ test.</li>
+        <li>Trang đã test (home, store, blog nào).</li>
+        <li>Sản phẩm &amp; sàn.</li>
+        <li>Kết quả:
+          <ul>
+            <li>Click có lên GA4 không?</li>
+            <li>Mạng affiliate thấy click/đơn ở thời gian nào?</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>4.2 – Chụp màn hình những mốc quan trọng</h3>
+      <ul>
+        <li>Ảnh URL khi vừa bấm nút mua từ Webshop (cho thấy aff_base).</li>
+        <li>Ảnh trang sản phẩm sau khi redirect.</li>
+        <li>Ảnh log click và log đơn trong mạng affiliate.</li>
+      </ul>
+      <p>
+        Những hình này là “bằng chứng nhẹ nhàng” để chính cậu hoặc người hỗ trợ kỹ thuật
+        nhìn vào là hiểu đường đi nước bước,
+        không phải đoán “chắc tại app lỗi”.
+      </p>
+
+      <h2><span class="mxd-step-badge">5</span>Nếu test xong mà vẫn không thấy đơn, nên làm gì?</h2>
+      <p>
+        Thay vì hoảng, cậu có thể đi theo checklist nhỏ sau:
+      </p>
+      <ul>
+        <li><strong>Bước 1:</strong> Kiểm tra <a href="/blog/checklist-ky-thuat-chong-roi-don-cho-webshop.html">
+          checklist kỹ thuật</a> – đặc biệt là aff_base, deeplink, GA4 &amp; mxd-affiliate.</li>
+        <li><strong>Bước 2:</strong> Đối chiếu time-line:
+          khách/ mình đặt lúc mấy giờ, log click và log đơn trong mạng aff hiển thị giờ nào.</li>
+        <li><strong>Bước 3:</strong> Xem chính sách:
+          có điều khoản nào về self-order, mã giảm giá, chiến dịch đặc biệt… làm đơn đó không được tính không?</li>
+        <li><strong>Bước 4:</strong> Nếu vẫn thấy bất thường, ghi lại đầy đủ thông tin
+          (ảnh màn hình, thời gian, mã đơn) để sau này có gì còn hỏi được đội hỗ trợ của mạng aff.</li>
+      </ul>
+
+      <h2><span class="mxd-step-badge">6</span>Nối lại với toàn bộ Seri 1</h2>
+      <p>
+        Sau bài này, cậu đã có đủ 3 lớp phòng thủ:
+      </p>
+      <ul>
+        <li><strong>Triết lý &amp; luồng:</strong>
+          <a href="/blog/aff-mot-dia-chi-khong-roi-don.html">Một địa chỉ, không rơi đơn</a> và
+          <a href="/blog/khong-roi-don-khi-dung-nhieu-link-va-kenh-ban.html">
+            Không rơi đơn khi dùng nhiều link, nhiều kênh, nhiều sàn
+          </a>.
+        </li>
+        <li><strong>Tâm lý khách:</strong>
+          <a href="/blog/5-kieu-roi-don-khi-khach-di-vong.html">
+            5 kiểu rơi đơn khi khách đi vòng
+          </a>.
+        </li>
+        <li><strong>Kỹ thuật &amp; kiểm tra:</strong>
+          <a href="/blog/checklist-ky-thuat-chong-roi-don-cho-webshop.html">
+            Checklist kỹ thuật
+          </a> và bài hướng dẫn <strong>test click &amp; đơn thử</strong> này.</li>
+      </ul>
+      <p>
+        Khi 3 lớp đó đều ổn, mỗi traffic cậu đẩy vào Webshop không chỉ là “thêm view”,
+        mà là một luồng được đo lường rõ ràng,  
+        có khả năng chuyển thành đơn – và quan trọng hơn: <strong>đơn ấy biết đường về với cậu</strong>.
+      </p>
+
+      <div class="mxd-btn-row">
+        <a class="mxd-btn mxd-btn-primary" href="/mxd-aff-academy.html">
+          Quay lại MXD AFF Academy
+        </a>
+        <a class="mxd-btn mxd-btn-outline" href="/lo-trinh-webshop-affiliate.html">
+          Xem lộ trình làm Webshop từ đầu
+        </a>
+      </div>
+    </article>
+
+    <footer class="mxd-article-footer">
+      <p>
+        Bài viết này thuộc <strong>Seri 1 – Một địa chỉ, không rơi đơn</strong> trong
+        <a href="/mxd-aff-academy.html">MXD AFF Academy</a>.
+      </p>
+      <p style="margin-top:.25rem;">
+        Sau này mỗi khi mở thêm repo Webshop mới, cậu chỉ cần làm lại bộ combo:
+        một lượt checklist kỹ thuật, một vài click test, 1–2 đơn thử giá rẻ –
+        coi như “khám sức khỏe đầu vào” trước khi đón khách thật.
+      </p>
+    </footer>
+  </main>
+</body>
+</html>
