@@ -1,3 +1,4 @@
+<!-- REPLACE WHOLE FILE: /index.html -->
 <!-- MXD-CHECK v2025-10-13 [index]
 - Canonical: https://mxd210.github.io/ ; robots=index,follow
 - GA4 (/assets/analytics.js) BEFORE /assets/mxd-affiliate.js (only once)
@@ -139,7 +140,20 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       .hero h1{font-size:22px}
     }
 
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--gap);margin:16px 0}
+    /* Lưới sản phẩm: cho nhiều item hơn mỗi hàng, đặc biệt trên mobile */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+      gap:var(--gap);
+      margin:16px 0;
+    }
+    @media (max-width:640px){
+      .grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:16px;
+      }
+    }
+
     .card{
       border:1px solid var(--border); border-radius:var(--radius);
       background:var(--card); overflow:hidden; display:flex; flex-direction:column;
@@ -314,16 +328,10 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
       <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
         <a href="/"                  class="nav-link" aria-current="page">Trang chủ</a>
         <a href="/store.html"        class="nav-link">Cửa hàng</a>
-
-        <!-- Hai hub nội dung chính -->
-        <a href="/blog-xay-dung.html"   class="nav-link">Góc xây dựng</a>
-        <a href="/mxd-aff-academy.html" class="nav-link">MXD Học làm AFF</a>
-
-        <!-- Tư vấn + đăng ký cho cả xây dựng & AFF -->
+        <a href="/blog/"             class="nav-link">Góc xây dựng</a>
+        <a href="/mxd-aff-academy.html" class="nav-link">MXD AFF Academy</a>
+        <a href="/tools/"            class="nav-link">Công cụ</a>
         <a href="/tu-van.html"       class="nav-link">Tư vấn / Đăng ký</a>
-
-        <!-- MXD-ANCHOR:NAV-CONG-CU -->
-        <a href="/cong-cu/"          class="nav-link">Công cụ</a>
         <a href="/lien-he.html"      class="nav-link">Liên hệ</a>
       </nav>
     </div>
@@ -717,7 +725,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           "itemListElement": list.map((p, i) => {
             const sku  = (p.sku||'').toLowerCase();
             const originUrl = normalizeOrigin(
-              p.origin_url || p.origin || p.url || p.link || ''
+              p.origin_url || p.origin || p.url || p.link || '';
             );
             const detail = p.sku
               ? `https://mxd210.github.io/g.html?sku=${encodeURIComponent(p.sku)}`
@@ -771,7 +779,7 @@ FIND: MXD-ANCHOR:HEAD-META | MXD-ANCHOR:HERO | MXD-ANCHOR:METRICS | MXD-ANCHOR:Q
           if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
           reg.addEventListener('updatefound', () => {
             const nw = reg.installing;
-            nw && nw.addEventListener('statechange', () => {
+            nw && reg.addEventListener('statechange', () => {
               if (nw.state === 'installed' && navigator.serviceWorker.controller) {
                 reg.waiting && reg.waiting.postMessage('SKIP_WAITING');
               }
