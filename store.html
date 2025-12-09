@@ -24,8 +24,9 @@
 
   <style>
     :root{
-      --bg:#fff; --text:#111; --muted:#666; --border:#eaeaea;
-      --card:#fff; --brand:#0a84ff; --brand-contrast:#fff;
+      /* Tông màu chuẩn toàn site: cam xây dựng + xám xanh (giống index) */
+      --bg:#ffffff; --text:#111; --muted:#6b7280; --border:#e5e7eb;
+      --card:#ffffff; --brand:#ff6a00; --brand-contrast:#ffffff;
       --hover:#111; --radius:16px; --gap:24px; --shadow:0 6px 20px rgba(0,0,0,.06);
     }
     @media (prefers-color-scheme: dark){
@@ -33,16 +34,93 @@
         --bg:#0f1215; --text:#e8e8e8; --muted:#a2a2a2; --border:#262b31;
         --card:#14181d; --shadow:0 10px 28px rgba(0,0,0,.35);
       }
-    }
-    .nav-link{
-      padding:8px 10px; border-radius:10px;
-      color:var(--text); text-decoration:none;
-    }
-    .nav-link:hover{ background:rgba(23,70,255,.08) }
-    .nav-link[aria-current="page"]{ background:#eef4ff; color:#1746ff }
-    @media (max-width:480px){ .nav-link{ padding:8px } }
+      /* MXD COLOR ENHANCE */
+      :root{
+        --brand-2:#ffb703;
+        --brand-3:#ff914d;
+        --chip-bg:linear-gradient(135deg, rgba(255,106,0,.10), rgba(255,183,3,.10));
+        --chip-border:#ffd9c4;
+        --chip-shadow:0 8px 22px rgba(0,0,0,.12);
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --chip-bg:linear-gradient(135deg, rgba(255,106,0,.08), rgba(255,183,3,.08));
+          --chip-border:#3b2a1f;
+          --chip-shadow:0 10px 28px rgba(0,0,0,.18);
+        }
+      }
 
-    /* QUICK-NAV */
+      .metrics .metric{
+        background:var(--chip-bg);
+        border-color:var(--chip-border);
+        box-shadow:var(--chip-shadow);
+        position:relative;
+      }
+      .metrics .metric svg{ color:var(--brand); }
+      .metrics .metric::after{
+        content:''; position:absolute; top:10px; right:12px;
+        width:8px; height:8px; border-radius:999px; background:var(--brand);
+        box-shadow:0 0 0 4px rgba(255,106,0,.12);
+      }
+
+      .quick-nav .qnav-item{
+        background:var(--chip-bg);
+        border-color:var(--chip-border);
+        box-shadow:var(--chip-shadow);
+      }
+    }
+
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:'Inter', system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","DejaVu Sans",sans-serif;
+      text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased;
+    }
+    a{color:var(--brand); text-decoration:none}
+    a:hover{opacity:.9}
+    header,footer{padding:12px 16px; border-bottom:1px solid var(--border)}
+    footer{border-bottom:none;border-top:1px solid var(--border); margin-top:24px}
+    .container{max-width:1180px;margin:0 auto;padding:0 16px}
+    .muted{color:var(--muted)}
+    .sr-only{position:absolute;left:-9999px}
+
+    /* GRID & CARD – giống index, để mobile hiển thị nhiều hơn */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+      gap:var(--gap);
+      margin:16px 0;
+    }
+    @media (max-width:640px){
+      .grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:16px;
+      }
+    }
+
+    .card{
+      border:1px solid var(--border); border-radius:var(--radius);
+      background:var(--card); overflow:hidden; display:flex; flex-direction:column;
+      box-shadow:var(--shadow); transition:transform .15s ease; height:100%;
+    }
+    .card:hover{transform:translateY(-2px)}
+    .card img{
+      width:100%;
+      aspect-ratio:1/1;
+      object-fit:cover;
+      background:#f7f7f7;
+      height:auto;
+    }
+    .card .body{padding:12px}
+
+    .name,.title,.product-title{
+      font-size:16px;line-height:1.35;margin:0 0 6px;color:var(--text);
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+      overflow:hidden;min-height:2.7em;
+    }
+    .price{font-weight:800;margin:4px 0 8px}
+
+    /* QUICK-NAV giống tone index */
     .quick-nav{
       display:flex;gap:12px;flex-wrap:wrap;
       padding:8px 0;margin:12px 0;
@@ -55,7 +133,7 @@
       box-shadow:var(--shadow);color:var(--text);
       text-decoration:none;
     }
-    .qnav-item:hover{background:rgba(23,70,255,.06)}
+    .qnav-item:hover{background:rgba(255,106,0,.06)}
     .quick-nav img{width:28px;height:28px;border-radius:8px}
 
     /* SEARCH BAR — MXD-SEARCH v1 */
@@ -86,41 +164,6 @@
       white-space:nowrap;
     }
 
-    /* GRID & CARD */
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-      gap:var(--gap);
-      margin:16px 0;
-    }
-    .card{
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      background:var(--card);
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      box-shadow:var(--shadow);
-      transition:transform .15s;
-      height:100%;
-    }
-    .card:hover{transform:translateY(-2px)}
-    .card img{
-      width:100%;
-      aspect-ratio:1/1;
-      object-fit:cover;
-      background:#f7f7f7;
-      height:auto;
-    }
-    .card .body{padding:12px}
-
-    .name,.title,.product-title{
-      font-size:16px;line-height:1.35;margin:0 0 6px;color:var(--text);
-      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-      overflow:hidden;min-height:2.7em;
-    }
-    .price{font-weight:800;margin:4px 0 8px}
-
     /* TAGS — MXD-TAGS v1 */
     .product-tags{
       display:flex;
@@ -131,7 +174,7 @@
     .tag-chip{
       border-radius:999px;
       border:1px solid var(--border);
-      background:rgba(23,70,255,.03);
+      background:rgba(255,106,0,.03);
       padding:3px 8px;
       font-size:11px;
       line-height:1.2;
@@ -140,7 +183,7 @@
       white-space:nowrap;
     }
     .tag-chip:hover{
-      background:rgba(23,70,255,.08);
+      background:rgba(255,106,0,.08);
       color:var(--text);
     }
 
@@ -149,15 +192,15 @@
       padding:10px 12px;border-radius:12px;
       font-weight:800;text-decoration:none;color:#fff;
       border:1px solid transparent;margin-top:auto;
-      background:#1746ff;border-color:#1746ff;
+      background:var(--brand);border-color:var(--brand);
     }
     .buy:focus-visible{outline:2px solid #0000ff55;outline-offset:2px}
     .buy:active{transform:translateY(1px)}
-    .buy[data-merchant="shopee"]{ background:#ee4d2d; border-color:#ee4d2d }
-    .buy[data-merchant="lazada"]{ background:#0f146d; border-color:#0f146d }
-    .buy[data-merchant="tiki"]{ background:#1a94ff; border-color:#1a94ff }
-    .buy[data-merchant="tiktok"]{ background:#111; border-color:#111 }
-    .buy[data-merchant="mediamart"]{ background:#c6000f; border-color:#c6000f }
+    .buy[data-merchant="shopee"]   { background:#ee4d2d; border-color:#ee4d2d }
+    .buy[data-merchant="lazada"]   { background:#0f146d; border-color:#0f146d }
+    .buy[data-merchant="tiki"]     { background:#1a94ff; border-color:#1a94ff }
+    .buy[data-merchant="tiktok"]   { background:#000;    border-color:#000 }
+    .buy[data-merchant="mediamart"]{ background:#d70018; border-color:#d70018 }
     .buy:hover{ filter:brightness(1.05) }
 
     .skeleton{
@@ -176,7 +219,6 @@
       100%{transform:translateX(100%)}
     }
 
-    /* Floating contacts (backup) */
     .floating-contacts{
       position:fixed;right:12px;
       bottom:calc(16px + env(safe-area-inset-bottom));
@@ -190,6 +232,71 @@
       box-shadow:0 6px 18px rgba(0,0,0,.18);
     }
     body.has-fixed-cta .floating-contacts{ bottom:112px }
+
+    /* NAV giống index (gradient xanh + chip-hover) */
+    .nav-link{
+      padding:8px 10px; border-radius:10px;
+      color:var(--text); text-decoration:none;
+    }
+    @media (max-width:480px){ .nav-link{ padding:8px } }
+
+    :root{
+      --brand-2:#ffb703;
+      --brand-3:#ff914d;
+      --chip-bg:linear-gradient(135deg, rgba(255,106,0,.12), rgba(255,183,3,.10));
+      --chip-border:#ffcfb6;
+      --chip-shadow:0 8px 22px rgba(0,0,0,.16);
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --chip-bg:linear-gradient(135deg, rgba(255,106,0,.10), rgba(255,183,3,.08));
+        --chip-border:#3b2a1f;
+        --chip-shadow:0 10px 28px rgba(0,0,0,.22);
+      }
+    }
+
+    .site-nav .nav-link{
+      border:1px solid transparent; border-radius:12px;
+      transition:background .15s, box-shadow .15s, border-color .15s;
+    }
+    .site-nav .nav-link:hover{
+      background:var(--chip-bg) !important;
+      border-color:var(--chip-border) !important;
+      box-shadow:var(--chip-shadow) !important;
+    }
+    .site-nav .nav-link[aria-current="page"]{
+      background:linear-gradient(135deg,#fff0e6,#ffe6d9) !important;
+      border-color:#ffcfb6 !important;
+      color:#b24900 !important;
+      box-shadow:0 8px 20px rgba(255,106,0,.20) !important;
+    }
+
+    :root{
+      --nav-blue-1:#1746ff;
+      --nav-blue-2:#1a94ff;
+      --nav-blue-ring:rgba(255,255,255,.18);
+    }
+
+    .site-nav{
+      background:linear-gradient(135deg,var(--nav-blue-1),var(--nav-blue-2)) !important;
+      padding:6px 10px !important;
+      border-radius:14px !important;
+      border:1px solid var(--nav-blue-ring) !important;
+      box-shadow:0 10px 24px rgba(23,70,255,.20) !important;
+    }
+
+    .site-nav .nav-link{
+      color:#fff !important;
+      border-color:transparent !important;
+      background:transparent !important;
+    }
+    .site-nav .nav-link:hover{
+      background:rgba(255,255,255,.14) !important;
+    }
+    .site-nav .nav-link[aria-current="page"]{
+      background:rgba(255,255,255,.22) !important;
+      color:#fff !important;
+    }
   </style>
 
   <!-- SUB -->
@@ -207,15 +314,15 @@
 <body>
   <header style="position:sticky;top:0;z-index:50;background:var(--bg);backdrop-filter:blur(6px)">
     <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)">
-      <a href="/" class="brand" style="font-weight:900;font-size:18px;color:var(--text);text-decoration:none">MXD</a>
+      <a href="/" class="brand" style="font-weight:900;font-size:20px;color:var(--text);text-decoration:none">MXD</a>
       <nav class="site-nav" style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap">
-        <a href="/" class="nav-link">Trang chủ</a>
-        <a href="/store.html" class="nav-link" aria-current="page">Cửa hàng</a>
-        <a href="/blog/" class="nav-link">Góc xây dựng</a>
+        <a href="/"                  class="nav-link">Trang chủ</a>
+        <a href="/store.html"        class="nav-link" aria-current="page">Cửa hàng</a>
+        <a href="/blog/"             class="nav-link">Góc xây dựng</a>
         <a href="/mxd-aff-academy.html" class="nav-link">MXD AFF Academy</a>
-        <a href="/tools/" class="nav-link">Công cụ</a>
-        <a href="/tu-van.html" class="nav-link">Tư vấn / Đăng ký</a>
-        <a href="/lien-he.html" class="nav-link">Liên hệ</a>
+        <a href="/tools/"            class="nav-link">Công cụ</a>
+        <a href="/tu-van.html"       class="nav-link">Tư vấn / Đăng ký</a>
+        <a href="/lien-he.html"      class="nav-link">Liên hệ</a>
       </nav>
     </div>
   </header>
@@ -387,7 +494,7 @@
             <div class="skeleton" style="height:16px;width:40%;margin-top:8px"></div>
           </div>
         </article>
-      `).join('');
+      `).join('`);
       if (empty) empty.style.display = 'none';
 
       // Danh sách gốc & danh sách đang hiển thị (sau search)
